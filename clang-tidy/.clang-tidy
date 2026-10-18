@@ -1,0 +1,51 @@
+---
+# 专注于内存安全和程序稳定性的配置
+Checks: '-*,
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  bugprone-*,
+  cert-mem57-cpp,
+  cert-err52-cpp,
+  cert-err58-cpp,
+  cert-err60-cpp,
+  cppcoreguidelines-owning-memory,
+  cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  cppcoreguidelines-pro-bounds-constant-array-index,
+  cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  cppcoreguidelines-slicing,
+  cppcoreguidelines-pro-type-reinterpret-cast,
+  modernize-use-nullptr,
+  modernize-make-unique,
+  modernize-make-shared,
+  bugprone-division-by-zero,
+  clang-analyzer-core.DivideByZero,
+  concurrency-thread-safety-analysis,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-magic-numbers'
+WarningsAsErrors: 'bugprone-dangling-handle,
+  bugprone-use-after-move,
+  bugprone-suspicious-memory-comparison,
+  bugprone-undefined-memory-manipulation,
+  bugprone-division-by-zero,
+  clang-analyzer-core.DivideByZero,
+  concurrency-thread-safety-analysis'
+HeaderFilterRegex: '.*'
+AnalyzeTemporaryDtors: true
+FormatStyle: file
+User: user
+CheckOptions:
+  # 内存安全相关配置
+  - key: cppcoreguidelines-owning-memory.LegacyResourceProducers
+    value: '::malloc;::aligned_alloc;::realloc;::calloc;::fopen;::freopen;::tmpfile'
+  - key: cppcoreguidelines-owning-memory.LegacyResourceConsumers
+    value: '::free;::realloc;::freopen;::fclose'
+  
+  # 保留原有的命名约定
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.PrivateMemberPrefix
+    value: m_
+  - key: readability-identifier-naming.FunctionCase
+    value: camelBack
+  - key: modernize-use-nullptr.NullMacros
+    value: 'NULL'

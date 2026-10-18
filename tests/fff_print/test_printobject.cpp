@@ -1,0 +1,187 @@
+#include <catch2/catch.hpp>
+
+#include "libslic3r/libslic3r.h"
+#include "libslic3r/Print.hpp"
+#include "libslic3r/Layer.hpp"
+
+#include "test_data.hpp"
+
+using namespace Slic3r;
+using namespace Slic3r::Test;
+
+SCENARIO("PrintObject: object layer heights", "[PrintObject]") {
+    GIVEN("20mm cube and default initial config, initial layer height of 2mm") {
+        WHEN("generate_object_layers() is called for 2mm layer heights and nozzle diameter of 3mm") {
+            Slic3r::Print print;
+            Slic3r::Test::init_and_process_print({TestMesh::cube_20x20x20}, print, {
+        		{ "first_layer_height", 2 },
+				{ "layer_height", 		2 },
+	            { "nozzle_diameter", 	3 }
+	        });
+            ConstLayerPtrsAdaptor layers = print.objects().front()->layers();
+            THEN("The output vector has 10 entries") {
+                REQUIRE(layers.size() == 10);
+            }
+            AND_THEN("Each layer is approximately 2mm above the previous Z") {
+                coordf_t last = 0.0;
+                for (size_t i = 0; i < layers.size(); ++ i) {
+                    REQUIRE((layers[i]->print_z - last) == Approx(2.0));
+                    last = layers[i]->print_z;
+                }
+            }
+        }
+        WHEN("generate_object_layers() is called for 10mm layer heights and nozzle diameter of 11mm") {
+            Slic3r::Print print;
+            Slic3r::Test::init_and_process_print({TestMesh::cube_20x20x20}, print, {
+        		{ "first_layer_height", 2 },
+				{ "layer_height", 		10 },
+	            { "nozzle_diameter", 	11 }
+	        });
+            ConstLayerPtrsAdaptor layers = print.objects().front()->layers();
+			THEN("The output vector has 3 entries") {
+                REQUIRE(layers.size() == 3);
+            }
+            AND_THEN("Layer 0 is at 2mm") {
+                REQUIRE(layers.front()->print_z == Approx(2.0));
+            }
+            AND_THEN("Layer 1 is at 12mm") {
+                REQUIRE(layers[1]->print_z == Approx(12.0));
+            }
+        }
+        WHEN("generate_object_layers() is called for 15mm layer heights and nozzle diameter of 16mm") {
+            Slic3r::Print print;
+            Slic3r::Test::init_and_process_print({TestMesh::cube_20x20x20}, print, {
+        		{ "first_layer_height", 2 },
+				{ "layer_height", 		15 },
+	            { "nozzle_diameter", 	16 }
+	        });
+            ConstLayerPtrsAdaptor layers = print.objects().front()->layers();
+			THEN("The output vector has 2 entries") {
+                REQUIRE(layers.size() == 2);
+            }
+            AND_THEN("Layer 0 is at 2mm") {
+                REQUIRE(layers[0]->print_z == Approx(2.0));
+            }
+            AND_THEN("Layer 1 is at 17mm") {
+                REQUIRE(layers[1]->print_z == Approx(17.0));
+            }
+        }
+#if 0
+        WHEN("generate_object_layers() is called for 15mm layer heights and nozzle diameter of 5mm") {
+            Slic3r::Print print;
+            Slic3r::Test::init_and_process_print({TestMesh::cube_20x20x20}, print, {
+        		{ "first_layer_height", 2 },
+				{ "layer_height", 		15 },
+	            { "nozzle_diameter", 	5 }
+	        });
+			const std::vector<Slic3r::Layer*> &layers = print.objects().front()->layers();
+			THEN("The layer height is limited to 5mm.") {
+                CHECK(layers.size() == 5);
+                coordf_t last = 2.0;
+                for (size_t i = 1; i < layers.size(); i++) {
+                    REQUIRE((layers[i]->print_z - last) == Approx(5.0));
+                    last = layers[i]->print_z;
+                }
+            }
+        }
+#endif
+    }
+}
+
+TEST_CASE("PrintObject: cloud role filament compatibility", "[PrintObject]")
+{
+    DynamicPrintConfig config = DynamicPrintConfig::full_print_config();
+    config.set_num_extruders(3);
+
+    Model model;
+    Print print;
+    Test::init_print({TestMesh::cube_20x20x20}, print, model, config);
+    ModelVolume *volume = model.objects.front()->volumes.front();
+    volume->config.set_key_value("extruder", new ConfigOptionInt(3));
+
+    SECTION("role filament 0 follows the model volume filament") {
+        config.set_key_value("wall_filament", new ConfigOptionInt(0));
+        config.set_key_value("sparse_infill_filament", new ConfigOptionInt(0));
+        config.set_key_value("solid_infill_filament", new ConfigOptionInt(0));
+
+        print.apply(model, config);
+        const PrintRegionConfig &region = print.objects().front()->all_regions().front().get().config();
+        CHECK(region.wall_filament.value == 3);
+        CHECK(region.sparse_infill_filament.value == 3);
+        CHECK(region.solid_infill_filament.value == 3);
+    }
+
+    SECTION("role filament 1 remains an explicit assignment") {
+        config.set_key_value("wall_filament", new ConfigOptionInt(1));
+        config.set_key_value("sparse_infill_filament", new ConfigOptionInt(1));
+        config.set_key_value("solid_infill_filament", new ConfigOptionInt(1));
+
+        print.apply(model, config);
+        const PrintRegionConfig &region = print.objects().front()->all_regions().front().get().config();
+        CHECK(region.wall_filament.value == 1);
+        CHECK(region.sparse_infill_filament.value == 1);
+        CHECK(region.solid_infill_filament.value == 1);
+    }
+
+    SECTION("model volume filament overrides object fallback filament") {
+        model.objects.front()->config.set_key_value("extruder", new ConfigOptionInt(3));
+        volume->config.set_key_value("extruder", new ConfigOptionInt(1));
+        config.set_key_value("wall_filament", new ConfigOptionInt(0));
+        config.set_key_value("sparse_infill_filament", new ConfigOptionInt(0));
+        config.set_key_value("solid_infill_filament", new ConfigOptionInt(0));
+
+        print.apply(model, config);
+        const PrintRegionConfig &region = print.objects().front()->all_regions().front().get().config();
+        CHECK(region.wall_filament.value == 1);
+        CHECK(region.sparse_infill_filament.value == 1);
+        CHECK(region.solid_infill_filament.value == 1);
+    }
+
+    SECTION("role filaments above 1 remain explicit assignments") {
+        config.set_key_value("wall_filament", new ConfigOptionInt(2));
+        config.set_key_value("sparse_infill_filament", new ConfigOptionInt(2));
+        config.set_key_value("solid_infill_filament", new ConfigOptionInt(2));
+
+        print.apply(model, config);
+        const PrintRegionConfig &region = print.objects().front()->all_regions().front().get().config();
+        CHECK(region.wall_filament.value == 2);
+        CHECK(region.sparse_infill_filament.value == 2);
+        CHECK(region.solid_infill_filament.value == 2);
+    }
+}
+
+TEST_CASE("PrintObject: filament mapping refreshes physical-nozzle slicing parameters", "[PrintObject][FilamentMap]")
+{
+    DynamicPrintConfig config = DynamicPrintConfig::full_print_config();
+    config.set_num_extruders(2);
+    config.option<ConfigOptionFloats>("nozzle_diameter")->values  = {0.2, 0.4};
+    config.option<ConfigOptionFloats>("min_layer_height")->values = {0.04, 0.08};
+    config.option<ConfigOptionFloats>("max_layer_height")->values = {0.14, 0.32};
+    config.option<ConfigOptionInts>("filament_map")->values       = {1, 2};
+
+    Model model;
+    Print print;
+    Test::init_print({TestMesh::cube_20x20x20, TestMesh::cube_20x20x20}, print, model, config);
+    model.objects[0]->volumes.front()->config.set_key_value("extruder", new ConfigOptionInt(1));
+    model.objects[1]->volumes.front()->config.set_key_value("extruder", new ConfigOptionInt(2));
+    print.apply(model, config);
+
+    const SlicingParameters first_before  = print.objects()[0]->slicing_parameters();
+    const SlicingParameters second_before = print.objects()[1]->slicing_parameters();
+    REQUIRE(first_before.min_layer_height == Approx(0.04));
+    REQUIRE(first_before.max_layer_height == Approx(0.20));
+    REQUIRE(second_before.min_layer_height == Approx(0.08));
+    REQUIRE(second_before.max_layer_height == Approx(0.32));
+    REQUIRE_FALSE(equal_layering(first_before, second_before));
+
+    // Reassign both logical filaments to the same 0.4 mm physical nozzle. The
+    // cached SlicingParameters must be rebuilt from the new physical mapping.
+    config.option<ConfigOptionInts>("filament_map")->values = {2, 2};
+    print.apply(model, config);
+
+    const SlicingParameters first_after  = print.objects()[0]->slicing_parameters();
+    const SlicingParameters second_after = print.objects()[1]->slicing_parameters();
+    REQUIRE(first_after.min_layer_height == Approx(0.08));
+    REQUIRE(first_after.max_layer_height == Approx(0.32));
+    REQUIRE(equal_layering(first_after, second_after));
+}

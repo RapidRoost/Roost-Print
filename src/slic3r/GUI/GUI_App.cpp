@@ -1,0 +1,14670 @@
+#include "libslic3r/DataDirectoryMigration.hpp"
+#include "libslic3r/DeviceAddUtils.hpp"
+#include "DataDirectoryVersion.hpp"
+#include "boost/filesystem/operations.hpp"
+#include "libslic3r/Technologies.hpp"
+#include "GUI_App.hpp"
+#include "BaseColorSpectraCache.hpp"
+#include "OfficialMaterialColorCache.hpp"
+#include "slic3r/Utils/Http.hpp"
+#include <nlohmann/json.hpp>
+#include "GUI_Init.hpp"
+#include "LinuxDisplayBackend.hpp"
+#include "GUI_ObjectList.hpp"
+#include "GUI_Factories.hpp"
+#include "slic3r/GUI/UserManager.hpp"
+#include "slic3r/GUI/TaskManager.hpp"
+#include "format.hpp"
+#include "libslic3r_version.h"
+#include "libslic3r/CrealityVersion.hpp"
+#include "Downloader.hpp"
+#include <string>
+#include <cstring>
+#include <wx/colour.h>
+#include <wx/event.h>
+#include <wx/bitmap.h>
+#include <wx/string.h>
+#include <wx/dialog.h>
+#include "slic3r/GUI/print_manage/utils/cxmdns.h"
+#include "slic3r/GUI/print_manage/Utils.hpp"
+#include "CrealityrintDump.hpp"
+#include "slic3r/Utils/ColorSpaceConvert.hpp"
+#include "ImGuiWrapper.hpp"
+#include "slic3r/GUI/DeviceManager.hpp"
+#include "slic3r/Utils/NetworkAgent.hpp"
+#include "slic3r/GUI/HMS.hpp"
+#include "slic3r/GUI/WebViewDialog.hpp"
+#include "slic3r/GUI/Widgets/WebView.hpp"
+#include "slic3r/GUI/WebUserLoginDialog.hpp"
+#include "slic3r/GUI/LoginDialog.hpp"
+#include "slic3r/GUI/simple/MCPChatPanel.hpp"
+#include "slic3r/GUI/FileDownloader.hpp"
+#include "slic3r/GUI/SystemId/SystemId.hpp"
+#include "slic3r/GUI/print_manage/utils/cxmdns.h"
+#include "slic3r/GUI/print_manage/Utils.hpp"
+#include "Widgets/HoverBorderIcon.hpp"
+#include "Widgets/Label.hpp"
+#include "slic3r/GUI/MsgDialog.hpp"
+// Localization headers: include libslic3r version first so everything in this file
+// uses the slic3r/GUI version (the macros will take precedence over the functions).
+// Also, there is a check that the former is not included from slic3r module.
+// This is the only place where we want to allow that, so define an override macro.
+#define SLIC3R_ALLOW_LIBSLIC3R_I18N_IN_SLIC3R
+#include "libslic3r/I18N.hpp"
+#undef SLIC3R_ALLOW_LIBSLIC3R_I18N_IN_SLIC3R
+#include "slic3r/GUI/I18N.hpp"
+
+#include <algorithm>
+#include <iterator>
+#include <exception>
+#include <stdexcept>
+#include <cstdlib>
+#include <cctype>
+#include <regex>
+#include <thread>
+#include <string_view>
+#include <fstream>
+#include <chrono>
+#include <iomanip>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/nowide/convert.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/detail/sha1.hpp>
+#ifdef _WIN32
+#include <boost/algorithm/hex.hpp>
+#include <boost/uuid/detail/md5.hpp>
+#endif
+
+#ifndef _WIN32
+#include <sys/statvfs.h>
+#endif
+
+#include "slic3r/GUI/MsgDialog.hpp"
+
+#include <wx/stdpaths.h>
+#include <wx/imagpng.h>
+#include <wx/display.h>
+#include <wx/menu.h>
+#include <wx/menuitem.h>
+#include <wx/filedlg.h>
+#include <wx/progdlg.h>
+#include <wx/dir.h>
+#include <wx/wupdlock.h>
+#include <wx/filefn.h>
+#include <wx/sysopt.h>
+#include <wx/process.h>
+#include <wx/richmsgdlg.h>
+#include <wx/hyperlink.h>
+#include <wx/log.h>
+#include <wx/intl.h>
+#include <wx/tokenzr.h>
+#include <wx/dialog.h>
+#include <wx/textctrl.h>
+#include <wx/splash.h>
+#include <wx/fontutil.h>
+#include <wx/glcanvas.h>
+#include <wx/dcgraph.h>
+#include <wx/evtloop.h>
+
+#include "libslic3r/Utils.hpp"
+#include "libslic3r/Model.hpp"
+#include "libslic3r/ModelVolume.hpp"
+#include "libslic3r/PresetBundle.hpp"
+#include "MaterialListDownloader.hpp"
+#include "MachineListDownloader.hpp"
+#include "libslic3r/Thread.hpp"
+#include "libslic3r/miniz_extension.hpp"
+#include "libslic3r/Color.hpp"
+#include "slic3r/GUI/Project.hpp"
+#include "slic3r/GUI/WebModelLibraryView.hpp"
+#ifdef _WIN32
+#include "libslic3r/UnittestFlow.hpp"
+#include "libslic3r/AutomationMgr.hpp"
+#endif
+#include "GUI.hpp"
+#include "GUI_Utils.hpp"
+#include "3DScene.hpp"
+#include "MainFrame.hpp"
+#include "Plater.hpp"
+#include "GLCanvas3D.hpp"
+#include "AnalyticsDataUploadManager.hpp"
+
+#include "../Utils/PresetUpdater.hpp"
+#include "../Utils/PrintHost.hpp"
+#include "../Utils/Process.hpp"
+#include "../Utils/MacDarkMode.hpp"
+#include "../Utils/Http.hpp"
+#include "../Utils/UndoRedo.hpp"
+#include "../Utils/ProfileFamilyLoader.hpp"
+#include "../Utils/PrinterCover.hpp"
+#include "../Utils/TestHelper.hpp"
+#include "../Utils/mouse_scheme.hpp"
+#include "slic3r/Config/Snapshot.hpp"
+#include "Preferences.hpp"
+#include "ConfigRelateDialog.hpp"
+#include "Tab.hpp"
+#include "SysInfoDialog.hpp"
+#include "UpdateDialogs.hpp"
+#include "Mouse3DController.hpp"
+#include "RemovableDriveManager.hpp"
+#include "InstanceCheck.hpp"
+#include "NotificationManager.hpp"
+#include "UnsavedChangesDialog.hpp"
+#include "SavePresetDialog.hpp"
+#include "PrintHostDialogs.hpp"
+#include "DesktopIntegrationDialog.hpp"
+#include "SendSystemInfoDialog.hpp"
+#include "ParamsDialog.hpp"
+
+#include "KBShortcutsDialog.hpp"
+#include "DownloadProgressDialog.hpp"
+#include "CloudDownloadProgressDialog.hpp"
+#include "AppUpdater.hpp"
+#include "AppUpdateDialogs.hpp"
+#include "SatisfactionSurveyIntegration.hpp"
+#include "SatisfactionSurveyManager.hpp"
+
+#include "BitmapCache.hpp"
+#include "Notebook.hpp"
+#include "Widgets/Label.hpp"
+#include "Widgets/ProgressDialog.hpp"
+#include "Widgets/TabCtrl.hpp"
+
+//BBS: DailyTip and UserGuide Dialog
+#include "WebDownPluginDlg.hpp"
+#include "WebGuideDialog.hpp"
+#include "ReleaseNote.hpp"
+#include "PrivacyUpdateDialog.hpp"
+#include "EnableLiteModeDialog.hpp"
+#include "ModelMall.hpp"
+#include "HintNotification.hpp"
+#include <boost/url.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread.hpp>
+#include <boost/regex.hpp>
+#ifdef _WIN32
+#include <boost/interprocess/sync/file_lock.hpp>
+#endif
+#include <slic3r/GUI/print_manage/AccountDeviceMgr.hpp>
+#include "libslic3r/common_header/common_header.h"
+#include "buildinfo.h"
+//#ifdef WIN32
+//#include "BaseException.h"
+//#endif
+#ifdef __APPLE__
+#include "libslic3r/MacUtils.hpp"
+#endif
+
+#ifdef __WXMSW__
+#include <dbt.h>
+#include <shlobj.h>
+
+#ifdef __WINDOWS__
+#ifdef _MSW_DARK_MODE
+#include "dark_mode.hpp"
+#include "wx/headerctrl.h"
+#include "wx/msw/headerctrl.h"
+#endif // _MSW_DARK_MODE
+#endif // __WINDOWS__
+
+#endif
+#ifdef _WIN32
+#include <boost/dll/runtime_symbol_info.hpp>
+#endif
+
+#ifdef WIN32
+#include "BaseException.h"
+#include <iphlpapi.h>
+#endif
+
+#if ENABLE_THUMBNAIL_GENERATOR_DEBUG
+#include <boost/beast/core/detail/base64.hpp>
+#include <boost/nowide/fstream.hpp>
+#endif // ENABLE_THUMBNAIL_GENERATOR_DEBUG
+
+// Needed for forcing menu icons back under gtk2 and gtk3
+#if defined(__WXGTK20__) || defined(__WXGTK3__)
+    #include <gtk/gtk.h>
+    #include <gio/gio.h>
+#endif
+#include "print_manage/UploadGcodeToCloud.hpp"
+#include "print_manage/Upload3mfToCloud.hpp"
+#include "libslic3r/GlobalConfig.hpp"
+#include "SyncUserPresets.hpp"
+#include "print_manage/AppMgr.hpp"
+#include "UpdateParams.hpp"
+#include "PrinterPresetConfig.hpp"
+#if AUTO_CONVERT_3MF
+#include "AutoConvert3mfMgr.hpp"
+#endif
+#include "AICloudServiceDialog.hpp"
+
+using namespace std::literals;
+namespace pt = boost::property_tree;
+
+namespace Slic3r {
+namespace GUI {
+
+class MainFrame;
+
+static AppUpdateProgressDialog* g_update_progress_dlg = nullptr;
+static bool g_update_ready_dialog_showing = false;
+static std::atomic<bool> g_async_material_list_update_running { false };
+static std::atomic<bool> g_async_machine_list_refresh_running { false };
+static std::atomic<bool> g_app_exiting { false };
+
+using PresetNameReplacements = std::vector<std::pair<std::string, std::string>>;
+
+static bool replace_legacy_preset_name(std::string& value, const PresetNameReplacements& replacements)
+{
+    bool changed = false;
+    for (const auto& [old_name, new_name] : replacements) {
+        if (old_name.empty() || old_name == new_name)
+            continue;
+
+        size_t pos = 0;
+        while ((pos = value.find(old_name, pos)) != std::string::npos) {
+            value.replace(pos, old_name.size(), new_name);
+            pos += new_name.size();
+            changed = true;
+        }
+    }
+    return changed;
+}
+
+static bool migrate_json_preset_names(nlohmann::json& value, const PresetNameReplacements& replacements)
+{
+    bool changed = false;
+    if (value.is_string()) {
+        std::string migrated = value.get<std::string>();
+        if (replace_legacy_preset_name(migrated, replacements)) {
+            value = std::move(migrated);
+            changed = true;
+        }
+    } else if (value.is_array()) {
+        for (auto& item : value)
+            changed = migrate_json_preset_names(item, replacements) || changed;
+    } else if (value.is_object()) {
+        for (auto& item : value)
+            changed = migrate_json_preset_names(item, replacements) || changed;
+
+        std::vector<std::pair<std::string, std::string>> renamed_keys;
+        for (auto it = value.begin(); it != value.end(); ++it) {
+            std::string migrated_key = it.key();
+            if (replace_legacy_preset_name(migrated_key, replacements))
+                renamed_keys.emplace_back(it.key(), std::move(migrated_key));
+        }
+        for (const auto& [old_key, new_key] : renamed_keys) {
+            // Keep an already migrated value when old and new data coexist.
+            if (!value.contains(new_key))
+                value[new_key] = std::move(value[old_key]);
+            value.erase(old_key);
+            changed = true;
+        }
+    }
+    return changed;
+}
+
+#ifdef _WIN32
+static std::string preset_migration_md5_line(const std::string_view data)
+{
+    using boost::uuids::detail::md5;
+    md5 md5_hash;
+    md5::digest_type md5_digest {};
+    std::string md5_digest_str;
+    md5_hash.process_bytes(data.data(), data.size());
+    md5_hash.get_digest(md5_digest);
+    boost::algorithm::hex(md5_digest, md5_digest + std::size(md5_digest), std::back_inserter(md5_digest_str));
+    return "# MD5 checksum " + md5_digest_str + "\n";
+}
+#endif
+
+static bool write_migrated_json(const fs::path& path, const nlohmann::json& value, bool app_config)
+{
+    const std::string serialized = value.dump(4);
+    fs::path tmp_path = path;
+    tmp_path += (boost::format(".%1%.preset-name-migration.tmp") % get_current_pid()).str();
+
+    boost::nowide::ofstream output(tmp_path.string(), std::ios::out | std::ios::trunc);
+    if (!output.is_open()) {
+        BOOST_LOG_TRIVIAL(error) << "Failed to open preset-name migration output: " << tmp_path.string();
+        return false;
+    }
+    output << serialized << '\n';
+#ifdef _WIN32
+    if (app_config)
+        output << preset_migration_md5_line(serialized);
+#else
+    (void) app_config;
+#endif
+    output.close();
+    if (!output) {
+        BOOST_LOG_TRIVIAL(error) << "Failed to write preset-name migration output: " << tmp_path.string();
+        boost::system::error_code remove_error;
+        fs::remove(tmp_path, remove_error);
+        return false;
+    }
+
+    if (app_config) {
+        std::string copy_error;
+        if (copy_file(tmp_path.string(), path.string() + ".bak", copy_error, false) != SUCCESS)
+            BOOST_LOG_TRIVIAL(error) << "Failed to update the migrated application config backup: " << copy_error;
+    }
+
+    const std::error_code rename_error = rename_file(tmp_path.string(), path.string());
+    if (rename_error) {
+        BOOST_LOG_TRIVIAL(error) << "Failed to replace migrated JSON " << path.string() << ": " << rename_error.message();
+        boost::system::error_code remove_error;
+        fs::remove(tmp_path, remove_error);
+        return false;
+    }
+    return true;
+}
+
+static bool migrate_json_file(const fs::path& path, const PresetNameReplacements& replacements,
+                              bool app_config = false, bool* completed = nullptr)
+{
+    if (completed != nullptr)
+        *completed = false;
+    try {
+        boost::nowide::ifstream input(path.string());
+        if (!input.is_open())
+            return false;
+
+        std::stringstream buffer;
+        buffer << input.rdbuf();
+        std::string contents = buffer.str();
+        if (app_config) {
+            const size_t json_end = contents.find_last_of('}');
+            if (json_end == std::string::npos)
+                return false;
+            contents.resize(json_end + 1);
+        }
+
+        nlohmann::json value = nlohmann::json::parse(contents);
+        if (!migrate_json_preset_names(value, replacements)) {
+            if (completed != nullptr)
+                *completed = true;
+            return false;
+        }
+        const bool written = write_migrated_json(path, value, app_config);
+        if (completed != nullptr)
+            *completed = written;
+        return written;
+    } catch (const std::exception& error) {
+        BOOST_LOG_TRIVIAL(error) << "Failed to migrate preset names in " << path.string() << ": " << error.what();
+        return false;
+    }
+}
+
+static PresetNameReplacements legacy_multi_extruder_preset_names()
+{
+    PresetNameReplacements replacements;
+    const auto collect_replacements = [&replacements](const fs::path& profile_root) {
+        const fs::path manifest = profile_root / "Creality.json";
+        try {
+            boost::nowide::ifstream input(manifest.string());
+            if (!input.is_open())
+                return;
+
+            const nlohmann::json vendor = nlohmann::json::parse(input);
+            if (!vendor.contains("machine_list") || !vendor["machine_list"].is_array())
+                return;
+
+            for (const auto& entry : vendor["machine_list"]) {
+                const std::string sub_path = entry.value("sub_path", std::string());
+                if (sub_path.empty())
+                    continue;
+
+                const fs::path machine_path = profile_root / "Creality" / sub_path;
+                boost::nowide::ifstream machine_input(machine_path.string());
+                if (!machine_input.is_open())
+                    continue;
+
+                const nlohmann::json machine = nlohmann::json::parse(machine_input);
+                const std::string current_name = machine.value("name", entry.value("name", std::string()));
+                const std::string model = machine.value("printer_model", std::string());
+                const auto nozzle_it = machine.find("nozzle_diameter");
+                if (machine.value("type", std::string()) != "machine" || current_name.empty() ||
+                    model == "Creality Sermoon D3 Pro" || boost::ends_with(current_name, " nozzle") ||
+                    nozzle_it == machine.end() || !nozzle_it->is_array() || nozzle_it->size() <= 1)
+                    continue;
+
+                std::string variant = machine.value("printer_variant", std::string());
+                if (variant.empty() && !nozzle_it->empty() && nozzle_it->front().is_string())
+                    variant = nozzle_it->front().get<std::string>();
+                if (variant.empty())
+                    continue;
+
+                replacements.emplace_back(current_name + " " + variant + " nozzle", current_name);
+            }
+        } catch (const std::exception& error) {
+            BOOST_LOG_TRIVIAL(error) << "Failed to collect legacy multi-extruder preset names from " << manifest.string()
+                                     << ": " << error.what();
+        }
+    };
+
+    // A printer installed by an online parameter update may exist only in the
+    // writable system bundle. Inspect it as well as the bundled resources.
+    collect_replacements(fs::path(resources_dir()).append("profiles"));
+    collect_replacements(fs::path(data_dir()).append(PRESET_SYSTEM_DIR));
+
+    std::sort(replacements.begin(), replacements.end(), [](const auto& lhs, const auto& rhs) {
+        return lhs.first.size() > rhs.first.size();
+    });
+    replacements.erase(std::unique(replacements.begin(), replacements.end()), replacements.end());
+    return replacements;
+}
+
+static bool migrate_loaded_app_config_preset_names(AppConfig& config,
+                                                   const PresetNameReplacements& replacements)
+{
+    bool changed = false;
+    for (const std::string& section_name : {AppConfig::SECTION_FILAMENTS, std::string("presets")}) {
+        if (!config.has_section(section_name))
+            continue;
+
+        const std::map<std::string, std::string>& old_section = config.get_section(section_name);
+        std::map<std::string, std::string> new_section;
+        for (const auto& [old_key, old_value] : old_section) {
+            std::string new_key = old_key;
+            std::string new_value = old_value;
+            changed = replace_legacy_preset_name(new_key, replacements) || changed;
+            changed = replace_legacy_preset_name(new_value, replacements) || changed;
+
+            // Prefer a value that was already stored under the current name.
+            if (new_section.find(new_key) == new_section.end() || new_key == old_key)
+                new_section[new_key] = std::move(new_value);
+        }
+        if (new_section != old_section)
+            config.set_section(section_name, new_section);
+    }
+    return changed;
+}
+
+static bool migrate_user_preset_names(const fs::path& user_root, const PresetNameReplacements& replacements)
+{
+    if (replacements.empty() || !fs::exists(user_root))
+        return true;
+
+    std::vector<fs::path> files;
+    bool completed = true;
+    try {
+        for (fs::recursive_directory_iterator it(user_root), end; it != end; ++it)
+            if (fs::is_regular_file(it->path()))
+                files.emplace_back(it->path());
+    } catch (const fs::filesystem_error& error) {
+        BOOST_LOG_TRIVIAL(error) << "Failed to scan user presets for name migration: " << error.what();
+        completed = false;
+    }
+
+    size_t migrated_json_count = 0;
+    for (const fs::path& path : files) {
+        if (!boost::iequals(path.extension().string(), ".json"))
+            continue;
+        bool file_completed = false;
+        if (migrate_json_file(path, replacements, false, &file_completed))
+            ++migrated_json_count;
+        completed = file_completed && completed;
+    }
+
+    size_t renamed_file_count = 0;
+    for (const fs::path& path : files) {
+        const std::string extension = path.extension().string();
+        if (!boost::iequals(extension, ".json") && !boost::iequals(extension, ".info"))
+            continue;
+
+        std::string migrated_filename = path.filename().string();
+        if (!replace_legacy_preset_name(migrated_filename, replacements))
+            continue;
+
+        const fs::path destination = path.parent_path() / migrated_filename;
+        try {
+            if (fs::exists(destination)) {
+                BOOST_LOG_TRIVIAL(warning) << "Skipped preset-name file migration because the target already exists: "
+                                           << destination.string();
+                continue;
+            }
+            fs::rename(path, destination);
+            ++renamed_file_count;
+        } catch (const fs::filesystem_error& error) {
+            BOOST_LOG_TRIVIAL(error) << "Failed to rename user preset " << path.string() << ": " << error.what();
+            completed = false;
+        }
+    }
+
+    if (migrated_json_count != 0 || renamed_file_count != 0)
+        BOOST_LOG_TRIVIAL(info) << "Migrated legacy multi-extruder user presets: JSON files=" << migrated_json_count
+                                << ", renamed files=" << renamed_file_count;
+    return completed;
+}
+
+static PresetNameReplacements migrate_legacy_multi_extruder_preset_names(AppConfig& config, bool& completed)
+{
+    completed = true;
+    const PresetNameReplacements replacements = legacy_multi_extruder_preset_names();
+    if (replacements.empty())
+        return replacements;
+
+    const fs::path config_path(config.config_path());
+    if (fs::exists(config_path)) {
+        bool config_completed = false;
+        if (migrate_json_file(config_path, replacements, true, &config_completed))
+            BOOST_LOG_TRIVIAL(info) << "Migrated legacy multi-extruder preset names in " << config_path.string();
+        completed = config_completed && completed;
+    }
+
+    completed = migrate_user_preset_names(fs::path(data_dir()).append(PRESET_USER_DIR), replacements) && completed;
+    return replacements;
+}
+
+static fs::path legacy_multi_extruder_preset_name_migration_marker()
+{
+    // Bump the suffix when another one-time preset-name migration is added.
+    return fs::path(data_dir()).append("preset_name_migration_v2.done");
+}
+
+static bool mark_legacy_multi_extruder_preset_name_migration_complete(const fs::path& marker)
+{
+    fs::path tmp_marker = marker;
+    tmp_marker += (boost::format(".%1%.tmp") % get_current_pid()).str();
+    boost::nowide::ofstream output(tmp_marker.string(), std::ios::out | std::ios::trunc);
+    if (!output.is_open())
+        return false;
+    output << "legacy_multi_extruder_preset_names_v2\n";
+    output.close();
+    if (!output) {
+        boost::system::error_code remove_error;
+        fs::remove(tmp_marker, remove_error);
+        return false;
+    }
+
+    const std::error_code rename_error = rename_file(tmp_marker.string(), marker.string());
+    if (rename_error) {
+        boost::system::error_code remove_error;
+        fs::remove(tmp_marker, remove_error);
+        BOOST_LOG_TRIVIAL(error) << "Failed to write preset-name migration marker " << marker.string()
+                                 << ": " << rename_error.message();
+        return false;
+    }
+    return true;
+}
+
+// "Update Ready" can be triggered from multiple entry points (download complete event,
+// pending-install prompt on startup, update check hitting local cache, etc).
+// Use a minimal re-entrancy guard to prevent showing duplicate dialogs at the same time.
+static int show_update_ready_dialog_guarded(wxWindow* parent)
+{
+    if (g_update_ready_dialog_showing)
+        return wxID_CANCEL;
+    g_update_ready_dialog_showing = true;
+    AppUpdateFinishDialog dlg(parent);
+    const int res = dlg.ShowModal();
+    g_update_ready_dialog_showing = false;
+    return res;
+}
+
+// ---------------------------------------------------------------------------
+// Hot-update state helpers
+//
+// All state is stored in a single file  update_state.json  inside the
+// version-specific cache directory.  Schema:
+//   {
+//     "version":   "<target version string>",
+//     "timestamp": <unix time>,
+//     "attempted": <bool>   // true = user clicked "Install Now"; false = "Install Later"
+//   }
+//
+// attempted=false  → show "Update Ready" dialog on next startup (pending).
+// attempted=true   → user already triggered the installer; stay silent until a
+//                    genuinely newer version arrives from the server.
+// ---------------------------------------------------------------------------
+
+static fs::path get_update_state_path()
+{
+    std::string current_version = std::string(CREALITYPRINT_VERSION);
+    std::string cache_dir = AppUpdater::get_cache_dir(current_version);
+    return fs::path(cache_dir) / "update_state.json";
+}
+
+// Write (or overwrite) the state file.
+static void write_update_state(const std::string& version, bool attempted)
+{
+    if (version.empty())
+        return;
+    fs::path p = get_update_state_path();
+    nlohmann::json j;
+    j["version"]   = version;
+    j["timestamp"] = std::time(nullptr);
+    j["attempted"] = attempted;
+    boost::nowide::ofstream f(p.string());
+    if (f.is_open()) {
+        f << j.dump(4);
+    }
+}
+
+// Read the state file.  Returns empty string if not present or unreadable.
+// Populates *out_attempted when non-null.
+static std::string read_update_state(bool* out_attempted = nullptr)
+{
+    fs::path p = get_update_state_path();
+    boost::system::error_code ec;
+    if (!fs::exists(p, ec))
+        return "";
+    try {
+        boost::nowide::ifstream f(p.string());
+        if (!f.is_open())
+            return "";
+        nlohmann::json j = nlohmann::json::parse(f);
+        if (out_attempted)
+            *out_attempted = j.value("attempted", false);
+        return j.value("version", std::string());
+    } catch (...) {}
+    return "";
+}
+
+// Remove the state file entirely.
+static void clear_update_state()
+{
+    fs::path p = get_update_state_path();
+    boost::system::error_code ec;
+    if (fs::exists(p, ec))
+        fs::remove(p, ec);
+}
+
+// Convenience wrappers that preserve the old call-sites' semantics.
+
+// User clicked "Install Later" — prompt again on next startup.
+static void set_pending_app_update(AppConfig* /*cfg*/, const std::string& version)
+{
+    write_update_state(version, /*attempted=*/false);
+}
+
+// User clicked "Install Now" — don't auto-prompt again for this version.
+static void set_install_attempted(const std::string& version)
+{
+    write_update_state(version, /*attempted=*/true);
+}
+
+// Clear all update state (called after a successful install or stale data).
+static void clear_pending_app_update(AppConfig* /*cfg*/)
+{
+    clear_update_state();
+}
+
+// Returns the pending version if the user previously chose "Install Later",
+// or empty string otherwise.
+static std::string get_pending_app_update_version()
+{
+    bool attempted = false;
+    std::string ver = read_update_state(&attempted);
+    if (ver.empty() || attempted)
+        return "";   // no pending, or already attempted
+    return ver;
+}
+
+// Returns the version the user already clicked "Install Now" for,
+// or empty string if no such record exists.
+static std::string get_install_attempted_version()
+{
+    bool attempted = false;
+    std::string ver = read_update_state(&attempted);
+    if (ver.empty() || !attempted)
+        return "";
+    return ver;
+}
+
+// Clear the attempted flag only (called when a genuinely newer version arrives).
+static void clear_install_attempted(AppConfig* /*cfg*/)
+{
+    clear_update_state();
+}
+
+
+void start_ping_test()
+{
+    return;
+    wxArrayString output;
+    wxExecute("ping www.amazon.com", output, wxEXEC_NODISABLE);
+
+    wxString output_i;
+    std::string output_temp;
+
+    for (int i = 0; i < output.size(); i++) {
+        output_i = output[i].To8BitData();
+        output_temp = output_i.ToStdString(wxConvUTF8);
+        BOOST_LOG_TRIVIAL(info) << "ping amazon:" << output_temp;
+
+    }
+    wxExecute("ping www.apple.com", output, wxEXEC_NODISABLE);
+    for (int i = 0; i < output.size(); i++) {
+        output_i = output[i].To8BitData();
+        output_temp = output_i.ToStdString(wxConvUTF8);
+        BOOST_LOG_TRIVIAL(info) << "ping www.apple.com:" << output_temp;
+    }
+    wxExecute("ping www.bambulab.com", output, wxEXEC_NODISABLE);
+    for (int i = 0; i < output.size(); i++) {
+        output_i = output[i].To8BitData();
+        output_temp = output_i.ToStdString(wxConvUTF8);
+        BOOST_LOG_TRIVIAL(info) << "ping bambulab:" << output_temp;
+    }
+    //Get GateWay IP
+    wxExecute("ping 192.168.0.1", output, wxEXEC_NODISABLE);
+    for (int i = 0; i < output.size(); i++) {
+        output_i = output[i].To8BitData();
+        output_temp = output_i.ToStdString(wxConvUTF8);
+        BOOST_LOG_TRIVIAL(info) << "ping 192.168.0.1:" << output_temp;
+    }
+}
+#if __linux__
+// 检测是否在Flatpak环境中运行
+inline bool isRunningInFlatpak() {
+    const char* flatpakInfo = std::getenv("FLATPAK_ID");
+    return flatpakInfo != nullptr;
+}
+
+static void ensure_flatpak_user_launcher()
+{
+    static const std::string app_id = "io.github.crealityofficial.CrealityPrint";
+    static const std::string app_name = "CrealityPrint";
+
+    const char *flatpak_id = std::getenv("FLATPAK_ID");
+    if (flatpak_id == nullptr || app_id != flatpak_id)
+        return;
+
+    const char *home = std::getenv("HOME");
+    if (home == nullptr || home[0] == '\0') {
+        BOOST_LOG_TRIVIAL(warning) << "Flatpak launcher repair skipped: HOME is empty";
+        return;
+    }
+
+    try {
+        const boost::filesystem::path data_home = boost::filesystem::path(home) / ".local" / "share";
+        const boost::filesystem::path applications_dir = data_home / "applications";
+        const boost::filesystem::path icons_dir = data_home / "icons";
+        boost::system::error_code ec;
+
+        boost::filesystem::create_directories(applications_dir, ec);
+        if (ec) {
+            BOOST_LOG_TRIVIAL(warning) << "Flatpak launcher repair failed to create applications directory: " << ec.message();
+            return;
+        }
+
+        const boost::filesystem::path desktop_path = applications_dir / (app_id + ".desktop");
+        std::ofstream desktop_file(desktop_path.string(), std::ios::out | std::ios::trunc);
+        if (!desktop_file) {
+            BOOST_LOG_TRIVIAL(warning) << "Flatpak launcher repair failed to open desktop file: " << desktop_path.string();
+            return;
+        }
+
+        desktop_file
+            << "[Desktop Entry]\n"
+            << "Name=" << app_name << "\n"
+            << "GenericName=3D Printing Software\n"
+            << "Icon=" << app_id << "\n"
+            << "Exec=/usr/bin/flatpak run --branch=master --arch=x86_64 --command=entrypoint --file-forwarding "
+            << app_id << " @@u %U @@\n"
+            << "Terminal=false\n"
+            << "Type=Application\n"
+            << "MimeType=model/stl;model/3mf;application/vnd.ms-3mfdocument;application/prs.wavefront-obj;application/x-amf;x-scheme-handler/crealityprintlink;\n"
+            << "Categories=Graphics;Utility;3DGraphics;Engineering;\n"
+            << "Keywords=3D;Printing;Slicer;slice;3D;printer;convert;gcode;stl;obj;amf;SLA\n"
+            << "StartupNotify=false\n"
+            << "StartupWMClass=" << app_name << "\n"
+            << "X-Flatpak=" << app_id << "\n";
+        desktop_file.close();
+
+        boost::filesystem::permissions(desktop_path,
+            boost::filesystem::owner_read | boost::filesystem::owner_write |
+            boost::filesystem::group_read | boost::filesystem::others_read, ec);
+        ec.clear();
+
+        const boost::filesystem::path src_icons_root("/app/share/icons");
+        if (boost::filesystem::exists(src_icons_root)) {
+            boost::filesystem::create_directories(icons_dir, ec);
+            if (ec) {
+                BOOST_LOG_TRIVIAL(warning) << "Flatpak launcher repair failed to create icons directory: " << ec.message();
+                ec.clear();
+            } else {
+                size_t copied_icons = 0;
+                for (boost::filesystem::recursive_directory_iterator it(src_icons_root), end; it != end; ++it) {
+                    if (!boost::filesystem::is_regular_file(it->path()))
+                        continue;
+
+                    const std::string filename = it->path().filename().string();
+                    if (!boost::starts_with(filename, app_id + ".") && !boost::starts_with(filename, app_name + "."))
+                        continue;
+
+                    const std::string src_root = src_icons_root.string();
+                    const std::string src_path = it->path().string();
+                    const std::string rel_path = src_path.size() > src_root.size() + 1 ? src_path.substr(src_root.size() + 1) : filename;
+                    const boost::filesystem::path dst_path = icons_dir / rel_path;
+                    boost::filesystem::create_directories(dst_path.parent_path(), ec);
+                    if (ec) {
+                        BOOST_LOG_TRIVIAL(warning) << "Flatpak launcher repair failed to create icon directory: " << ec.message();
+                        ec.clear();
+                        continue;
+                    }
+
+                    std::string error_message;
+                    if (Slic3r::copy_file(src_path, dst_path.string(), error_message, false) == Slic3r::SUCCESS)
+                        ++copied_icons;
+                    else
+                        BOOST_LOG_TRIVIAL(warning) << "Flatpak launcher repair failed to copy icon " << src_path << ": " << error_message;
+                }
+                BOOST_LOG_TRIVIAL(info) << "Flatpak launcher repair copied " << copied_icons << " icons";
+            }
+        } else {
+            BOOST_LOG_TRIVIAL(warning) << "Flatpak launcher repair icon source does not exist: " << src_icons_root.string();
+        }
+
+        BOOST_LOG_TRIVIAL(info) << "Flatpak launcher repair wrote " << desktop_path.string();
+    } catch (const std::exception &e) {
+        BOOST_LOG_TRIVIAL(warning) << "Flatpak launcher repair failed: " << e.what();
+    }
+}
+#endif
+VersionInfo::VersionInfo() 
+{
+    for (int i = 0; i < VERSION_LEN; i++) {
+        ver_items[i] = 0;
+    }
+    force_upgrade = false;
+    version_str = "";
+}
+
+void GUI_App::schedule_software_launch_analytics()
+{
+    if (m_is_closing || m_app_launch_initialized)
+        return;
+    if (!is_privacy_checked())
+        return;
+
+    wxTimer* timer = new wxTimer();
+    timer->Bind(wxEVT_TIMER, [this, timer](wxTimerEvent&) {
+        if (m_is_closing || m_app_launch_initialized || !is_privacy_checked()) {
+            timer->Stop();
+            delete timer;
+            return;
+        }
+
+        m_app_launch_initialized = true;
+
+        check_app_first_launch_info();
+        AnalyticsDataUploadManager::getInstance()
+            .triggerUploadTasks(AnalyticsUploadTiming::ON_SOFTWARE_LAUNCH,
+                                {AnalyticsDataEventType::ANALYTICS_SOFTWARE_LAUNCH,
+                                 AnalyticsDataEventType::ANALYTICS_ACCOUNT_DEVICE_INFO});
+        AnalyticsEventPayload payload1;
+        payload1.type = AnalyticsDataEventType::ANALYTICS_SOFTWARE_LAUNCH;
+        AnalyticsDataUploadManager::getInstance().triggerUploadTasksWithPayload(payload1);
+        AnalyticsEventPayload payload2;
+        payload2.type = AnalyticsDataEventType::ANALYTICS_ACCOUNT_DEVICE_INFO;
+        AnalyticsDataUploadManager::getInstance().triggerUploadTasksWithPayload(payload2);
+
+        // OTA analytics: check ota_result.json left by updater
+        {
+            boost::filesystem::path ota_result_path = boost::filesystem::path(Slic3r::data_dir()) / "ota_result.json";
+            if (boost::filesystem::exists(ota_result_path)) {
+                BOOST_LOG_TRIVIAL(warning) << "[OTA_ANALYTICS] Found ota_result.json at: " << ota_result_path.string();
+                try {
+                    boost::nowide::ifstream f(ota_result_path.string());
+                    nlohmann::json j = nlohmann::json::parse(f);
+                    f.close();
+                    std::string result = j.value("result", "");
+                    std::string from_ver = j.value("from_version", "");
+                    std::string to_ver = j.value("to_version", "");
+                    BOOST_LOG_TRIVIAL(warning) << "[OTA_ANALYTICS] ota_result.json content: result=" << result
+                                              << ", from_version=" << from_ver << ", to_version=" << to_ver;
+                    if (!result.empty()) {
+                        // Always report ota_update_start first (file existence implies install was triggered)
+                        BOOST_LOG_TRIVIAL(warning) << "[OTA_ANALYTICS] Reporting ota_update_start (implied by ota_result.json existence)";
+                        AnalyticsEventPayload startPayload;
+                        startPayload.type = AnalyticsDataEventType::ANALYTICS_OTA_UPDATE_START;
+                        AnalyticsDataUploadManager::getInstance().triggerUploadTasksWithPayload(startPayload);
+
+                        // Then report the result
+                        AnalyticsEventPayload resultPayload;
+                        if (result == "success") {
+                            resultPayload.type = AnalyticsDataEventType::ANALYTICS_OTA_UPDATE_SUCCESS;
+                        } else if (result == "fail") {
+                            resultPayload.type = AnalyticsDataEventType::ANALYTICS_OTA_UPDATE_FAIL;
+                        } else if (result == "cancel") {
+                            resultPayload.type = AnalyticsDataEventType::ANALYTICS_OTA_UPDATE_CANCEL;
+                        }
+                        BOOST_LOG_TRIVIAL(warning) << "[OTA_ANALYTICS] Reporting ota result: " << result;
+                        AnalyticsDataUploadManager::getInstance().triggerUploadTasksWithPayload(resultPayload);
+                    }
+                    boost::filesystem::remove(ota_result_path);
+                    BOOST_LOG_TRIVIAL(warning) << "[OTA_ANALYTICS] ota_result.json removed after reporting";
+                } catch (const std::exception& e) {
+                    BOOST_LOG_TRIVIAL(warning) << "[OTA_ANALYTICS] Failed to parse ota_result.json: " << e.what();
+                    boost::filesystem::remove(ota_result_path);
+                } catch (...) {
+                    BOOST_LOG_TRIVIAL(warning) << "[OTA_ANALYTICS] Failed to parse ota_result.json: unknown error";
+                    boost::filesystem::remove(ota_result_path);
+                }
+            }
+        }
+
+        if (app_config->get_bool("software_crash")) {
+            AnalyticsDataUploadManager::getInstance()
+                .triggerUploadTasks(AnalyticsUploadTiming::ON_SOFTWARE_CRASH,
+                                    {AnalyticsDataEventType::ANALYTICS_SOFTWARE_CRASH});
+            AnalyticsEventPayload payload;
+            payload.type = AnalyticsDataEventType::ANALYTICS_SOFTWARE_CRASH;
+            AnalyticsDataUploadManager::getInstance().triggerUploadTasksWithPayload(payload);
+            app_config->set_bool("software_crash", false);
+            app_config->save();
+        }
+
+        timer->Stop();
+        delete timer;
+    });
+    timer->StartOnce(5000);
+}
+
+void VersionInfo::parse_version_str(std::string str) 
+{
+    version_str = str;
+    std::vector<std::string> items;
+    boost::split(items, str, boost::is_any_of("."));
+    if (items.size() == VERSION_LEN) {
+        try {
+            for (int i = 0; i < VERSION_LEN; i++) {
+                ver_items[i] = stoi(items[i]);
+            }
+        }
+        catch (...) {
+            ;
+        }
+    }
+}
+
+std::string VersionInfo::convert_full_version(std::string short_version)
+{
+    std::string result = "";
+    std::vector<std::string> items;
+    boost::split(items, short_version, boost::is_any_of("."));
+    if (items.size() == VERSION_LEN) {
+        for (int i = 0; i < VERSION_LEN; i++) {
+            std::stringstream ss;
+            ss << std::setw(2) << std::setfill('0') << items[i];
+            result += ss.str();
+            if (i != VERSION_LEN - 1)
+                result += ".";
+        }
+        return result;
+    }
+    return result;
+}
+
+std::string VersionInfo::convert_short_version(std::string full_version)
+{
+    full_version.erase(std::remove(full_version.begin(), full_version.end(), '0'), full_version.end());
+    return full_version;
+}
+
+int VersionInfo::compare(std::string ver_str) 
+{
+    if (version_str.empty()) return -1;
+
+    int      ver_target[VERSION_LEN];
+    std::vector<std::string> items;
+    boost::split(items, ver_str, boost::is_any_of("."));
+    if (items.size() == VERSION_LEN) {
+        try {
+            for (int i = 0; i < VERSION_LEN; i++) {
+                ver_target[i] = stoi(items[i]);
+                if (ver_target[i] < ver_items[i]) {
+                    return 1;
+                }
+                else if (ver_target[i] == ver_items[i]) {
+                    continue;
+                }
+                else {
+                    return -1;
+                }
+            }
+        }
+        catch (...) {
+            return -1;
+        }
+    }
+    return -1;
+}
+
+static std::string convert_studio_language_to_api(std::string lang_code)
+{
+    boost::replace_all(lang_code, "_", "-");
+    return lang_code;
+
+    /*if (lang_code == "zh_CN")
+        return "zh-hans";
+    else if (lang_code == "zh_TW")
+        return "zh-hant";
+    else
+        return "en";*/
+}
+
+#ifdef _WIN32
+bool is_associate_files(std::wstring extend)
+{
+    wchar_t app_path[MAX_PATH];
+    ::GetModuleFileNameW(nullptr, app_path, sizeof(app_path));
+
+    std::wstring prog_id             = L" Orca.Slicer.1";
+    std::wstring reg_base            = L"Software\\Classes";
+    std::wstring reg_extension       = reg_base + L"\\." + extend;
+
+    wchar_t szValueCurrent[1000];
+    DWORD   dwType;
+    DWORD   dwSize = sizeof(szValueCurrent);
+
+    int iRC = ::RegGetValueW(HKEY_CURRENT_USER, reg_extension.c_str(), nullptr, RRF_RT_ANY, &dwType, szValueCurrent, &dwSize);
+
+    bool bDidntExist = iRC == ERROR_FILE_NOT_FOUND;
+
+    if (!bDidntExist && ::wcscmp(szValueCurrent, prog_id.c_str()) == 0)
+        return true;
+
+    return false;
+}
+#endif
+
+#ifdef __WXGTK__
+static bool gui_app_is_wayland_session()
+{
+    const char* gdk_backend     = ::getenv("GDK_BACKEND");
+    const char* wayland_display = ::getenv("WAYLAND_DISPLAY");
+    const char* session_type    = ::getenv("XDG_SESSION_TYPE");
+
+    return (gdk_backend != nullptr && ::strstr(gdk_backend, "wayland") != nullptr) ||
+           ((gdk_backend == nullptr || *gdk_backend == '\0') &&
+            ((wayland_display && *wayland_display) ||
+             (session_type && ::strcmp(session_type, "wayland") == 0)));
+}
+#endif
+
+class SplashScreen : public wxSplashScreen
+{
+public:
+    SplashScreen(const wxBitmap& bitmap, long splashStyle, int milliseconds, wxPoint pos = wxDefaultPosition)
+        : wxSplashScreen(bitmap, splashStyle, milliseconds, static_cast<wxWindow*>(wxGetApp().mainframe), wxID_ANY, pos, wxDefaultSize,
+#ifdef __APPLE__
+            wxBORDER_NONE | wxFRAME_NO_TASKBAR | wxSTAY_ON_TOP
+#else
+            wxBORDER_NONE | wxFRAME_NO_TASKBAR
+#endif // !__APPLE__
+        )
+    {
+        int init_dpi = get_dpi_for_window(this);
+        if (pos != wxDefaultPosition)
+            this->SetPosition(pos);
+        else
+            this->CenterOnScreen();
+        int new_dpi = get_dpi_for_window(this);
+
+        m_scale = (float)(new_dpi) / (float)(init_dpi);
+
+        m_main_bitmap = bitmap;
+
+        scale_bitmap(m_main_bitmap, m_scale);
+
+        // init constant texts and scale fonts
+        m_constant_text.init(Label::Body_16);
+
+		// ORCA scale all fonts with monitor scale
+        scale_font(m_constant_text.version_font,	m_scale * 2);
+        scale_font(m_constant_text.based_on_font,	m_scale * 1.5f);
+        scale_font(m_constant_text.credits_font,	m_scale * 2);
+
+        // this font will be used for the action string
+        m_action_font = m_constant_text.credits_font;
+
+        // draw logo and constant info text
+        Decorate(m_main_bitmap);
+        set_bitmap(m_main_bitmap);
+        wxGetApp().UpdateFrameDarkUI(this);
+    }
+
+    void SetText(const wxString& text)
+    {
+        set_bitmap(m_main_bitmap);
+        if (!text.empty()) {
+            wxBitmap bitmap(m_main_bitmap);
+
+            wxMemoryDC memDC;
+            memDC.SelectObject(bitmap);
+            memDC.SetFont(m_action_font);
+            memDC.SetTextForeground(StateColor::darkModeColorFor(wxColour(144, 144, 144)));
+            int width = bitmap.GetWidth();
+            //int text_height = memDC.GetTextExtent(text).GetHeight();
+            //int text_width = memDC.GetTextExtent(text).GetWidth();
+            //wxRect text_rect(wxPoint(0, m_action_line_y_position), wxPoint(width, m_action_line_y_position + text_height));
+            //memDC.DrawLabel(text, text_rect, wxALIGN_CENTER);
+
+            memDC.SelectObject(wxNullBitmap);
+            set_bitmap(bitmap);
+#ifdef __WXOSX__
+            // without this code splash screen wouldn't be updated under OSX
+            wxYield();
+#endif
+        }
+    }
+    // Split string by characters
+    std::vector<wxString> SplitStringByChar(const wxString& text)
+    {
+        std::vector<wxString> chars;
+        for (size_t i = 0; i < text.length(); ++i)
+        {
+            chars.push_back(text.Mid(i, 1));
+        }
+        return chars;
+    }
+    // Draw centered and wrapped text
+    void DrawCenteredWrappedText(wxGraphicsContext* gc, const wxString& text, const wxRect& rect, const wxFont& font, const wxColour& color)
+    {
+        //Set font and color
+        gc->SetFont(font, color);
+
+        // split string into characters
+        std::vector<wxString> chars = SplitStringByChar(text);
+
+        //Calculate the text of each line
+        wxString currentLine;
+        std::vector<wxString> lines;
+        wxDouble charWidth, charHeight;
+        gc->GetTextExtent("  ", &charWidth, &charHeight);
+        charHeight += 2; 
+        for (const auto& ch : chars)
+        {
+            wxDouble currentLineWidth, currentLineHeight;
+            gc->GetTextExtent(currentLine, &currentLineWidth, &currentLineHeight);
+
+            wxDouble chWidth, chHeight;
+            gc->GetTextExtent(ch, &chWidth, &chHeight);
+
+            if (currentLineWidth + chWidth > rect.width)
+            {
+                lines.push_back(currentLine);
+                currentLine.clear();
+            }
+
+            currentLine += ch;
+        }
+
+        if (!currentLine.empty())
+        {
+            lines.push_back(currentLine);
+        }
+        wxDouble totalHeight = lines.size() * charHeight;
+
+        wxDouble y = rect.y;
+
+        //Draw each line of text
+        for (const auto& line : lines)
+        {
+            wxDouble lineWidth, lineHeight;
+            gc->GetTextExtent(line, &lineWidth, &lineHeight);
+
+            wxDouble x = rect.x + (rect.width - lineWidth) / 2;
+
+            gc->DrawText(line, x, y);
+            y += lineHeight;
+        }
+    }
+    void Decorate(wxBitmap& bmp)
+    {
+        if (!bmp.IsOk())
+            return;
+
+		bool is_dark = wxGetApp().app_config->get("dark_color_mode") == "1";
+
+        // use a memory DC to draw directly onto the bitmap
+        wxMemoryDC memDc(bmp);
+        
+        int width = bmp.GetWidth();
+		int height = bmp.GetHeight();
+
+		// Logo
+        BitmapCache bmp_cache;
+        // wxBitmap logo_bmp = *bmp_cache.load_svg(is_dark ? "splash_logo_dark" : "splash_logo", width, height);  // use with full width & height
+        wxBitmap logo_bmp = *bmp_cache.load_png("splash_logo", width, height);
+        memDc.DrawBitmap(logo_bmp, 0, 0, true);
+
+        // Create a graphics context from the memory DC
+        wxGraphicsContext* gc = wxGraphicsContext::Create(memDc);
+        if(!gc)
+            return;
+
+        gc->SetAntialiasMode(wxANTIALIAS_DEFAULT);
+
+        // const wxColor  font_color(184, 188, 187);
+        const wxColor  font_color(100, 100, 100);
+
+#if !defined(CUSTOMIZED) || defined(CUSTOM_SPLASH_LOADING_TEXT_VISIBLE)
+        // Official brief introduction
+        wxString official_brief_introduction = m_loading_info + "\n\n" + _L("Official brief introduction");
+
+        wxRect rect(FromDIP(32), height * 0.50, FromDIP(210), FromDIP(100));
+        const double splash_scale = std::max(1.0, double(width) / 860.0);
+        auto scale_splash_font = [splash_scale](wxFont font) {
+            const int point_size = std::max(1, int(font.GetPointSize() * splash_scale + 0.5));
+            font.SetPointSize(point_size);
+            return font;
+        };
+        wxFont font = scale_splash_font(wxFont(11, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+        wxColour color(0, 0, 0); 
+
+        DrawCenteredWrappedText(gc, official_brief_introduction, rect, font, font_color);
+
+        // Version
+         //gc->SetFont(m_constant_text.version_font, font_color);
+        wxString version_text = _L("Version:") + m_constant_text.version;
+        wxFont version_font = scale_splash_font(Label::Body_13);
+        gc->SetFont(version_font, font_color);
+        wxDouble text_width, text_height;
+        gc->GetTextExtent(version_text, &text_width, &text_height);
+        wxRect version_rect(FromDIP(32), height * 0.90, FromDIP(210), text_height);
+        DrawCenteredWrappedText(gc, version_text, version_rect, version_font, font_color);
+#endif
+        // Clean up the graphics context
+        delete gc;
+
+        // Dynamic Text
+        // m_action_line_y_position = int(height * 0.83);
+
+		// // Based on Text
+        // memDc.SetFont(m_constant_text.based_on_font);
+        // auto bs_version = wxString::Format("Based on OrcaaSlicer").ToStdString();
+        // wxSize based_on_ext = memDc.GetTextExtent(bs_version);
+        // wxRect based_on_rect(
+		// 	wxPoint(0, height - based_on_ext.GetHeight() * 2),
+        //     wxPoint(width, height - based_on_ext.GetHeight())
+		// );
+        // memDc.DrawLabel(bs_version, based_on_rect, wxALIGN_CENTER);
+    }
+
+    static wxBitmap MakeBitmap()
+    {
+        int width = FromDIP(860, nullptr);
+        int height = FromDIP(480, nullptr);
+
+        wxImage image(width, height, true);
+        image.InitAlpha();
+        unsigned char* alpha = image.GetAlpha();
+        memset(alpha, 0, width * height);
+
+        wxBitmap new_bmp(image);
+
+        wxMemoryDC memDC;
+        memDC.SelectObject(new_bmp);
+        // memDC.SetBrush(StateColor::darkModeColorFor(*wxWHITE));
+        memDC.SetBrush(*wxTRANSPARENT_BRUSH);
+        memDC.SetPen(*wxTRANSPARENT_PEN);
+        memDC.DrawRectangle(-1, -1, width + 2, height + 2);
+        memDC.DrawBitmap(new_bmp, 0, 0, true);
+
+        memDC.SelectObject(wxNullBitmap);
+        return new_bmp;
+    }
+
+    void set_bitmap(wxBitmap& bmp)
+    {
+        m_window->SetBitmap(bmp);
+        m_window->Refresh();
+        m_window->Update();
+    }
+
+    void scale_bitmap(wxBitmap& bmp, float scale)
+    {
+        if (scale == 1.0)
+            return;
+
+        wxImage image = bmp.ConvertToImage();
+        if (!image.IsOk() || image.GetWidth() == 0 || image.GetHeight() == 0)
+            return;
+
+        int width   = int(scale * image.GetWidth());
+        int height  = int(scale * image.GetHeight());
+        image.Rescale(width, height, wxIMAGE_QUALITY_BILINEAR);
+
+        bmp = wxBitmap(std::move(image));
+    }
+
+    void scale_font(wxFont& font, float scale)
+    {
+#ifdef __WXMSW__
+        // Workaround for the font scaling in respect to the current active display,
+        // not for the primary display, as it's implemented in Font.cpp
+        // See https://github.com/wxWidgets/wxWidgets/blob/master/src/msw/font.cpp
+        // void wxNativeFontInfo::SetFractionalPointSize(float pointSizeNew)
+        wxNativeFontInfo nfi= *font.GetNativeFontInfo();
+        float pointSizeNew  = scale * font.GetPointSize();
+        nfi.lf.lfHeight     = nfi.GetLogFontHeightAtPPI(pointSizeNew, get_dpi_for_window(this));
+        nfi.pointSize       = pointSizeNew;
+        font = wxFont(nfi);
+#else
+        font.Scale(scale);
+#endif //__WXMSW__
+    }
+
+
+private:
+    wxStaticText* m_staticText_slicer_name;
+    wxStaticText* m_staticText_slicer_version;
+    wxStaticBitmap* m_bitmap;
+    wxStaticText* m_staticText_loading;
+    wxString        m_loading_info = _L("Loading configuration") + dots;
+    wxBitmap    m_main_bitmap;
+    wxFont      m_action_font;
+    float       m_scale {1.0};
+
+    struct ConstantText
+    {
+        wxString title;
+        wxString version;
+        wxString credits;
+
+        wxFont   title_font;
+        wxFont   version_font;
+        wxFont   credits_font;
+        wxFont   based_on_font;
+
+        void init(wxFont init_font)
+        {
+            // title
+            //title = wxGetApp().is_editor() ? SLIC3R_APP_FULL_NAME : GCODEVIEWER_APP_NAME;
+
+            // dynamically get the version to display
+            version = GUI_App::format_display_version();
+
+            // credits infornation
+            credits = "";
+
+            //title_font    = Label::Head_16;
+            version_font  = Label::Body_13;
+            based_on_font = Label::Body_8;
+            credits_font  = Label::Body_8;
+        }
+    }
+    m_constant_text;
+};
+
+#ifdef __linux__
+bool static check_old_linux_datadir(const wxString& app_name) {
+    // If we are on Linux and the datadir does not exist yet, look into the old
+    // location where the datadir was before version 2.3. If we find it there,
+    // tell the user that he might wanna migrate to the new location.
+    // (https://github.com/prusa3d/PrusaSlicer/issues/2911)
+    // To be precise, the datadir should exist, it is created when single instance
+    // lock happens. Instead of checking for existence, check the contents.
+
+    namespace fs = boost::filesystem;
+
+    std::string new_path = Slic3r::data_dir();
+
+    wxString dir;
+    if (! wxGetEnv(wxS("XDG_CONFIG_HOME"), &dir) || dir.empty() )
+        dir = wxFileName::GetHomeDir() + wxS("/.config");
+    std::string default_path = (dir + "/" + app_name).ToUTF8().data();
+
+    if (new_path != default_path) {
+        // This happens when the user specifies a custom --datadir.
+        // Do not show anything in that case.
+        return true;
+    }
+
+    fs::path data_dir = fs::path(new_path);
+    if (! fs::is_directory(data_dir))
+        return true; // This should not happen.
+
+    int file_count = std::distance(fs::directory_iterator(data_dir), fs::directory_iterator());
+
+    if (file_count <= 1) { // just cache dir with an instance lock
+        // BBS
+    } else {
+        // If the new directory exists, be silent. The user likely already saw the message.
+    }
+    return true;
+}
+#endif
+
+struct FileWildcards {
+    std::string_view              title;
+    std::vector<std::string_view> file_extensions;
+};
+
+static const FileWildcards file_wildcards_by_type[FT_SIZE] = {
+    /* FT_STEP */    { "STEP files"sv,      { ".stp"sv, ".step"sv } },
+    /* FT_STL */     { "STL files"sv,       { ".stl"sv } },
+    /* FT_OBJ */     { "OBJ files"sv,       { ".obj"sv } },
+    /* FT_AMF */     { "AMF files"sv,       { ".amf"sv, ".zip.amf"sv, ".xml"sv } },
+    /* FT_3MF */     { "3MF files"sv,       { ".3mf"sv } },
+    /* FT_GCODE */   { "G-code files"sv,    { ".gcode"sv, ".3mf"sv } },
+    /* FT_GCODE_3MF */   { "Gcode 3MF files"sv,    { ".gcode.3mf"sv } },
+#ifdef __APPLE__
+    /* FT_MODEL */
+    {"All"sv, {".3mf"sv, ".stl"sv, ".oltp"sv, ".stp"sv, ".step"sv, ".svg"sv, ".amf"sv, ".obj"sv, ".gltf"sv, ".glb"sv, ".fbx"sv, ".usd"sv, ".usda"sv, ".usdc"sv, ".usdz"sv, ".abc"sv, ".ply"sv,".dae"sv,".3ds"sv,".off"sv}},
+#else
+    /* FT_MODEL */
+    {"All"sv, {".3mf"sv, ".stl"sv, ".oltp"sv, ".stp"sv, ".step"sv, ".svg"sv, ".amf"sv, ".obj"sv, ".gltf"sv, ".glb"sv, ".fbx"sv, ".dae"sv, ".3ds"sv, ".ply"sv, ".off"sv}},
+#endif
+    /* FT_ZIP */     { "ZIP files"sv,       { ".zip"sv } },
+    /* FT_PROJECT */ { "Project files"sv,   { ".3mf"sv, ".cxprj"sv } },
+    /* FT_GALLERY */ { "Known files"sv,     { ".stl"sv, ".obj"sv } },
+
+    /* FT_INI */     { "INI files"sv,       { ".ini"sv } },
+    /* FT_SVG */     { "SVG files"sv,       { ".svg"sv } },
+    /* FT_TEX */     { "Texture"sv,         { ".png"sv, ".svg"sv } },
+    /* FT_SL1 */     { "Masked SLA files"sv, { ".sl1"sv, ".sl1s"sv } },
+    /* FT_CXPRJ */   { "Cxprj files"sv,     { ".cxprj"sv } },
+    /* FT_ONLY_GCODE */   { "G-code files"sv,    { ".gcode"sv } },
+    /* FT_MESH_FILE */ { "Mesh files"sv,   { ".stl"sv, ".obj"sv, ".dae"sv, ".3ds"sv, ".off"sv, ".ply"sv, ".3mf"sv } },
+    /* FT_CAD_FILE */     { "CAD files"sv, { ".stp"sv, ".step"sv } },
+};
+
+// This function produces a Win32 file dialog file template mask to be consumed by wxWidgets on all platforms.
+// The function accepts a custom extension parameter. If the parameter is provided, the custom extension
+// will be added as a fist to the list. This is important for a "file save" dialog on OSX, which strips
+// an extension from the provided initial file name and substitutes it with the default extension (the first one in the template).
+wxString file_wildcards(FileType file_type, const std::string &custom_extension)
+{
+    const FileWildcards& data = file_wildcards_by_type[file_type];
+    std::string title;
+    std::string mask;
+    std::string custom_ext_lower;
+
+    if (! custom_extension.empty()) {
+        // Generate an extension into the title mask and into the list of extensions.
+        custom_ext_lower = boost::to_lower_copy(custom_extension);
+        const std::string custom_ext_upper = boost::to_upper_copy(custom_extension);
+        if (custom_ext_lower == custom_extension) {
+            // Add a lower case version.
+            title = std::string("*") + custom_ext_lower;
+            mask = title;
+            // Add an upper case version.
+            mask  += ";*";
+            mask  += custom_ext_upper;
+        } else if (custom_ext_upper == custom_extension) {
+            // Add an upper case version.
+            title = std::string("*") + custom_ext_upper;
+            mask = title;
+            // Add a lower case version.
+            mask += ";*";
+            mask += custom_ext_lower;
+        } else {
+            // Add the mixed case version only.
+            title = std::string("*") + custom_extension;
+            mask = title;
+        }
+    }
+
+    for (const std::string_view &ext : data.file_extensions)
+        // Only add an extension if it was not added first as the custom extension.
+        if (ext != custom_ext_lower) {
+            if (title.empty()) {
+                title = "*";
+                title += ext;
+                mask  = title;
+            } else {
+                title += ", *";
+                title += ext;
+                mask  += ";*";
+                mask  += ext;
+            }
+            mask += ";*";
+            mask += boost::to_upper_copy(std::string(ext));
+        }
+    return GUI::format_wxstr("%s (%s)|%s", data.title, title, mask);
+}
+
+static std::string libslic3r_translate_callback(const char *s) { return wxGetTranslation(wxString(s, wxConvUTF8)).utf8_str().data(); }
+
+static std::string sha1_hex_of_file(const boost::filesystem::path& path)
+{
+    boost::uuids::detail::sha1 sha;
+    std::ifstream stream(path.string(), std::ios::binary);
+    if (!stream)
+        return std::string();
+    char buffer[8192];
+    while (stream.good()) {
+        stream.read(buffer, sizeof(buffer));
+        std::streamsize count = stream.gcount();
+        if (count > 0)
+            sha.process_bytes(buffer, static_cast<size_t>(count));
+    }
+    unsigned int digest[5] = { 0 };
+    sha.get_digest(digest);
+    std::ostringstream oss;
+    oss.setf(std::ios::hex, std::ios::basefield);
+    oss.fill('0');
+    for (int i = 0; i < 5; ++i) {
+        oss.width(8);
+        oss << digest[i];
+    }
+    std::string s = oss.str();
+    boost::algorithm::to_lower(s);
+    return s;
+}
+
+static bool download_file_with_check(const std::string& url, const boost::filesystem::path& target_path, long long expected_size, const std::string& expected_sha1)
+{
+    namespace fs = boost::filesystem;
+    bool ok = false;
+    fs::path tmp_path = target_path;
+    tmp_path += ".tmp";
+
+    Slic3r::Http::get(url)
+        .on_error([&](std::string body, std::string error, unsigned http_status) {
+            (void)body;
+            BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]download failed: " << url << " status " << http_status << " error " << error;
+        })
+        .on_complete([&](std::string body, unsigned) {
+            try {
+                std::ofstream file(tmp_path.string(), std::ios::binary | std::ios::trunc);
+                file.write(body.data(), static_cast<std::streamsize>(body.size()));
+                file.close();
+                fs::rename(tmp_path, target_path);
+                ok = true;
+            } catch (const std::exception& e) {
+                BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]write file failed: " << target_path.string() << " reason " << e.what();
+            }
+        })
+        .perform_sync();
+
+    if (!ok)
+        return false;
+
+    try {
+        if (expected_size > 0) {
+            uintmax_t size = fs::file_size(target_path);
+            if (size != static_cast<uintmax_t>(expected_size)) {
+                BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]size mismatch for " << target_path.string() << " expected " << expected_size << " got " << size;
+                fs::remove(target_path);
+                return false;
+            }
+        }
+        if (!expected_sha1.empty()) {
+            std::string actual = sha1_hex_of_file(target_path);
+            if (actual.empty()) {
+                BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]sha1 compute failed for " << target_path.string();
+                fs::remove(target_path);
+                return false;
+            }
+            if (!boost::iequals(actual, expected_sha1)) {
+                BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]sha1 mismatch for " << target_path.string() << " expected " << expected_sha1 << " got " << actual;
+                fs::remove(target_path);
+                return false;
+            }
+        }
+    } catch (const std::exception& e) {
+        BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]post-check failed for " << target_path.string() << " reason " << e.what();
+        return false;
+    }
+
+    return true;
+}
+
+static bool get_local_update_work_dir(wxString& out_dir)
+{
+#ifdef __WXMSW__
+    wxString local_appdata;
+    if (!wxGetEnv("LOCALAPPDATA", &local_appdata) || local_appdata.IsEmpty())
+        return false;
+    wxFileName updater_dest_dir(local_appdata, "crealityprint_squirrel");
+    wxString updater_dest_dir_path = updater_dest_dir.GetFullPath();
+    if (!wxDirExists(updater_dest_dir_path)) {
+        if (!wxFileName::Mkdir(updater_dest_dir_path, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL))
+            return false;
+    }
+    out_dir = updater_dest_dir_path;
+    return true;
+#else
+    (void)out_dir;
+    return false;
+#endif
+}
+
+#ifdef WIN32
+#if !wxVERSION_EQUAL_OR_GREATER_THAN(3,1,3)
+static void register_win32_dpi_event()
+{
+    enum { WM_DPICHANGED_ = 0x02e0 };
+
+    wxWindow::MSWRegisterMessageHandler(WM_DPICHANGED_, [](wxWindow *win, WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam) {
+        const int dpi = wParam & 0xffff;
+        const auto rect = reinterpret_cast<PRECT>(lParam);
+        const wxRect wxrect(wxPoint(rect->top, rect->left), wxPoint(rect->bottom, rect->right));
+
+        DpiChangedEvent evt(EVT_DPI_CHANGED_SLICER, dpi, wxrect);
+        win->GetEventHandler()->AddPendingEvent(evt);
+
+        return true;
+    });
+}
+#endif // !wxVERSION_EQUAL_OR_GREATER_THAN
+
+static GUID GUID_DEVINTERFACE_HID = { 0x4D1E55B2, 0xF16F, 0x11CF, 0x88, 0xCB, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30 };
+
+static void register_win32_device_notification_event()
+{
+    wxWindow::MSWRegisterMessageHandler(WM_DEVICECHANGE, [](wxWindow *win, WXUINT /* nMsg */, WXWPARAM wParam, WXLPARAM lParam) {
+        // Some messages are sent to top level windows by default, some messages are sent to only registered windows, and we explictely register on MainFrame only.
+        auto main_frame = dynamic_cast<MainFrame*>(win);
+        auto plater = (main_frame == nullptr) ? nullptr : main_frame->plater();
+        if (plater == nullptr)
+            // Maybe some other top level window like a dialog or maybe a pop-up menu?
+            return true;
+		PDEV_BROADCAST_HDR lpdb = (PDEV_BROADCAST_HDR)lParam;
+        switch (wParam) {
+        case DBT_DEVICEARRIVAL:
+			if (lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME)
+		        plater->GetEventHandler()->AddPendingEvent(VolumeAttachedEvent(EVT_VOLUME_ATTACHED));
+			else if (lpdb->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
+				PDEV_BROADCAST_DEVICEINTERFACE lpdbi = (PDEV_BROADCAST_DEVICEINTERFACE)lpdb;
+//				if (lpdbi->dbcc_classguid == GUID_DEVINTERFACE_VOLUME) {
+//					printf("DBT_DEVICEARRIVAL %d - Media has arrived: %ws\n", msg_count, lpdbi->dbcc_name);
+				if (lpdbi->dbcc_classguid == GUID_DEVINTERFACE_HID)
+			        plater->GetEventHandler()->AddPendingEvent(HIDDeviceAttachedEvent(EVT_HID_DEVICE_ATTACHED, boost::nowide::narrow(lpdbi->dbcc_name)));
+			}
+            break;
+		case DBT_DEVICEREMOVECOMPLETE:
+			if (lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME)
+                plater->GetEventHandler()->AddPendingEvent(VolumeDetachedEvent(EVT_VOLUME_DETACHED));
+			else if (lpdb->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
+				PDEV_BROADCAST_DEVICEINTERFACE lpdbi = (PDEV_BROADCAST_DEVICEINTERFACE)lpdb;
+//				if (lpdbi->dbcc_classguid == GUID_DEVINTERFACE_VOLUME)
+//					printf("DBT_DEVICEARRIVAL %d - Media was removed: %ws\n", msg_count, lpdbi->dbcc_name);
+				if (lpdbi->dbcc_classguid == GUID_DEVINTERFACE_HID)
+        			plater->GetEventHandler()->AddPendingEvent(HIDDeviceDetachedEvent(EVT_HID_DEVICE_DETACHED, boost::nowide::narrow(lpdbi->dbcc_name)));
+			}
+			break;
+        default:
+            break;
+        }
+        return true;
+    });
+
+    wxWindow::MSWRegisterMessageHandler(MainFrame::WM_USER_MEDIACHANGED, [](wxWindow *win, WXUINT /* nMsg */, WXWPARAM wParam, WXLPARAM lParam) {
+        // Some messages are sent to top level windows by default, some messages are sent to only registered windows, and we explictely register on MainFrame only.
+        auto main_frame = dynamic_cast<MainFrame*>(win);
+        auto plater = (main_frame == nullptr) ? nullptr : main_frame->plater();
+        if (plater == nullptr)
+            // Maybe some other top level window like a dialog or maybe a pop-up menu?
+            return true;
+        wchar_t sPath[MAX_PATH];
+        if (lParam == SHCNE_MEDIAINSERTED || lParam == SHCNE_MEDIAREMOVED) {
+            struct _ITEMIDLIST* pidl = *reinterpret_cast<struct _ITEMIDLIST**>(wParam);
+            if (! SHGetPathFromIDList(pidl, sPath)) {
+                BOOST_LOG_TRIVIAL(error) << "MediaInserted: SHGetPathFromIDList failed";
+                return false;
+            }
+        }
+        switch (lParam) {
+        case SHCNE_MEDIAINSERTED:
+        {
+            //printf("SHCNE_MEDIAINSERTED %S\n", sPath);
+            plater->GetEventHandler()->AddPendingEvent(VolumeAttachedEvent(EVT_VOLUME_ATTACHED));
+            break;
+        }
+        case SHCNE_MEDIAREMOVED:
+        {
+            //printf("SHCNE_MEDIAREMOVED %S\n", sPath);
+            plater->GetEventHandler()->AddPendingEvent(VolumeDetachedEvent(EVT_VOLUME_DETACHED));
+            break;
+        }
+	    default:
+//          printf("Unknown\n");
+            break;
+	    }
+        return true;
+    });
+
+    wxWindow::MSWRegisterMessageHandler(WM_INPUT, [](wxWindow *win, WXUINT /* nMsg */, WXWPARAM wParam, WXLPARAM lParam) {
+        auto main_frame = dynamic_cast<MainFrame*>(Slic3r::GUI::find_toplevel_parent(win));
+        auto plater = (main_frame == nullptr) ? nullptr : main_frame->plater();
+//        if (wParam == RIM_INPUTSINK && plater != nullptr && main_frame->IsActive()) {
+        if (wParam == RIM_INPUT && plater != nullptr && main_frame->IsActive()) {
+        RAWINPUT raw;
+			UINT rawSize = sizeof(RAWINPUT);
+			::GetRawInputData((HRAWINPUT)lParam, RID_INPUT, &raw, &rawSize, sizeof(RAWINPUTHEADER));
+			if (raw.header.dwType == RIM_TYPEHID && plater->get_mouse3d_controller().handle_raw_input_win32(raw.data.hid.bRawData, raw.data.hid.dwSizeHid))
+				return true;
+		}
+        return false;
+    });
+
+	wxWindow::MSWRegisterMessageHandler(WM_COPYDATA, [](wxWindow* win, WXUINT /* nMsg */, WXWPARAM wParam, WXLPARAM lParam) {
+		COPYDATASTRUCT* copy_data_structure = { 0 };
+		copy_data_structure = (COPYDATASTRUCT*)lParam;
+		if (copy_data_structure->dwData == 1) {
+			LPCWSTR arguments = (LPCWSTR)copy_data_structure->lpData;
+			Slic3r::GUI::wxGetApp().other_instance_message_handler()->handle_message(boost::nowide::narrow(arguments));
+		}
+		return true;
+		});
+}
+#endif // WIN32
+
+static void generic_exception_handle()
+{
+    // Note: Some wxWidgets APIs use wxLogError() to report errors, eg. wxImage
+    // - see https://docs.wxwidgets.org/3.1/classwx_image.html#aa249e657259fe6518d68a5208b9043d0
+    //
+    // wxLogError typically goes around exception handling and display an error dialog some time
+    // after an error is logged even if exception handling and OnExceptionInMainLoop() take place.
+    // This is why we use wxLogError() here as well instead of a custom dialog, because it accumulates
+    // errors if multiple have been collected and displays just one error message for all of them.
+    // Otherwise we would get multiple error messages for one missing png, for example.
+    //
+    // If a custom error message window (or some other solution) were to be used, it would be necessary
+    // to turn off wxLogError() usage in wx APIs, most notably in wxImage
+    // - see https://docs.wxwidgets.org/trunk/classwx_image.html#aa32e5d3507cc0f8c3330135bc0befc6a
+/*#ifdef WIN32
+    //LPEXCEPTION_POINTERS exception_pointers = nullptr;
+    __try {
+        throw;
+    }
+    __except (CBaseException::UnhandledExceptionFilter2(GetExceptionInformation()), EXCEPTION_EXECUTE_HANDLER) {
+    //__except (exception_pointers = GetExceptionInformation(), EXCEPTION_EXECUTE_HANDLER) {
+    //    if (exception_pointers) {
+    //        CBaseException::UnhandledExceptionFilter(exception_pointers);
+    //    }
+    //    else
+            throw;
+    }
+#else*/
+    try {
+        throw;
+    } catch (const std::bad_alloc& ex) {
+        // bad_alloc in main thread is most likely fatal. Report immediately to the user (wxLogError would be delayed)
+        // and terminate the app so it is at least certain to happen now.
+        BOOST_LOG_TRIVIAL(error) << boost::format("std::bad_alloc exception: %1%") % ex.what();
+        flush_logs();
+        wxString errmsg = wxString::Format(_L("Creality3DSlicer will terminate because of running out of memory."
+                                              "It may be a bug. It will be appreciated if you report the issue to our team."));
+        wxMessageBox(errmsg + "\n\n" + wxString(ex.what()), _L("Fatal error"), wxOK | wxICON_ERROR);
+
+        std::terminate();
+        //throw;
+     } catch (const boost::io::bad_format_string& ex) {
+     	BOOST_LOG_TRIVIAL(error) << boost::format("Uncaught exception: %1%") % ex.what();
+        flush_logs();
+        wxString errmsg = _L("Creality3DSlicer will terminate because of a localization error. "
+                             "It will be appreciated if you report the specific scenario this issue happened.");
+        wxMessageBox(errmsg + "\n\n" + wxString(ex.what()), _L("Critical error"), wxOK | wxICON_ERROR);
+        std::terminate();
+        //throw;
+    } catch (const std::exception& ex) {
+        wxLogError(format_wxstr(_L("Creality3DSlicer got an unhandled exception: %1%"), ex.what()));
+        BOOST_LOG_TRIVIAL(error) << boost::format("Uncaught exception: %1%") % ex.what();
+        flush_logs();
+        throw;
+    }
+//#endif
+}
+
+bool GUI_App::getExtraHeader(std::map<std::string, std::string>& mapHeader)
+{
+    mapHeader = this->get_extra_header();
+    return true;
+}
+
+void GUI_App::toggle_show_gcode_window()
+{
+    m_show_gcode_window = !m_show_gcode_window;
+    app_config->set_bool("show_gcode_window", m_show_gcode_window);
+}
+#ifdef _WIN32
+static std::list<HWND> l_creality_print_hwnds;
+static BOOL CALLBACK EnumWindowsProc(_In_ HWND   hwnd, _In_ LPARAM lParam)
+{
+		//checks for other instances of prusaslicer, if found brings it to front and return false to stop enumeration and quit this instance
+		//search is done by classname(wxWindowNR is wxwidgets thing, so probably not unique) and name in window upper panel
+		//other option would be do a mutex and check for its existence
+		//BOOST_LOG_TRIVIAL(error) << "ewp: version: " << l_version_wstring;
+		TCHAR 		 wndText[1000];
+		TCHAR 		 className[1000];
+		int          err;
+		err = GetClassName(hwnd, className, 1000);
+		if (err == 0)
+			return true;
+		err = GetWindowText(hwnd, wndText, 1000);
+		if (err == 0)
+			return true;
+		std::wstring classNameString(className);
+		std::wstring wndTextString(wndText);
+		if (wndTextString.find(L"CrealityPrint") != std::wstring::npos && classNameString == L"wxWindowNR") {
+			//check if other instances has same instance hash
+			//if not it is not same version(binary) as this version 
+			HANDLE   handle = GetProp(hwnd, L"Instance_Hash_Minor");
+			uint64_t other_instance_hash = PtrToUint(handle);
+			uint64_t other_instance_hash_major;
+			uint64_t my_instance_hash = GUI::wxGetApp().get_instance_hash_int();
+			handle = GetProp(hwnd, L"Instance_Hash_Major");
+			other_instance_hash_major = PtrToUint(handle);
+			other_instance_hash_major = other_instance_hash_major << 32;
+			other_instance_hash += other_instance_hash_major;
+            //All CrealityPrint instances send
+			//if(my_instance_hash == other_instance_hash) 
+			{
+				BOOST_LOG_TRIVIAL(debug) << "win enum - found correct instance";
+				l_creality_print_hwnds.push_back(hwnd);
+				return true;
+			}
+			BOOST_LOG_TRIVIAL(debug) << "win enum - found wrong instance";
+		}
+		return true;
+	}
+#endif
+void  GUI_App::reload_homepage()
+{
+    if (mainframe)
+    {
+        if(mainframe->m_webview)
+        {
+            mainframe->m_webview->Reload();
+        }
+    }
+
+}
+
+void GUI_App::reload_region_sensitive_views()
+{
+    auto mf = mainframe;
+    if (!mf) return;
+    if (auto* ai_view = mf->get_ai_creation_view()) {
+        ai_view->SetStartPage(wxString::FromUTF8(get_ai_creation_webaddress()));
+        // Preserve lazy loading for a tab that has never been opened.
+        if (ai_view->IsInitialized()) {
+            ai_view->UpdateUserAgent();
+            ai_view->open_default_page();
+        }
+    }
+
+    auto mlv = mf->get_modellibrary_view();
+    if (!mlv) return;
+
+    // 在线模型库切换区域需要切换到对应域名；
+    // 切换地区会改变环境，不同环境配置的模型标签数据不同，
+    // 因此需要导航到模型库首页，避免黑屏问题。
+    wxString new_base = wxString::FromUTF8(Slic3r::GUI::get_cloud_webaddress());
+
+    // 规范化拼接，避免出现双斜杠
+    if (!new_base.EndsWith("/")) new_base += "/";
+
+    // 导航到模型库首页
+    wxString target = new_base + "model-category/3d-print-all";
+
+    // 在导航到新的域名前刷新 Cookies（UA 仅在初始化设置）
+    mlv->UpdateUserAgent();
+    mlv->load_url(target);
+}
+bool GUI_App::send_app_message(const std::string& msg,bool bforce)
+{
+    bool isActive = mainframe->IsActive();
+    BOOST_LOG_TRIVIAL(error) << "send message to other instance: " << isActive;
+    if(!isActive && !bforce)
+    {
+        //only send message when the mainframe is active
+        return false;
+    }   
+#ifdef __APPLE__
+    std::cout << "Request received: ";
+    send_message_mac(msg,get_instance_hash_string());
+    return true;
+#endif     
+#ifdef _WIN32
+    l_creality_print_hwnds.clear();
+    EnumWindows(EnumWindowsProc, 0);
+    if (!l_creality_print_hwnds.empty()) {
+        std::wstring wstr = boost::nowide::widen(msg);
+        std::unique_ptr<LPWSTR> command_line_args = std::make_unique<LPWSTR>(const_cast<LPWSTR>(wstr.c_str()));
+        /*LPWSTR command_line_args = new wchar_t[wstr.size() + 1];
+        copy(wstr.begin(), wstr.end(), command_line_args);
+        command_line_args[wstr.size()] = 0;*/
+
+        //Create a COPYDATASTRUCT to send the information
+        //cbData represents the size of the information we want to send.
+        //lpData represents the information we want to send.
+        //dwData is an ID defined by us(this is a type of ID different than WM_COPYDATA).
+        COPYDATASTRUCT data_to_send = { 0 };
+        data_to_send.dwData = 1;
+        data_to_send.cbData = sizeof(TCHAR) * (wcslen(*command_line_args.get()) + 1);
+        data_to_send.lpData = *command_line_args.get();
+        for(auto hwnd : l_creality_print_hwnds)
+        {
+            if(hwnd != mainframe->GetHWND())
+            {
+                SendMessage(hwnd, WM_COPYDATA, 0, (LPARAM)&data_to_send);
+            }
+            
+        }
+        
+        return true;  
+    }
+#endif
+    return false;
+}
+
+std::vector<std::string> GUI_App::split_str(std::string src, std::string separator)
+{
+    std::string::size_type pos;
+    std::vector<std::string> result;
+    src += separator;
+    int size = src.size();
+
+    for (int i = 0; i < size; i++)
+    {
+        pos = src.find(separator, i);
+        if (pos < size)
+        {
+            std::string s = src.substr(i, pos - i);
+            result.push_back(s);
+            i = pos + separator.size() - 1;
+        }
+    }
+    return result;
+}
+void GUI_App::post_openlink_cmd(std::string link)
+{
+    if (link.length() > 0)
+    {
+        std::string url = link;
+        json m_Res = json::object();
+        m_Res["command"] = "url_scheme";
+        m_Res["url"] = url;
+        wxString strJS = wxString::Format("window.handleStudioCmd(%s)", m_Res.dump(-1, ' ', false, json::error_handler_t::ignore));
+        GUI::wxGetApp().run_script(strJS);
+
+    }
+}
+void GUI_App::post_login_status_cmd(bool isSuccess, UserInfo user)
+{
+    json m_Res = json::object();
+    json user_info        = json::object();
+    
+    m_Res["command"] = "login_status_cmd";
+    m_Res["login_status"] = isSuccess;
+    std::string region    = wxGetApp().app_config->get("region");
+
+    if (isSuccess) {
+        m_Res["user_info"] = 
+        {
+            {"token", user.token}, {"nickName", user.nickName}, {"userId", user.userId}, {"avatar", user.avatar}, { "region", region }
+        };
+    }
+    else {
+        m_Res["user_info"] = nullptr;
+    }
+    wxString strJS        = wxString::Format("window.handleStudioCmd(%s)", m_Res.dump(-1, ' ', true, json::error_handler_t::ignore));
+    GUI::wxGetApp().run_script(strJS);
+    
+
+    // 关闭LoginDialog窗口；登录成功路径与文件监听器都可能触发本函数，
+    // 对话框已被关闭时再次 EndModal 会触发 AppKit 窗口事务断言崩溃
+    if (m_login_dialog && m_login_dialog->IsShown()) {
+        m_login_dialog->EndModal(isSuccess ? wxID_OK : wxID_CANCEL);
+    }
+}
+
+// param_set 参数集合页
+
+// 启动监听 user_info.json 的文件变更，用于跨进程同步登录状态到当前实例
+void GUI_App::start_user_info_watcher()
+{
+    try {
+        auto user_file = fs::path(data_dir()).append("user_info.json");
+        if (!m_user_info_watcher) {
+            m_user_info_watcher = std::make_unique<wxFileSystemWatcher>();
+            m_user_info_watcher->Add(wxFileName(boost::nowide::widen(user_file.string())));
+            m_user_info_watcher->Bind(wxEVT_FSWATCHER, &GUI_App::on_user_info_file_event, this);
+            BOOST_LOG_TRIVIAL(info) << "start_user_info_watcher: watching " << user_file.string();
+        }
+    } catch (...) {
+        BOOST_LOG_TRIVIAL(info) << "start_user_info_watcher: failed to start watcher";
+    }
+}
+
+// 文件系统事件：当 user_info.json 被创建、修改、重命名或删除时触发
+void GUI_App::on_user_info_file_event(wxFileSystemWatcherEvent& evt)
+{
+    const int change = evt.GetChangeType();
+    auto user_file   = fs::path(data_dir()).append("user_info.json");
+
+    auto apply_logout = [this] {
+        m_user.token.clear();
+        m_user.nickName.clear();
+        m_user.avatar.clear();
+        m_user.userId.clear();
+        m_user.bLogin = false;
+        app_config->set("cloud", "user_id", m_user.userId);
+        app_config->set("cloud", "token", m_user.token);
+        NotifyAIChatLoginStatusChanged();
+        CallAfter([this] {
+            post_login_status_cmd(false, {});
+            if (mainframe) {
+                mainframe->update_model_webviews_user_agent();
+            }
+        });
+    };
+
+    if (change == wxFSW_EVENT_CREATE || change == wxFSW_EVENT_MODIFY || change == wxFSW_EVENT_RENAME) {
+        try {
+            if (!fs::exists(user_file)) {
+                apply_logout();
+                return;
+            }
+
+            json j;
+            boost::nowide::ifstream ifs(user_file.string());
+            ifs >> j;
+
+            UserInfo user;
+            user.token    = j.value("token", "");
+            user.nickName = j.value("nickName", "");
+            user.avatar   = j.value("avatar", "");
+            user.userId   = j.value("userId", "");
+
+            const bool old_login  = m_user.bLogin;
+            const wxString old_token = m_user.token;
+            const wxString old_uid   = m_user.userId;
+
+            m_user.token    = user.token;
+            m_user.nickName = user.nickName;
+            m_user.avatar   = user.avatar;
+            m_user.userId   = user.userId;
+            m_user.bLogin   = !m_user.token.empty();
+
+            app_config->set("cloud", "user_id", m_user.userId);
+            app_config->set("cloud", "token", m_user.token);
+            NotifyAIChatLoginStatusChanged();
+
+            const bool login_unchanged = (old_login == m_user.bLogin);
+            const bool token_unchanged = (old_token == m_user.token);
+            const bool uid_unchanged   = (old_uid   == m_user.userId);
+
+            if (login_unchanged && token_unchanged && uid_unchanged)
+                return; // 无变化，不触发更新
+
+            CallAfter([this, user] {
+                post_login_status_cmd(!user.token.empty(), user);
+                if (mainframe) {
+                    mainframe->update_model_webviews_user_agent();
+                }
+            });
+        } catch (const std::exception& e) {
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ", parse user_info.json failed: " << e.what();
+        }
+    } else if (change == wxFSW_EVENT_DELETE) {
+        apply_logout();
+    }
+}
+// token_expired token过期
+// login 登录
+void GUI_App::swith_community_sub_page(const std::string& pageName)
+{
+    json m_Res       = json::object();
+    m_Res["command"] = "switch_sub_page";
+    m_Res["page_name"]     = pageName;
+    wxString strJS   = wxString::Format("window.handleStudioCmd(%s)", m_Res.dump(-1, ' ', false, json::error_handler_t::ignore));
+    GUI::wxGetApp().run_script(strJS);
+}
+
+//  参数值：
+//  tpHome - 社区页面
+void GUI_App::switch_to_tab(const std::string& tabName)
+{
+    if (mainframe == nullptr)
+        return;
+
+    if (tabName == "tpHome") {
+        mainframe->select_tab(MainFrame::tpHome);
+    }
+    else if (tabName == "tpOnlineModel") {
+        mainframe->select_tab(MainFrame::tpOnlineModel);
+        wxCommandEvent e = wxCommandEvent(wxCUSTOMEVT_NOTEBOOK_SEL_CHANGED);
+        e.SetId(MainFrame::TabPosition::tpOnlineModel); // printer details page
+        wxPostEvent(wxGetApp().mainframe->topbar(), e);
+        //mainframe->m_topbar->SetSelection(size_t(MainFrame::tpOnlineModel));
+    }
+}
+
+void GUI_App::post_init()
+{
+    assert(initialized());
+    if (! this->initialized())
+        throw Slic3r::RuntimeError("Calling post_init() while not yet initialized");
+
+    if (!m_enable_test && is_editor() && app_config != nullptr && !m_satisfaction_survey_manager) {
+        m_satisfaction_survey_manager = std::make_unique<SatisfactionSurveyManager>(
+            *app_config, CxBuildInfo::getVersion(), CxBuildInfo::getBuildType());
+        install_satisfaction_survey_event_filter();
+    }
+
+    if (app_config->get("sync_user_preset") == "true") {
+        // BBS loading user preset
+        // Always async, not such startup step
+        // BOOST_LOG_TRIVIAL(info) << "Loading user presets...";
+        // scrn->SetText(_L("Loading user presets..."));
+        if (true /*m_agent*/) {
+            start_sync_user_preset();
+        }
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << " sync_user_preset: true";
+    } else {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << " sync_user_preset: false";
+    }
+
+    Update_easy_mode_flag();
+
+    m_open_method = "double_click";
+    bool switch_to_3d = false;
+    if (!this->init_params->input_files.empty()) {
+        bool onlyDefault = preset_bundle->printers.only_default_printers();
+        if (onlyDefault) return;
+
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", init with input files, size %1%, input_gcode %2%")
+            %this->init_params->input_files.size() %this->init_params->input_gcode;
+        const auto first_url = this->init_params->input_files.front();
+        if (this->init_params->input_files.size() == 1 && is_supported_open_protocol(first_url)) {
+            switch_to_3d = true;
+            std::cout << "first_url: " << first_url << std::endl;
+            BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << first_url << "\n";
+            start_download(first_url);
+            m_openlink_url = first_url;
+            m_open_method = "url";
+            
+            
+            
+        } else {
+            switch_to_3d = true;
+            if (this->init_params->input_gcode) {
+                mainframe->select_tab(size_t(MainFrame::tp3DEditor));
+                plater_->select_view_3D("3D");
+                this->plater()->load_gcode(from_u8(this->init_params->input_files.front()));
+                this->plater()->update();
+                m_open_method = "gcode";
+            } else {
+                mainframe->select_tab(size_t(MainFrame::tp3DEditor));
+                plater_->select_view_3D("3D");
+                wxArrayString input_files;
+#if AUTO_CONVERT_3MF
+                //(1) 3mf-to-3mf, format like this: CrealityPrint.exe convert_3mf "input_file.3mf" "printer_name" "output_file"
+                //(2) stl-to-3mf, format like this: CrealityPrint.exe convert_3mf "stl_dir" "printer_name" "output_file"
+
+                // 检查第2个参数是否是目录
+                wxString firstArg = from_u8(this->init_params->input_files[1]);
+                if (wxDirExists(firstArg)) {
+                    // 是目录，遍历目录中的所有 STL 文件
+                    wxDir    dir(firstArg);
+                    wxString filename;
+                    bool     cont = dir.GetFirst(&filename, "*.stl", wxDIR_FILES);
+                    while (cont) {
+                        input_files.push_back(dir.GetNameWithSep() + filename);
+                        cont = dir.GetNext(&filename);
+                    }
+                } else {
+                    // 不是目录，按原方式处理
+                    for (int i = 0; i < this->init_params->input_files.size() - 1; i++) {
+                        input_files.push_back(wxString::FromUTF8(this->init_params->input_files[i]));
+                    }
+                }
+
+                // for (int i = 0; i < this->init_params->input_files.size() - 1; i++) {
+                //     input_files.push_back(wxString::FromUTF8(this->init_params->input_files[i]));
+                // }
+#else
+                for (auto& file : this->init_params->input_files) {
+                    input_files.push_back(wxString::FromUTF8(file));
+                }
+#endif
+
+#if AUTOMATION_TOOL
+                if (AutomationMgr::enabled()) {
+                    input_files.clear();
+                }
+#endif // AUTOMATION_TOOL
+
+                this->plater()->set_project_filename(_L("Untitled"));
+                this->plater()->load_files(input_files);
+                try {
+                    if (!input_files.empty()) {
+                        std::string           file_path = input_files.front().ToStdString();
+                        std::filesystem::path path(file_path);
+                        //m_open_method = "file_" + path.extension().string();
+                    }
+                } catch (...) {
+                    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ", file path exception!";
+                    m_open_method = "file";
+                }
+            }
+        }
+    }
+
+//#if BBL_HAS_FIRST_PAGE
+    bool slow_bootup = false;
+    if (app_config->get("slow_bootup") == "true") {
+        slow_bootup = true;
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ", slow bootup, won't render gl here.";
+    }
+    if (!switch_to_3d) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ", begin load_gl_resources";
+#ifndef __linux__
+        mainframe->Freeze();
+#endif
+        plater_->canvas3D()->enable_render(false);
+        mainframe->select_tab(size_t(MainFrame::tp3DEditor));
+        plater_->select_view_3D("3D");
+        //BBS init the opengl resource here
+#ifdef __linux__
+        const bool glcontext_ready = is_running_on_wayland()
+            ? plater_->canvas3D()->make_current_for_postinit()
+            : (plater_->canvas3D()->get_wxglcanvas()->IsShownOnScreen() &&
+               plater_->canvas3D()->make_current_for_postinit());
+#else
+        const bool glcontext_ready = plater_->canvas3D()->get_wxglcanvas()->IsShownOnScreen() &&
+            plater_->canvas3D()->make_current_for_postinit();
+#endif
+        if (!glcontext_ready) {
+            BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << ": glcontext not ready, postpone init";
+            plater_->canvas3D()->enable_render(true);
+            plater_->canvas3D()->set_as_dirty();
+#ifdef __linux__
+            // Wayland/EGL may not have committed the GL surface yet; ask the
+            // idle loop to retry post_init when the canvas is actually mapped.
+            // Without this, GL function pointers stay null and the first
+            // Preview focus can crash in Camera::apply_viewport.
+            m_post_initialized = false;
+            return;
+#endif
+        } else {
+            Size canvas_size = plater_->canvas3D()->get_canvas_size();
+            wxGetApp().imgui()->set_display_size(static_cast<float>(canvas_size.get_width()), static_cast<float>(canvas_size.get_height()));
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ", start to init opengl";
+            wxGetApp().init_opengl();
+            if (!is_gl_version_greater_or_equal_to(2, 0)) {
+                return;
+            }
+
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ", finished init opengl";
+            plater_->canvas3D()->init();
+
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ", finished init canvas3D";
+            wxGetApp().imgui()->new_frame();
+
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ", finished init imgui frame";
+            plater_->canvas3D()->enable_render(true);
+
+            if (!slow_bootup) {
+                BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ", start to render a first frame for test";
+                plater_->canvas3D()->render(false);
+                BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ", finished rendering a first frame for test";
+            }
+        }
+        if (app_config->get("default_page") == "1")
+        {
+            // First launch: keep the home page in front so the home-page SPA
+            // (get_is_first_install -> deviceAddEnd=0) renders the onboarding
+            // guide (machine -> LAN connect -> new user tour). With default_page
+            // set to "1" the app would otherwise open the 3D editor and the
+            // guide would never show on a clean install.
+#if defined(__WXOSX__) && defined(CREALITYPRINT_APP_STORE)
+            // First-launch: keep the home page in front so the home-page SPA
+            // renders the onboarding guide. Other platforms keep the original
+            // default page.
+            if (m_app_first_launch) {
+                mainframe->select_tab(size_t(MainFrame::tpHome));
+                mainframe->m_topbar->SetSelection(size_t(MainFrame::tpHome));
+            } else
+#endif
+            {
+                mainframe->select_tab(size_t(MainFrame::tp3DEditor));
+                mainframe->m_topbar->SetSelection(size_t(MainFrame::tp3DEditor));
+            }
+        }
+        else if (is_editor())
+        {
+            mainframe->select_tab(size_t(MainFrame::tpHome));
+            mainframe->m_topbar->SetSelection(size_t(MainFrame::tpHome));
+         }
+#ifndef __linux__
+        mainframe->Thaw();
+#endif
+        // If a pending hot-update is waiting (user chose "Install Later" last time),
+        // defer the restore-project prompt so the "Update Ready" dialog appears first.
+        if (m_satisfaction_survey_manager)
+            m_satisfaction_survey_manager->expect_startup_restore();
+        if (!get_pending_app_update_version().empty()) {
+            m_restore_project_deferred = true;
+        } else {
+            plater_->trigger_restore_project(1);
+        }
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ", end load_gl_resources";
+    }
+//#endif
+
+    //BBS: remove GCodeViewer as seperate APP logic
+    /*if (this->init_params->start_as_gcodeviewer) {
+        if (! this->init_params->input_files.empty())
+            this->plater()->load_gcode(wxString::FromUTF8(this->init_params->input_files[0].c_str()));
+    }
+    else
+    {
+        if (! this->init_params->preset_substitutions.empty())
+            show_substitutions_info(this->init_params->preset_substitutions);
+
+#if 0
+        // Load the cummulative config over the currently active profiles.
+        //FIXME if multiple configs are loaded, only the last one will have an effect.
+        // We need to decide what to do about loading of separate presets (just print preset, just filament preset etc).
+        // As of now only the full configs are supported here.
+        if (!m_print_config.empty())
+            this->gui->mainframe->load_config(m_print_config);
+#endif
+        if (! this->init_params->load_configs.empty())
+            // Load the last config to give it a name at the UI. The name of the preset may be later
+            // changed by loading an AMF or 3MF.
+            //FIXME this is not strictly correct, as one may pass a print/filament/printer profile here instead of a full config.
+            this->mainframe->load_config_file(this->init_params->load_configs.back());
+        // If loading a 3MF file, the config is loaded from the last one.
+        if (!this->init_params->input_files.empty()) {
+            const std::vector<size_t> res = this->plater()->load_files(this->init_params->input_files);
+            if (!res.empty() && this->init_params->input_files.size() == 1) {
+                // Update application titlebar when opening a project file
+                const std::string& filename = this->init_params->input_files.front();
+                //BBS: remove amf logic as project
+                if (boost::algorithm::iends_with(filename, ".3mf"))
+                    this->plater()->set_project_filename(filename);
+            }
+        }
+        if (! this->init_params->extra_config.empty())
+            this->mainframe->load_config(this->init_params->extra_config);
+    }*/
+
+    // BBS: to be checked
+#if 1
+    // show "Did you know" notification
+    if (app_config->get("show_hints") == "true" && !is_gcode_viewer()) {
+        plater_->get_notification_manager()->push_hint_notification(false);
+    }
+#endif
+
+    if (app_config->get("stealth_mode") == "false")
+        hms_query = new HMSQuery();
+
+    m_show_gcode_window = app_config->get_bool("show_gcode_window");
+    if (m_networking_need_update) {
+        //updating networking
+        int ret = updating_bambu_networking();
+        if (!ret) {
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__<<":networking plugin updated successfully";
+            //restart_networking();
+        }
+        else {
+            BOOST_LOG_TRIVIAL(error) << __FUNCTION__<<":networking plugin updated failed";
+        }
+    }
+
+    // The extra CallAfter() is needed because of Mac, where this is the only way
+    // to popup a modal dialog on start without screwing combo boxes.
+    // This is ugly but I honestly found no better way to do it.
+    // Neither wxShowEvent nor wxWindowCreateEvent work reliably.
+    //this->check_creality_privacy_version();
+    if (this->preset_updater) { // G-Code Viewer does not initialize preset_updater.
+        if (this->preset_updater->version_check_enabled() &&
+            app_config->get("is_first_install") == "1") {
+            // Reserve the lowest-priority dialog slot before the updater's
+            // worker thread starts, closing the scheduling race with survey UI.
+            m_startup_update_check_running.store(true, std::memory_order_release);
+        }
+        CallAfter([this] {
+            // First-launch onboarding is driven by the home page SPA through
+            // get_is_first_install/deviceAddEnd, matching the regular release.
+            // A modal guide here would consume the first-install state and skip
+            // the LAN-connect and new-user-tour steps.
+            //bool cw_showed = this->config_wizard_startup();
+#if CUSTOM_CXCLOUD
+            std::string http_url = get_http_url(app_config->get_country_code());
+            std::string language = GUI::into_u8(current_language_code());
+            std::string network_ver = Slic3r::NetworkAgent::get_version();
+            bool        sys_preset  = app_config->get("sync_system_preset") == "true";
+            
+            this->preset_updater->sync(http_url, language, network_ver, sys_preset ? preset_bundle : nullptr);
+
+            //this->check_new_version_cx();
+            if (is_user_login() && app_config->get("stealth_mode") == "false") {
+               //this->check_privacy_version(0);
+              request_user_handle(0);
+            }
+
+            //  检测是否有5.x的配置需要加载
+            // mainframe->checkHaveOldPresetsNeedLoad();
+            //  检查是否有参数需要更新
+            //UpdateParams::getInstance().checkParamsNeedUpdate();
+#endif
+            //  设置应用启动完成
+            SyncUserPresets::getInstance().setAppHasStartuped();
+            //  检测token是否过期
+            
+            // Removed startup update ready dialog logic to avoid confusion with version checking
+            // Update ready dialog will be shown only when pending version matches detected new version
+            
+        });
+    }
+
+#if !AUTO_CONVERT_3MF
+    if (is_user_login())
+        request_user_handle(0);
+#endif
+
+    if(!m_networking_need_update && m_agent) {
+        m_agent->set_on_ssdp_msg_fn(
+            [this](std::string json_str) {
+                if (m_is_closing) {
+                    return;
+                }
+                GUI::wxGetApp().CallAfter([this, json_str] {
+                    if (m_device_manager) {
+                        m_device_manager->on_machine_alive(json_str);
+                    }
+                    });
+            }
+        );
+        m_agent->set_on_http_error_fn([this](unsigned int status, std::string body) {
+            this->handle_http_error(status, body);
+        });
+        m_agent->start_discovery(true, false);
+    }
+    
+    //update the plugin tips
+    CallAfter([this] {
+            mainframe->refresh_plugin_tips();
+        });
+
+    // update hms info
+    //CallAfter([this] {
+            //if (hms_query)
+                //hms_query->check_hms_info();
+      //  });
+
+
+    DeviceManager::load_filaments_blacklist_config();
+    
+    // remove old log files over LOG_FILES_MAX_NUM
+    std::string log_addr = data_dir();
+    if (!log_addr.empty()) {
+        auto log_folder = boost::filesystem::path(log_addr) / "log";
+        if (boost::filesystem::exists(log_folder)) {
+           std::vector<std::pair<time_t, std::string>> files_vec;
+           for (auto& it : boost::filesystem::directory_iterator(log_folder)) {
+               auto temp_path = it.path();
+               try {
+                   std::time_t lw_t = boost::filesystem::last_write_time(temp_path) ;
+                   files_vec.push_back({ lw_t, temp_path.filename().string() });
+               } catch (const std::exception &ex) {
+               }
+           }
+           std::sort(files_vec.begin(), files_vec.end(), [](
+               std::pair<time_t, std::string> &a, std::pair<time_t, std::string> &b) {
+               return a.first > b.first;
+           });
+
+           while (files_vec.size() > LOG_FILES_MAX_NUM) {
+               auto full_path = log_folder / boost::filesystem::path(files_vec[files_vec.size() - 1].second);
+               BOOST_LOG_TRIVIAL(info) << "delete log file over " << LOG_FILES_MAX_NUM << ", filename: "<< files_vec[files_vec.size() - 1].second;
+               try {
+                   boost::filesystem::remove(full_path);
+               }
+               catch (const std::exception& ex) {
+                   BOOST_LOG_TRIVIAL(error) << "failed to delete log file: "<< files_vec[files_vec.size() - 1].second << ". Error: " << ex.what();
+               }
+               files_vec.pop_back();
+           }
+        }
+    }
+    BOOST_LOG_TRIVIAL(info) << "finished post_init";
+    if (m_satisfaction_survey_manager) {
+        m_satisfaction_survey_manager->begin_startup_check();
+        m_satisfaction_survey_manager->notify_post_init_finished(mainframe);
+    }
+    
+//BBS: remove the single instance currently
+#ifdef _WIN32
+    // Sets window property to mainframe so other instances can indentify it.
+    OtherInstanceMessageHandler::init_windows_properties(mainframe, m_instance_hash_int);
+#endif //WIN32
+    
+    //if (m_openlink_url.length() > 0)
+    //{
+    //    _sleep(6000);
+    //    push_openlink_cmd();
+    //}
+    //
+    //const std::string _3mf_file = ("C:/Users/Administrator/Desktop/BLTEST/123456.3mf");
+
+    //run aplication ,load data completed
+#ifdef _WIN32
+    std::function<void(std::string)> callback = [this](std::string _3mf_file) {
+        wxString wxStr(_3mf_file.c_str(), wxConvWhateverWorks);
+        this->mainframe->open_recent_project(0, wxStr);
+	};
+    // 1. start BL test
+    if (BLCompareTestFlow::enabled())
+    {
+        Slic3r::BLCompareTestFlow::startBLTest(callback);
+    }
+#if AUTOMATION_TOOL
+    if (AutomationMgr::enabled()) {
+        // change string to wstring
+        std::wstring _3mf_file = boost::locale::conv::to_utf<wchar_t>(AutomationMgr::get3mfPath(), "UTF-8");
+        if (!std::filesystem::exists(_3mf_file)) {
+            AutomationMgr::outputLog("can't found file, file is not exist!", 1);
+            AutomationMgr::endFunction();
+            return;
+        }
+        callback(AutomationMgr::get3mfPath());
+    }
+#endif // AUTOMATION_TOOL
+
+#endif
+    if (is_enable_test())
+        Test::mark_app_ready();
+}
+
+wxDEFINE_EVENT(EVT_ENTER_FORCE_UPGRADE, wxCommandEvent);
+wxDEFINE_EVENT(EVT_SHOW_NO_NEW_VERSION, wxCommandEvent);
+wxDEFINE_EVENT(EVT_SHOW_DIALOG, wxCommandEvent);
+wxDEFINE_EVENT(EVT_CONNECT_LAN_MODE_PRINT, wxCommandEvent);
+wxDEFINE_EVENT(EVT_TEST_HELPER_CMD, wxCommandEvent);
+
+#if AUTO_CONVERT_3MF
+wxDEFINE_EVENT(EVT_SLICE_ALL_PLATE_FINISHED, wxCommandEvent);
+wxDEFINE_EVENT(EVT_ARRANGE_PLATE_FINISHED, wxCommandEvent);
+#endif
+
+IMPLEMENT_APP(GUI_App)
+
+//BBS: remove GCodeViewer as seperate APP logic
+//GUI_App::GUI_App(EAppMode mode)
+GUI_App::GUI_App(bool enable_test /*= false*/)
+    : wxApp()
+    //, m_app_mode(mode)
+    , m_app_mode(EAppMode::Editor)
+    , m_em_unit(10)
+    , m_imgui(new ImGuiWrapper())
+	, m_removable_drive_manager(std::make_unique<RemovableDriveManager>())
+    , m_downloader(std::make_unique<Downloader>())
+	, m_other_instance_message_handler(std::make_unique<OtherInstanceMessageHandler>())
+    , m_enable_test(enable_test)
+{
+	//app config initializes early becasuse it is used in instance checking in CrealityPrint.cpp
+    this->init_app_config();
+    Test::Init(enable_test);
+    this->init_download_path();
+#if wxUSE_WEBVIEW_EDGE
+    this->init_webview_runtime();
+#endif
+    initDevelopParams();
+    reset_to_active();
+#ifdef __APPLE__
+    Slic3r::GUI::register_receive_mac([](const std::string& m) { wxGetApp().on_interinstance_message(m); });
+#endif
+}
+
+void GUI_App::shutdown()
+{
+    BOOST_LOG_TRIVIAL(info) << "GUI_App::shutdown enter";
+
+	if (m_removable_drive_manager) {
+		removable_drive_manager()->shutdown();
+	}
+
+    // destroy login dialog
+    if (login_dlg != nullptr) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< boost::format(": destroy login dialog");
+        delete login_dlg;
+        login_dlg = nullptr;
+    }
+
+    if (m_is_recreating_gui) return;
+    uninstall_satisfaction_survey_event_filter();
+    if (m_satisfaction_survey_manager)
+        m_satisfaction_survey_manager->shutdown();
+    g_app_exiting = true;
+    m_is_closing = true;
+    BOOST_LOG_TRIVIAL(info) << "GUI_App::shutdown exit";
+}
+
+bool GUI_App::can_show_satisfaction_survey() const
+{
+    if (!initialized() || !is_editor() || m_is_closing || m_is_recreating_gui ||
+        m_restore_project_deferred ||
+        m_enable_test || mainframe == nullptr || mainframe->IsBeingDeleted() ||
+        !mainframe->IsShownOnScreen() || mainframe->IsIconized() ||
+        !mainframe->IsActive() || !dialogStack.empty() ||
+        m_startup_update_check_running.load(std::memory_order_acquire) ||
+        g_update_ready_dialog_showing ||
+        (g_update_progress_dlg != nullptr && g_update_progress_dlg->IsShown()) ||
+        (m_UITour != nullptr && m_UITour->IsShown()))
+        return false;
+
+    if (plater_ != nullptr && plater_->is_background_process_slicing())
+        return false;
+
+    // Include modeless startup windows (for example update progress), which do
+    // not participate in dialogStack.
+    for (wxWindow* window : wxTopLevelWindows) {
+        if (window != nullptr && window != mainframe && window->IsShown())
+            return false;
+    }
+    return true;
+}
+
+
+std::string GUI_App::get_http_url(std::string country_code, std::string path)
+{
+    std::string url;
+    if (country_code == "US") {
+        url = "https://api.bambulab.com/";
+    }
+    else if (country_code == "CN") {
+        url = "https://api.bambulab.cn/";
+    }
+    else if (country_code == "ENV_CN_DEV") {
+        url = "https://api-dev.bambu-lab.com/";
+    }
+    else if (country_code == "ENV_CN_QA") {
+        url = "https://api-qa.bambu-lab.com/";
+    }
+    else if (country_code == "ENV_CN_PRE") {
+        url = "https://api-pre.bambu-lab.com/";
+    }
+    else {
+        url = "https://api.bambulab.com/";
+    }
+
+    url += path.empty() ? "v1/iot-service/api/slicer/resource" : path;
+    return url;
+}
+
+std::string GUI_App::get_model_http_url(std::string country_code)
+{
+    std::string url;
+    if (country_code == "US") {
+        url = "https://makerworld.com/";
+    }
+    else if (country_code == "CN") {
+        url = "https://makerworld.com/";
+    }
+    else if (country_code == "ENV_CN_DEV") {
+        url = "https://makerhub-dev.bambu-lab.com/";
+    }
+    else if (country_code == "ENV_CN_QA") {
+        url = "https://makerhub-qa.bambu-lab.com/";
+    }
+    else if (country_code == "ENV_CN_PRE") {
+        url = "https://makerhub-pre.bambu-lab.com/";
+    }
+    else {
+        url = "https://makerworld.com/";
+    }
+
+    return url;
+}
+
+
+std::string GUI_App::get_plugin_url(std::string name, std::string country_code)
+{
+    std::string url = get_http_url(country_code);
+
+    std::string curr_version = SLIC3R_VERSION;
+    std::string using_version = curr_version.substr(0, 9) + "00";
+    if (name == "cameratools")
+        using_version = curr_version.substr(0, 6) + "00.00";
+    url += (boost::format("?slicer/%1%/cloud=%2%") % name % using_version).str();
+    //url += (boost::format("?slicer/plugins/cloud=%1%") % "01.01.00.00").str();
+    return url;
+}
+
+static std::string decode(std::string const& extra, std::string const& path = {}) {
+    char const* p = extra.data();
+    char const* e = p + extra.length();
+    while (p + 4 < e) {
+        boost::uint16_t len = ((boost::uint16_t)p[2]) | ((boost::uint16_t)p[3] << 8);
+        if (p[0] == '\x75' && p[1] == '\x70' && len >= 5 && p + 4 + len < e && p[4] == '\x01') {
+            return std::string(p + 9, p + 4 + len);
+        }
+        else {
+            p += 4 + len;
+        }
+    }
+    return Slic3r::decode_path(path.c_str());
+}
+
+int GUI_App::download_plugin(std::string name, std::string package_name, InstallProgressFn pro_fn, WasCancelledFn cancel_fn)
+{
+    int result = 0;
+    json j;
+    std::string err_msg;
+
+    // get country_code
+    AppConfig* app_config = wxGetApp().app_config;
+    if (!app_config) {
+        j["result"] = "failed";
+        j["error_msg"] = "app_config is nullptr";
+        return -1;
+    }
+
+    BOOST_LOG_TRIVIAL(info) << "[download_plugin]: enter";
+    m_networking_cancel_update = false;
+    // get temp path
+    fs::path target_file_path = (fs::temp_directory_path() / package_name);
+    fs::path tmp_path = target_file_path;
+    tmp_path += format(".%1%%2%", get_current_pid(), ".tmp");
+
+    // get_url
+    std::string  url = get_plugin_url(name, app_config->get_country_code());
+    std::string download_url;
+    Slic3r::Http http_url = Slic3r::Http::get(url);
+    BOOST_LOG_TRIVIAL(info) << "[download_plugin]: check the plugin from " << url;
+    http_url.timeout_connect(TIMEOUT_CONNECT)
+        .timeout_max(TIMEOUT_RESPONSE)
+        .on_complete(
+        [&download_url](std::string body, unsigned status) {
+            try {
+                json j = json::parse(body);
+                std::string message = j["message"].get<std::string>();
+
+                if (message == "success") {
+                    json resource = j.at("resources");
+                    if (resource.is_array()) {
+                        for (auto iter = resource.begin(); iter != resource.end(); iter++) {
+                            Semver version;
+                            std::string url;
+                            std::string type;
+                            std::string vendor;
+                            std::string description;
+                            for (auto sub_iter = iter.value().begin(); sub_iter != iter.value().end(); sub_iter++) {
+                                if (boost::iequals(sub_iter.key(), "type")) {
+                                    type = sub_iter.value();
+                                    BOOST_LOG_TRIVIAL(info) << "[download_plugin]: get version of settings's type, " << sub_iter.value();
+                                }
+                                else if (boost::iequals(sub_iter.key(), "version")) {
+                                    version = *(Semver::parse(sub_iter.value()));
+                                }
+                                else if (boost::iequals(sub_iter.key(), "description")) {
+                                    description = sub_iter.value();
+                                }
+                                else if (boost::iequals(sub_iter.key(), "url")) {
+                                    url = sub_iter.value();
+                                }
+                            }
+                            BOOST_LOG_TRIVIAL(info) << "[download_plugin 1]: get type " << type << ", version " << version.to_string() << ", url " << url;
+                            download_url = url;
+                        }
+                    }
+                }
+                else {
+                    BOOST_LOG_TRIVIAL(info) << "[download_plugin 1]: get version of plugin failed, body=" << body;
+                }
+            }
+            catch (...) {
+                BOOST_LOG_TRIVIAL(error) << "[download_plugin 1]: catch unknown exception";
+                ;
+            }
+        }).on_error(
+            [&result, &err_msg](std::string body, std::string error, unsigned int status) {
+                BOOST_LOG_TRIVIAL(error) << "[download_plugin 1] on_error: " << error<<", body = " << body;
+                err_msg += "[download_plugin 1] on_error: " + error + ", body = " + body;
+                result = -1;
+        }).perform_sync();
+
+    bool cancel = false;
+    if (result < 0) {
+        j["result"] = "failed";
+        j["error_msg"] = err_msg;
+        if (pro_fn) pro_fn(InstallStatusDownloadFailed, 0, cancel);
+        return result;
+    }
+
+
+    if (download_url.empty()) {
+        BOOST_LOG_TRIVIAL(info) << "[download_plugin 1]: no available plugin found for this app version: " << SLIC3R_VERSION;
+        if (pro_fn) pro_fn(InstallStatusDownloadFailed, 0, cancel);
+        j["result"] = "failed";
+        j["error_msg"] = "[download_plugin 1]: no available plugin found for this app version: " + std::string(SLIC3R_VERSION);
+        return -1;
+    }
+    else if (pro_fn) {
+        pro_fn(InstallStatusNormal, 5, cancel);
+    }
+
+    if (m_networking_cancel_update || cancel) {
+        BOOST_LOG_TRIVIAL(info) << boost::format("[download_plugin 1]: %1%, cancelled by user") % __LINE__;
+        j["result"] = "failed";
+        j["error_msg"] = (boost::format("[download_plugin 1]: %1%, cancelled by user") % __LINE__).str();
+        return -1;
+    }
+    BOOST_LOG_TRIVIAL(info) << "[download_plugin] get_url = " << download_url;
+
+    // download
+    Slic3r::Http http = Slic3r::Http::get(download_url);
+    int reported_percent = 0;
+    http.on_progress(
+        [this, &pro_fn, cancel_fn, &result, &reported_percent, &err_msg](Slic3r::Http::Progress progress, bool& cancel) {
+            int percent = 0;
+            if (progress.dltotal != 0)
+                percent = progress.dlnow * 50 / progress.dltotal;
+            bool was_cancel = false;
+            if (pro_fn && ((percent - reported_percent) >= 10)) {
+                pro_fn(InstallStatusNormal, percent, was_cancel);
+                reported_percent = percent;
+                BOOST_LOG_TRIVIAL(info) << "[download_plugin 2] progress: " << reported_percent;
+            }
+            cancel = m_networking_cancel_update || was_cancel;
+            if (cancel_fn)
+                if (cancel_fn())
+                    cancel = true;
+
+            if (cancel) {
+                err_msg += "[download_plugin] cancel";
+                result = -1;
+            }
+        })
+        .on_complete([&pro_fn, tmp_path, target_file_path](std::string body, unsigned status) {
+            BOOST_LOG_TRIVIAL(info) << "[download_plugin 2] completed";
+            bool cancel = false;
+            int percent = 0;
+            fs::fstream file(tmp_path, std::ios::out | std::ios::binary | std::ios::trunc);
+            file.write(body.c_str(), body.size());
+            file.close();
+            fs::rename(tmp_path, target_file_path);
+            if (pro_fn) pro_fn(InstallStatusDownloadCompleted, 80, cancel);
+            })
+        .on_error([&pro_fn, &result, &err_msg](std::string body, std::string error, unsigned int status) {
+            bool cancel = false;
+            if (pro_fn) pro_fn(InstallStatusDownloadFailed, 0, cancel);
+            BOOST_LOG_TRIVIAL(error) << "[download_plugin 2] on_error: " << error<<", body = " << body;
+            err_msg += "[download_plugin 2] on_error: " + error + ", body = " + body;
+            result = -1;
+        });
+    http.perform_sync();
+    j["result"] = result < 0 ? "failed" : "success";
+    j["error_msg"] = err_msg;
+    return result;
+}
+
+int GUI_App::install_plugin(std::string name, std::string package_name, InstallProgressFn pro_fn, WasCancelledFn cancel_fn)
+{
+    bool cancel = false;
+    std::string target_file_path = (fs::temp_directory_path() / package_name).string();
+
+    BOOST_LOG_TRIVIAL(info) << "[install_plugin] enter";
+    // get plugin folder
+    std::string data_dir_str = data_dir();
+    boost::filesystem::path data_dir_path(data_dir_str);
+    auto plugin_folder = data_dir_path / name;
+    //auto plugin_folder = boost::filesystem::path(wxStandardPaths::Get().GetUserDataDir().ToUTF8().data()) / "plugins";
+    auto backup_folder = plugin_folder/"backup";
+    if (!boost::filesystem::exists(plugin_folder)) {
+        BOOST_LOG_TRIVIAL(info) << "[install_plugin] will create directory "<<plugin_folder.string();
+        boost::filesystem::create_directory(plugin_folder);
+    }
+    if (!boost::filesystem::exists(backup_folder)) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", will create directory %1%")%backup_folder.string();
+        boost::filesystem::create_directory(backup_folder);
+    }
+
+    if (m_networking_cancel_update) {
+        BOOST_LOG_TRIVIAL(info) << boost::format("[install_plugin]: %1%, cancelled by user")%__LINE__;
+        return -1;
+    }
+    if (pro_fn) {
+        pro_fn(InstallStatusNormal, 50, cancel);
+    }
+    // unzip
+    mz_zip_archive archive;
+    mz_zip_zero_struct(&archive);
+    if (!open_zip_reader(&archive, target_file_path)) {
+        BOOST_LOG_TRIVIAL(error) << boost::format("[install_plugin]: %1%, open zip file failed")%__LINE__;
+        if (pro_fn) pro_fn(InstallStatusDownloadFailed, 0, cancel);
+        return InstallStatusUnzipFailed;
+    }
+
+    mz_uint num_entries = mz_zip_reader_get_num_files(&archive);
+    mz_zip_archive_file_stat stat;
+    BOOST_LOG_TRIVIAL(error) << boost::format("[install_plugin]: %1%, got %2% files")%__LINE__ %num_entries;
+    for (mz_uint i = 0; i < num_entries; i++) {
+        if (m_networking_cancel_update || cancel) {
+            BOOST_LOG_TRIVIAL(info) << boost::format("[install_plugin]: %1%, cancelled by user")%__LINE__;
+            return -1;
+        }
+        if (mz_zip_reader_file_stat(&archive, i, &stat)) {
+            if (stat.m_uncomp_size > 0) {
+                std::string dest_file;
+                if (stat.m_is_utf8) {
+                    dest_file = stat.m_filename;
+                }
+                else {
+                    std::string extra(1024, 0);
+                    size_t n = mz_zip_reader_get_extra(&archive, stat.m_file_index, extra.data(), extra.size());
+                    dest_file = decode(extra.substr(0, n), stat.m_filename);
+                }
+                auto dest_file_path = boost::filesystem::path(dest_file);
+                dest_file = dest_file_path.filename().string();
+                auto dest_path = boost::filesystem::path(plugin_folder.string() + "/" + dest_file);
+                std::string dest_zip_file = encode_path(dest_path.string().c_str());
+                try {
+                    if (fs::exists(dest_path))
+                        fs::remove(dest_path);
+                    mz_bool res = mz_zip_reader_extract_to_file(&archive, stat.m_file_index, dest_zip_file.c_str(), 0);
+                    BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", extract  %1% from plugin zip %2%\n") % dest_file % stat.m_filename;
+                    if (res == 0) {
+#ifdef WIN32
+                        std::wstring new_dest_zip_file = boost::locale::conv::utf_to_utf<wchar_t>(dest_path.generic_string());
+                        res                            = mz_zip_reader_extract_to_file_w(&archive, stat.m_file_index, new_dest_zip_file.c_str(), 0);
+#endif
+                        if (res == 0) {
+                            mz_zip_error zip_error = mz_zip_get_last_error(&archive);
+                            BOOST_LOG_TRIVIAL(error) << "[install_plugin]Archive read error:" << mz_zip_get_error_string(zip_error) << std::endl;
+                            close_zip_reader(&archive);
+                            if (pro_fn) { pro_fn(InstallStatusUnzipFailed, 0, cancel); }
+                            return InstallStatusUnzipFailed;
+                        }
+                    }
+                    else {
+                        if (pro_fn) {
+                            pro_fn(InstallStatusNormal, 50 + i/num_entries, cancel);
+                        }
+                        try {
+                            auto backup_path = boost::filesystem::path(backup_folder.string() + "/" + dest_file);
+                            if (fs::exists(backup_path))
+                                fs::remove(backup_path);
+                            std::string error_message;
+                            CopyFileResult cfr = copy_file(dest_path.string(), backup_path.string(), error_message, false);
+                            if (cfr != CopyFileResult::SUCCESS) {
+                                BOOST_LOG_TRIVIAL(error) << "Copying to backup failed(" << cfr << "): " << error_message;
+                            }
+                        }
+                        catch (const std::exception& e)
+                        {
+                            BOOST_LOG_TRIVIAL(error) << "Copying to backup failed: " << e.what();
+                            //continue
+                        }
+                    }
+                }
+                catch (const std::exception& e)
+                {
+                    // ensure the zip archive is closed and rethrow the exception
+                    close_zip_reader(&archive);
+                    BOOST_LOG_TRIVIAL(error) << "[install_plugin]Archive read exception:"<<e.what();
+                    if (pro_fn) {
+                        pro_fn(InstallStatusUnzipFailed, 0, cancel);
+                    }
+                    return InstallStatusUnzipFailed;
+                }
+            }
+        }
+        else {
+            BOOST_LOG_TRIVIAL(error) << boost::format("[install_plugin]: %1%, mz_zip_reader_file_stat for file %2% failed")%__LINE__%i;
+        }
+    }
+
+    close_zip_reader(&archive);
+
+    if (pro_fn)
+        pro_fn(InstallStatusInstallCompleted, 100, cancel);
+    if (name == "plugins")
+        app_config->set_bool("installed_networking", true);
+    BOOST_LOG_TRIVIAL(info) << "[install_plugin] success";
+    return 0;
+}
+
+void GUI_App::restart_networking()
+{
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< boost::format(" enter, mainframe %1%")%mainframe;
+    on_init_network(true);
+    if(m_agent) {
+        init_networking_callbacks();
+        m_agent->set_on_ssdp_msg_fn(
+            [this](std::string json_str) {
+                if (m_is_closing) {
+                    return;
+                }
+                GUI::wxGetApp().CallAfter([this, json_str] {
+                    if (m_device_manager) {
+                        m_device_manager->on_machine_alive(json_str);
+                    }
+                    });
+            }
+        );
+        m_agent->set_on_http_error_fn([this](unsigned int status, std::string body) {
+            this->handle_http_error(status, body);
+        });
+        m_agent->start_discovery(true, false);
+        if (mainframe)
+            mainframe->refresh_plugin_tips();
+        if (plater_)
+            plater_->get_notification_manager()->bbl_close_plugin_install_notification();
+
+        if (m_agent->is_user_login()) {
+            remove_user_presets();
+            enable_user_preset_folder(true);
+            preset_bundle->load_user_presets(m_agent->get_user_id(), ForwardCompatibilitySubstitutionRule::Enable);
+            mainframe->update_side_preset_ui();
+        }
+
+        if (app_config->get("sync_user_preset") == "true") {
+            start_sync_user_preset();
+        }
+        // if (mainframe && this->app_config->get("staff_pick_switch") == "true") {
+        //     if (mainframe->m_webview) { mainframe->m_webview->SendDesignStaffpick(has_model_mall()); }
+        // }
+    }
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< boost::format(" exit, m_agent=%1%")%m_agent;
+}
+
+void GUI_App::remove_old_networking_plugins()
+{
+    std::string data_dir_str = data_dir();
+    boost::filesystem::path data_dir_path(data_dir_str);
+    auto plugin_folder = data_dir_path / "plugins";
+    //auto plugin_folder = boost::filesystem::path(wxStandardPaths::Get().GetUserDataDir().ToUTF8().data()) / "plugins";
+    if (boost::filesystem::exists(plugin_folder)) {
+        BOOST_LOG_TRIVIAL(info) << "[remove_old_networking_plugins] remove the directory "<<plugin_folder.string();
+        try {
+            fs::remove_all(plugin_folder);
+        } catch (...) {
+            BOOST_LOG_TRIVIAL(error) << "Failed  removing the plugins directory " << plugin_folder.string();
+        }
+    }
+}
+
+int GUI_App::updating_bambu_networking()
+{
+    DownloadProgressDialog dlg(_L("Downloading Bambu Network Plug-in"));
+    dlg.ShowModal();
+    return 0;
+}
+
+bool GUI_App::check_networking_version()
+{
+    std::string network_ver = Slic3r::NetworkAgent::get_version();
+    if (!network_ver.empty()) {
+        BOOST_LOG_TRIVIAL(info) << "get_network_agent_version=" << network_ver;
+    }
+    std::string studio_ver = SLIC3R_VERSION;
+    if (network_ver.length() >= 8) {
+        if (network_ver.substr(0,8) == studio_ver.substr(0,8)) {
+            m_networking_compatible = true;
+            return true;
+        }
+    }
+
+    m_networking_compatible = false;
+    return false;
+}
+
+bool GUI_App::is_compatibility_version()
+{
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< boost::format(": m_networking_compatible=%1%")%m_networking_compatible;
+    return m_networking_compatible;
+}
+
+void GUI_App::cancel_networking_install()
+{
+    m_networking_cancel_update = true;
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< boost::format(": plugin install cancelled!");
+}
+
+void GUI_App::init_networking_callbacks()
+{
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< boost::format(": enter, m_agent=%1%")%m_agent;
+    if (m_agent) {
+        //set callbacks
+        //m_agent->set_on_user_login_fn([this](int online_login, bool login) {
+        //    GUI::wxGetApp().request_user_handle(online_login);
+        //    });
+
+        m_agent->set_on_server_connected_fn([this](int return_code, int reason_code) {
+            if (m_is_closing) {
+            return;
+            }
+            if (return_code == 5) {
+                GUI::wxGetApp().CallAfter([this] {
+                    this->request_user_logout();
+                    MessageDialog msg_dlg(nullptr, _L("Login information expired. Please login again."), "", wxAPPLY | wxOK);
+                    if (msg_dlg.ShowModal() == wxOK) {
+                        return;
+                    }
+                });
+                return;
+            }
+            GUI::wxGetApp().CallAfter([this] {
+                if (m_is_closing)
+                    return;
+                BOOST_LOG_TRIVIAL(trace) << "static: server connected";
+                m_agent->set_user_selected_machine(m_agent->get_user_selected_machine());
+                    if (this->is_enable_multi_machine()) {
+                        auto evt = new wxCommandEvent(EVT_UPDATE_MACHINE_LIST);
+                        wxQueueEvent(this, evt);
+                    }
+                    m_agent->set_user_selected_machine(m_agent->get_user_selected_machine());
+                    //subscribe device
+                    if (m_agent->is_user_login()) {
+                        m_agent->start_device_subscribe();
+                        /* resubscribe the cache dev list */
+                        if (this->is_enable_multi_machine()) {
+                            DeviceManager* dev = this->getDeviceManager();
+                            if (dev && !dev->subscribe_list_cache.empty()) {
+                                dev->subscribe_device_list(dev->subscribe_list_cache);
+                            }
+                        }
+                    }
+                });
+            });
+
+        m_agent->set_on_printer_connected_fn([this](std::string dev_id) {
+            if (m_is_closing) {
+                return;
+            }
+            GUI::wxGetApp().CallAfter([this, dev_id] {
+                if (m_is_closing)
+                    return;
+                bool tunnel = boost::algorithm::starts_with(dev_id, "tunnel/");
+                /* request_pushing */
+                MachineObject* obj = m_device_manager->get_my_machine(tunnel ? dev_id.substr(7) : dev_id);
+                if (obj) {
+                    obj->is_tunnel_mqtt = tunnel;
+                    obj->command_request_push_all(true);
+                    obj->command_get_version();
+                    obj->erase_user_access_code();
+                    obj->command_get_access_code();
+                    if (!is_enable_multi_machine()) {
+                        GUI::wxGetApp().sidebar().load_ams_list(obj->dev_id, obj);
+                    }
+                }
+                });
+            });
+
+        m_agent->set_get_country_code_fn([this]() {
+            if (app_config)
+                return app_config->get_country_code();
+            return std::string();
+            }
+        );
+
+        m_agent->set_on_subscribe_failure_fn([this](std::string dev_id) {
+            CallAfter([this, dev_id] {
+                on_start_subscribe_again(dev_id);
+            });
+        });
+
+        m_agent->set_on_local_connect_fn(
+            [this](int state, std::string dev_id, std::string msg) {
+                if (m_is_closing) {
+                    return;
+                }
+                CallAfter([this, state, dev_id, msg] {
+                    if (m_is_closing) {
+                        return;
+                    }
+                    /* request_pushing */
+                    MachineObject* obj = m_device_manager->get_my_machine(dev_id);
+                    wxCommandEvent event(EVT_CONNECT_LAN_MODE_PRINT);
+
+                    if (obj) {
+
+                        if (obj->is_lan_mode_printer()) {
+                            if (state == ConnectStatus::ConnectStatusOk) {
+                                obj->command_request_push_all(true);
+                                obj->command_get_version();
+                                event.SetInt(0);
+                                event.SetString(obj->dev_id);
+                                GUI::wxGetApp().sidebar().load_ams_list(obj->dev_id, obj);
+                            } else if (state == ConnectStatus::ConnectStatusFailed) {
+                                obj->set_access_code("");
+                                obj->erase_user_access_code();
+                                m_device_manager->set_selected_machine("", true);
+                                wxString text;
+                                if (msg == "5") {
+                                    text = wxString::Format(_L("Incorrect password"));
+                                    wxGetApp().show_dialog(text);
+                                } else {
+                                    text = wxString::Format(_L("Connect %s failed! [SN:%s, code=%s]"), from_u8(obj->dev_name), obj->dev_id, msg);
+                                    wxGetApp().show_dialog(text);
+                                }
+                                event.SetInt(-1);
+                            } else if (state == ConnectStatus::ConnectStatusLost) {
+                                obj->set_access_code("");
+                                obj->erase_user_access_code();
+                                m_device_manager->localMachineList.erase(obj->dev_id);
+                                m_device_manager->set_selected_machine("", true);
+                                event.SetInt(-1);
+                                BOOST_LOG_TRIVIAL(info) << "set_on_local_connect_fn: state = lost";
+                            } else {
+                                event.SetInt(-1);
+                                BOOST_LOG_TRIVIAL(info) << "set_on_local_connect_fn: state = " << state;
+                            }
+
+                            obj->set_lan_mode_connection_state(false);
+                        }
+                        else {
+                            if (state == ConnectStatus::ConnectStatusOk) {
+                                event.SetInt(1);
+                                event.SetString(obj->dev_id);
+                            }
+                            else if(msg == "5") {
+                                event.SetInt(5);
+                                event.SetString(obj->dev_id);
+                            }
+                            else {
+                                event.SetInt(-2);
+                                event.SetString(obj->dev_id);
+                            }
+                        }
+                    }
+                    if (wxGetApp().plater()->get_select_machine_dialog()) {
+                        wxPostEvent(wxGetApp().plater()->get_select_machine_dialog(), event);
+                    }
+                });
+            }
+        );
+
+        auto message_arrive_fn = [this](std::string dev_id, std::string msg) {
+            if (m_is_closing) {
+                return;
+            }
+            CallAfter([this, dev_id, msg] {
+                if (m_is_closing)
+                    return;
+                MachineObject* obj = this->m_device_manager->get_user_machine(dev_id);
+                if (obj) {
+                    obj->is_ams_need_update = false;
+
+                    auto sel = this->m_device_manager->get_selected_machine();
+
+                    if (sel && sel->dev_id == dev_id) {
+                        obj->parse_json(msg);
+                    }
+                    else {
+                        obj->parse_json(msg, true);
+                    }
+                    
+
+                    if (!this->is_enable_multi_machine()) {
+                        if ((sel == obj || sel == nullptr) && obj->is_ams_need_update) {
+                            GUI::wxGetApp().sidebar().load_ams_list(obj->dev_id, obj);
+                        }
+                    }
+                }
+            });
+        };
+
+        m_agent->set_on_message_fn(message_arrive_fn);
+
+        auto user_message_arrive_fn = [this](std::string user_id, std::string msg) {
+            if (m_is_closing) {
+                return;
+            }
+            CallAfter([this, user_id, msg] {
+                if (m_is_closing)
+                    return;
+
+                //check user
+                if (user_id == m_agent->get_user_id()) {
+                    this->m_user_manager->parse_json(msg);
+                }
+
+            });
+        };
+
+        m_agent->set_on_user_message_fn(user_message_arrive_fn);
+
+
+        auto lan_message_arrive_fn = [this](std::string dev_id, std::string msg) {
+            if (m_is_closing) {
+                return;
+            }
+            CallAfter([this, dev_id, msg] {
+                if (m_is_closing)
+                    return;
+
+                MachineObject* obj = m_device_manager->get_my_machine(dev_id);
+                if (!obj || !obj->is_lan_mode_printer()) {
+                    obj = m_device_manager->get_local_machine(dev_id);
+                }
+
+                if (obj) {
+                    obj->parse_json(msg, DeviceManager::key_field_only);
+                    if (this->m_device_manager->get_selected_machine() == obj && obj->is_ams_need_update) {
+                        GUI::wxGetApp().sidebar().load_ams_list(obj->dev_id, obj);
+                    }
+                }
+                obj = m_device_manager->get_local_machine(dev_id);
+                if (obj) {
+                    obj->parse_json(msg, DeviceManager::key_field_only);
+                }
+                });
+        };
+        m_agent->set_on_local_message_fn(lan_message_arrive_fn);
+        m_agent->set_queue_on_main_fn([this](std::function<void()> callback) {
+            CallAfter(callback);
+        });
+    }
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< boost::format(": exit, m_agent=%1%")%m_agent;
+}
+
+GUI_App::~GUI_App()
+{
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< boost::format(": enter");
+    uninstall_satisfaction_survey_event_filter();
+    m_satisfaction_survey_manager.reset();
+    if (app_config != nullptr) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< boost::format(": destroy app_config");
+        delete app_config;
+    }
+
+    if (preset_bundle != nullptr) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< boost::format(": destroy preset_bundle");
+        delete preset_bundle;
+    }
+
+    if (preset_updater != nullptr) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< boost::format(": destroy preset updater");
+        delete preset_updater;
+    }
+
+    if (printerPresetConfig != nullptr) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(": destroy printerPresetConfig");
+        delete printerPresetConfig;
+    }
+
+    if (m_login_dialog != nullptr) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(": destroy login_dialog");
+        m_login_dialog->Destroy();
+        m_login_dialog = nullptr;
+    }
+
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< boost::format(": exit");
+}
+
+// If formatted for github, plaintext with OpenGL extensions enclosed into <details>.
+// Otherwise HTML formatted for the system info dialog.
+std::string GUI_App::get_gl_info(bool for_github)
+{
+    return OpenGLManager::get_gl_info().to_string(for_github);
+}
+
+wxGLContext* GUI_App::init_glcontext(wxGLCanvas& canvas)
+{
+    return m_opengl_mgr.init_glcontext(canvas);
+}
+
+bool GUI_App::init_opengl()
+{
+#ifdef __linux__
+    bool status = m_opengl_mgr.init_gl();
+    if (status)
+        m_opengl_initialized = true;
+    return status;
+#else
+    return m_opengl_mgr.init_gl();
+#endif
+}
+
+// gets path to PrusaSlicer.ini, returns semver from first line comment
+static boost::optional<Semver> parse_semver_from_ini(std::string path)
+{
+    std::ifstream stream(path);
+    std::stringstream buffer;
+    buffer << stream.rdbuf();
+    std::string body = buffer.str();
+    size_t start = body.find("CrealityPrint ");
+    if (start == std::string::npos) {
+        start = body.find("CrealityPrint ");
+        if (start == std::string::npos)
+            return boost::none;
+    }
+    body = body.substr(start + 12);
+    size_t end = body.find_first_of(" \n");
+    if (end < body.size())
+        body.resize(end);
+    return Semver::parse(body);
+}
+
+void GUI_App::init_download_path()
+{
+    std::string down_path = app_config->get("download_path");
+
+    if (down_path.empty()) {
+        boost::filesystem::path user_down_path =  boost::filesystem::path(data_dir()) / "cloud_download_data";//wxStandardPaths::Get().GetUserDir(wxStandardPaths::Dir_Downloads).ToUTF8().data();
+        app_config->set("download_path", user_down_path.string());
+    }
+    else {
+        fs::path dp(down_path);
+        if (!fs::exists(dp)) {
+
+            boost::filesystem::path user_down_path =  boost::filesystem::path(data_dir()) / "cloud_download_data";
+            if (!fs::exists(user_down_path))
+                fs::create_directories(user_down_path);
+            app_config->set("download_path", user_down_path.string());
+        }
+    }
+}
+
+#if wxUSE_WEBVIEW_EDGE
+void GUI_App::init_webview_runtime()
+{
+#ifdef __WIN32__
+    const bool single_process = app_config->get_bool("webview_single_process");
+    WebView::SetForceSingleProcess(single_process);
+    BOOST_LOG_TRIVIAL(info) << "[WebViewRuntime] config webview_single_process=" << (single_process ? "true" : "false");
+#endif
+    // Check WebView Runtime
+    if (!WebView::CheckWebViewRuntime()) {
+        int nRet = wxMessageBox(_L("Creality Print requires the Microsoft WebView2 Runtime to operate certain features.\nClick Yes to install it now."),
+                                _L("WebView2 Runtime"), wxYES_NO);
+        if (nRet == wxYES) {
+            WebView::DownloadAndInstallWebViewRuntime();
+        }
+    }
+}
+bool GUI_App::mark_webview_runtime_repair_prompted()
+{
+    if (m_webview_runtime_repair_prompted) {
+        BOOST_LOG_TRIVIAL(info) << "[WebViewRuntime] Repair prompt already shown in this session, skip duplicate prompt.";
+        return false;
+    }
+    m_webview_runtime_repair_prompted = true;
+    return true;
+}
+void GUI_App::reinstall_webview_runtime()
+{
+    // Check WebView Runtime
+    int nRet = wxMessageBox(
+        _L("Creality Print requires the Microsoft WebView2 Runtime,But it has been found that the abnormal operation of Microsoft WebView2 may be related to the installation of Microsoft Edge. \nClick the Yes to reinstall Microsoft Edge"),
+        _L("WebView2 Runtime"), wxYES_NO);
+    if (nRet == wxYES) {
+        //const bool reinstall_ok = WebView::ReInstallWebViewRuntime();
+        if (!false) {
+            // Show a dialog with a clickable tutorial link.
+            wxDialog dlg(mainframe ? mainframe : nullptr, wxID_ANY, _L("WebView2 Runtime"),
+                wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+            std::string lang_code = wxGetApp().app_config->get("language");
+            wxString lang = lang_code.empty() ? wxS("en_GB") : wxString::FromUTF8(lang_code.c_str());
+            bool is_cn = lang.StartsWith(wxS("zh_CN"));
+            wxString link_url = is_cn ? wxS("https://wiki.creality.com/zh/software/6-0/webview")
+                                      : wxS("https://wiki.creality.com/en/software/6-0/webview");
+            const int padding   = dlg.FromDIP(12);
+            const int wrap_width = dlg.FromDIP(420);
+            auto *sizer = new wxBoxSizer(wxVERTICAL);
+            auto *msg   = new wxStaticText(&dlg, wxID_ANY,
+                _L("Failed to reinstall the Microsoft WebView2 Runtime. Please reinstall it manually."));
+            msg->Wrap(wrap_width);
+            sizer->Add(msg, 0, wxALL | wxEXPAND, padding);
+            auto *link = new wxHyperlinkCtrl(&dlg, wxID_ANY,
+                wxString::Format(_L("tutorial: %s"), link_url),
+                link_url);
+            sizer->Add(link, 0, wxLEFT | wxRIGHT | wxBOTTOM, padding);
+            sizer->Add(dlg.CreateStdDialogButtonSizer(wxOK), 0, wxALIGN_RIGHT | wxALL, dlg.FromDIP(10));
+            dlg.SetSizerAndFit(sizer);
+            dlg.CentreOnParent();
+            dlg.ShowModal();
+            if (mainframe)
+                mainframe->Close(true);
+            else
+                ExitMainLoop();
+            return;
+        }
+
+        wxMessageBox(_L("The Microsoft WebView2 Runtime has been reinstalled successfully. The application will restart now."),
+                     _L("WebView2 Runtime"), wxOK | wxICON_INFORMATION);
+
+        wxString exe_path = wxStandardPaths::Get().GetExecutablePath();
+        wxString restart_cmd = wxString::Format("\"%s\"", exe_path);
+        long     pid = wxExecute(restart_cmd, wxEXEC_ASYNC);
+        if (pid <= 0)
+            BOOST_LOG_TRIVIAL(error) << "[WebViewRuntime] Failed to relaunch Creality Print after reinstall.";
+
+        if (mainframe)
+            mainframe->Close(true);
+        else
+            ExitMainLoop();
+    }
+}
+#endif
+
+bool GUI_App::confirm_mesh_paint_warning()
+{
+    MessageDialog dlg(nullptr,
+        _L("This operation rebuilds the model's mesh. Painted color, supports, seam and "
+           "fuzzy-skin will be transferred to the new mesh by a best-effort approximation, "
+           "so the result may be slightly off and, in rare cases, some painting may be lost.\n\n"
+           "Do you want to continue?"),
+        _L("Painting may change"),
+        wxICON_WARNING | wxYES_NO | wxNO_DEFAULT);
+    return dlg.ShowModal() == wxID_YES;
+}
+
+void GUI_App::init_app_config()
+{
+	// Profiles for the alpha are stored into the PrusaSlicer-alpha directory to not mix with the current release.
+    SetAppName(SLIC3R_APP_KEY);
+//	SetAppName(SLIC3R_APP_KEY "-alpha");
+//  SetAppName(SLIC3R_APP_KEY "-beta");
+//	SetAppDisplayName(SLIC3R_APP_NAME);
+
+	// Set the Slic3r data directory at the Slic3r XS module.
+	// Unix: ~/ .Slic3r
+	// Windows : "C:\Users\username\AppData\Roaming\Slic3r" or "C:\Documents and Settings\username\Application Data\Slic3r"
+	// Mac : "~/Library/Application Support/Slic3r"
+    if (data_dir().empty()) {
+#ifndef __linux__
+        const std::string root = wxStandardPaths::Get().GetUserDataDir().ToUTF8().data();
+        m_app_first_launch = !root.empty() && !fs::exists(root);
+        set_data_dir(root);
+#else
+        wxString root;
+        if (!wxGetEnv(wxS("XDG_CONFIG_HOME"), &root) || root.empty())
+            root = wxFileName::GetHomeDir() + wxS("/.config");
+        set_data_dir((root + "/" + GetAppName()).ToUTF8().data());
+#endif
+        DataMigration::Options migration;
+        migration.target = std::filesystem::u8path(Slic3r::data_dir());
+        migration.resources = std::filesystem::u8path(resources_dir());
+        migration.data_version = CREALITYPRINT_DATA_VERSION;
+        migration.application_version = CREALITYPRINT_VERSION;
+        migration.alpha = boost::algorithm::icontains(std::string(PROJECT_VERSION_EXTRA), "alpha");
+        migration.validate_preset = DataMigration::validate_preset_readonly;
+        try {
+            DataMigration::initialize(migration);
+        } catch (const std::exception& error) {
+            // Include filesystem/permission failures in the non-interactive migration error path.
+            throw DataMigration::Error(error.what());
+        }
+        fs::create_directories(fs::path(Slic3r::data_dir()) / "log");
+        chdir(encode_path((Slic3r::data_dir() + "/log").c_str()).c_str());
+    } else {
+        // Explicit --datadir keeps its existing behavior and never imports another installation.
+        m_datadir_redefined = true;
+    }
+
+    // start log here
+    std::time_t       t        = std::time(0);
+    std::tm *         now_time = std::localtime(&t);
+    std::stringstream buf;
+    buf << std::put_time(now_time, "debug_%a_%b_%d_%H_%M_%S_");
+    buf << get_current_pid() << ".log";
+    std::string log_filename = buf.str();
+
+#if !BBL_RELEASE_TO_PUBLIC
+    set_log_path_and_level(log_filename, 5, m_enable_test);
+#else
+    set_log_path_and_level(log_filename, 3, m_enable_test);
+#endif
+
+    //BBS: remove GCodeViewer as seperate APP logic
+    if (!app_config)
+        app_config = new AppConfig();
+    // app_config = new AppConfig(is_editor() ? AppConfig::EAppMode::Editor : AppConfig::EAppMode::GCodeViewer);
+
+    // Multi-extruder printer presets no longer include the nozzle suffix (except D3 Pro).
+    // Migrate the persisted config and user presets before they are loaded.
+    PresetNameReplacements migrated_preset_names;
+    const fs::path preset_name_migration_marker =
+        legacy_multi_extruder_preset_name_migration_marker();
+    if (!DataMigration::preserves_user_presets(std::filesystem::u8path(data_dir())) &&
+        !fs::exists(preset_name_migration_marker)) {
+        bool migration_completed = false;
+        migrated_preset_names = migrate_legacy_multi_extruder_preset_names(*app_config, migration_completed);
+        if (migration_completed &&
+            mark_legacy_multi_extruder_preset_name_migration_complete(preset_name_migration_marker))
+            BOOST_LOG_TRIVIAL(info) << "Completed one-time multi-extruder preset-name migration";
+        else if (!migration_completed)
+            BOOST_LOG_TRIVIAL(warning) << "Preset-name migration was incomplete and will be retried next launch";
+    }
+    
+    m_config_corrupted = false;
+	// load settings
+	m_app_conf_exists = app_config->exists();
+    if (m_app_conf_exists) {
+        std::string error = app_config->load();
+        if (!error.empty()) {
+            BOOST_LOG_TRIVIAL(warning) << "Skipping loaded preset-name migration because application config failed to load";
+        } else if (migrate_loaded_app_config_preset_names(*app_config, migrated_preset_names)) {
+            BOOST_LOG_TRIVIAL(info) << "Migrated legacy multi-extruder preset names in loaded application config";
+        }
+        if (!error.empty()) {
+            // Orca: if the config file is corrupted, we will show a error dialog and create a default config file.
+            m_config_corrupted = true;
+
+        }
+        // Save orig_version here, so its empty if no app_config existed before this run.
+        m_last_config_version = app_config->orig_version();//parse_semver_from_ini(app_config->config_path());
+    }
+    else {
+#ifdef _WIN32
+        // update associate files from registry information
+        if (is_associate_files(L"3mf")) {
+            app_config->set("associate_3mf", "true");
+        }
+        if (is_associate_files(L"stl")) {
+            app_config->set("associate_stl", "true");
+        }
+        if (is_associate_files(L"step") && is_associate_files(L"stp")) {
+            app_config->set("associate_step", "true");
+        }
+#endif // _WIN32
+    }
+    set_logging_level(Slic3r::level_string_to_boost(app_config->get("log_severity_level")));
+
+    if (printerPresetConfig == nullptr) {
+        printerPresetConfig = new PrinterPresetConfig();
+    }
+}
+
+// returns true if found newer version and user agreed to use it
+bool GUI_App::check_older_app_config(Semver current_version, bool backup)
+{
+    //BBS: current no need these logic
+    return false;
+}
+
+void GUI_App::copy_older_config()
+{
+    preset_bundle->copy_files(m_older_data_dir_path);
+}
+#if defined(WIN32)
+std::string GetMACAddress() {
+    std::string result;
+
+    IP_ADAPTER_INFO AdapterInfo[16];                // Allocate information
+    DWORD dwBufLen = sizeof(AdapterInfo);           // Save memory size of buffer
+    if (GetAdaptersInfo(AdapterInfo, &dwBufLen) == ERROR_SUCCESS) {
+        PIP_ADAPTER_INFO pAdapterInfo = AdapterInfo; // Contains pointer to current adapter info
+        while (pAdapterInfo) {
+            for (UINT i = 0; i < pAdapterInfo->AddressLength; i++) {
+                char buffer[3];
+                sprintf(buffer, "%02X", pAdapterInfo->Address[i]);
+                result += buffer;
+                if (i < pAdapterInfo->AddressLength - 1) {
+                    result += ":";
+                }
+            }
+            if (!result.empty()) {
+                break;
+            }
+            pAdapterInfo = pAdapterInfo->Next;
+        }
+    }
+    boost::replace_all(result, ":", "_");
+    return result;
+}
+#elif defined(__APPLE__)
+#include <ifaddrs.h>
+#include <net/if_dl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <net/if.h>
+
+
+std::string GetMACAddress() {
+    struct ifaddrs *ifap, *ifaptr;
+    unsigned char *ptr;
+    std::string result;
+
+    if (getifaddrs(&ifap) == 0) {
+        for (ifaptr = ifap; ifaptr != NULL; ifaptr = ifaptr->ifa_next) {
+            if (ifaptr->ifa_addr->sa_family == AF_LINK) {
+                struct sockaddr_dl* sdl = (struct sockaddr_dl*)ifaptr->ifa_addr;
+                ptr = (unsigned char *)LLADDR(sdl);
+                for (int i = 0; i < sdl->sdl_alen; i++) {
+                    char buffer[3];
+                    sprintf(buffer, "%02X", ptr[i]);
+                    result += buffer;
+                    if (i < sdl->sdl_alen - 1) {
+                        result += ":";
+                    }
+                }
+                if (!result.empty()) {
+                    break;
+                }
+            }
+        }
+        freeifaddrs(ifap);
+    }
+    return result;
+}
+#else // Linux
+std::string GetMACAddress() 
+{
+    return "xxxmac";
+}
+#endif
+inline auto I18nToLangaugeIndex(const std::string& i18n) -> std::string {
+      // 归一化：
+      // - 小写
+      // - 将 '-' 转为 '_'
+      // - 去掉 ".utf8"、".utf-8"、区域后缀（如 ".UTF-8"、"@latin" 等）
+      auto normalize = [](std::string s) {
+          // to lower
+          std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return (char)std::tolower(c); });
+          // hyphen -> underscore
+          std::replace(s.begin(), s.end(), '-', '_');
+          // strip trailing locale modifiers
+          size_t pos = s.find_first_of(".@ ");
+          if (pos != std::string::npos)
+              s = s.substr(0, pos);
+          // common zh variants
+          if (s == "zh_hans" || s == "zh_cn_hans") s = "zh_cn";
+          if (s == "zh_hant" || s == "zh_tw_hant" || s == "zh_hk_hant") s = "zh_tw";
+          return s;
+      };
+      const std::string key = normalize(i18n);
+      // 语言到索引映射（标注对应国家/地区）
+      static const auto I18N_INDEX_MAP = std::map<std::string, std::string>{
+        { std::string("en")   , std::string("0")  },   // 英语（通用）
+        { std::string("en_us"), std::string("0")  },   // 英语（美国）
+        { std::string("en_uk"), std::string("0")  },   // 英语（英国）
+        { std::string("en_gb"), std::string("0")  },   // 英语（英国，Linux 常见）
+
+        { std::string("zh")   , std::string("1")  },   // 中文（通用）
+        { std::string("zh_cn"), std::string("1")  },   // 中文（中国大陆）
+        { std::string("zh_tw"), std::string("2")  },   // 中文（中国台湾）
+        { std::string("zh_hk"), std::string("3")  },   // 中文（中国香港）
+
+        { std::string("ko")   , std::string("5")  },   // 韩语（韩国）
+        { std::string("ko_kr"), std::string("5")  },   // 韩语（韩国）
+
+        { std::string("ja")   , std::string("10") },   // 日语（日本）
+        { std::string("ja_jp"), std::string("10") },   // 日语（日本）
+
+        { std::string("pt")   , std::string("11") },   // 葡萄牙语（葡萄牙）
+        { std::string("pt_pt"), std::string("11") },   // 葡萄牙语（葡萄牙）
+        { std::string("pt_br"), std::string("15") },   // 葡萄牙语（巴西）
+
+        { std::string("ru")   , std::string("4")  },   // 俄语（俄罗斯）
+        { std::string("ru_ru"), std::string("4")  },   // 俄语（俄罗斯）
+        { std::string("uk_ua"), std::string("4")  },
+        { std::string("xa")   , std::string("6")  },   // 未知/保留（请根据后续规范映射）
+        { std::string("es")   , std::string("7")  },   // 西班牙语（西班牙/拉美）
+        { std::string("ca_es"), std::string("7")  },   // 加泰罗尼亚语（西班牙）
+        { std::string("de")   , std::string("8")  },   // 德语（德国）
+        { std::string("de_de"), std::string("8")  },   // 德语（德国）
+        { std::string("fr")   , std::string("9")  },   // 法语（法国）
+        { std::string("fr_fr"), std::string("9")  },   // 法语（法国）
+        { std::string("th")   , std::string("12") },   // 泰语（泰国）
+        { std::string("th_th"), std::string("12") },   // 泰语（泰国）
+        { std::string("vi")   , std::string("23") },   // 越南语（越南）
+        { std::string("vi_vn"), std::string("23") },   // 越南语（越南）
+        { std::string("nl")   , std::string("13") },   // 荷兰语（荷兰）
+        { std::string("nl_nl"), std::string("13") },   // 荷兰语（荷兰）
+        { std::string("it")   , std::string("14") },   // 意大利语（意大利）
+        { std::string("it_it"), std::string("14") },   // 意大利语（意大利）
+        { std::string("tr")   , std::string("16") },   // 土耳其语（土耳其）
+        { std::string("ro")   , std::string("17") },   // 罗马尼亚语（罗马尼亚）
+        { std::string("he")   , std::string("18") },   // 希伯来语（以色列）
+        { std::string("pl")   , std::string("19") },   // 波兰语（波兰）
+        { std::string("pl_pl"), std::string("19") },   // 波兰语（波兰）
+        { std::string("in")   , std::string("20") },   // 印度尼西亚语（印度尼西亚）
+        { std::string("in_in"), std::string("20") },   // 印度尼西亚语（印度尼西亚）
+        { std::string("id")   , std::string("20") },   // 印度尼西亚语（印度尼西亚）
+        { std::string("id_id"), std::string("20") },   // 印度尼西亚语（印度尼西亚）
+        { std::string("hu")   , std::string("21") },   // 匈牙利语（匈牙利）
+        { std::string("hu_hu"), std::string("21") },   // 匈牙利语（匈牙利）
+        { std::string("uk")   , std::string("22") },   // 乌克兰语
+      };
+      //uk_ua,sv_se,cs   no map
+      // 精确匹配（已归一化）
+      if (auto iter = I18N_INDEX_MAP.find(key); iter != I18N_INDEX_MAP.cend())
+        return iter->second;
+
+      // 基于主语言的回退（如 en_US -> en）
+      size_t under = key.find('_');
+      if (under != std::string::npos) {
+          const std::string base = key.substr(0, under);
+          if (auto iter = I18N_INDEX_MAP.find(base); iter != I18N_INDEX_MAP.cend())
+               return iter->second;
+      }
+
+      // 未命中时统一回退到英文（"0"），避免非中文语言错误显示为中文
+      return std::string("0");
+}
+std::map<std::string, std::string> GUI_App::get_extra_header()
+{
+    wxString language = app_config->get("language");
+    std::map<std::string, std::string> extra_headers = {
+                                                        {"__CXY_APP_ID_", "creality_model"},
+
+                                                        {"__CXY_PLATFORM_", "11"},
+                                                        {"__CXY_BRAND_", "creality"},
+                                                        {"__CXY_APP_CH_", "creality"},
+                                                        {"__CXY_OS_LANG_", I18nToLangaugeIndex(language.Lower().ToStdString())},
+                                                        {"__CXY_DUID_", GetMACAddress()}};
+    extra_headers.emplace("__CXY_APP_VER_", CREALITYPRINT_VERSION);
+    wxDateTime::TimeZone tz(wxDateTime::Local);
+    long                 offset = tz.GetOffset();
+    extra_headers.emplace("__CXY_TIMEZONE_", std::to_string(offset));
+    extra_headers.emplace("__CXY_UID_", app_config->get("cloud", "user_id"));
+    extra_headers.emplace("__CXY_TOKEN_", app_config->get("cloud", "token"));
+
+#if defined(__WINDOWS__)
+    extra_headers.emplace("__CXY_OS_VER_", "win");
+#elif defined(__APPLE__)
+    extra_headers.emplace("__CXY_OS_VER_",  "macos");
+#elif defined(__LINUX__)
+    extra_headers.emplace("__CXY_OS_VER_", "linux");
+#else()
+    extra_headers.emplace("__CXY_OS_VER_", "unknown");
+#endif
+    return extra_headers;
+}
+void GUI_App::setUserAccount(std::string userId, std::string tokenId)
+{
+    app_config->set("cloud", "user_id", userId);
+    app_config->set("cloud", "token", tokenId);
+}
+std::map<std::string, std::string> GUI_App::get_modellibrary_header()
+{
+    wxString language = app_config->get("language");
+    std::map<std::string, std::string> extra_headers;
+    extra_headers.emplace("__CXY_TOKEN_", app_config->get("cloud", "token"));
+    extra_headers.emplace("__CXY_UID_", app_config->get("cloud", "user_id"));
+    extra_headers.emplace("__CXY_OS_LANG_", I18nToLangaugeIndex(language.Lower().ToStdString()));
+    // 供前端环境识别：应用版本与 WebView 类型（跨平台一致）
+    extra_headers.emplace("__CXY_APP_VER_", CREALITYPRINT_VERSION);
+    extra_headers.emplace("__CXY_WEBVIEW_TYPE_", "creality_print_slice");
+    extra_headers.emplace("__CXY_PLATFORM_", "11");
+    extra_headers.emplace( "__CXY_DUID_", Slic3r::GUI::SystemId::get_system_id());
+     
+    //extra_headers.emplace("_DARK_MODE", dark_mode() ? "1" : "0");
+    return extra_headers;
+}
+
+
+std::string GUI_App::get_local_device_dir() 
+{
+    std::string local_device_dir;
+    bool        success  = true;
+    std::string user_dir = data_dir() + "/" + PRESET_USER_DIR;
+    fs::path    user_folder(user_dir);
+
+    if (!fs::exists(user_folder)) {
+        success = fs::create_directory(user_folder);
+    }
+    if (!success) {
+        return local_device_dir;
+    }
+
+    std::string account_id = "default";
+    if (is_login()) {
+        UserInfo user = get_user();
+        account_id                 = user.userId;
+    }
+
+    std::string dir_user_presets = user_dir + "/" + account_id;
+    fs::path    folder(user_folder / account_id);
+    if (!fs::exists(folder)) {
+        success = fs::create_directory(folder);
+    }
+    if (!success) {
+        return local_device_dir;
+    }
+
+    const std::string local_device = preset_type_local_device();
+    local_device_dir = dir_user_presets + "/" + local_device;
+    fs::path          folder_local(folder / local_device);
+    if (!fs::exists(folder_local)) {
+        success = fs::create_directory(folder_local);
+    }
+
+    return success ? local_device_dir : "";
+}
+
+long long GUI_App::get_app_startup_duration()
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(m_app_end_time - m_app_start_time).count();
+}
+
+long GUI_App::get_app_running_duration()
+{
+    return std::chrono::duration_cast<std::chrono::minutes>(m_app_close_time - m_app_start_time).count();
+}
+
+void GUI_App::mark_app_close_time()
+{
+    m_app_close_time = std::chrono::steady_clock::now();
+}
+
+std::string GUI_App::get_client_id()
+{
+    // 尝试获取 MAC 地址作为客户端 ID
+    std::string client_id = "";
+    
+    try {
+        client_id = GetMACAddress();
+    }
+    catch (const std::exception& e) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << "MAC address retrieval failed: " << e.what();
+    }
+    catch (...) {
+        BOOST_LOG_TRIVIAL(info) << "Unknown exception during MAC address retrieval";
+    }
+
+    if (!client_id.empty()) {
+        return client_id;
+    }
+
+    // 回退到从配置数据获取 UUID
+    try {
+        if (auto it = m_app_first_launch_data.find("uuid");
+            it != m_app_first_launch_data.end() && it->is_string()) {
+            return it->get<std::string>();
+        }
+    }
+    catch (const std::exception& e) {
+        BOOST_LOG_TRIVIAL(info) << "UUID retrieval failed: " << e.what();
+    }
+    catch (...) {
+        BOOST_LOG_TRIVIAL(info) << "Unknown exception during UUID retrieval";
+    }
+
+    // 所有尝试都失败时返回空字符串
+    return "";
+}
+
+void GUI_App::startTour_Simple()
+{
+}
+
+void GUI_App::startTour(int startIndex)
+{
+    if(wxGetApp().easy_mode())
+        return startTour_Simple();
+
+    m_UITour = new UITour(this->mainframe);
+    wxRect size = this->mainframe->GetRect();
+
+    if (startIndex == 0)
+    {
+        // step0
+        wxRect printerBtn = sidebar().obj_list()->printComboRect();
+        m_UITour->AddStep(0, printerBtn, _L("Here you can select and add your printer presets"), "", "userGuide_step1", "", wxRIGHT);
+    }
+
+    //step1
+    wxRect wifiBtn = sidebar().obj_list()->wifiBtn();
+    m_UITour->AddStep(1 - startIndex, wifiBtn, _L("Click 【"), _L("】 to select Creality printer matching the chosen preset"),
+       "userGuide_step2", "wifi", wxRIGHT);
+
+    //step2
+    Plater*     plater = wxGetApp().plater();
+    GLCanvas3D* canvas = plater->get_current_canvas3D();
+    Vec2f       pos    = canvas->getToolBar().get_item_position_from_top_left(*canvas, "add");
+    
+    wxRect rect;
+    rect.x      = pos.x();
+    #ifdef __APPLE__
+   float scale = 1;
+    rect.x = pos.x() ;
+    rect.y      = pos.y() + 37;
+    #else
+    float scale = mainframe->scale_factor();
+    rect.y      = pos.y() + 37 * scale;
+    #endif
+    rect.SetWidth(40 * scale);
+    rect.SetHeight(40 * scale);
+    m_UITour->AddStep(2 - startIndex, rect, _L("Here to import model files"), "", "userGuide_step3", "", wxRIGHT);
+
+    // step3
+    HoverBorderIcon* flushBtn                     = sidebar().autoMap_button();
+    wxRect           step3Rect = flushBtn->GetRect();
+    auto p_rect = this->mainframe->ClientToScreen(wxPoint(0, 0));
+    wxPoint          screenPos = flushBtn->GetScreenPosition() - p_rect;
+    wxRect           resStep3Rect                 = wxRect(screenPos.x, screenPos.y, step3Rect.width + 150 * scale, step3Rect.height);
+    
+    m_UITour->AddStep(3 - startIndex, resStep3Rect, _L("Click the Mapping button【"),
+                                   _L("】to map filament colors and types(If the selected device supports multi-color printing)"), "userGuide_step4",
+                               "auto_mapping_dark", wxLEFT);
+
+    // step4
+    wxRect setp4Rect = canvas->getSlicerBtnRec();
+    m_UITour->AddStep(4 - startIndex, setp4Rect, _L("Click 【Slice plate】 to generate the G-code file for printing"), "",
+                      "userGuide_step5", "",
+                               wxUP);
+
+    // step5
+    wxRect setp5Rect = canvas->getSenderBtnRec();
+    m_UITour->AddStep(5 - startIndex, setp5Rect, _L("Click 【Send print】, send the file to the selected device and start printing"), "",
+                               "userGuide_step6", "", wxUP);
+
+    m_UITour->Start();
+
+#ifndef __APPLE__
+    this->mainframe->set_content_visible(false);
+#endif // !1
+}
+
+void GUI_App::startTour_Apple() 
+{
+    wxGetApp().app_config->set("is_first_install", "1");
+    wxGetApp().check_creality_privacy_version();
+}
+
+void GUI_App::set_picking_effect(EPickingEffect effect)
+{
+    if (m_picking_effect != effect)
+    {
+        std::string str_picking_effect{};
+        switch (effect)
+        {
+        case EPickingEffect::Disabled:
+            str_picking_effect = "Disabled";
+            break;
+        case EPickingEffect::StencilOutline:
+            str_picking_effect = "StencilOutline";
+            break;
+        case EPickingEffect::Silhouette:
+            str_picking_effect = "Silhouette";
+            break;
+        }
+        BOOST_LOG_TRIVIAL(info) << "Switched picking effect to: " << str_picking_effect;
+        m_picking_effect = effect;
+    }
+}
+
+EPickingEffect GUI_App::get_picking_effect() const
+{
+    return m_picking_effect;
+}
+
+void GUI_App::set_picking_color(const ColorRGB& color)
+{
+    m_picking_color = color;
+}
+
+const ColorRGB& GUI_App::get_picking_color() const
+{
+    return m_picking_color;
+}
+
+//BBS
+void GUI_App::init_http_extra_header()
+{
+    std::map<std::string, std::string> extra_headers = get_extra_header();
+
+    if (m_agent)
+        m_agent->set_extra_http_header(extra_headers);
+}
+
+void GUI_App::update_http_extra_header()
+{
+    std::map<std::string, std::string> extra_headers = get_extra_header();
+    Slic3r::Http::set_extra_headers(extra_headers);
+    if (m_agent)
+        m_agent->set_extra_http_header(extra_headers);
+}
+
+void GUI_App::on_start_subscribe_again(std::string dev_id)
+{
+    auto start_subscribe_timer = new wxTimer(this, wxID_ANY);
+    Bind(wxEVT_TIMER, [this, start_subscribe_timer, dev_id](auto& e) {
+        start_subscribe_timer->Stop();
+        Slic3r::DeviceManager* dev = Slic3r::GUI::wxGetApp().getDeviceManager();
+        if (!dev) return;
+        MachineObject* obj = dev->get_selected_machine();
+        if (!obj) return;
+
+        if ( (dev_id == obj->dev_id) && obj->is_connecting() && obj->subscribe_counter > 0) {
+            obj->subscribe_counter--;
+            if(wxGetApp().getAgent()) wxGetApp().getAgent()->set_user_selected_machine(dev_id);
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": dev_id=" << obj->dev_id;
+        }
+    });
+    start_subscribe_timer->Start(4000, wxTIMER_ONE_SHOT);
+}
+
+void GUI_App::openDevelopMode(bool open)
+{    
+    if(isAlpha())
+        return;
+
+    app_config->set("role_type", "1");
+    update_develop_state();
+}
+
+void GUI_App::initDevelopParams()
+{
+    app_config->set("is_factory_mode", "false");
+    app_config->save();
+    boost::filesystem::path path_resources = resources_dir();
+    boost::filesystem::path creality_file = boost::filesystem::path(path_resources.string()).append("profiles").append("CrealityUserMode.json");
+    if (boost::filesystem::exists(creality_file))
+    {
+        try {
+            boost::nowide::ifstream t(creality_file.string());
+            std::stringstream buffer;
+            buffer << t.rdbuf();
+            json jLocal = json::parse(buffer.str());
+            auto paramsList = jLocal["params_list"];
+            for (const auto& item : paramsList)
+            {
+                std::string paramsKey = item["key"];
+                std::string paramType = item["type"];
+                m_DevelopParamslist.insert(std::make_pair(paramsKey, paramType));
+            }
+        }
+        catch (std::exception e) {
+
+        }
+
+    }
+}
+
+bool GUI_App::isAlpha()
+{
+    std::string version = std::string(PROJECT_VERSION_EXTRA);
+    bool        is_alpha = boost::algorithm::icontains(version, "alpha");
+    return is_alpha;
+}
+
+bool GUI_App::isDevelopParams(const std::string key)
+{
+    std::string processed_key = key;
+    size_t pos = processed_key.find("#0");
+    if (pos != std::string::npos) {
+        processed_key.erase(pos, 2);
+    }
+
+    pos = processed_key.find("#1");
+    if (pos != std::string::npos) {
+        processed_key.erase(pos, 2);
+    }
+
+    auto it = wxGetApp().m_DevelopParamslist.find(processed_key);
+    if (it != wxGetApp().m_DevelopParamslist.end())
+    {
+        return true;
+    }
+	return false;
+}
+
+std::string GUI_App::getDevelopParamsType(const std::string key)
+{
+    std::string processed_key = key;
+    size_t pos = processed_key.find("#0");
+    if (pos != std::string::npos) {
+        processed_key.erase(pos, 2);
+    }
+
+    pos = processed_key.find("#1");
+    if (pos != std::string::npos) {
+        processed_key.erase(pos, 2);
+    }
+
+    auto it = wxGetApp().m_DevelopParamslist.find(processed_key);
+    if (it != wxGetApp().m_DevelopParamslist.end())
+    {
+        return it->second;
+    }
+    return "";
+}
+
+const std::map<std::string, std::string> GUI_App::getUserKeys()
+{
+    return m_DevelopParamslist;
+}
+
+std::string GUI_App::get_local_models_path()
+{
+    std::string local_path = "";
+    if (data_dir().empty()) {
+        return local_path;
+    }
+
+    auto models_folder = (boost::filesystem::path(data_dir()) / "models");
+    local_path = models_folder.string();
+
+    if (!fs::exists(models_folder)) {
+        if (!fs::create_directory(models_folder)) {
+            local_path = "";
+        }
+        BOOST_LOG_TRIVIAL(info) << "create models folder:" << models_folder.string();
+    }
+    return local_path;
+}
+
+void GUI_App::init_single_instance_checker(const std::string &name, const std::string &path)
+{
+    BOOST_LOG_TRIVIAL(debug) << "init wx instance checker " << name << " "<< path;
+    m_single_instance_checker = std::make_unique<wxSingleInstanceChecker>(boost::nowide::widen(name), boost::nowide::widen(path));
+}
+
+bool GUI_App::OnInit()
+{
+    ::Label::initSysFont();
+    system_memory_stats(__FUNCTION__);
+    try {
+#if AUTO_CONVERT_3MF
+        if (this->init_params->argc >= 2 && this->init_params->argv != nullptr) {
+            std::string _arg1 = this->init_params->argv[1];
+            if (_arg1 == "version") {
+#ifdef _WIN32
+                // 分配控制台
+                AllocConsole();
+
+                // 重定向标准输出到控制台
+                HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+                if (hStdOut != INVALID_HANDLE_VALUE) {
+                    // 设置控制台标题
+                    SetConsoleTitleA("Creality Print Version");
+
+                    // 输出版本信息
+                    std::string versionMsg = "Creality Print Version: " + std::string(CREALITYPRINT_VERSION) + "\n";
+                    DWORD       bytesWritten;
+                    WriteConsoleA(hStdOut, versionMsg.c_str(), versionMsg.length(), &bytesWritten, NULL);
+
+                    // 等待用户按键
+                    WriteConsoleA(hStdOut, "Press any key to exit...\n", 25, &bytesWritten, NULL);
+
+                    // 等待按键
+                    HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
+                    if (hStdIn != INVALID_HANDLE_VALUE) {
+                        INPUT_RECORD ir;
+                        DWORD        eventsRead;
+                        do {
+                            ReadConsoleInput(hStdIn, &ir, 1, &eventsRead);
+                        } while (ir.EventType != KEY_EVENT || !ir.Event.KeyEvent.bKeyDown);
+                    }
+                }
+#else
+                std::cout << "Creality Print Version: " << CREALITYPRINT_VERSION << std::endl;
+#endif
+                exit(0);
+            }
+        }
+#endif
+        m_app_start_time = std::chrono::steady_clock::now();
+        #ifdef _WIN32
+        boost::filesystem::path data_dir = boost::filesystem::path(Slic3r::data_dir()).append("applock.data");
+        fs::ofstream file(data_dir);
+        file.close();
+        boost::interprocess::file_lock fl(from_u8(data_dir.string().c_str()));
+        fl.lock();
+        #endif
+        bool isDumpLauncher = false;
+        if (!this->init_params->input_files.empty())
+        {
+            const auto url = this->init_params->input_files.front();
+            if (boost::starts_with(url, "minidump://file=")) {
+                isDumpLauncher = true;
+            }
+        }
+        bool res = on_init_inner(isDumpLauncher);
+        if (!this->init_params->input_files.empty())
+        {
+            const auto url = this->init_params->input_files.front();
+            if(boost::starts_with(url, "minidump://file=")) {
+                
+                const auto file = url.substr(16);
+                if (boost::filesystem::exists(file)) {
+                    // BBS: if the file exists, we will show a error dialog and create a default config file.
+                    ErrorReportDialog* err_report_dialog = new ErrorReportDialog(nullptr, _L("Error Report"));
+                    err_report_dialog->Centre(wxBOTH);
+                    err_report_dialog->setDumpFilePath(file);
+                    int result = err_report_dialog->ShowModal();
+                    m_send_crash_report = (result == wxID_OK ? true : false);
+                    // Mark software crash for deferred analytics upload on next normal start
+                    wxGetApp().app_config->set_bool("software_crash", true);
+                    wxGetApp().app_config->save();
+                    // software crash, upload analytics data here
+                    AnalyticsDataUploadManager::getInstance().triggerUploadTasks(AnalyticsUploadTiming::ON_SOFTWARE_CRASH,{ AnalyticsDataEventType::ANALYTICS_SOFTWARE_CRASH });
+                    AnalyticsEventPayload payload;
+                    payload.type = AnalyticsDataEventType::ANALYTICS_SOFTWARE_CRASH;
+                    AnalyticsDataUploadManager::getInstance().triggerUploadTasksWithPayload(payload);
+                    BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << " result is " << result;
+                    if (result == wxID_OK) {
+                        err_report_dialog->sendReport();
+                        err_report_dialog->Destroy();
+                        boost::log::core::get()->flush();
+                        #ifdef _WIN32
+                        fl.unlock();
+                        #endif
+                        return true;
+                    }else{
+                        err_report_dialog->Destroy();
+                        boost::log::core::get()->flush();
+                        #ifdef _WIN32
+                        fl.unlock();
+                        #endif
+                        return false;
+                    }
+                    
+                }
+            }
+        }
+        //test code
+         //int* p = nullptr;
+         //*p = 0;
+         if (app_config->get("sync_user_preset") == "true") {
+            start_sync_user_preset();
+         }
+         #ifdef _WIN32
+         fl.unlock();
+         #endif
+        return res;
+    } catch (const std::exception &err) {
+        BOOST_LOG_TRIVIAL(error) << __FUNCTION__<<" got a generic exception, reason = " << err.what();
+        generic_exception_handle();
+        return false;
+    }
+}
+
+int GUI_App::OnExit()
+{
+    g_app_exiting = true;
+    BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << " start";
+
+    // Clear resumable state on exit: remove any *.part files under the update cache root.
+    AppUpdater::getInstance().cleanup_partial_downloads(CREALITYPRINT_VERSION);
+
+    //stop_sync_user_preset();
+    SyncUserPresets::getInstance().shutdown();
+
+    if (m_device_manager) {
+        delete m_device_manager;
+        m_device_manager = nullptr; 
+    }
+
+    if (m_user_manager) {
+        delete m_user_manager;
+        m_user_manager = nullptr;
+    }
+
+    if (m_agent) {
+        // BBS avoid a crash on mac platform
+#ifdef __WINDOWS__
+        m_agent->start_discovery(false, false);
+#endif
+        delete m_agent;
+        m_agent = nullptr;
+    }
+
+    // Orca: clean up encrypted bbl network log file if plugin is used
+    // No point to keep them as they are encrypted and can't be used for debugging
+    try {
+        auto              log_folder  = boost::filesystem::path(data_dir()) / "log";
+        const std::string filePattern = R"(debug_network_.*\.log\.enc)";
+        std::regex        pattern(filePattern);
+        if (boost::filesystem::exists(log_folder)) {
+            std::vector<boost::filesystem::path> network_logs;
+            for (auto& it : boost::filesystem::directory_iterator(log_folder)) {
+                auto temp_path = it.path();
+                if (boost::filesystem::is_regular_file(temp_path) && std::regex_match(temp_path.filename().string(), pattern)) {
+                    network_logs.push_back(temp_path.filename());
+                }
+            }
+            for (auto f : network_logs) {
+                boost::filesystem::remove(f);
+            }
+        }
+    } catch (...) {
+        BOOST_LOG_TRIVIAL(error) << "Failed to clean up encrypt bbl network log file";
+    }
+
+
+#if defined(__WIN32__) && wxUSE_WEBVIEW_EDGE
+    // CallOnExit() has already destroyed pending windows and their WebView
+    // controls. It is now safe to release the shared WebView2 environment,
+    // wait for the PIDs captured by BeginShutdown(), and clean the profile.
+    WebView::FinalizeShutdown();
+#endif
+    int result = wxApp::OnExit();
+
+    BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << " end";
+    boost::log::core::get()->flush();
+    return result;
+}
+
+void GUI_App::OnUnhandledException()
+{
+#if AUTOMATION_TOOL
+    if (AutomationMgr::enabled()) {
+        AutomationMgr::outputLog("has catch exception", 1);
+        AutomationMgr::endFunction();
+        return;
+    }
+#endif // AUTOMATION_TOOL
+
+    wxApp::OnUnhandledException();
+}
+class wxBoostLog : public wxLog
+{
+    void DoLogText(const wxString &msg) override {
+
+        BOOST_LOG_TRIVIAL(warning) << msg.ToUTF8().data();
+    }
+    ~wxBoostLog() override
+    {
+        // This is a hack. Prevent thread logs from going to wxGuiLog on app quit.
+        auto t = wxLog::SetActiveTarget(this);
+        wxLog::FlushActive();
+        wxLog::SetActiveTarget(t);
+    }
+};
+
+bool GUI_App::on_init_inner(bool isdump_launcher)
+{
+    wxLog::SetActiveTarget(new wxBoostLog());
+    BaseColorSpectraCache::initialize();
+    OfficialMaterialColors::initialize_from_resources();
+#ifdef __linux__
+    ensure_flatpak_user_launcher();
+#endif
+#if BBL_RELEASE_TO_PUBLIC
+    wxLog::SetLogLevel(wxLOG_Message);
+#endif
+
+    // Set initialization of image handlers before any UI actions - See GH issue #7469
+    wxInitAllImageHandlers();
+
+    // If the previous run exited unexpectedly, *.part may remain. Clear them on startup as well.
+    AppUpdater::getInstance().cleanup_partial_downloads(CREALITYPRINT_VERSION);
+#ifdef NDEBUG
+    wxImage::SetDefaultLoadFlags(0); // ignore waring in release build
+#endif
+
+#if defined(_WIN32) && ! defined(_WIN64)
+    // BBS: remove 32bit build prompt
+    // Win32 32bit build.
+#endif // _WIN64
+
+    // Forcing back menu icons under gtk2 and gtk3. Solution is based on:
+    // https://docs.gtk.org/gtk3/class.Settings.html
+    // see also https://docs.wxwidgets.org/3.0/classwx_menu_item.html#a2b5d6bcb820b992b1e4709facbf6d4fb
+    // TODO: Find workaround for GTK4
+#if defined(__WXGTK20__) || defined(__WXGTK3__)
+    g_object_set (gtk_settings_get_default (), "gtk-menu-images", TRUE, NULL);
+#endif
+
+#if defined(__WXGTK20__) || defined(__WXGTK3__)
+    // Suppress harmless GTK critical warnings from GTK3/wxWidgets interactions.
+    // These include allocation/events on unrealized widgets and style-context
+    // operations while custom controls are still being constructed.
+    g_log_set_handler("Gtk", G_LOG_LEVEL_CRITICAL,
+        [](const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data) {
+            if (message && (strstr(message, "gtk_widget_set_allocation") ||
+                            strstr(message, "WIDGET_REALIZED_FOR_EVENT") ||
+                            strstr(message, "gtk_widget_get_style_context") ||
+                            strstr(message, "gtk_style_context_add_provider")))
+                return;
+            g_log_default_handler(log_domain, log_level, message, user_data);
+        }, nullptr);
+#endif
+
+#ifdef WIN32
+    //BBS set crash log folder
+    
+    //CBaseException::set_log_folder(data_dir());
+#endif
+    
+    wxGetApp().Bind(wxEVT_QUERY_END_SESSION, [this](auto & e) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< "received wxEVT_QUERY_END_SESSION";
+        if (mainframe) {
+            wxCloseEvent e2(wxEVT_CLOSE_WINDOW);
+            e2.SetCanVeto(true);
+            mainframe->GetEventHandler()->ProcessEvent(e2);
+            if (e2.GetVeto()) {
+                e.Veto();
+                return;
+            }
+        }
+        for (auto d : dialogStack)
+            d->EndModal(wxID_ABORT);
+    });
+
+    wxGetApp().Bind(EVT_TEST_HELPER_CMD, [this](wxCommandEvent& e) 
+    { 
+        Test::Visitor().call_cmd("handle_app_cmd", e.GetString().ToStdString());
+    });
+
+    // Verify resources path
+    const wxString resources_dir = from_u8(Slic3r::resources_dir());
+    wxCHECK_MSG(wxDirExists(resources_dir), false,
+        wxString::Format("Resources path does not exist or is not a directory: %s", resources_dir));
+
+#ifdef __linux__
+    if (! check_old_linux_datadir(GetAppName())) {
+        std::cerr << "Quitting, user chose to move their data to new location." << std::endl;
+        return false;
+    }
+#endif
+
+    BOOST_LOG_TRIVIAL(info) << boost::format("gui mode, Current CrealityPrint Version %1%")%CREALITYPRINT_VERSION;
+    // Enable this to get the default Win32 COMCTRL32 behavior of static boxes.
+//    wxSystemOptions::SetOption("msw.staticbox.optimized-paint", 0);
+    // Enable this to disable Windows Vista themes for all wxNotebooks. The themes seem to lead to terrible
+    // performance when working on high resolution multi-display setups.
+//    wxSystemOptions::SetOption("msw.notebook.themed-background", 0);
+
+//     Slic3r::debugf "wxWidgets version %s, Wx version %s\n", wxVERSION_STRING, wxVERSION;
+    if (is_editor()) {
+        std::string msg = Slic3r::Http::tls_global_init();
+        std::string ssl_cert_store = app_config->get("tls_accepted_cert_store_location");
+        bool ssl_accept = app_config->get("tls_cert_store_accepted") == "yes" && ssl_cert_store == Slic3r::Http::tls_system_cert_store();
+
+        if (!msg.empty() && !ssl_accept) {
+            RichMessageDialog
+                dlg(nullptr,
+                    wxString::Format(_L("%s\nDo you want to continue?"), msg),
+                    "CrealityPrint", wxICON_QUESTION | wxYES_NO);
+            dlg.ShowCheckBox(_L("Remember my choice"));
+            if (dlg.ShowModal() != wxID_YES) return false;
+
+            app_config->set("tls_cert_store_accepted",
+                dlg.IsCheckBoxChecked() ? "yes" : "no");
+            app_config->set("tls_accepted_cert_store_location",
+                dlg.IsCheckBoxChecked() ? Slic3r::Http::tls_system_cert_store() : "");
+        }
+    }
+    on_init_custom_config();
+    // !!! Initialization of UI settings as a language, application color mode, fonts... have to be done before first UI action.
+    // Like here, before the show InfoDialog in check_older_app_config()
+
+    bool is_first_run = !boost::filesystem::exists(data_dir() + "/Creality.conf") || 
+                        app_config->get("language").empty();
+#ifdef __APPLE__
+    if (is_first_run) {
+        // 首次运行时使用系统语言
+        std::string system_lang = get_system_language();
+        app_config->set("language", system_lang);
+        app_config->save();
+    }
+#endif
+
+    // If load_language() fails, the application closes.
+    load_language(wxString(), true);
+
+#ifdef _MSW_DARK_MODE
+
+#ifndef __WINDOWS__
+    #if __linux__
+        if(!isRunningInFlatpak())
+        {
+            wxSystemAppearance app = wxSystemSettings::GetAppearance();
+            GUI::wxGetApp().app_config->set("dark_color_mode", app.IsDark() ? "1" : "0");
+            GUI::wxGetApp().app_config->save();
+        }
+    #else
+        wxSystemAppearance app = wxSystemSettings::GetAppearance();
+        GUI::wxGetApp().app_config->set("dark_color_mode", app.IsDark() ? "1" : "0");
+        GUI::wxGetApp().app_config->save();
+    #endif
+#endif // __APPLE__
+
+
+    bool init_dark_color_mode = dark_mode();
+    bool init_sys_menu_enabled = app_config->get("sys_menu_enabled") == "1";
+#ifdef __WINDOWS__
+     NppDarkMode::InitDarkMode(init_dark_color_mode, init_sys_menu_enabled);
+#endif // __WINDOWS__
+
+#endif
+    // initialize label colors and fonts
+    init_label_colours();
+    init_fonts();
+    wxGetApp().Update_dark_mode_flag();
+    if (isdump_launcher)
+    {
+        check_creality_privacy_version(false);
+        return true;
+    }
+    //return true;
+
+#ifdef _MSW_DARK_MODE
+    // app_config can be updated in check_older_app_config(), so check if dark_color_mode and sys_menu_enabled was changed
+    if (bool new_dark_color_mode = dark_mode();
+        init_dark_color_mode != new_dark_color_mode) {
+
+#ifdef __WINDOWS__
+        NppDarkMode::SetDarkMode(new_dark_color_mode);
+#endif // __WINDOWS__
+
+        init_label_colours();
+        //update_label_colours_from_appconfig();
+    }
+    if (bool new_sys_menu_enabled = app_config->get("sys_menu_enabled") == "1";
+        init_sys_menu_enabled != new_sys_menu_enabled)
+#ifdef __WINDOWS__
+        NppDarkMode::SetSystemMenuForApp(new_sys_menu_enabled);
+#endif
+#endif
+
+    if (m_last_config_version) {
+        int last_major = m_last_config_version->maj();
+        int last_minor = m_last_config_version->min();
+        int last_patch = m_last_config_version->patch()/100;
+        std::string studio_ver = SLIC3R_VERSION;
+        int cur_major = atoi(studio_ver.substr(0,2).c_str());
+        int cur_minor = atoi(studio_ver.substr(3,2).c_str());
+        int cur_patch = atoi(studio_ver.substr(6,2).c_str());
+        BOOST_LOG_TRIVIAL(info) << boost::format("last app version {%1%.%2%.%3%}, current version {%4%.%5%.%6%}")
+            %last_major%last_minor%last_patch%cur_major%cur_minor%cur_patch;
+        if ((last_major != cur_major)
+            ||(last_minor != cur_minor)
+            ||(last_patch != cur_patch)) {
+            remove_old_networking_plugins();
+        }
+    }
+
+    if(app_config->get("version") != SLIC3R_VERSION) {
+        app_config->set("version", SLIC3R_VERSION);
+    }
+
+    SplashScreen * scrn = nullptr;
+    if (app_config->get("show_splash_screen") == "true") {
+        // make a bitmap with dark grey banner on the left side
+        //BBS make BBL splash screen bitmap
+        wxBitmap bmp = SplashScreen::MakeBitmap();
+        // Detect position (display) to show the splash screen
+        // Now this position is equal to the mainframe position
+        wxPoint splashscreen_pos = wxDefaultPosition;
+        long splash_style = wxSPLASH_TIMEOUT | wxSPLASH_CENTRE_ON_SCREEN;
+#if defined(__WXGTK__)
+        const bool wayland_session = gui_app_is_wayland_session();
+#else
+        const bool wayland_session = false;
+#endif
+        if (!wayland_session && app_config->has("window_mainframe")) {
+            auto metrics = WindowMetrics::deserialize(app_config->get("window_mainframe"));
+            if (metrics) {
+                wxPoint mainframe_pos = metrics->get_rect().GetPosition();
+                int display_index = wxDisplay::GetFromPoint(mainframe_pos);
+                if (display_index != wxNOT_FOUND) {
+                    wxRect display_rect = wxDisplay(display_index).GetClientArea();
+                    splashscreen_pos = wxPoint(display_rect.x + (display_rect.width - bmp.GetWidth()) / 2,
+                                               display_rect.y + (display_rect.height - bmp.GetHeight()) / 2);
+                    splash_style = wxSPLASH_TIMEOUT | wxSPLASH_NO_CENTRE;
+                }
+            }
+        }
+
+
+        BOOST_LOG_TRIVIAL(info) << "begin to show the splash screen...";
+        //BBS use BBL splashScreen
+        scrn = new SplashScreen(bmp, splash_style, 1500, splashscreen_pos);
+       
+        //CusDialog* wDialog = new CusDialog(this->mainframe, wxID_ANY, "Login");
+        
+        scrn->Bind(wxEVT_CLOSE_WINDOW, [this](wxCloseEvent& evt) {
+            int a = 0;
+          /*  wxRect size = this->mainframe->GetRect();
+            wDialog->SetSize(size.width, size.height);
+            wDialog->Show();*/
+            // 创建UI Tour
+            //startTour();
+            evt.Skip();
+        });   
+        wxYield();
+
+#if defined(CUSTOMIZED) && !defined(CUSTOM_SPLASH_LOADING_TEXT_VISIBLE)
+        scrn->SetText(_L(""));
+#else
+        scrn->SetText(_L("Loading configuration") + dots);
+#endif
+    }
+
+    BOOST_LOG_TRIVIAL(info) << "loading systen presets...";
+    
+    preset_bundle = new PresetBundle();
+
+    // just checking for existence of Slic3r::data_dir is not enough : it may be an empty directory
+    // supplied as argument to --datadir; in that case we should still run the wizard
+    preset_bundle->setup_directories();
+
+
+    if (m_init_app_config_from_older)
+        copy_older_config();
+
+    if (is_editor()) {
+//#ifdef __WXMSW__
+        //if (app_config->get("associate_3mf") == "true")
+        //    associate_files(L"3mf");
+        //if (app_config->get("associate_stl") == "true")
+        //    associate_files(L"stl");
+        //if (app_config->get("associate_step") == "true") {
+        //    associate_files(L"step");
+        //    associate_files(L"stp");
+        //}
+        //associate_url(L"CrealityPrint");
+
+        //if (app_config->get("associate_gcode") == "true")
+        //    associate_files(L"gcode");
+//#endif // __WXMSW__
+
+        preset_updater = new PresetUpdater();
+
+        // start load profile family after preset updater finished
+        ProfileFamilyLoader::init();
+
+#if !AUTO_CONVERT_3MF
+
+#if !defined(CUSTOMIZED) || defined(CUSTOM_CHECKUPDATE_ENABLED)
+        Bind(EVT_SLIC3R_VERSION_ONLINE, [this](const wxCommandEvent& evt) {
+#if defined(CREALITYPRINT_APP_STORE) && defined(__WXOSX__)
+            // Mac App Store updates are delivered by the store, never by an external download.
+            return;
+#endif
+            if (this->plater_ != nullptr) {
+                // this->plater_->get_notification_manager()->push_notification(NotificationType::NewAppAvailable);
+                //BBS show msg box to download new version
+               /* wxString tips = wxString::Format(_L("Click to download new version in default browser: %s"), version_info.version_str);
+                DownloadDialog dialog(this->mainframe,
+                    tips,
+                    _L("New version of Creality Print"),
+                    false,
+                    wxCENTER | wxICON_INFORMATION);
+
+
+                dialog.SetExtendedMessage(extmsg);*/
+                std::string skip_version_str = this->app_config->get("app", "skip_version");
+                bool skip_this_version = false;
+                if (!skip_version_str.empty()) {
+                    BOOST_LOG_TRIVIAL(info) << "new version = " << version_info.version_str << ", skip version = " << skip_version_str;
+                    if (compare_creality_versions(version_info.version_str, skip_version_str) <= 0) {
+                        skip_this_version = true;
+                    } else {
+                        app_config->set("skip_version", "");
+                        skip_this_version = false;
+                    }
+                }
+                // Only show update ready dialog if we're not checking for a new version
+                // When checking for new version, always show the version check dialog instead
+                if (evt.GetInt() == 0 && this->app_config) {
+                    // Background check (not user-initiated):
+                    // Only show "Update Ready" dialog if there is a pending install for this exact version.
+                    // If user has already clicked "Install Now" (pending was cleared), stay silent so we
+                    // don't re-prompt on every startup after a failed install.
+                    std::string pending_version = get_pending_app_update_version();
+                    if (!pending_version.empty() && pending_version == version_info.version_str) {
+                        // Prepare the cached hot update before showing dialog
+                        if (!AppUpdater::getInstance().prepare_cached_hot_update_from_version(version_info.version_str, version_info.url)) {
+                            // If preparation fails, clear pending update and stay silent
+                            clear_pending_app_update(this->app_config);
+                            // Update won't show; unblock deferred restore project if any.
+                            this->trigger_deferred_restore_project();
+                        } else {
+                            const int res = show_update_ready_dialog_guarded(this->mainframe);
+                            if (res == wxID_YES) {
+                                clear_pending_app_update(this->app_config);
+                                set_install_attempted(version_info.version_str);
+                                AppUpdater::getInstance().install_update();
+                                // App is about to close/restart; no need to restore project.
+                            } else {
+                                // User chose "Install Later" — now show restore project if deferred.
+                                this->trigger_deferred_restore_project();
+                            }
+                        }
+                        return;  // pending path always returns; UpdateVersionDialog not needed
+                    }
+                    // No pending install: silently skip.
+                    // If user already clicked "Install Now" for this version, don't nag again on every
+                    // startup (install may have failed but version number is unchanged).
+                    // When the server publishes a genuinely newer version, that version won't be in
+                    // the attempted list, so the background check will show the dialog normally.
+                    std::string attempted_version = get_install_attempted_version();
+                    if (!attempted_version.empty() && attempted_version == version_info.version_str) {
+                        // Already attempted this version; stay silent.
+                        // Still need to unblock deferred restore project if any.
+                        this->trigger_deferred_restore_project();
+                        return;
+                    }
+                    // Genuinely new version (never attempted): clear any stale attempted flag and
+                    // fall through to show the UpdateVersionDialog below.
+                    if (!attempted_version.empty())
+                        clear_install_attempted(this->app_config);
+                    // If there was a pending install but it was for a different/older version,
+                    // fall through as well (pending was already handled above or doesn't match).
+                }
+                if (!skip_this_version
+                    || evt.GetInt() != 0) {
+                    // Parse version numbers to compare major versions
+                    int current_major = 0, current_minor = 0, current_patch = 0;
+                    int new_major = 0, new_minor = 0, new_patch = 0;
+                    
+                    // Parse current version
+                    std::string current_version = CREALITYPRINT_VERSION;
+                    sscanf(current_version.c_str(), "%d.%d.%d", &current_major, &current_minor, &current_patch);
+                    
+                    // Parse new version
+                    std::string new_version = version_info.version_str;
+                    sscanf(new_version.c_str(), "%d.%d.%d", &new_major, &new_minor, &new_patch);
+                    
+                    // Check if major version is greater
+                    bool is_major_update = (new_major > current_major);
+
+                    // Hotfix: same major.minor.patch, only the 4th field (build id) differs.
+                    // These still go through the hot update flow, but must use the full package
+                    // and tell the updater to force-install it (see m_update_force_full below),
+                    // because the nupkg name only carries the 3-part version and the updater
+                    // would otherwise skip a same-3-part package.
+                    bool is_hotfix_update = (new_major == current_major &&
+                                             new_minor == current_minor &&
+                                             new_patch == current_patch);
+                    m_update_force_full = is_hotfix_update;
+#ifndef _WIN32
+                    // Hot update (minor version incremental update) is only supported on Windows.
+                    // On macOS/Linux, always treat as a major update so the dialog shows "Download"
+                    // and clicking it opens the browser to download the full installer.
+                    is_major_update = true;
+                    m_update_force_full = false;
+#endif
+                    UpdateVersionDialog dialog(this->mainframe);
+                    wxString            extmsg = wxString::FromUTF8(version_info.description);
+                    dialog.update_version_info(extmsg, version_info.version_str);
+                    int isUser = evt.GetInt();
+                    dialog.isUser(isUser);
+                    
+                    // Set update information
+                    dialog.set_update_info(is_major_update, version_info.version_str, version_info.url);
+                    
+                    // If it's not a major update, change the download button to "Update"
+                    if (!is_major_update) {
+                        dialog.m_button_download->SetLabel(_L("Update"));
+                    }
+                    
+                    if (evt.GetInt() != 0) {
+                        dialog.m_button_skip_version->Hide();
+                    }
+                    switch (dialog.ShowModal())
+                    {
+                    case wxID_YES:
+                        // For minor updates, use local hot update process
+                        if (!is_major_update) {
+                            // Use saved update packages directly
+                            if (!m_update_packages.empty()) {
+                                process_update_packages(m_update_packages, m_update_version, m_update_base_package_name, m_update_file_url, true, 1);
+                            }
+                        } else {
+                            // For major updates, use original online update process
+                            wxLaunchDefaultBrowser(version_info.url);
+                        }
+                        break;
+                    case wxID_NO:
+                        break;
+                    default:
+                        ;
+					}
+                    // Unblock deferred restore project (if any) now that the version dialog is gone.
+                    this->trigger_deferred_restore_project();
+                }
+            }
+        });
+#endif
+
+        Bind(EVT_ENTER_FORCE_UPGRADE, [this](const wxCommandEvent& evt) {
+#if defined(CREALITYPRINT_APP_STORE) && defined(__WXOSX__)
+            return;
+#endif
+            if (this->mainframe == nullptr || this->m_is_closing)
+                return;
+            wxString       version_str      = wxString::FromUTF8(this->app_config->get("upgrade", "version"));
+            wxString       description_text = wxString::FromUTF8(this->app_config->get("upgrade", "description"));
+            std::string    download_url     = this->app_config->get("upgrade", "url");
+            wxString       tips             = wxString::Format(_L("Click to download new version in default browser: %s"), version_str);
+                DownloadDialog dialog(this->mainframe,
+                    tips,
+                    _L("The Creality Print needs an upgrade"),
+                    false,
+                    wxCENTER | wxICON_INFORMATION);
+            dialog.SetExtendedMessage(description_text);
+
+            int result = dialog.ShowModal();
+                switch (result)
+                {
+                 case wxID_YES:
+                     wxLaunchDefaultBrowser(download_url);
+                     break;
+            case wxID_NO:
+                if (wxGetApp().mainframe)
+                    wxGetApp().mainframe->Close(true);
+                break;
+            case wxID_CANCEL: break;
+            default:
+                break;
+            }
+        });
+
+        Bind(EVT_SHOW_NO_NEW_VERSION, [this](const wxCommandEvent& evt) {
+                    wxString   msg = _L("This is the newest version.") + "\n" +
+                                     wxString::Format(_L("Current version: %s"), GUI_App::format_display_version());
+                    InfoDialog dlg(nullptr, _L("Info"), msg);
+                    dlg.ShowModal();
+        });
+#endif
+        Bind(EVT_SHOW_DIALOG, [this](const wxCommandEvent& evt) {
+                    wxString   msg = evt.GetString();
+                    InfoDialog dlg(this->mainframe, _L("Info"), msg);
+            dlg.Bind(wxEVT_DESTROY, [this](auto& e) {
+                m_info_dialog_content = wxEmptyString;
+            });
+                    dlg.ShowModal();
+        });
+    }
+    else {
+#ifdef __WXMSW__
+        if (app_config->get("associate_gcode") == "true")
+            associate_files(L"gcode");
+#endif // __WXMSW__
+    }
+
+    // Suppress the '- default -' presets.
+    preset_bundle->set_default_suppressed(true);
+
+    Bind(EVT_SET_SELECTED_MACHINE, &GUI_App::on_set_selected_machine, this);
+    Bind(EVT_UPDATE_MACHINE_LIST, &GUI_App::on_update_machine_list, this);
+    Bind(EVT_USER_LOGIN, &GUI_App::on_user_login, this);
+    Bind(EVT_USER_LOGIN_HANDLE, &GUI_App::on_user_login_handle, this);
+    Bind(EVT_CHECK_PRIVACY_VER, &GUI_App::on_check_privacy_update, this);
+    Bind(EVT_CHECK_PRIVACY_SHOW, &GUI_App::show_check_privacy_dlg, this);
+
+    Bind(EVT_SHOW_IP_DIALOG, &GUI_App::show_ip_address_enter_dialog_handler, this);
+
+
+    std::map<std::string, std::string> extra_headers = get_extra_header();
+    Slic3r::Http::set_extra_headers(extra_headers);
+
+    copy_network_if_available();
+    on_init_network();
+
+    if (m_agent && m_agent->is_user_login()) {
+        enable_user_preset_folder(true);
+    } else {
+        enable_user_preset_folder(false);
+    }
+
+    // BBS if load user preset failed
+    //if (loaded_preset_result != 0) {
+        try {
+            // Enable all substitutions (in both user and system profiles), but log the substitutions in user profiles only.
+            // If there are substitutions in system profiles, then a "reconfigure" event shall be triggered, which will force
+            // installation of a compatible system preset, thus nullifying the system preset substitutions.
+            init_user_profile();
+            init_params->preset_substitutions = preset_bundle->load_presets(*app_config, ForwardCompatibilitySubstitutionRule::EnableSystemSilent);
+        }catch(ConfigurationError &ex)
+        {
+            int ret = wxMessageBox(_L("Detected corruption in the Creality Print configuration file, attempted to rebuild, \nplease manually restart the software."), _L("Error"), wxOK | wxICON_ERROR);
+            if(ret == wxOK) {
+                boost::filesystem::path dir = (boost::filesystem::path(data_dir()) / PRESET_SYSTEM_DIR).make_preferred();
+                if (boost::filesystem::exists(dir)) {
+                    boost::filesystem::remove_all(dir);
+                }
+                wxExit();
+                return false;
+            }
+           
+        }
+        catch (const std::exception& ex) {
+            show_error(nullptr, ex.what());
+        }
+    //}
+
+#ifdef WIN32
+#if !wxVERSION_EQUAL_OR_GREATER_THAN(3,1,3)
+    register_win32_dpi_event();
+#endif // !wxVERSION_EQUAL_OR_GREATER_THAN
+    register_win32_device_notification_event();
+#endif // WIN32
+    
+    // Let the libslic3r know the callback, which will translate messages on demand.
+    Slic3r::I18N::set_translate_callback(libslic3r_translate_callback);
+
+    BOOST_LOG_TRIVIAL(info) << "create the main window";
+  
+    mainframe = new MainFrame();
+    mainframe->Bind(EVT_APP_UPDATE_PROGRESS, [this](wxCommandEvent& e) {
+        if (g_update_progress_dlg)
+            g_update_progress_dlg->update_progress(e.GetInt(), e.GetString());
+    });
+    mainframe->Bind(EVT_APP_UPDATE_COMPLETE, [this](wxCommandEvent&) {
+        if (g_update_progress_dlg)
+            g_update_progress_dlg->close_imgui_notification();
+        if (g_update_progress_dlg)
+            g_update_progress_dlg->Hide();
+
+        // Write pending state immediately so that if the app crashes or is killed
+        // while the "Update Ready" dialog is shown, the user will still be prompted
+        // to install on next startup.
+        set_pending_app_update(this->app_config, AppUpdater::getInstance().get_version());
+
+        // Defer the "Update Ready" dialog until no other modal dialog (e.g. the
+        // "Restore unsaved project?" prompt) is blocking the UI.  Poll every
+        // 300 ms; give up after ~30 s to avoid an infinite loop.
+        struct ShowUpdateReady {
+            static void schedule(GUI_App* app, int retries_left) {
+                wxGetApp().CallAfter([app, retries_left]() {
+                    // Check whether a modal window is currently active.
+                    bool modal_busy = false;
+                    for (wxWindow* w : wxTopLevelWindows) {
+                        if (w == app->mainframe)
+                            continue;
+                        if (auto* dlg = dynamic_cast<wxDialog*>(w)) {
+                            if (dlg->IsModal() && dlg->IsShown()) {
+                                modal_busy = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (modal_busy && retries_left > 0) {
+                        // Another dialog is open — try again shortly.
+                        wxTimer* t = new wxTimer();
+                        t->Bind(wxEVT_TIMER, [app, retries_left, t](wxTimerEvent&) {
+                            // Delete the timer safely outside its own callback.
+                            wxTheApp->CallAfter([t]() { delete t; });
+                            schedule(app, retries_left - 1);
+                        });
+                        t->StartOnce(300);
+                        return;
+                    }
+                    // No competing dialog (or retries exhausted) — show now.
+                    const int res = show_update_ready_dialog_guarded(app->mainframe);
+                    if (res == wxID_YES) {
+                        clear_pending_app_update(app->app_config);
+                        set_install_attempted(AppUpdater::getInstance().get_version());
+                        AppUpdater::getInstance().install_update();
+                        // App is about to close/restart; no need to restore project.
+                    } else {
+                        set_pending_app_update(app->app_config, AppUpdater::getInstance().get_version());
+                        // User deferred install — unblock deferred restore project if any.
+                        app->trigger_deferred_restore_project();
+                    }
+                });
+            }
+        };
+        ShowUpdateReady::schedule(this, 100 /*retries ≈ 30 s*/);
+    });
+    mainframe->Bind(EVT_APP_UPDATE_CANCELED, [this](wxCommandEvent&) {
+        if (g_update_progress_dlg)
+            g_update_progress_dlg->close_imgui_notification();
+        if (g_update_progress_dlg)
+            g_update_progress_dlg->Hide();
+
+        // OTA analytics: report download cancel
+        {
+            BOOST_LOG_TRIVIAL(warning) << "[OTA_ANALYTICS] ota_download_cancel: user canceled download";
+            AnalyticsEventPayload payload;
+            payload.type = AnalyticsDataEventType::ANALYTICS_OTA_DOWNLOAD_CANCEL;
+            AnalyticsDataUploadManager::getInstance().triggerUploadTasksWithPayload(payload);
+        }
+    });
+    mainframe->Bind(EVT_APP_UPDATE_ERROR, [this](wxCommandEvent& e) {
+        if (g_update_progress_dlg)
+            g_update_progress_dlg->close_imgui_notification();
+        if (g_update_progress_dlg)
+            g_update_progress_dlg->Hide();
+        
+        // Use CP's RichMessageDialog for consistent UI style
+        Slic3r::GUI::RichMessageDialog dlg(this->mainframe, _(L"Download incomplete, please check your network and try again"), _(L"Download Failed"), wxYES | wxNO);
+        
+        // Show dialog briefly to ensure buttons are created
+        dlg.Show(false);
+        
+        // Find and update button labels
+        if (Button* btn_yes = static_cast<Button*>(dlg.FindWindowById(wxID_YES))) {
+            btn_yes->SetLabel(_(L"Retry"));
+        }
+        if (Button* btn_no = static_cast<Button*>(dlg.FindWindowById(wxID_NO))) {
+            btn_no->SetLabel(_(L"Confirm"));
+        }
+        
+        dlg.Layout();
+        if (dlg.ShowModal() == wxID_YES) {
+            if (g_update_progress_dlg) {
+                g_update_progress_dlg->update_progress(0, _L("Preparing to download..."));
+                g_update_progress_dlg->Show();
+            }
+            AppUpdater::getInstance().retry();
+        }
+    });
+    //UITour::Instance();
+    // hide settings tabs after first Layout
+    if (this->init_params->input_files.empty()) {
+        mainframe->select_tab(size_t(0));
+    }else{
+        mainframe->select_tab(size_t(MainFrame::tp3DEditor));
+    }
+
+    sidebar().obj_list()->init();
+    //sidebar().aux_list()->init_auxiliary();
+   // mainframe->m_project->init_auxiliary();
+
+//     update_mode(); // !!! do that later
+    SetTopWindow(mainframe);
+
+    plater_->init_notification_manager();
+
+    m_printhost_job_queue.reset(new PrintHostJobQueue(mainframe->printhost_queue_dlg()));
+
+    if (is_gcode_viewer()) {
+        mainframe->update_layout();
+        if (plater_ != nullptr)
+            // ensure the selected technology is ptFFF
+            plater_->set_printer_technology(ptFFF);
+    }
+    else
+        load_current_presets();
+
+    if (plater_ != nullptr) {
+        plater_->reset_project_dirty_initial_presets();
+        plater_->update_project_dirty_from_presets();
+    }
+
+    // BBS:
+#ifdef __WINDOWS__
+    mainframe->topbar()->SaveNormalRect();
+#endif
+    mainframe->Show(true);
+#ifdef __WXOSX__
+    // App Store review (Guideline 4): activate on launch so the App menu and
+    // Dock icon appear; without this the window stays inactive on fresh installs.
+    Slic3r::activate_app();
+    mainframe->Raise();
+#endif
+#ifdef __WXMSW__
+    // Show() invalidates the custom topbar, but startup continues synchronously
+    // before the event loop can paint it. Render the entire child tree now so
+    // DWM never presents the toolbar's unpainted background.
+    ::RedrawWindow(mainframe->GetHandle(), nullptr, nullptr,
+        RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_UPDATENOW);
+#endif
+    BOOST_LOG_TRIVIAL(info) << "main frame firstly shown";
+    start_async_material_list_update();
+    OfficialMaterialColors::refresh_async();
+
+    // 启动用户信息文件监听，确保跨实例同步在线模型库登录状态
+    start_user_info_watcher();
+
+//#if BBL_HAS_FIRST_PAGE
+    //BBS: set tp3DEditor firstly
+    /*plater_->canvas3D()->enable_render(false);
+    mainframe->select_tab(size_t(MainFrame::tp3DEditor));
+    scrn->SetText(_L("Loading Opengl resourses..."));
+    plater_->select_view_3D("3D");
+    //BBS init the opengl resource here
+    Size canvas_size = plater_->canvas3D()->get_canvas_size();
+    wxGetApp().imgui()->set_display_size(static_cast<float>(canvas_size.get_width()), static_cast<float>(canvas_size.get_height()));
+    wxGetApp().init_opengl();
+    plater_->canvas3D()->init();
+    wxGetApp().imgui()->new_frame();
+    plater_->canvas3D()->enable_render(true);
+    plater_->canvas3D()->render();
+    if (is_editor())
+        mainframe->select_tab(size_t(0));*/
+//#else
+    //plater_->trigger_restore_project(1);
+//#endif
+
+    obj_list()->set_min_height();
+
+    int mode = wxGetApp().app_config->get("role_type") != "0";
+    update_mode(mode); // update view mode after fix of the object_list size
+
+#ifdef __APPLE__
+   other_instance_message_handler()->bring_instance_forward();
+#endif //__APPLE__
+
+    Bind(EVT_HTTP_ERROR, &GUI_App::on_http_error, this);
+
+
+    Bind(wxEVT_IDLE, [this](wxIdleEvent& event)
+    {
+        bool curr_studio_active = this->is_studio_active();
+        if (m_studio_active != curr_studio_active) {
+            if (curr_studio_active) {
+                BOOST_LOG_TRIVIAL(info) << "studio is active, start to subscribe";
+                if (m_agent) {
+                    json j = json::object();
+                    m_agent->start_subscribe("app");
+                }
+            } else {
+                BOOST_LOG_TRIVIAL(info) << "studio is inactive, stop to subscribe";
+                if (m_agent) {
+                    json j = json::object();
+                    m_agent->stop_subscribe("app");
+                }
+            }
+            m_studio_active = curr_studio_active;
+        }
+
+
+        if (! plater_)
+            return;
+
+        // BBS
+        //this->obj_manipul()->update_if_dirty();
+
+        //use m_post_initialized instead
+        //static bool update_gui_after_init = true;
+
+        // An ugly solution to GH #5537 in which GUI_App::init_opengl (normally called from events wxEVT_PAINT
+        // and wxEVT_SET_FOCUS before GUI_App::post_init is called) wasn't called before GUI_App::post_init and OpenGL wasn't initialized.
+//#ifdef __linux__
+//        if (!m_post_initialized && m_opengl_initialized) {
+//#else
+        if (!m_post_initialized && !m_adding_script_handler) {
+//#endif
+            m_post_initialized = true;
+#ifdef WIN32
+            this->mainframe->register_win32_callbacks();
+#endif
+            this->post_init();
+
+            m_app_end_time = std::chrono::steady_clock::now();
+
+            update_publish_status();
+
+#if AUTO_CONVERT_3MF
+            parse_convert_3mf_args();
+#endif
+            
+        }
+        
+        if (m_post_initialized && app_config->dirty()) {
+            save_user_default_filaments(app_config);
+            app_config->save();
+            SyncUserPresets::getInstance().syncConfigToCXCloud();
+        }
+
+    });
+
+    m_initialized = true;
+
+    flush_logs();
+
+    //after init
+    parse_args();
+
+    BOOST_LOG_TRIVIAL(info) << "finished the gui app init";
+    
+    if (m_config_corrupted) {
+        m_config_corrupted = false;
+        show_error(nullptr,
+                   _u8L(
+                       "The CrealityPrint configuration file may be corrupted and cannot be parsed.\nCrealityPrint has attempted to recreate the "
+                       "configuration file.\nPlease note, application settings will be lost, but printer profiles will not be affected."));
+    }
+
+#if !AUTO_CONVERT_3MF
+    //  启动同步预设线程
+    SyncUserPresets::getInstance().startup();
+#endif
+    return true;
+}
+void  GUI_App::on_init_custom_config()
+{
+    auto config_file = fs::path(resources_dir() + "/data/customized_config.json");
+    json j;
+    if (fs::exists(config_file))
+    {
+        try{
+            boost::nowide::ifstream ifs(config_file.string());
+            ifs >> j;
+        }catch (const std::exception& e) {
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(",  parse json failed, %1%.") % e.what();
+        }
+    }else{
+        return;
+    }
+    m_customize_config.cur_language = j["language"];
+    std::string language = app_config->get("language");
+    if (language.empty() && !m_customize_config.cur_language.empty())
+    {
+        app_config->set("language", m_customize_config.cur_language);
+    }
+}
+void  GUI_App::track_event(const std::string& event, const std::string& data)
+{
+    // Analytics may be delivered by timers that were queued before shutdown.
+    // Never forward them to the main frame after its WebView children start
+    // being destroyed.
+    if (m_is_closing)
+        return;
+
+    std::string final_data = data;
+    try {
+        nlohmann::json js = nlohmann::json::parse(data);
+        if (js.is_object()) {
+            const std::string system_id = SystemId::get_system_id();
+            js["app_version"]    = GUI_App::format_display_version().c_str();
+            js["operating_system"] = wxGetOsDescription().ToStdString().c_str();
+            js["device_id"]      = system_id;
+            js["client_id"]      = system_id;
+            js["user_id"]        = wxGetApp().get_user().userId;
+            final_data = js.dump();
+        }
+    } catch (...) {
+    }
+    if (mainframe && !m_is_closing) {
+        mainframe->trackEvent(event, final_data);
+    }
+}
+void GUI_App::copy_network_if_available()
+{
+    if (app_config->get("update_network_plugin") != "true")
+        return;
+    std::string network_library, player_library, live555_library, network_library_dst, player_library_dst, live555_library_dst;
+    std::string data_dir_str = data_dir();
+    boost::filesystem::path data_dir_path(data_dir_str);
+    auto plugin_folder = data_dir_path / "plugins";
+    auto cache_folder = data_dir_path / "ota";
+    std::string changelog_file = cache_folder.string() + "/network_plugins.json";
+#if defined(_MSC_VER) || defined(_WIN32)
+    network_library = cache_folder.string() + "/bambu_networking.dll";
+    player_library      = cache_folder.string() + "/BambuSource.dll";
+    live555_library     = cache_folder.string() + "/live555.dll";
+    network_library_dst = plugin_folder.string() + "/bambu_networking.dll";
+    player_library_dst  = plugin_folder.string() + "/BambuSource.dll";
+    live555_library_dst = plugin_folder.string() + "/live555.dll";
+#elif defined(__WXMAC__)
+    network_library = cache_folder.string() + "/libbambu_networking.dylib";
+    player_library = cache_folder.string() + "/libBambuSource.dylib";
+    live555_library = cache_folder.string() + "/liblive555.dylib";
+    network_library_dst = plugin_folder.string() + "/libbambu_networking.dylib";
+    player_library_dst = plugin_folder.string() + "/libBambuSource.dylib";
+    live555_library_dst = plugin_folder.string() + "/liblive555.dylib";
+#else
+    network_library = cache_folder.string() + "/libbambu_networking.so";
+    player_library      = cache_folder.string() + "/libBambuSource.so";
+    live555_library     = cache_folder.string() + "/liblive555.so";
+    network_library_dst = plugin_folder.string() + "/libbambu_networking.so";
+    player_library_dst  = plugin_folder.string() + "/libBambuSource.so";
+    live555_library_dst = plugin_folder.string() + "/liblive555.so";
+#endif
+
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< ": checking network_library " << network_library << ", player_library " << player_library;
+    if (!boost::filesystem::exists(plugin_folder)) {
+        BOOST_LOG_TRIVIAL(info)<< __FUNCTION__ << ": create directory "<<plugin_folder.string();
+        boost::filesystem::create_directory(plugin_folder);
+    }
+    std::string error_message;
+    if (boost::filesystem::exists(network_library)) {
+        CopyFileResult cfr = copy_file(network_library, network_library_dst, error_message, false);
+        if (cfr != CopyFileResult::SUCCESS) {
+            BOOST_LOG_TRIVIAL(error) << __FUNCTION__<< ": Copying failed(" << cfr << "): " << error_message;
+            return;
+        }
+
+        static constexpr const auto perms = fs::owner_read | fs::owner_write | fs::group_read | fs::others_read;
+        fs::permissions(network_library_dst, perms);
+        fs::remove(network_library);
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< ": Copying network library from" << network_library << " to " << network_library_dst<<" successfully.";
+    }
+
+    if (boost::filesystem::exists(player_library)) {
+        CopyFileResult cfr = copy_file(player_library, player_library_dst, error_message, false);
+        if (cfr != CopyFileResult::SUCCESS) {
+            BOOST_LOG_TRIVIAL(error) << __FUNCTION__<< ": Copying failed(" << cfr << "): " << error_message;
+            return;
+        }
+
+        static constexpr const auto perms = fs::owner_read | fs::owner_write | fs::group_read | fs::others_read;
+        fs::permissions(player_library_dst, perms);
+        fs::remove(player_library);
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< ": Copying player library from" << player_library << " to " << player_library_dst<<" successfully.";
+    }
+
+    if (boost::filesystem::exists(live555_library)) {
+        CopyFileResult cfr = copy_file(live555_library, live555_library_dst, error_message, false);
+        if (cfr != CopyFileResult::SUCCESS) {
+            BOOST_LOG_TRIVIAL(error) << __FUNCTION__<< ": Copying failed(" << cfr << "): " << error_message;
+            return;
+        }
+
+        static constexpr const auto perms = fs::owner_read | fs::owner_write | fs::group_read | fs::others_read;
+        fs::permissions(live555_library_dst, perms);
+        fs::remove(live555_library);
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< ": Copying live555 library from" << live555_library << " to " << live555_library_dst<<" successfully.";
+    }
+    if (boost::filesystem::exists(changelog_file))
+        fs::remove(changelog_file);
+    app_config->set("update_network_plugin", "false");
+}
+
+bool GUI_App::on_init_network(bool try_backup)
+{
+    auto should_load_networking_plugin = app_config->get_bool("installed_networking");
+    if(!should_load_networking_plugin) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << "Don't load plugin as installed_networking is false";
+        return false;
+    }
+    return false;
+    int load_agent_dll = Slic3r::NetworkAgent::initialize_network_module();
+    bool create_network_agent = false;
+__retry:
+    if (!load_agent_dll) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": on_init_network, load dll ok";
+        if (check_networking_version()) {
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": on_init_network, compatibility version";
+            auto bambu_source = Slic3r::NetworkAgent::get_bambu_source_entry();
+            if (!bambu_source) {
+                BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": can not get bambu source module!";
+                m_networking_compatible = false;
+                if (should_load_networking_plugin) {
+                    m_networking_need_update = true;
+                }
+            }
+            else
+                create_network_agent = true;
+        } else {
+            if (try_backup) {
+                int result = Slic3r::NetworkAgent::unload_network_module();
+                BOOST_LOG_TRIVIAL(info) << "on_init_network, version mismatch, unload_network_module, result = " << result;
+                load_agent_dll = Slic3r::NetworkAgent::initialize_network_module(true);
+                try_backup = false;
+                goto __retry;
+            }
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": on_init_network, version dismatch, need upload network module";
+            if (should_load_networking_plugin) {
+                m_networking_need_update = true;
+            }
+        }
+    } else {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": on_init_network, load dll failed";
+        if (should_load_networking_plugin) {
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ": on_init_network, need upload network module";
+            m_networking_need_update = true;
+        }
+    }
+
+    if (create_network_agent) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", create network agent...");
+        //std::string data_dir = wxStandardPaths::Get().GetUserDataDir().ToUTF8().data();
+        std::string data_directory = data_dir();
+
+        m_agent = new Slic3r::NetworkAgent(data_directory);
+
+        if (!m_device_manager)
+            m_device_manager = new Slic3r::DeviceManager(m_agent);
+        else
+            m_device_manager->set_agent(m_agent);
+
+        if (!m_user_manager)
+            m_user_manager = new Slic3r::UserManager(m_agent);
+        else
+            m_user_manager->set_agent(m_agent);
+
+        if (this->is_enable_multi_machine()) {
+            if (!m_task_manager) {
+                m_task_manager = new Slic3r::TaskManager(m_agent);
+                m_task_manager->start();
+            }
+            m_agent->enable_multi_machine(true);
+            DeviceManager::EnableMultiMachine = true;
+        } else {
+            m_agent->enable_multi_machine(false);
+            DeviceManager::EnableMultiMachine = false;
+        }
+
+        //BBS set config dir
+        if (m_agent) {
+            m_agent->set_config_dir(data_directory);
+        }
+        //BBS start http log
+        if (m_agent) {
+            m_agent->init_log();
+        }
+
+        //BBS set cert dir
+        if (m_agent)
+            m_agent->set_cert_file(resources_dir() + "/cert", "slicer_base64.cer");
+
+        init_http_extra_header();
+
+        if (m_agent) {
+            init_networking_callbacks();
+            std::string country_code = app_config->get_country_code();
+            m_agent->set_country_code(country_code);
+            m_agent->start();
+        }
+    }
+    else {
+        int result = Slic3r::NetworkAgent::unload_network_module();
+        BOOST_LOG_TRIVIAL(info) << "on_init_network, unload_network_module, result = " << result;
+
+        if (!m_device_manager)
+            m_device_manager = new Slic3r::DeviceManager();
+
+        if (!m_user_manager)
+            m_user_manager = new Slic3r::UserManager();
+    }
+
+    return true;
+}
+
+unsigned GUI_App::get_colour_approx_luma(const wxColour &colour)
+{
+    double r = colour.Red();
+    double g = colour.Green();
+    double b = colour.Blue();
+
+    return std::round(std::sqrt(
+        r * r * .241 +
+        g * g * .691 +
+        b * b * .068
+        ));
+}
+
+bool GUI_App::dark_mode()
+{
+#ifdef SUPPORT_DARK_MODE
+    #if __APPLE__
+        // The check for dark mode returns false positive on 10.12 and 10.13,
+        // which allowed setting dark menu bar and dock area, which is
+        // is detected as dark mode. We must run on at least 10.14 where the
+        // proper dark mode was first introduced.
+        return wxPlatformInfo::Get().CheckOSVersion(10, 14) && mac_dark_mode();
+    #elif __linux__
+        // return false;
+        if(isRunningInFlatpak())
+        {
+           const unsigned luma = get_colour_approx_luma(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+           return luma < 128;
+        }else{
+            return wxSystemSettings::GetAppearance().IsDark();
+        }
+        
+        // return wxGetApp().app_config->get("dark_color_mode") == "1" ? true : false;
+    #else 
+        return wxGetApp().app_config->get("dark_color_mode") == "1" ? true : check_dark_mode();
+        //const unsigned luma = get_colour_approx_luma(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+        //return luma < 128;
+    #endif
+#else
+    //BBS disable DarkUI mode
+    return false;
+#endif
+}
+
+const wxColour GUI_App::get_label_default_clr_system()
+{
+    return dark_mode() ? wxColour(35, 59, 44) : wxColour(220, 246, 230);
+}
+
+const wxColour GUI_App::get_label_default_clr_modified()
+{
+    return dark_mode() ? wxColour(253, 111, 40) : wxColour(252, 77, 1);
+}
+
+void GUI_App::init_label_colours()
+{
+    bool is_dark_mode = dark_mode();
+    m_color_label_modified = is_dark_mode ? wxColour("#EBC406") : wxColour("#EBC406");
+    m_color_label_sys      = is_dark_mode ? wxColour("#B2B3B5") : wxColour("#363636");
+
+#if defined(_WIN32) || defined(__linux__) || defined(__APPLE__)
+    m_color_label_default           = is_dark_mode ? wxColour(250, 250, 250) : m_color_label_sys; // wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
+    m_color_highlight_label_default = is_dark_mode ? wxColour(230, 230, 230): wxSystemSettings::GetColour(/*wxSYS_COLOUR_HIGHLIGHTTEXT*/wxSYS_COLOUR_WINDOWTEXT);
+    m_color_highlight_default       = is_dark_mode ? wxColour(78, 78, 78)   : wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT);
+    m_color_hovered_btn_label       = is_dark_mode ? wxColour(255, 255, 254) : wxColour(0,0,0);
+    m_color_default_btn_label       = is_dark_mode ? wxColour(255, 255, 254): wxColour(0,0,0);
+    m_color_selected_btn_bg         = is_dark_mode ? wxColour(84, 84, 91)   : wxColour(206, 206, 206);
+#else
+    m_color_label_default = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
+#endif
+    m_color_window_default          = is_dark_mode ? wxColour(43, 43, 43)   : wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+    StateColor::SetDarkMode(is_dark_mode);
+}
+
+void GUI_App::update_label_colours_from_appconfig()
+{
+    if (app_config->has("label_clr_sys")) {
+        auto str = app_config->get("label_clr_sys");
+        if (str != "")
+            m_color_label_sys = wxColour(str);
+    }
+
+    if (app_config->has("label_clr_modified")) {
+        auto str = app_config->get("label_clr_modified");
+        if (str != "")
+            m_color_label_modified = wxColour(str);
+    }
+}
+
+void GUI_App::update_publish_status()
+{
+    // mainframe->show_publish_button(has_model_mall());
+    // if (app_config->get("staff_pick_switch") == "true") {
+    //     mainframe->m_webview->SendDesignStaffpick(has_model_mall());
+    // }
+}
+
+bool GUI_App::has_model_mall()
+{
+    if (auto cc = app_config->get_region(); cc == "CNH" || cc == "China" || cc == "")
+        return false;
+    return true;
+}
+
+void GUI_App::update_label_colours()
+{
+    for (Tab* tab : tabs_list)
+        tab->update_label_colours();
+}
+
+#ifdef _WIN32
+static bool is_focused(HWND hWnd)
+{
+    HWND hFocusedWnd = ::GetFocus();
+    return hFocusedWnd && hWnd == hFocusedWnd;
+}
+
+static bool is_default(wxWindow* win)
+{
+    wxTopLevelWindow* tlw = find_toplevel_parent(win);
+    if (!tlw)
+        return false;
+
+    return win == tlw->GetDefaultItem();
+}
+#endif
+
+void GUI_App::UpdateDarkUI(wxWindow* window, bool highlited/* = false*/, bool just_font/* = false*/)
+{
+    if (m_is_dark_mode != dark_mode() )
+        m_is_dark_mode = dark_mode();   
+
+    if (wxButton *btn = dynamic_cast<wxButton*>(window)) {
+        if (btn->GetWindowStyleFlag() & wxBU_AUTODRAW)
+            return;
+        else {
+#ifdef _WIN32
+            if (btn->GetId() == wxID_OK || btn->GetId() == wxID_CANCEL) {
+                bool is_focused_button = false;
+                bool is_default_button = false;
+
+                if (!(btn->GetWindowStyle() & wxNO_BORDER)) {
+                    btn->SetWindowStyle(btn->GetWindowStyle() | wxNO_BORDER);
+                    highlited = true;
+                }
+
+                auto mark_button = [this, btn, highlited](const bool mark) {
+                    btn->SetBackgroundColour(mark ? m_color_selected_btn_bg : highlited ? m_color_highlight_default : m_color_window_default);
+                    btn->SetForegroundColour(mark ? m_color_hovered_btn_label :m_color_default_btn_label);
+                    btn->Refresh();
+                    btn->Update();
+                };
+
+                // hovering
+                btn->Bind(wxEVT_ENTER_WINDOW, [mark_button](wxMouseEvent& event) { mark_button(true); event.Skip(); });
+                btn->Bind(wxEVT_LEAVE_WINDOW, [mark_button, btn](wxMouseEvent& event) { mark_button(is_focused(btn->GetHWND())); event.Skip(); });
+                // focusing
+                btn->Bind(wxEVT_SET_FOCUS, [mark_button](wxFocusEvent& event) { mark_button(true); event.Skip(); });
+                btn->Bind(wxEVT_KILL_FOCUS, [mark_button](wxFocusEvent& event) { mark_button(false); event.Skip(); });
+
+                is_focused_button = is_focused(btn->GetHWND());
+                is_default_button = is_default(btn);
+                mark_button(is_focused_button);
+            }
+#endif
+        }
+    }
+
+    if (Button* btn = dynamic_cast<Button*>(window)) {
+        if (btn->GetWindowStyleFlag() & wxBU_AUTODRAW)
+            return;
+    }
+
+    if (m_is_dark_mode) {
+
+        auto orig_col = window->GetBackgroundColour();
+        auto bg_col = StateColor::darkModeColorFor(orig_col);
+        // there are cases where the background color of an item is bright, specifically:
+        // * the background color of a button: #009688  -- 73
+        if (bg_col != orig_col) {
+            window->SetBackgroundColour(bg_col);
+        }
+
+        orig_col = window->GetForegroundColour();
+        auto fg_col = StateColor::darkModeColorFor(orig_col);
+        auto fg_l = StateColor::GetLightness(fg_col);
+
+        auto color_difference = StateColor::GetColorDifference(bg_col, fg_col);
+
+        // fallback and sanity check with LAB
+        // color difference of less than 2 or 3 is not normally visible, and even less than 30-40 doesn't stand out
+        if (color_difference < 10) {
+            fg_col = StateColor::SetLightness(fg_col, 90);
+        }
+        // some of the stock colors have a lightness of ~49
+        if (fg_l < 45) {
+            fg_col = StateColor::SetLightness(fg_col, 70);
+        }
+        // at this point it shouldn't be possible that fg_col is the same as bg_col, but let's be safe
+        if (fg_col == bg_col) {
+            fg_col = StateColor::SetLightness(fg_col, 70);
+        }
+
+        window->SetForegroundColour(fg_col);
+    }
+    else {
+        auto original_col = window->GetBackgroundColour();
+        auto bg_col = StateColor::lightModeColorFor(original_col);
+
+        if (bg_col != original_col) {
+            window->SetBackgroundColour(bg_col);
+        }
+
+        original_col = window->GetForegroundColour();
+        auto fg_col = StateColor::lightModeColorFor(original_col);
+
+        if (fg_col != original_col) {
+            window->SetForegroundColour(fg_col);
+        }
+    }
+}
+
+
+// recursive function for scaling fonts for all controls in Window
+static void update_dark_children_ui(wxWindow* window, bool just_buttons_update = false)
+{
+    /*bool is_btn = dynamic_cast<wxButton*>(window) != nullptr;
+    is_btn = false;*/
+    if (!window) return;
+
+    wxGetApp().UpdateDarkUI(window);
+
+    auto children = window->GetChildren();
+    for (auto child : children) {
+        update_dark_children_ui(child);
+    }
+}
+
+// Note: Don't use this function for Dialog contains ScalableButtons
+void GUI_App::UpdateDarkUIWin(wxWindow* win)
+{
+    update_dark_children_ui(win);
+}
+
+void GUI_App::Update_dark_mode_flag()
+{
+    m_is_dark_mode = dark_mode();
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(": switch the current dark mode status to %1% ")%m_is_dark_mode;
+
+    // 当主题偏好被切换时，刷新所有WebView的主题
+    // 1. 更新在线模型库的UA和Cookies
+    if (mainframe) {
+        mainframe->update_model_webviews_user_agent();
+    }
+    
+    // 2. 通知AI工具重新应用主题
+    NotifyAIChatThemeChanged();
+}
+
+void GUI_App::UpdateDlgDarkUI(wxDialog* dlg)
+{
+#ifdef __WINDOWS__
+    NppDarkMode::SetDarkExplorerTheme(dlg->GetHWND());
+    NppDarkMode::SetDarkTitleBar(dlg->GetHWND());
+#endif
+    update_dark_children_ui(dlg);
+}
+
+void GUI_App::UpdateFrameDarkUI(wxFrame* dlg)
+{
+#ifdef __WINDOWS__
+    NppDarkMode::SetDarkExplorerTheme(dlg->GetHWND());
+    NppDarkMode::SetDarkTitleBar(dlg->GetHWND());
+#endif
+    update_dark_children_ui(dlg);
+}
+
+void GUI_App::UpdateDVCDarkUI(wxDataViewCtrl* dvc, bool highlited/* = false*/)
+{
+#ifdef __WINDOWS__
+    if (!dvc)
+        return;
+
+    UpdateDarkUI(dvc, highlited ? dark_mode() : false);
+#ifdef _MSW_DARK_MODE
+    HWND hwnd;
+    if (!dvc->HasFlag(wxDV_NO_HEADER)) {
+        auto header = dvc->GenericGetHeader();
+        if (header) {
+            hwnd = (HWND)header->GetHandle();
+            if (hwnd != NULL) {
+                hwnd = GetWindow(hwnd, GW_CHILD);
+                if (hwnd != NULL)
+                    NppDarkMode::SetDarkListViewHeader(hwnd);
+            }
+
+            wxItemAttr attr;
+            attr.SetFont(::Label::Body_13);
+            dvc->SetHeaderAttr(attr);
+        }
+    }
+#endif //_MSW_DARK_MODE
+   /* if (dvc->HasFlag(wxDV_ROW_LINES))
+        dvc->SetAlternateRowColour(m_color_highlight_default);*/
+    if (dvc->GetBorder() != wxBORDER_SIMPLE)
+        dvc->SetWindowStyle(dvc->GetWindowStyle() | wxBORDER_SIMPLE);
+#endif
+}
+
+void GUI_App::UpdateAllStaticTextDarkUI(wxWindow* parent)
+{
+#ifdef __WINDOWS__
+    wxGetApp().UpdateDarkUI(parent);
+
+    auto children = parent->GetChildren();
+    for (auto child : children) {
+        if (dynamic_cast<wxStaticText*>(child))
+            child->SetForegroundColour(m_color_label_default);
+    }
+#endif
+}
+
+void GUI_App::init_fonts()
+{
+    // BBS: modify font
+    m_small_font = Label::Body_10;
+    m_bold_font = Label::Body_10.Bold();
+    m_normal_font = Label::Body_10;
+
+#ifdef __WXMAC__
+    m_small_font.SetPointSize(11);
+    m_bold_font.SetPointSize(13);
+#endif /*__WXMAC__*/
+
+    // wxSYS_OEM_FIXED_FONT and wxSYS_ANSI_FIXED_FONT use the same as
+    // DEFAULT in wxGtk. Use the TELETYPE family as a work-around
+    m_code_font = wxFont(wxFontInfo().Family(wxFONTFAMILY_TELETYPE));
+    m_code_font.SetPointSize(m_small_font.GetPointSize());
+}
+
+void GUI_App::update_fonts(const MainFrame *main_frame)
+{
+    /* Only normal and bold fonts are used for an application rescale,
+     * because of under MSW small and normal fonts are the same.
+     * To avoid same rescaling twice, just fill this values
+     * from rescaled MainFrame
+     */
+	if (main_frame == nullptr)
+		main_frame = this->mainframe;
+    m_normal_font   = Label::Body_14; // BBS: larger font size
+    m_small_font    = m_normal_font;
+    m_bold_font     = m_normal_font.Bold();
+    m_link_font     = m_bold_font.Underlined();
+    m_em_unit       = main_frame->em_unit();
+    m_code_font.SetPointSize(m_small_font.GetPointSize());
+}
+
+void GUI_App::set_label_clr_modified(const wxColour& clr)
+{
+    return;
+    //BBS
+    /*
+    if (m_color_label_modified == clr)
+        return;
+    m_color_label_modified = clr;
+    const std::string str = encode_color(ColorRGB(clr.Red(), clr.Green(), clr.Blue()));
+    app_config->save();
+    */
+}
+
+void GUI_App::set_label_clr_sys(const wxColour& clr)
+{
+    return;
+    //BBS
+    /*
+    if (m_color_label_sys == clr)
+        return;
+    m_color_label_sys = clr;
+    const std::string str = encode_color(ColorRGB(clr.Red(), clr.Green(), clr.Blue()));
+    app_config->save();
+    */
+}
+
+bool GUI_App::get_side_menu_popup_status()
+{
+    return m_side_popup_status;
+}
+
+void GUI_App::set_side_menu_popup_status(bool status)
+{
+    m_side_popup_status = status;
+}
+
+void GUI_App::link_to_network_check()
+{
+    std::string url;
+    std::string country_code = app_config->get_country_code();
+
+
+    if (country_code == "US") {
+        url = "https://status.bambulab.com";
+    }
+    else if (country_code == "CN") {
+        url = "https://status.bambulab.cn";
+    }
+    else {
+        url = "https://status.bambulab.com";
+    }
+    wxLaunchDefaultBrowser(url);
+}
+
+void GUI_App::webGetDevicesInfo(json& result)
+{
+    printerPresetConfig->LoadProfile();
+    result = printerPresetConfig->getProfileJson();
+
+    //struct PrinterInfo
+    //{
+    //    std::string name;
+    //    std::string seriesNameList;
+    //};
+
+    //boost::filesystem::path vendor_dir = (boost::filesystem::path(Slic3r::data_dir()) / PRESET_SYSTEM_DIR).make_preferred();
+    //boost::filesystem::path rsrc_vendor_dir = (boost::filesystem::path(resources_dir()) / "profiles").make_preferred();
+
+    //json machineJson                   = json::parse("{}");
+    //machineJson["machine"]              = json::array();
+    //boost::filesystem::path machinepath = vendor_dir;
+    //if (!boost::filesystem::exists((vendor_dir / "Creality" / "machineList").replace_extension(".json"))) {
+    //    machinepath = rsrc_vendor_dir;
+    //}
+
+    //std::string strVendor = "machineList";
+    //std::string             strFilePath = (machinepath / "Creality" / "machineList.json").string();
+    //boost::filesystem::path file_path(strFilePath);
+    //boost::filesystem::path vendor_dir1 = boost::filesystem::absolute(file_path.parent_path() / strVendor).make_preferred();
+    //BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(",  vendor path %1%.") % vendor_dir1.string();
+    //try {
+    //    std::string contents;
+    //    boost::nowide::ifstream t(strFilePath);
+    //    std::stringstream       buffer;
+    //    buffer << t.rdbuf();
+    //    contents = buffer.str();
+    //    BOOST_LOG_TRIVIAL(trace) << __FUNCTION__ << boost::format(", load %1% into buffer") % strFilePath;
+
+    //    json jLocal = json::parse(contents);
+    //    json pmodels = jLocal["printerList"];
+    //    json series  = jLocal["series"];
+
+    //    std::vector<PrinterInfo> printers;
+
+    //    for (const auto& item : series) {
+    //        int         id   = item["id"];
+    //        std::string name = item["name"];
+
+    //        if (name.empty())
+    //            continue;
+
+    //        PrinterInfo printerInfo;
+    //        printerInfo.name = name;
+
+    //        std::map<std::string, std::string> mapMachineThumbnail;
+
+    //        for (const auto& printer : pmodels) {
+    //            int seriesId = printer["seriesId"];
+    //            if (seriesId == id) {
+    //                std::string str1 = printer["name"];
+    //                if (str1.find("Creality") == std::string::npos) {
+    //                    str1 = "Creality " + str1;
+    //                }
+    //                std::string str2 = printer["printerIntName"];
+    //                printerInfo.seriesNameList += (str1 + ";" + str2 + ";");
+    //                std::string printerName = printer["name"];
+    //                if (printerName.find("Creality") == std::string::npos) {
+    //                    printerName = "Creality " + printerName;
+    //                }
+    //                mapMachineThumbnail[printerName] = printer["thumbnail"];
+    //            }
+    //        }
+
+    //        printers.push_back(printerInfo);
+    //    }
+
+    //    auto toLowerAndContains = [](const std::string& str, const std::string& key) {
+    //        std::string lowerStr = str;
+    //        std::string lowerKey = key;
+
+    //        std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+    //        std::transform(lowerKey.begin(), lowerKey.end(), lowerKey.begin(), ::tolower);
+
+    //        return lowerStr.find(lowerKey) != std::string::npos;
+    //    };
+
+    //    std::sort(printers.begin(), printers.end(), [toLowerAndContains](const PrinterInfo& pi, const PrinterInfo& pi1) {
+    //            static const std::vector<std::string> order = {"flagship", "ender", "cr", "halot"};
+
+    //            auto getPriority = [toLowerAndContains](const std::string& name) {
+    //                for (size_t i = 0; i < order.size(); ++i) {
+    //                    if (toLowerAndContains(name, order[i])) {
+    //                        return i;
+    //                    }
+    //                }
+    //                return order.size(); // Lowest priority if no keyword matches
+    //            };
+
+    //            return getPriority(pi.name) < getPriority(pi1.name);
+    //    });
+
+    //    for (const auto& info : printers) {
+    //        json childList = json::object();
+
+    //        std::string name  = info.name;
+    //        wxString    sName = _L(name);
+    //        childList["name"] = sName.utf8_str();
+
+    //        childList["printers"] = info.seriesNameList;
+    //        machineJson["machine"].push_back(childList);
+    //    }
+
+    //    // wxString strJS = wxString::Format("handleStudioCmd(%s)", m_MachineJson.dump(-1, ' ', true));
+    //    result = machineJson;
+    //} catch (nlohmann::detail::parse_error& err) {
+    //    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": parse " << strFilePath
+    //                             << " got a nlohmann::detail::parse_error, reason = " << err.what();
+    //    return;
+    //} catch (std::exception& e) {
+    //    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": parse " << strFilePath << " got exception: " << e.what();
+    //    return;
+    //}
+
+    //return;
+}
+
+bool GUI_App::tabs_as_menu() const
+{
+    return false;
+}
+
+wxSize GUI_App::get_min_size() const
+{
+    return wxSize(120*m_em_unit, 49 * m_em_unit);
+}
+
+wxSize GUI_App::get_min_size_ex(wxWindow* display_win) const
+{
+    // be careful when setting "105 * m_em_unit", in some screen size when toggle the maximize button, could possibly hide the maximize and close button
+    wxSize min_size(106 * m_em_unit, 60 * m_em_unit);
+
+    //const wxDisplay display = wxDisplay(display_win);
+    //wxRect display_rect = display.GetGeometry();  // for example: 1920 * 1080
+    //display_rect.width *= 0.75;
+    //display_rect.height *= 0.75;
+
+    //if (min_size.x > display_rect.GetWidth())
+    //    min_size.x = display_rect.GetWidth();
+    //if (min_size.y > display_rect.GetHeight())
+    //    min_size.y = display_rect.GetHeight();
+
+    return min_size;
+}
+
+float GUI_App::toolbar_icon_scale(const bool is_limited/* = false*/) const
+{
+#ifdef __APPLE__
+    const float icon_sc = 1.0f; // for Retina display will be used its own scale
+#else
+    const float icon_sc = m_em_unit * 0.1f;
+#endif // __APPLE__
+
+    // fixed icon size
+    return icon_sc;
+
+    const std::string& auto_val = app_config->get("toolkit_size");
+
+    if (auto_val.empty())
+        return icon_sc;
+
+    int int_val =  100;
+    // correct value in respect to toolkit_size
+    int_val = std::min(atoi(auto_val.c_str()), int_val);
+
+    if (is_limited && int_val < 50)
+        int_val = 50;
+
+    return 0.01f * int_val * icon_sc;
+}
+
+void GUI_App::set_auto_toolbar_icon_scale(float scale) const
+{
+#ifdef __APPLE__
+    const float icon_sc = 1.0f; // for Retina display will be used its own scale
+#else
+    const float icon_sc = m_em_unit * 0.1f;
+#endif // __APPLE__
+
+    long int_val = std::min(int(std::lround(scale / icon_sc * 100)), 100);
+    std::string val = std::to_string(int_val);
+
+    app_config->set("toolkit_size", val);
+}
+
+// check user printer_presets for the containing information about "Print Host upload"
+void GUI_App::check_printer_presets()
+{
+//BBS
+#if 0
+    std::vector<std::string> preset_names = PhysicalPrinter::presets_with_print_host_information(preset_bundle->printers);
+    if (preset_names.empty())
+        return;
+
+    // BBS: remove "print host upload" message dialog
+    preset_bundle->physical_printers.load_printers_from_presets(preset_bundle->printers);
+#endif
+}
+
+void switch_window_pools();
+void release_window_pools();
+
+void GUI_App::recreate_GUI(const wxString &msg_name)
+{
+    BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << " start";
+    m_is_recreating_gui = true;
+
+    DestroyAIChatPanelsForGUIRecreate();
+    update_http_extra_header();
+
+    mainframe->shutdown();
+    ProgressDialog dlg(msg_name, msg_name, 100, nullptr, wxPD_AUTO_HIDE);
+    dlg.Pulse();
+    dlg.Update(10, _L("Rebuild") + dots);
+
+    MainFrame *old_main_frame = mainframe;
+    struct ClientData : wxClientData
+    {
+        ~ClientData() { release_window_pools(); }
+    };
+    old_main_frame->SetClientObject(new ClientData);
+
+    switch_window_pools();
+    old_main_frame->destroy_webviews_for_recreate();
+    mainframe = new MainFrame();
+    if (is_editor())
+        // hide settings tabs after first Layout
+        mainframe->select_tab(size_t(MainFrame::tp3DEditor));
+    // Propagate model objects to object list.
+    sidebar().obj_list()->init();
+    //sidebar().aux_list()->init_auxiliary();
+    //mainframe->m_auxiliary->init_auxiliary();
+    SetTopWindow(mainframe);
+
+    dlg.Update(30, _L("Rebuild") + dots);
+    old_main_frame->Destroy();
+
+    dlg.Update(80, _L("Loading current presets") + dots);
+    m_printhost_job_queue.reset(new PrintHostJobQueue(mainframe->printhost_queue_dlg()));
+    load_current_presets();
+    mainframe->Show(true);
+#ifdef __WXOSX__
+    // App Store review (Guideline 4): activate on launch so the App menu and
+    // Dock icon appear; without this the window stays inactive on fresh installs.
+    Slic3r::activate_app();
+    mainframe->Raise();
+#endif
+#ifdef __WXMSW__
+    // Show() invalidates the custom topbar, but startup continues synchronously
+    // before the event loop can paint it. Render the entire child tree now so
+    // DWM never presents the toolbar's unpainted background.
+    ::RedrawWindow(mainframe->GetHandle(), nullptr, nullptr,
+        RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_UPDATENOW);
+#endif
+    //mainframe->refresh_plugin_tips();
+
+    dlg.Update(90, _L("Loading a mode view") + dots);
+
+    obj_list()->set_min_height();
+    update_mode();
+
+    //check hms info for different language
+    //if (hms_query)
+    //    hms_query->check_hms_info();
+
+    //BBS: trigger restore project logic here, and skip confirm
+    plater_->trigger_restore_project(1);
+
+    // #ys_FIXME_delete_after_testing  Do we still need this  ?
+//     CallAfter([]() {
+//         // Run the config wizard, don't offer the "reset user profile" checkbox.
+//         config_wizard_startup(true);
+//     });
+
+
+    update_publish_status();
+
+    m_is_recreating_gui = false;
+
+    BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << " end";
+    boost::log::core::get()->flush();
+}
+
+void GUI_App::system_info()
+{
+    //SysInfoDialog dlg;
+    //dlg.ShowModal();
+}
+
+void GUI_App::keyboard_shortcuts()
+{
+    KBShortcutsDialog dlg;
+    dlg.ShowModal();
+}
+
+
+void GUI_App::ShowUserGuide() {
+    // BBS:Show NewUser Guide
+    try {
+        bool res = false;
+        GuideFrame GuideDlg(this);
+                //if (GuideDlg.IsFirstUse())
+        res = GuideDlg.run();
+if (res) {
+            load_current_presets();
+            update_publish_status();
+            mainframe->refresh_plugin_tips();
+            // BBS: remove SLA related message
+        }
+    } catch (std::exception &e) {
+        // wxMessageBox(e.what(), "", MB_OK);
+    }
+}
+
+void GUI_App::ShowDownNetPluginDlg() {
+    try {
+        auto iter = std::find_if(dialogStack.begin(), dialogStack.end(), [](auto dialog) {
+            return dynamic_cast<DownloadProgressDialog *>(dialog) != nullptr;
+        });
+        if (iter != dialogStack.end())
+            return;
+        DownloadProgressDialog dlg(_L("Downloading Bambu Network Plug-in"));
+        dlg.ShowModal();
+    } catch (std::exception &e) {
+        ;
+    }
+}
+
+void GUI_App::ShowUserLogin(bool show,const wxString& loginUrl)
+{
+#if 0
+        // BBS: User Login Dialog
+    if (show) {
+        try {
+            if (!login_dlg)
+                login_dlg = new ZUserLogin();
+            else {
+                delete login_dlg;
+                login_dlg = new ZUserLogin();
+            }
+            login_dlg->ShowModal();
+        } catch (std::exception &e) {
+            ;
+        }
+    } else {
+        if (login_dlg)
+            login_dlg->EndModal(wxID_OK);
+    }
+#else
+    //// CP: User Login Dialog
+    if (show) {
+        try {
+            // 使用CallAfter避免WebView2重入问题
+            CallAfter([this, loginUrl]() {
+                if (m_login_dialog) {
+                    m_login_dialog->Destroy();
+                    m_login_dialog = nullptr;
+                }
+                m_login_dialog = new LoginDialog(mainframe, _("Login"));
+                m_login_dialog->ShowLoginDialog(loginUrl);
+                if (m_login_dialog->ShowModal() == wxID_OK) {
+                    // 登录成功后更新登录信息
+                    //get_login_info();
+                }
+                // 对话框关闭后清理指针
+                if (m_login_dialog) {
+                    m_login_dialog->Destroy();
+                    m_login_dialog = nullptr;
+                }
+            });
+        } catch (std::exception &e) {
+            ;
+        }
+    }
+#endif
+    // 注意：show=false的情况不再需要处理，因为LoginDialog是模态对话框
+}
+
+
+void GUI_App::ShowOnlyFilament() {
+    // BBS:Show NewUser Guide
+    try {
+        bool       res = false;
+        GuideFrame GuideDlg(this);
+        GuideDlg.SetStartPage(GuideFrame::GuidePage::BBL_FILAMENT_ONLY);
+        res = GuideDlg.run();
+        if (res) {
+            load_current_presets();
+
+            // BBS: remove SLA related message
+        }
+    } catch (std::exception &e) {
+        // wxMessageBox(e.what(), "", MB_OK);
+    }
+}
+
+
+
+// static method accepting a wxWindow object as first parameter
+bool GUI_App::catch_error(std::function<void()> cb,
+    //                       wxMessageDialog* message_dialog,
+    const std::string& err /*= ""*/)
+{
+    if (!err.empty()) {
+        if (cb)
+            cb();
+        //         if (message_dialog)
+        //             message_dialog->(err, "Error", wxOK | wxICON_ERROR);
+        show_error(/*this*/nullptr, err);
+        return true;
+    }
+    return false;
+}
+
+// static method accepting a wxWindow object as first parameter
+void fatal_error(wxWindow* parent)
+{
+    show_error(parent, "");
+    //     exit 1; // #ys_FIXME
+}
+
+#ifdef __WINDOWS__
+#ifdef _MSW_DARK_MODE
+static void update_scrolls(wxWindow* window)
+{
+    wxWindowList::compatibility_iterator node = window->GetChildren().GetFirst();
+    while (node)
+    {
+        wxWindow* win = node->GetData();
+        if (dynamic_cast<wxScrollHelper*>(win) ||
+            dynamic_cast<wxTreeCtrl*>(win) ||
+            dynamic_cast<wxTextCtrl*>(win))
+            NppDarkMode::SetDarkExplorerTheme(win->GetHWND());
+
+        update_scrolls(win);
+        node = node->GetNext();
+    }
+}
+#endif //_MSW_DARK_MODE
+
+
+#ifdef _MSW_DARK_MODE
+void GUI_App::force_menu_update()
+{
+    NppDarkMode::SetSystemMenuForApp(app_config->get("sys_menu_enabled") == "1");
+}
+#endif //_MSW_DARK_MODE
+#endif //__WINDOWS__
+
+void GUI_App::force_colors_update()
+{
+#ifdef _MSW_DARK_MODE
+#ifdef __WINDOWS__
+    NppDarkMode::SetDarkMode(dark_mode());
+#if !wxCHECK_VERSION(3, 3, 0)
+    if (WXHWND wxHWND = wxToolTip::GetToolTipCtrl())
+        NppDarkMode::SetDarkExplorerTheme((HWND)wxHWND);
+#endif
+    NppDarkMode::SetDarkTitleBar(mainframe->GetHWND());
+
+
+    //NppDarkMode::SetDarkExplorerTheme((HWND)mainframe->m_settings_dialog.GetHWND());
+    //NppDarkMode::SetDarkTitleBar(mainframe->m_settings_dialog.GetHWND());
+
+#endif // __WINDOWS__
+#endif //_MSW_DARK_MODE
+    m_force_colors_update = true;
+}
+
+// Called after the Preferences dialog is closed and the program settings are saved.
+// Update the UI based on the current preferences.
+void GUI_App::update_ui_from_settings()
+{
+    update_label_colours();
+    // Upadte UI colors before Update UI from settings
+    if (m_force_colors_update) {
+        m_force_colors_update = false;
+        //UpdateDlgDarkUI(&mainframe->m_settings_dialog);
+        //mainframe->m_settings_dialog.Refresh();
+        //mainframe->m_settings_dialog.Update();
+
+        if (mainframe) {
+#ifdef __WINDOWS__
+            mainframe->force_color_changed();
+            update_scrolls(mainframe);
+            update_scrolls(&mainframe->m_settings_dialog);
+#endif //_MSW_DARK_MODE
+            update_dark_children_ui(mainframe);
+        }
+    }
+
+    if (mainframe) {mainframe->update_ui_from_settings();}
+}
+
+void GUI_App::persist_window_geometry(wxTopLevelWindow *window, bool default_maximized)
+{
+    const std::string name = into_u8(window->GetName());
+
+    window->Bind(wxEVT_CLOSE_WINDOW, [=](wxCloseEvent &event) {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__<< ": received wxEVT_CLOSE_WINDOW, trigger save for window_mainframe";
+        window_pos_save(window, "mainframe");
+        event.Skip();
+    });
+
+    if (window_pos_restore(window, "mainframe", default_maximized)) {
+        on_window_geometry(window, [=]() {
+            window_pos_sanitize(window);
+        });
+    } else {
+        on_window_geometry(window, [=]() {
+            window_pos_center(window);
+        });
+    }
+}
+
+// Creality:in purpose of skipping confirmation about unsaved preset when loading project, which using in automation
+bool GUI_App::discard_all_current_preset_changes()
+{
+    if (!has_current_preset_changes())
+        return true;
+
+    PrinterTechnology printer_technology = preset_bundle->printers.get_edited_preset().printer_technology();
+    for (const Tab* const tab : tabs_list) {
+        if (tab->supports_printer_technology(printer_technology) && tab->current_preset_is_dirty())
+            tab->m_presets->discard_current_changes();
+    }
+    // 和确认弹框里“Discard”分支一致
+    // 这样进入 load_project() 时已经没有脏改动，弹框自然不会出现。
+    load_current_presets(false);
+    return true;
+}
+
+void GUI_App::load_project(wxWindow *parent, wxString& input_file) const
+{
+    input_file.Clear();
+    wxFileDialog dialog(parent ? parent : GetTopWindow(),
+        _L("Choose one file (3mf):"),
+        app_config->get_last_dir(), "",
+        file_wildcards(FT_PROJECT), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+    if (dialog.ShowModal() == wxID_OK) {
+        input_file = dialog.GetPath();
+        
+        // Fire file_project_open analytics event when user selects a project file and clicks OK
+        AnalyticsEventPayload payload;
+        payload.type = AnalyticsDataEventType::ANALYTICS_FILE_PROJECT_OPEN;
+        AnalyticsDataUploadManager::getInstance().triggerUploadTasksWithPayload(payload);
+    }
+}
+
+void GUI_App::import_model(wxWindow *parent, wxArrayString& input_files, bool Category_or_not) const
+{
+    wxString wildcard;
+    wildcard = file_wildcards(FT_MODEL);
+    if (Category_or_not)
+    {
+        wildcard = GUI::format_wxstr("%s|%s|%s", file_wildcards(FT_MODEL), file_wildcards(FT_MESH_FILE),file_wildcards(FT_CAD_FILE));
+    }
+
+    input_files.Clear();
+    wxFileDialog dialog(parent ? parent : GetTopWindow(),
+#ifdef __APPLE__
+        _L("Choose one or more files (3mf/step/stl/svg/obj/amf/usd*/abc/ply):"),
+#else
+        _L("Choose one or more files (3mf/step/stl/svg/obj/amf):"),
+#endif
+        from_u8(app_config->get_last_dir()), "",
+        wildcard, wxFD_OPEN | wxFD_MULTIPLE | wxFD_FILE_MUST_EXIST);
+
+    if (dialog.ShowModal() == wxID_OK)
+        dialog.GetPaths(input_files);
+}
+
+void GUI_App::import_zip(wxWindow* parent, wxString& input_file) const
+{
+    wxFileDialog dialog(parent ? parent : GetTopWindow(),
+                        _L("Choose ZIP file") + ":",
+                        from_u8(app_config->get_last_dir()), "",
+                        file_wildcards(FT_ZIP), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+    if (dialog.ShowModal() == wxID_OK)
+        input_file = dialog.GetPath();
+}
+
+void GUI_App::load_gcode(wxWindow* parent, wxString& input_file) const
+{
+    input_file.Clear();
+    wxFileDialog dialog(parent ? parent : GetTopWindow(),
+        _L("Choose one file (gcode/3mf):"),
+        app_config->get_last_dir(), "",
+        file_wildcards(FT_GCODE), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+    if (dialog.ShowModal() == wxID_OK)
+        input_file = dialog.GetPath();
+}
+
+wxString GUI_App::transition_tridid(int trid_id)
+{
+    wxString maping_dict[8] = { "A", "B", "C", "D", "E", "F", "G" };
+    int id_index = ceil(trid_id / 4);
+    int id_suffix = (trid_id + 1) % 4 == 0 ? 4 : (trid_id + 1) % 4;
+    return wxString::Format("%s%d", maping_dict[id_index], id_suffix);
+}
+
+//BBS
+void GUI_App::request_login(bool show_user_info)
+{
+#if !AUTO_CONVERT_3MF
+    ShowUserLogin(true, wxT("https://www.creality.com/pages/login"));
+
+    if (show_user_info) {
+        get_login_info();
+    }
+#endif
+}
+
+void GUI_App::get_login_info()
+{
+    if (m_agent) {
+        if (m_agent->is_user_login()) {
+            std::string login_cmd = m_agent->build_login_cmd();
+            wxString strJS = wxString::Format("window.handleStudioCmd(%s)", login_cmd);
+            GUI::wxGetApp().run_script(strJS);
+        }
+        else {
+            m_agent->user_logout();
+            std::string logout_cmd = m_agent->build_logout_cmd();
+            wxString strJS = wxString::Format("window.handleStudioCmd(%s)", logout_cmd);
+            GUI::wxGetApp().run_script(strJS);
+        }
+        mainframe->m_webview->SetLoginPanelVisibility(true);
+    }
+}
+
+bool GUI_App::is_user_login()
+{
+    if (m_agent) {
+        return m_agent->is_user_login();
+    }
+    return false;
+}
+
+
+bool GUI_App::is_login()
+{
+    return m_user.bLogin;
+}
+
+const Slic3r::GUI::UserInfo& GUI_App::get_user()
+{
+    return m_user;
+}
+
+bool GUI_App::check_login()
+{
+    bool result = false;
+    if (m_agent) {
+        result = m_agent->is_user_login();
+    }
+
+    if (!result) {
+        ShowUserLogin(true, wxT("https://www.creality.com/pages/login"));
+    }
+    return result;
+}
+
+void GUI_App::request_user_handle(int online_login)
+{
+    auto evt = new wxCommandEvent(EVT_USER_LOGIN_HANDLE);
+    evt->SetInt(online_login);
+    wxQueueEvent(this, evt);
+}
+
+void GUI_App::request_user_login(int online_login)
+{
+    auto evt = new wxCommandEvent(EVT_USER_LOGIN);
+    evt->SetInt(online_login);
+    wxQueueEvent(this, evt);
+}
+
+void GUI_App::request_user_logout()
+{
+    if (m_agent && m_agent->is_user_login()) {
+        // Update data first before showing dialogs
+        m_agent->user_logout();
+        NotifyAIChatLoginStatusChanged(true);
+        m_agent->set_user_selected_machine("");
+        /* delete old user settings */
+        bool     transfer_preset_changes = false;
+        wxString header = _L("Some presets are modified.") + "\n" +
+            _L("You can keep the modifield presets to the new project, discard or save changes as new presets.");
+        wxGetApp().check_and_keep_current_preset_changes(_L("User logged out"), header, ActionButtons::KEEP | ActionButtons::SAVE, &transfer_preset_changes);
+
+        m_device_manager->clean_user_info();
+        GUI::wxGetApp().sidebar().load_ams_list({}, {});
+        remove_user_presets();
+        enable_user_preset_folder(false);
+        preset_bundle->load_user_presets(DEFAULT_USER_FOLDER_NAME, ForwardCompatibilitySubstitutionRule::Enable);
+        mainframe->update_side_preset_ui();
+
+        GUI::wxGetApp().stop_sync_user_preset();
+    }
+}
+
+int GUI_App::request_user_unbind(std::string dev_id)
+{
+    int result = -1;
+    if (m_agent) {
+        result = m_agent->unbind(dev_id);
+        BOOST_LOG_TRIVIAL(info) << "request_user_unbind, dev_id = " << dev_id << ", result = " << result;
+        return result;
+    }
+    return result;
+}
+void GUI_App::start_async_material_list_update()
+{
+    bool expected = false;
+    if (!g_async_material_list_update_running.compare_exchange_strong(expected, true))
+        return;
+
+    const std::string base_url = get_cloud_api_url();
+    const std::map<std::string, std::string> extra_headers = get_extra_header();
+    std::thread([base_url, extra_headers]() {
+        const bool updated = MaterialListDownloader::download_official_material_list(base_url, extra_headers, 2, 5);
+        g_async_material_list_update_running = false;
+
+        if (!updated || g_app_exiting || wxTheApp == nullptr)
+            return;
+
+        wxTheApp->CallAfter([]() {
+            GUI_App& app = wxGetApp();
+            if (g_app_exiting || app.mainframe == nullptr)
+                return;
+            app.mainframe->update_side_preset_ui();
+        });
+    }).detach();
+}
+void GUI_App::refresh_machine_list_for_region()
+{
+    bool expected = false;
+    if (!g_async_machine_list_refresh_running.compare_exchange_strong(expected, true))
+        return;
+
+    // Snapshot the region-dependent endpoint and headers on the calling (UI) thread:
+    // app_config and the agent must not be touched from the worker.
+    const std::string                        base_url      = get_cloud_api_url();
+    const std::map<std::string, std::string> extra_headers = get_extra_header();
+
+    std::thread([base_url, extra_headers]() {
+        const bool downloaded = MachineListDownloader::download_official_machine_list(base_url, extra_headers, 2, 5);
+        // LoadMachineJson() translates series names through _L(), so skip the reparse once
+        // the app is tearing down rather than touching wxWidgets from a detached thread.
+        if (downloaded && !g_app_exiting)
+            ProfileFamilyLoader::get_instance()->reload_machine_list();
+        else if (!downloaded)
+            BOOST_LOG_TRIVIAL(info) << "refresh_machine_list_for_region: download skipped or failed, the previously "
+                                       "cached machine list stays in use";
+        g_async_machine_list_refresh_running = false;
+    }).detach();
+}
+bool GUI_App::check_machine_list()
+{
+#ifdef WIN32    
+    if(single_instance_checker()->IsAnotherRunning())
+    {
+        return false;
+    }
+#endif
+    bool result = false;
+    bool machine_list_downloaded = false;
+    auto printer_list_file = fs::path(data_dir()).append("system").append("Creality").append("machineList.json").string();
+    //boost::filesystem::remove(printer_list_file);
+    std::string base_url              = get_cloud_api_url();
+                        auto        preupload_profile_url = "/api/cxy/v2/slice/profile/official/printerList";
+                        std::map<std::string, std::string> extra_headers = get_extra_header();
+                        extra_headers["__CXY_OS_LANG_"] = "0";
+                        //extra_headers.insert(std::pair<std::string, std::string>("__CXY_OS_LANG_","0"));
+                        Http::set_extra_headers(extra_headers);
+                        Http http = Http::post(base_url + preupload_profile_url);
+                        json        j;
+                        j["engineVersion"]  = "3.0.0";
+                        boost::uuids::uuid uuid = boost::uuids::random_generator()();
+                            http.header("Content-Type", "application/json")
+                                .header("__CXY_REQUESTID_", to_string(uuid))
+                                .timeout_connect(2)
+                                .timeout_max(5)
+                                .set_post_body(j.dump())
+                                .on_complete([&](std::string body, unsigned status) {
+                                    if(status!=200){
+                                        return false;
+                                    }
+                                    try{
+                                        json j = json::parse(body);
+                                        json printer_list = j["result"];
+                                        json list = printer_list["printerList"];
+                                        if(list.empty()){
+                                            return false;
+                                        }
+                                        auto out_printer_list_file = fs::path(data_dir()).append("system")
+                                                                         .append("Creality")
+                                                                         .append("machineList.json")
+                                                                         .string();
+                                        boost::nowide::ofstream c;
+                                        c.open(out_printer_list_file, std::ios::out | std::ios::trunc);
+                                        c << std::setw(4) << printer_list << std::endl;
+                                        c.close();
+                                        machine_list_downloaded = !c.fail();
+                                        return true;
+                                    }catch(...){
+                                        return false;
+                                    }
+                                }).perform_sync();
+
+    // The full profile family is loaded once per process, so a list downloaded here is
+    // otherwise only visible after a restart. Reparsing this single file is cheap and
+    // keeps the add-printer navigation tree in sync with what was just written.
+    if (machine_list_downloaded)
+        ProfileFamilyLoader::get_instance()->reload_machine_list();
+
+    //download material list
+     auto material_list_file = fs::path(data_dir()).append("system").append("Creality").append("materialList.json").string();
+    auto        material_profile_url = "/api/cxy/v2/slice/profile/official/materialList";
+    Http http2 = Http::post(base_url + material_profile_url);
+    json        j2;
+    j2["engineVersion"]  = "3.0.0";
+    j2["pageSize"] = 1000;
+    http2.header("Content-Type", "application/json")
+    .header("__CXY_REQUESTID_", to_string(uuid))
+    .timeout_connect(2)
+    .timeout_max(5)
+    .set_post_body(j2.dump())
+    .on_complete([&](std::string body, unsigned status) {
+                                    if(status!=200){
+                                        return false;
+                                    }
+                                    try{
+                                     json j = json::parse(body);
+                                        json printer_list = j["result"]["list"];
+                                        if(printer_list.empty()){
+                                            return false;
+                                        }
+                                        json list;
+                                        list["materials"] = printer_list;
+                                        auto out_printer_list_file = fs::path(data_dir()).append("system")
+                                                                         .append("Creality")
+                                                                         .append("materialList.json")
+                                                                         .string();
+                                        boost::nowide::ofstream c;
+                                        c.open(out_printer_list_file, std::ios::out | std::ios::trunc);
+                                        c << std::setw(4) << list << std::endl;
+                                        return true;
+                                    } catch (...) {
+                                        return false;
+                                    }
+                                }).perform_sync();
+    //检测是否有需要自己更新参数包
+    std::vector<json> printer_version_list;
+    
+    if(!boost::filesystem::exists(printer_list_file)||!boost::filesystem::exists(material_list_file))
+        return false;
+    try 
+    {
+        std::string contents;
+        boost::nowide::ifstream t(printer_list_file);
+        std::stringstream buffer;
+        buffer << t.rdbuf();
+        contents=buffer.str();
+        json jLocal = json::parse(contents);
+        json pmodels = jLocal["printerList"];
+        std::map<std::string, size_t> queued_multi_extruder_profiles;
+        for (const auto& printer : pmodels)
+        {
+            std::string name = printer["name"].get<std::string>();
+            const json& nozzle_diameters = printer["nozzleDiameter"];
+            std::string nozzleDiameter = nozzle_diameters[0].get<std::string>();
+            const std::string printer_int_name = printer.value("printerIntName", std::string());
+            const bool omit_nozzle_from_name = nozzle_diameters.size() > 1 &&
+                printer_int_name != "Sermoon D3 Pro" && name != "Creality Sermoon D3 Pro";
+            std::string printer_model;
+            if(name.find("Creality") != std::string::npos||name.find("SPARKX") != std::string::npos){
+                printer_model = name;
+            }else{
+                printer_model = "Creality " + name;
+            }
+            const std::string machine_name = omit_nozzle_from_name ? printer_model :
+                (boost::format("%1% %2% nozzle") % printer_model % nozzleDiameter).str();
+            boost::filesystem::path filePath = boost::filesystem::path(data_dir()).append("system").append("Creality").append("machine").append(machine_name + ".json");
+            if (!boost::filesystem::exists(filePath))
+            {
+                if (!omit_nozzle_from_name) {
+                    printer_version_list.push_back(printer);
+                    continue;
+                }
+
+                const auto queued = queued_multi_extruder_profiles.find(machine_name);
+                if (queued == queued_multi_extruder_profiles.end()) {
+                    queued_multi_extruder_profiles.emplace(machine_name, printer_version_list.size());
+                    printer_version_list.push_back(printer);
+                } else {
+                    const std::string queued_nozzle =
+                        printer_version_list[queued->second]["nozzleDiameter"][0].get<std::string>();
+                    if (queued_nozzle != "0.4" && nozzleDiameter == "0.4")
+                        printer_version_list[queued->second] = printer;
+                }
+            }
+        }
+        json j;
+        j["command"] = "update_preset_params";
+        j["data"] = printer_version_list;
+        if(printer_version_list.empty()){
+            return true;
+        }
+        std::stringstream ss;
+        ss << j << std::endl;
+        handle_web_request(ss.str());
+        return true;
+    } 
+    catch (std::exception &e) 
+    {
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(",  load local machine list failed, %1%.") % e.what();
+    }
+
+    return true;
+}
+std::mutex mtx;
+
+static std::vector<std::string> update_package_nozzle_diameters(const pt::ptree& printer)
+{
+    std::vector<std::string> nozzles;
+    if (const auto child = printer.get_child_optional("nozzleDiameter"))
+        for (const auto& nozzle : *child)
+            nozzles.emplace_back(nozzle.second.data());
+    return nozzles;
+}
+
+static std::string update_package_printer_model(const pt::ptree& printer)
+{
+    std::string model = printer.get<std::string>("name", "");
+    if (model.find("Creality") == std::string::npos && model.find("SPARKX") == std::string::npos)
+        model = "Creality " + model;
+    return model;
+}
+
+static bool update_package_uses_bare_multi_extruder_name(const pt::ptree& printer)
+{
+    const std::vector<std::string> nozzles = update_package_nozzle_diameters(printer);
+    return nozzles.size() > 1 &&
+        printer.get<std::string>("printerIntName", "") != "Sermoon D3 Pro" &&
+        update_package_printer_model(printer) != "Creality Sermoon D3 Pro";
+}
+
+static fs::path downloaded_update_package_path(const pt::ptree& printer)
+{
+    const std::string zip_url = printer.get<std::string>("zipUrl", "");
+    const size_t separator = zip_url.find_last_of('/');
+    if (zip_url.empty() || separator == std::string::npos)
+        return {};
+    return fs::path(fs::temp_directory_path()).append(zip_url.substr(separator + 1));
+}
+
+static bool update_package_has_multi_extruder_variant_schema(const fs::path& archive_path,
+                                                              size_t physical_extruder_count,
+                                                              std::vector<std::string>* supported_nozzles = nullptr)
+{
+    if (physical_extruder_count <= 1 || archive_path.empty() || !fs::exists(archive_path))
+        return false;
+
+    mz_zip_archive archive;
+    mz_zip_zero_struct(&archive);
+    if (!open_zip_reader(&archive, archive_path.string().c_str()))
+        return false;
+
+    bool has_variant_schema = false;
+    const mz_uint entry_count = mz_zip_reader_get_num_files(&archive);
+    for (mz_uint index = 0; index < entry_count && !has_variant_schema; ++index) {
+        mz_zip_archive_file_stat stat;
+        if (!mz_zip_reader_file_stat(&archive, index, &stat))
+            continue;
+
+        std::string name(stat.m_filename);
+        std::replace(name.begin(), name.end(), '\\', '/');
+        if (name.find('/') != std::string::npos || !boost::algorithm::iends_with(name, ".json"))
+            continue;
+
+        try {
+            std::vector<unsigned char> buffer(stat.m_uncomp_size);
+            if (!mz_zip_reader_extract_to_mem(&archive, index, buffer.data(), buffer.size(), 0))
+                continue;
+            const json definition = json::parse(reinterpret_cast<const char*>(buffer.data()),
+                                                reinterpret_cast<const char*>(buffer.data() + buffer.size()));
+            has_variant_schema = definition.contains("printer") &&
+                definition["printer"].contains("extruder_variant_list") &&
+                definition["printer"]["extruder_variant_list"].is_array() &&
+                !definition["printer"]["extruder_variant_list"].empty();
+            if (supported_nozzles != nullptr && definition.contains("printer") &&
+                definition["printer"].contains("nozzle_variant_diameters") &&
+                definition["printer"]["nozzle_variant_diameters"].is_array()) {
+                for (const json& diameter : definition["printer"]["nozzle_variant_diameters"]) {
+                    if (!diameter.is_string())
+                        continue;
+                    const std::string value = diameter.get<std::string>();
+                    if (std::find(supported_nozzles->begin(), supported_nozzles->end(), value) == supported_nozzles->end())
+                        supported_nozzles->push_back(value);
+                }
+            }
+        } catch (const std::exception& error) {
+            BOOST_LOG_TRIVIAL(warning) << "Failed to inspect update package " << archive_path.string()
+                                       << ": " << error.what();
+        }
+    }
+    close_zip_reader(&archive);
+    return has_variant_schema;
+}
+
+static std::vector<pt::ptree> select_update_param_packages(const pt::ptree& packages)
+{
+    struct SelectedPackage
+    {
+        size_t result_index;
+        std::pair<bool, bool> rank;
+    };
+
+    std::vector<pt::ptree> result;
+    std::map<std::string, SelectedPackage> selected_multi_extruder_packages;
+    for (const auto& item : packages) {
+        const pt::ptree& printer = item.second;
+        if (!update_package_uses_bare_multi_extruder_name(printer)) {
+            result.push_back(printer);
+            continue;
+        }
+
+        const std::vector<std::string> nozzles = update_package_nozzle_diameters(printer);
+        const std::string profile_name = update_package_printer_model(printer);
+        const std::pair<bool, bool> rank {
+            update_package_has_multi_extruder_variant_schema(downloaded_update_package_path(printer), nozzles.size()),
+            !nozzles.empty() && nozzles.front() == "0.4"
+        };
+        const auto selected = selected_multi_extruder_packages.find(profile_name);
+        if (selected == selected_multi_extruder_packages.end()) {
+            selected_multi_extruder_packages.emplace(profile_name, SelectedPackage {result.size(), rank});
+            result.push_back(printer);
+        } else if (rank > selected->second.rank) {
+            result[selected->second.result_index] = printer;
+            selected->second.rank = rank;
+        }
+    }
+
+    for (const auto& [profile_name, selected] : selected_multi_extruder_packages) {
+        BOOST_LOG_TRIVIAL(info) << "Multi-extruder parameter update " << profile_name << " selected "
+                                << downloaded_update_package_path(result[selected.result_index]).filename().string();
+    }
+    return result;
+}
+
+static pt::ptree include_multi_extruder_update_candidates(const pt::ptree& requested_packages,
+                                                          const fs::path& machine_list_path)
+{
+    pt::ptree result = requested_packages;
+    std::set<std::string> requested_models;
+    std::set<std::string> package_urls;
+    for (const auto& item : requested_packages) {
+        const pt::ptree& printer = item.second;
+        package_urls.insert(printer.get<std::string>("zipUrl", ""));
+        if (update_package_uses_bare_multi_extruder_name(printer))
+            requested_models.insert(update_package_printer_model(printer));
+    }
+    if (requested_models.empty() || !fs::exists(machine_list_path))
+        return result;
+
+    try {
+        pt::ptree machine_list;
+        pt::read_json(machine_list_path.string(), machine_list);
+        const auto printers = machine_list.get_child_optional("printerList");
+        if (!printers)
+            return result;
+
+        for (const auto& item : *printers) {
+            const pt::ptree& printer = item.second;
+            if (!update_package_uses_bare_multi_extruder_name(printer) ||
+                requested_models.find(update_package_printer_model(printer)) == requested_models.end())
+                continue;
+
+            const std::string zip_url = printer.get<std::string>("zipUrl", "");
+            if (!zip_url.empty() && package_urls.insert(zip_url).second)
+                result.push_back(std::make_pair("", printer));
+        }
+    } catch (const std::exception& error) {
+        BOOST_LOG_TRIVIAL(warning) << "Failed to expand multi-extruder parameter packages from "
+                                   << machine_list_path.string() << ": " << error.what();
+    }
+    return result;
+}
+
+static void update_multi_extruder_package_alias_versions(json& cache_json,
+                                                         const pt::ptree& packages,
+                                                         const std::set<std::string>& updated_models)
+{
+    if (updated_models.empty())
+        return;
+    if (!cache_json.contains("Creality") || !cache_json["Creality"].is_array())
+        cache_json["Creality"] = json::array();
+
+    for (const auto& item : packages) {
+        const pt::ptree& printer = item.second;
+        if (!update_package_uses_bare_multi_extruder_name(printer))
+            continue;
+
+        const std::string model = update_package_printer_model(printer);
+        if (updated_models.find(model) == updated_models.end())
+            continue;
+
+        const std::vector<std::string> nozzles = update_package_nozzle_diameters(printer);
+        if (nozzles.empty())
+            continue;
+
+        bool found = false;
+        for (json& cached : cache_json["Creality"]) {
+            if (cached.value("name", std::string()) != model ||
+                !cached.contains("nozzleDiameter") || !cached["nozzleDiameter"].is_array() ||
+                cached["nozzleDiameter"].empty() || !cached["nozzleDiameter"][0].is_string() ||
+                cached["nozzleDiameter"][0].get<std::string>() != nozzles.front())
+                continue;
+
+            cached["showVersion"] = printer.get<std::string>("showVersion", "");
+            cached["updating"] = false;
+            found = true;
+            break;
+        }
+        if (!found) {
+            json cached;
+            cached["name"] = model;
+            cached["nozzleDiameter"] = nozzles;
+            cached["showVersion"] = printer.get<std::string>("showVersion", "");
+            cached["updating"] = false;
+            cache_json["Creality"].push_back(std::move(cached));
+        }
+    }
+}
+
+static void normalize_multi_extruder_filament_variants(json& filament_data)
+{
+    static const std::vector<std::string> legacy_extruder_variants(4, "Direct Drive Standard");
+    static const std::vector<std::string> legacy_nozzle_variants {"0", "1", "2", "3"};
+
+    const bool has_extruder_variants = filament_data.contains("filament_extruder_variant");
+    const bool has_nozzle_variants   = filament_data.contains("filament_nozzle_variant");
+    if (!has_extruder_variants && !has_nozzle_variants) {
+        filament_data["filament_extruder_variant"] = legacy_extruder_variants;
+        filament_data["filament_nozzle_variant"]   = legacy_nozzle_variants;
+    } else if (!has_extruder_variants || !has_nozzle_variants ||
+               !filament_data["filament_extruder_variant"].is_array() ||
+               !filament_data["filament_nozzle_variant"].is_array() ||
+               filament_data["filament_extruder_variant"].empty() ||
+               filament_data["filament_extruder_variant"].size() !=
+                   filament_data["filament_nozzle_variant"].size()) {
+        throw std::runtime_error(
+            "Multi-extruder material selectors filament_extruder_variant and "
+            "filament_nozzle_variant must be non-empty arrays of equal length");
+    }
+
+    const size_t variant_count = filament_data["filament_nozzle_variant"].size();
+    for (const std::string& key : filament_options_with_variant) {
+        if (key == "filament_extruder_variant" || key == "filament_nozzle_variant" ||
+            !filament_data.contains(key))
+            continue;
+
+        json& value = filament_data[key];
+        if (!value.is_array()) {
+            const json common_value = value;
+            value = json::array();
+            for (size_t index = 0; index < variant_count; ++index)
+                value.push_back(common_value);
+            continue;
+        }
+        if (value.size() == 1) {
+            const json common_value = value.front();
+            value = json::array();
+            for (size_t index = 0; index < variant_count; ++index)
+                value.push_back(common_value);
+            continue;
+        }
+        if (value.size() == variant_count)
+            continue;
+
+        if (value.size() > variant_count && value.size() % variant_count == 0) {
+            json canonical_row = json::array();
+            for (size_t index = 0; index < variant_count; ++index)
+                canonical_row.push_back(value[index]);
+
+            bool rows_differ = false;
+            for (size_t offset = variant_count; offset < value.size() && !rows_differ;
+                 offset += variant_count) {
+                for (size_t index = 0; index < variant_count; ++index) {
+                    if (value[offset + index] != canonical_row[index]) {
+                        rows_differ = true;
+                        break;
+                    }
+                }
+            }
+            if (rows_differ) {
+                BOOST_LOG_TRIVIAL(warning)
+                    << "Multi-extruder material option " << key
+                    << " has conflicting physical-extruder rows; using the first row";
+            }
+            value = std::move(canonical_row);
+            continue;
+        }
+
+        const bool all_same = !value.empty() &&
+            std::all_of(std::next(value.begin()), value.end(),
+                        [&value](const json& item) { return item == value.front(); });
+        if (all_same) {
+            const json common_value = value.front();
+            value = json::array();
+            for (size_t index = 0; index < variant_count; ++index)
+                value.push_back(common_value);
+            continue;
+        }
+
+        throw std::runtime_error(
+            "Multi-extruder material option " + key + " has " + std::to_string(value.size()) +
+            " values, expected 1 or " + std::to_string(variant_count));
+    }
+}
+
+bool UpdateParamPackage(pt::ptree v,json& profile_json,json& cache_json,json& materials_json)
+{
+        std::string printer_model  = update_package_printer_model(v);
+        std::string showVersion = v.get_child("showVersion").data();
+        std::string zipUrl      = v.get_child("zipUrl").data();
+        std::string thumbnail      = v.get<std::string>("thumbnail", "");
+        std::vector<std::string> nozzleDiameters = update_package_nozzle_diameters(v);
+        fs::path tmp_path = downloaded_update_package_path(v);
+        
+        if(!fs::exists(tmp_path))
+        {
+            return false;
+        }
+        bool bHasUpdateMachine = false;        
+        auto        old_machine_name = tmp_path.stem().string();
+        std::string nozzle           = nozzleDiameters.empty() ? "0.4" : nozzleDiameters[0];
+        const std::string printer_int_name = v.get<std::string>("printerIntName", "");
+        const bool has_multiple_extruders = nozzleDiameters.size() > 1;
+        const bool omit_nozzle_from_name =
+            has_multiple_extruders &&
+            printer_int_name != "Sermoon D3 Pro" &&
+            printer_model != "Creality Sermoon D3 Pro";
+        const std::string nozzle_qualified_machine_name = printer_model + " " + nozzle + " nozzle";
+
+        mz_zip_archive archive_in;
+        mz_zip_zero_struct(&archive_in);
+
+        if (!open_zip_reader(&archive_in, tmp_path.string().c_str())) {
+            return false;
+        }
+        mz_uint                  num_entries = mz_zip_reader_get_num_files(&archive_in);
+        mz_zip_archive_file_stat stat;
+        std::string              machine_name;
+        std::string              out_machine_name =
+            omit_nozzle_from_name ? printer_model : nozzle_qualified_machine_name;
+        std::vector<std::string> supported_nozzles;
+        bool uses_multi_extruder_variant_schema =
+            update_package_has_multi_extruder_variant_schema(tmp_path, nozzleDiameters.size(), &supported_nozzles);
+        if (supported_nozzles.empty())
+            supported_nozzles.push_back(nozzle);
+        
+        auto updateProfile = [&](const std::string& type, json element) {
+            std::lock_guard<std::mutex> lock(mtx);
+            if (!profile_json.contains(type) || !profile_json[type].is_array())
+                return;
+
+            for (json& current : profile_json[type]) {
+                if (current.value("name", std::string()) == element.value("name", std::string()) ||
+                    current.value("sub_path", std::string()) == element.value("sub_path", std::string())) {
+                    current = std::move(element);
+                    return;
+                }
+            }
+            profile_json[type].push_back(std::move(element));
+        };
+        auto removeProfile = [&](const std::string& type, const std::string& name,
+                                 const std::string& sub_path) {
+            std::lock_guard<std::mutex> lock(mtx);
+            if (!profile_json.contains(type) || !profile_json[type].is_array())
+                return;
+
+            json& profiles = profile_json[type];
+            for (auto it = profiles.begin(); it != profiles.end();) {
+                if (it->value("name", std::string()) == name ||
+                    it->value("sub_path", std::string()) == sub_path)
+                    it = profiles.erase(it);
+                else
+                    ++it;
+            }
+        };
+        auto getDefaultMaterials = [=](json top_materials){
+            std::string materials = "";
+            if(materials_json["materials"].empty()){
+                return materials;
+            }
+            for (auto it = top_materials.begin(); it != top_materials.end();) {
+                if (it.value().is_string()) {
+                    for(auto material:materials_json["materials"]){
+                        std::string material_id = material["id"].get<std::string>();
+                        std::string top_material_id = it.value().get<std::string>();
+                        if(material_id==top_material_id){
+                            materials += material["name"].get<std::string>()+";";
+                            break;
+                        }
+                    }
+                }
+                it++;
+            }
+            return materials;
+        };
+        std::string default_materials = "";
+        for (mz_uint i = 0; i < num_entries; ++i) {
+            if (mz_zip_reader_file_stat(&archive_in, i, &stat)) {
+                try{
+                    std::string name(stat.m_filename);
+                    if (!boost::algorithm::iends_with(name, ".json")) {
+                        continue;
+                    }
+                    std::vector<unsigned char> buffer_input(stat.m_uncomp_size);
+                    std::replace(name.begin(), name.end(), '\\', '/');
+                    if (!mz_zip_reader_extract_to_mem(&archive_in, i, buffer_input.data(), buffer_input.size(), 0)) {
+                        continue;
+                    }
+                    json json_in = json::parse(reinterpret_cast<const char*>(buffer_input.data()),
+                                                    reinterpret_cast<const char*>(buffer_input.data() +
+                                                                                    buffer_input.size()));
+                    if (name.find('/') == name.npos) {
+                        uses_multi_extruder_variant_schema = uses_multi_extruder_variant_schema ||
+                            (nozzleDiameters.size() > 1 && json_in.contains("printer") &&
+                            json_in["printer"].contains("extruder_variant_list") &&
+                            json_in["printer"]["extruder_variant_list"].is_array() &&
+                            !json_in["printer"]["extruder_variant_list"].empty());
+                        json json_out;
+                        std::string default_bed_type = "High Temp Plate";
+                        json_out["type"] = "machine";
+                        json_out["from"] = "system";
+                        json_out["instantiation"] = "true";
+                        json_out["inherits"] = "fdm_creality_common";
+                        json_out["printer_structure"] = "i3";
+                        json_out.merge_patch(json_in["printer"]);
+                        json_out.merge_patch(json_in["extruders"][0]["engine_data"]);
+                        json_out["printer_model"]     = printer_model;
+                        std::string preferred_process = json_in["metadata"]["preferred_process"];
+                        auto top_material = json_in["metadata"]["top_material"];
+                        default_materials = getDefaultMaterials(top_material);
+                        auto index = preferred_process.find_last_of("@");
+                        if (index != std::string::npos) {
+                            preferred_process = preferred_process.substr(0, index);
+                        }
+                        json_out["default_print_profile"] = preferred_process + " @" + out_machine_name;
+
+                        json filament_array;
+                        filament_array.push_back("Hyper PLA @" + out_machine_name);
+                        json_out["default_filament_profile"] = filament_array;
+                        // The package stores all supported nozzle variants in
+                        // extruders[0].engine_data.nozzle_diameter. That list is
+                        // not the physical extruder layout selected by the
+                        // device entry. Wrapping it would create [[...]], which
+                        // is parsed as a single extruder. Use the selected
+                        // nozzle list from the update response instead.
+                        json selected_nozzle_diameters = json::array();
+                        if (has_multiple_extruders) {
+                            for (const std::string& diameter : nozzleDiameters)
+                                selected_nozzle_diameters.push_back(diameter);
+                        } else {
+                            selected_nozzle_diameters.push_back(nozzle);
+                        }
+                        json_out["nozzle_diameter"] = std::move(selected_nozzle_diameters);
+                        if (json_out.contains("printer_variant")) {
+                            json_out["printer_variant"] = nozzle;
+                        }
+                        if (json_out.contains("material_flow_temp_graph")) {
+                            json_out.erase("material_flow_temp_graph");
+                        }
+                        if (json_out.contains("material_flow_dependent_temperature")) {
+                            json_out.erase("material_flow_dependent_temperature");
+                        }
+                        if (json_out.contains("curr_bed_type")) {
+                            default_bed_type = json_out["curr_bed_type"];
+                            json_out.erase("curr_bed_type");
+                        }
+                        json_out["name"] = out_machine_name;
+                        json_out["inherits"] = "fdm_creality_common";
+                        std::hash<std::string> hash_fn;
+                        json_out["setting_id"] = std::to_string(hash_fn(nozzle_qualified_machine_name)).substr(1,6);
+                        json_out["support_multi_bed_types"] = "1";
+                        for (auto it = json_out.begin(); it != json_out.end(); ) {
+                            if (it.value().is_string()) {
+                                std::string str = it.value().get<std::string>();
+                                if (str.empty()) {
+                                    it = json_out.erase(it);
+                                    continue;
+                                }
+                            }
+                            ++it;
+                        }
+                        const std::string supported_nozzle_list = boost::algorithm::join(supported_nozzles, ";");
+                        const std::string machine_model_file_name = printer_model + "_model";
+                        auto out_machine_model_json_file = fs::path(data_dir()).append("system")
+                                                                            .append("Creality")
+                                                                            .append("machine")
+                                                                            .append(machine_model_file_name + ".json")
+                                                                            .string();
+                        auto legacy_machine_model_json_file = fs::path(data_dir()).append("system")
+                                                                               .append("Creality")
+                                                                               .append("machine")
+                                                                               .append(printer_model + ".json")
+                                                                               .string();
+                        if (!fs::exists(out_machine_model_json_file) &&
+                            fs::exists(legacy_machine_model_json_file)) {
+                            boost::nowide::ifstream legacy_file(legacy_machine_model_json_file);
+                            std::stringstream legacy_buffer;
+                            legacy_buffer << legacy_file.rdbuf();
+                            json legacy_json = json::parse(legacy_buffer.str());
+                            if (legacy_json.value("type", std::string()) == "machine_model")
+                                fs::rename(legacy_machine_model_json_file, out_machine_model_json_file);
+                        }
+                        if(!fs::exists(out_machine_model_json_file)){
+                            json json_out;
+                            json_out["type"] = "machine_model";
+                            json_out["name"] = printer_model;
+                            json_out["nozzle_diameter"] = supported_nozzle_list;
+                            json_out["bed_model"] = "creality_k1_buildplate_model.stl";
+                            if(printer_model.find("SPARKX") != std::string::npos)
+                            {
+                                json_out["bed_model"] = "Creality F022_buildplate_model.stl";
+                            }
+                            json_out["bed_texture"] = "";
+                            json_out["family"] = "Creality";
+                            json_out["hotend_model"] = "";
+                            json_out["machine_tech"] = "FFF";
+                            json_out["default_materials"] = default_materials;
+                            json_out["default_bed_type"] = default_bed_type;
+                            std::string new_printer_model = printer_model;
+                            boost::replace_all(new_printer_model, " ", "_");
+                            json_out["model_id"] = new_printer_model;
+                            boost::nowide::ofstream c;
+                            c.open(out_machine_model_json_file, std::ios::out | std::ios::trunc);
+                            c << std::setw(4) << json_out << std::endl;
+                            c.close();
+                        }else{
+                            std::string contents;
+                            boost::nowide::ifstream t(out_machine_model_json_file);
+                            std::stringstream buffer;
+                            buffer << t.rdbuf();
+                            contents=buffer.str();
+                            json json_in = json::parse(contents);
+                            auto nozzles = json_in["nozzle_diameter"].get<std::string>();
+                            std::vector<std::string> existing_nozzles;
+                            boost::algorithm::split(existing_nozzles, nozzles, boost::is_any_of(";"));
+                            for (const std::string& supported_nozzle : supported_nozzles) {
+                                if (std::find(existing_nozzles.begin(), existing_nozzles.end(), supported_nozzle) == existing_nozzles.end()) {
+                                    if (!nozzles.empty())
+                                        nozzles += ";";
+                                    nozzles += supported_nozzle;
+                                    existing_nozzles.push_back(supported_nozzle);
+                                }
+                            }
+                            json_in["nozzle_diameter"] = nozzles;
+                            std::vector<std::string> materials;
+                            boost::algorithm::split(materials, default_materials, boost::is_any_of(";"));
+                            for(std::string default_material:materials){
+                                if(json_in["default_materials"].get<std::string>().find(default_material) == std::string::npos){
+                                    json_in["default_materials"] = json_in["default_materials"].get<std::string>() + ";" + default_material;
+                                }
+                            }
+
+                            boost::nowide::ofstream c;
+                            c.open(out_machine_model_json_file, std::ios::out | std::ios::trunc);
+                            c << std::setw(4) << json_in << std::endl;
+                            c.close();
+
+                        }
+                        json new_model_elem;
+                        new_model_elem["name"] = printer_model;
+                        new_model_elem["sub_path"] = "machine/" + machine_model_file_name + ".json";
+                        updateProfile("machine_model_list", new_model_elem);
+                        auto out_machine_json_file = fs::path(data_dir()).append("system")
+                                                            .append("Creality")
+                                                            .append("machine")
+                                                            .append(out_machine_name + ".json")
+                                                            .string();
+                        if(!fs::exists(out_machine_json_file)){
+                            boost::nowide::ofstream c;
+                            c.open(out_machine_json_file, std::ios::out | std::ios::trunc);
+                            c << std::setw(4) << json_out << std::endl;
+                            c.close();
+                            bHasUpdateMachine = true;
+
+                        }else{
+                            auto out_machine_json_file_tmp = out_machine_json_file+".tmp";
+                            boost::nowide::ofstream c;
+                            c.open(out_machine_json_file_tmp, std::ios::out | std::ios::trunc);
+                            c << std::setw(4) << json_out << std::endl;
+                            c.close();
+                            fs::remove(out_machine_json_file);
+                            fs::rename(out_machine_json_file_tmp, out_machine_json_file);
+                        }
+                        if (omit_nozzle_from_name) {
+                            for (const std::string& legacy_nozzle : supported_nozzles) {
+                                const std::string legacy_name = printer_model + " " + legacy_nozzle + " nozzle";
+                                auto legacy_machine_json_file = fs::path(data_dir()).append("system")
+                                                                            .append("Creality")
+                                                                            .append("machine")
+                                                                            .append(legacy_name + ".json");
+                                if (fs::exists(legacy_machine_json_file))
+                                    fs::remove(legacy_machine_json_file);
+                                removeProfile("machine_list", legacy_name, "machine/" + legacy_name + ".json");
+                            }
+                        }
+                        json new_elem;
+                        new_elem["name"] = out_machine_name;
+                        new_elem["sub_path"] = "machine/" + out_machine_name + ".json";
+                        updateProfile("machine_list", new_elem);
+                    } else if (boost::algorithm::istarts_with(name, "Materials")) {
+                        static std::set<std::string> array_keys = {"filament_type", "filament_vendor", "filament_start_gcode",
+                                                    "filament_end_gcode"};
+                        json json_out;
+                        json_out["type"]              = "filament";
+                        json_out["filament_id"]              = "GFB98";
+                        json_out["setting_id"]     = "GFSA04";
+                        json_out["name"]          = "Creality Generic ASA";
+                        json_out["from"]                     = "system";
+                        json_out["instantiation"]            = "true";
+                        json_out["inherits"]                 = "fdm_filament_common";
+                        json_out.merge_patch(json_in["engine_data"]);
+                        json_out["filament_id"] = json_in["metadata"]["id"];
+                        auto basename                = fs::path(name).stem().string();
+                        auto index = basename.find_last_of("-");
+                        if (index != std::string::npos) {
+                            basename = basename.substr(0, index);
+                        }
+                        const std::string filament_name = basename;
+                        basename = basename + " @" + out_machine_name;
+                        json_out["name"] = basename;
+                        json compatible_printers_array;
+                        compatible_printers_array.push_back(out_machine_name);
+                        json_out["compatible_printers"] = compatible_printers_array;
+                        if (json_out.contains("filament_type")) {
+                            auto filament_type = json_out["filament_type"].get<std::string>();
+                            if(filament_type=="PLA" || filament_type=="PLA-CF")
+                            {
+                                json_out["inherits"]            = "fdm_filament_pla";
+                            }else if(filament_type=="PETG"||filament_type=="PETG-CF")
+                            {
+                                json_out["inherits"]            = "fdm_filament_petg";
+                            }else if(filament_type=="TPU")
+                            {
+                                json_out["inherits"]            = "fdm_filament_tpu";
+                            }else if(filament_type=="ABS")
+                            {
+                                json_out["inherits"]            = "fdm_filament_abs";
+                            }else if(filament_type=="ASA")
+                            {
+                                json_out["inherits"]            = "fdm_filament_asa";
+                            }else if(filament_type=="PP")
+                            {
+                                json_out["inherits"]            = "fdm_filament_pp";
+                            }else if(filament_type=="PPS" || filament_type=="PPS-CF")
+                            {
+                                json_out["inherits"]            = "fdm_filament_pps";
+                            }else if(filament_type=="PET" || filament_type=="PET-CF")
+                            {
+                                json_out["inherits"]            = "fdm_filament_pet";
+                            }else if(filament_type=="PC")
+                            {
+                                json_out["inherits"]            = "fdm_filament_pc";
+                            }else if(filament_type == "PA" || filament_type == "PA6" || filament_type == "PA6-CF" || filament_type == "PA-CF" || filament_type == "PAHT" || filament_type == "PAHT-CF")
+                            {
+                                json_out["inherits"]            = "fdm_filament_pa";
+                            }else if(filament_type=="HIPS")
+                            {
+                                json_out["inherits"]            = "fdm_filament_hips";
+                            }else if(filament_type=="BVOH")
+                            {
+                                json_out["inherits"]            = "fdm_filament_common";
+                                if(!json_out.contains("filament_adhesiveness_category"))
+                                {
+                                    json_out["filament_adhesiveness_category"] = "797";
+                                }
+                            }else{
+                                json_out["inherits"]            = "fdm_filament_common";
+                            }
+                        }else{
+                            json_out["inherits"]            = "fdm_filament_common";
+                        }
+                        
+                        json_out["default_filament_colour"] = "\"\"";
+                        if (json_out.contains("material_flow_dependent_temperature")) {
+                            //json_out.erase("material_flow_dependent_temperature");
+                        }
+                        if (json_out.contains("material_flow_temp_graph")) {
+                            //json_out.erase("material_flow_temp_graph");
+                        }
+                        for (auto it = json_out.begin(); it != json_out.end();) {
+                            if (it.value().is_string()) {
+                                std::string str = it.value().get<std::string>();
+                                if (str.empty()) {
+                                    it = json_out.erase(it);
+                                    continue;
+                                } else if (array_keys.find(it.key()) != array_keys.cend()) {
+                                    json array;
+                                    array.push_back(str);
+                                    json_out[it.key()] = array;
+                                }
+                            }
+                            ++it;
+                        }
+                        if (uses_multi_extruder_variant_schema)
+                            normalize_multi_extruder_filament_variants(json_out);
+                        if (omit_nozzle_from_name) {
+                            for (const std::string& legacy_nozzle : supported_nozzles) {
+                                const std::string legacy_basename = filament_name + " @" + printer_model + " " +
+                                    legacy_nozzle + " nozzle";
+                                auto old_filament_json_file = fs::path(data_dir())
+                                                                  .append("system")
+                                                                  .append("Creality")
+                                                                  .append("filament")
+                                                                  .append(legacy_basename + ".json");
+                                if (fs::exists(old_filament_json_file))
+                                    fs::remove(old_filament_json_file);
+                                removeProfile("filament_list", legacy_basename,
+                                              "filament/" + legacy_basename + ".json");
+                            }
+                        }
+                        auto out_filament_json_file = fs::path(data_dir())
+                                                            .append("system")
+                                                            .append("Creality")
+                                                            .append("filament")
+                                                            .append(basename + ".json")
+                                                            .string();
+                        if(!fs::exists(out_filament_json_file)){
+                            boost::nowide::ofstream c;
+                            c.open(out_filament_json_file, std::ios::out | std::ios::trunc);
+                            c << std::setw(4) << json_out << std::endl;
+                            c.close();
+                        }else{
+                            auto out_filament_json_file_tmp = out_filament_json_file+".tmp";
+                            boost::nowide::ofstream c;
+                            c.open(out_filament_json_file_tmp, std::ios::out | std::ios::trunc);
+                            c << std::setw(4) << json_out << std::endl;
+                            c.close();
+                            fs::remove(out_filament_json_file);
+                            fs::rename(out_filament_json_file_tmp, out_filament_json_file);
+                        }
+                        json new_elem;
+                        new_elem["name"] = basename;
+                        new_elem["sub_path"] = "filament/" + basename + ".json";
+                        updateProfile("filament_list", new_elem);
+                        //judge if the material is in the default materials list
+                        auto* app_config = GUI::wxGetApp().app_config;
+                        if(app_config->has_printer_settings(out_machine_name))
+                        {
+                             std::string section_name = AppConfig::SECTION_FILAMENTS;
+                             if (app_config->has_section(section_name)) {
+                                const std::map<std::string, std::string> &installed = app_config->get_section(section_name);
+                                auto has = [&installed](const std::string &name) {
+                                    auto it = installed.find(name);
+                                    return it != installed.end() && ! it->second.empty();
+                                };
+                                std::vector<std::string> materials;
+                                boost::algorithm::split(materials, default_materials, boost::is_any_of(";"));
+                                for (const auto& str : materials) {
+                                    auto fname = basename.substr(0, basename.find("@"));
+                                    boost::trim_right(fname);
+                                    if(str == fname){
+                                        bool is_visible = has(basename);
+                                        if (!is_visible) {
+                                            app_config->set(section_name, basename, "true");
+                                        }
+                                    }
+                                }
+                            } 
+                        }
+                    } else if (boost::algorithm::istarts_with(name, "Processes")) {
+                        static std::set<std::string> array_keys = {"filament_colour",      "flush_multiplier",
+                                                                    "flush_volumes_matrix", "flush_volumes_vector",
+                                                                    "wipe_tower_x",         "wipe_tower_y",
+                                                                    "has_scarf_joint_seam", "arc_tolerance",
+                                                                    "wall_filament", "solid_infill_filament",
+                                                                    "sparse_infill_filament"};
+                        json json_out;
+                        json_out["type"]          = "process";
+                        json_out["setting_id"]    = "GP004";
+                        json_out["name"]          = "0.08mm SuperDetail @Creality CR-6 0.2";
+                        json_out["from"]          = "system";
+                        json_out["instantiation"] = "true";
+                        json_out.merge_patch(json_in["engine_data"]);
+                        auto basename = fs::path(name).stem().string();
+                        auto index    = basename.find_last_of("@");
+                        if (index != std::string::npos) {
+                            basename = basename.substr(0, index);
+                        }
+                        boost::trim_right(basename);
+                        const std::string process_name = basename;
+                        basename = basename + " @" + out_machine_name;
+                        json_out["name"] = basename;
+                        json compatible_printers_array;
+                        compatible_printers_array.push_back(out_machine_name);
+                        json_out["compatible_printers"] = compatible_printers_array;
+                        json_out["inherits"]            = "fdm_process_creality_common";
+                        if (json_out.contains("min_length_factor") && json_out["min_length_factor"].empty()) {
+                            json_out.erase("min_length_factor");
+                        }
+                        for (auto key : array_keys) {
+                            if (json_out.contains(key)) {
+                                json_out.erase(key);
+                            }
+                        }
+                        for (auto it = json_out.begin(); it != json_out.end();) {
+                            if (it.value().is_string()) {
+                                std::string str = it.value().get<std::string>();
+                                if (str.empty()) {
+                                    it = json_out.erase(it);
+                                    continue;
+                                }
+                            }
+                            ++it;
+                        }
+                        if (omit_nozzle_from_name) {
+                            for (const std::string& legacy_nozzle : supported_nozzles) {
+                                const std::string legacy_basename = process_name + " @" + printer_model + " " +
+                                    legacy_nozzle + " nozzle";
+                                auto old_process_json_file = fs::path(data_dir())
+                                                                .append("system")
+                                                                .append("Creality")
+                                                                .append("process")
+                                                                .append(legacy_basename + ".json");
+                                if (fs::exists(old_process_json_file))
+                                    fs::remove(old_process_json_file);
+                                removeProfile("process_list", legacy_basename,
+                                              "process/" + legacy_basename + ".json");
+                            }
+                        }
+                        auto out_process_json_file = fs::path(data_dir())
+                                                            .append("system")
+                                                            .append("Creality")
+                                                            .append("process")
+                                                            .append(basename + ".json")
+                                                            .string();
+                        if(!fs::exists(out_process_json_file)){
+                            boost::nowide::ofstream c;
+                            c.open(out_process_json_file, std::ios::out | std::ios::trunc);
+                            c << std::setw(4) << json_out << std::endl;
+                            c.close();
+                        }else{
+                            auto out_process_json_file_tmp = out_process_json_file+".tmp";
+                            boost::nowide::ofstream c;
+                            c.open(out_process_json_file_tmp, std::ios::out | std::ios::trunc);
+                            c << std::setw(4) << json_out << std::endl;
+                            c.close();
+                            fs::remove(out_process_json_file);
+                            fs::rename(out_process_json_file_tmp, out_process_json_file);
+                        }
+                        json new_elem;
+                        new_elem["name"] = basename;
+                        new_elem["sub_path"] = "process/" + basename + ".json";
+                        updateProfile("process_list", new_elem);
+                    }
+                }
+                catch (const std::exception& e) {
+                    BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(",  parse json failed, %1%.") % e.what();
+                    close_zip_reader(&archive_in);
+                    return false;
+                }
+            }
+                
+        }
+        if (!close_zip_reader(&archive_in)) {
+            return false;
+        }
+        sync_printer_cover("Creality", printer_model, thumbnail);
+        std::lock_guard<std::mutex> lock(mtx);
+
+
+        try{
+            
+            if(fs::exists(tmp_path)){
+                fs::remove(tmp_path);
+            }
+            
+                std::vector<std::string> ec_a;
+                bool found = false;
+                for (auto& elem : cache_json["Creality"]) {
+                    if (elem["name"] == printer_model && elem["nozzleDiameter"][0] == nozzleDiameters[0]) {
+                        found = true;
+                        elem["showVersion"] = showVersion;
+                        elem["updating"] = false;
+                    }
+                }
+                if (!found) {
+                    json new_elem;
+                    new_elem["name"] = printer_model;
+                    new_elem["nozzleDiameter"] = nozzleDiameters;
+                    new_elem["showVersion"] = showVersion;
+                    new_elem["updating"] = false;
+                    cache_json["Creality"].push_back(new_elem);						
+                }
+        }catch(const std::exception& e)
+        {
+            return false;
+        }
+        return true;
+    }
+void  GUI_App::init_user_profile()
+{
+    auto user_file = fs::path(data_dir()).append("user_info.json");
+    json j;
+    if (fs::exists(user_file))
+    {
+        try{
+            boost::nowide::ifstream ifs(user_file.string());
+            ifs >> j;
+        }catch (const std::exception& e) {
+            fs::remove(user_file);
+            return;
+            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(",  parse json failed, %1%.") % e.what();
+        }
+    }else{
+        return;
+    }
+    m_user.token = j["token"];
+    m_user.nickName = j["nickName"];
+    m_user.avatar = j["avatar"];
+    m_user.userId = j["userId"];
+    app_config->set("cloud", "user_id", m_user.userId);
+    app_config->set("cloud", "token", m_user.token);
+    if (!m_user.token.empty()) {
+        m_user.bLogin = true;
+        app_config->set("preset_folder", m_user.userId);
+        //enable_user_preset_folder(true);
+
+     }
+
+
+}
+
+std::string escapeForJS(const std::string& input)
+{
+    std::string output;
+    output.reserve(input.size() * 2); // 预留空间，减少扩容
+
+    for (char c : input) {
+        switch (c) {
+        case '\"': output += "\\\""; break; // 双引号
+        case '\'': output += "\\\'"; break; // 单引号
+        case '\\': output += "\\\\"; break; // 反斜杠
+        case '\n': output += "\\n"; break;  // 换行
+        case '\r': output += "\\r"; break;  // 回车
+        case '\t': output += "\\t"; break;  // Tab
+        default: output += c; break;
+        }
+    }
+    return output;
+}
+
+struct DeviceAddPreparation
+{
+    json selected_printers;
+    json profile_json;
+    bool valid{false};
+};
+
+static std::vector<std::string> split_device_add_values(const std::string& values)
+{
+    std::vector<std::string> result;
+    boost::split(result, values, boost::is_any_of(";"), boost::token_compress_on);
+    result.erase(std::remove_if(result.begin(), result.end(), [](const std::string& value) { return value.empty(); }), result.end());
+    return result;
+}
+
+static void apply_device_add_config_snapshot(json& profile_json,
+                                             const AppConfig::VendorMap& enabled_vendors,
+                                             const std::map<std::string, std::string>& enabled_filaments)
+{
+    for (auto& model : profile_json["model"]) {
+        if (!model.is_object())
+            continue;
+
+        const std::string model_name  = model.value("model", std::string());
+        const std::string vendor_name = model.value("vendor", std::string());
+        std::string selected;
+        auto vendor_it = enabled_vendors.find(vendor_name);
+        if (vendor_it != enabled_vendors.end()) {
+            auto model_it = vendor_it->second.find(model_name);
+            if (model_it != vendor_it->second.end()) {
+                for (const std::string& nozzle : split_device_add_values(model.value("nozzle_diameter", std::string()))) {
+                    if (model_it->second.find(nozzle) == model_it->second.end())
+                        continue;
+                    if (!selected.empty())
+                        selected += ";";
+                    selected += nozzle;
+                }
+            }
+        }
+        model["nozzle_selected"] = selected;
+    }
+
+    if (profile_json["model"].size() == 1)
+        profile_json["model"][0]["nozzle_selected"] = profile_json["model"][0]["nozzle_diameter"];
+
+    for (auto it = profile_json["filament"].begin(); it != profile_json["filament"].end(); ++it) {
+        if (enabled_filaments.find(it.key()) != enabled_filaments.end())
+            it.value()["selected"] = 1;
+    }
+}
+
+static DeviceAddPreparation prepare_device_add(json selected_printers,
+                                               json profile_json,
+                                               const AppConfig::VendorMap& enabled_vendors,
+                                               const std::map<std::string, std::string>& enabled_filaments)
+{
+    DeviceAddPreparation result;
+    apply_device_add_config_snapshot(profile_json, enabled_vendors, enabled_filaments);
+
+    auto load_catalog = [](const fs::path& path) {
+        json catalog;
+        try {
+            if (fs::exists(path)) {
+                boost::nowide::ifstream input(path.string());
+                input >> catalog;
+            }
+        } catch (const std::exception& e) {
+            BOOST_LOG_TRIVIAL(warning) << "Cannot read printer catalog " << path.string() << ": " << e.what();
+        }
+        return catalog;
+    };
+    const json system_catalog = load_catalog(fs::path(data_dir()) / "system" / "Creality" / "machineList.json");
+    const json bundled_catalog = load_catalog(fs::path(resources_dir()) / "profiles" / "Creality" / "machineList.json");
+    DeviceAddUtils::resolve_printer_selections(selected_printers, profile_json["model"], system_catalog, bundled_catalog);
+
+    struct SelectedNozzle
+    {
+        size_t index;
+        std::string model;
+        std::vector<std::string> diameters;
+        std::vector<bool> selected;
+    };
+
+    std::vector<SelectedNozzle> selected_nozzles;
+    for (size_t index = 0; index < profile_json["model"].size(); ++index) {
+        json& model = profile_json["model"][index];
+        model["nozzle_selected"] = "";
+        for (auto it = selected_printers.begin(); it != selected_printers.end(); ++it) {
+            const json& selected = it.value();
+            if (!selected.is_object() || model.value("model", std::string()) != selected.value("model", std::string()) ||
+                model.value("vendor", std::string()) != selected.value("vendor", std::string()))
+                continue;
+
+            const std::string selected_value = selected.contains("nozzle_diameter") ?
+                                                   DeviceAddUtils::normalize_nozzles(selected["nozzle_diameter"]) :
+                                                   std::string();
+            model["nozzle_selected"] = selected_value;
+            SelectedNozzle nozzle;
+            nozzle.index     = index;
+            nozzle.model     = model.value("model", std::string());
+            nozzle.diameters = split_device_add_values(model.value("nozzle_diameter", std::string()));
+            const auto selected_values = split_device_add_values(selected_value);
+            nozzle.selected.reserve(nozzle.diameters.size());
+            for (const std::string& diameter : nozzle.diameters) {
+                nozzle.selected.push_back(std::find(selected_values.begin(), selected_values.end(), diameter) != selected_values.end());
+            }
+            selected_nozzles.emplace_back(std::move(nozzle));
+            break;
+        }
+    }
+
+    if (selected_nozzles.empty())
+        return result;
+
+    std::set<std::string> selected_filaments;
+    for (const SelectedNozzle& nozzle : selected_nozzles) {
+        json& model = profile_json["model"][nozzle.index];
+        if (!model["materials"].is_string())
+            continue;
+
+        for (const std::string& material : split_device_add_values(model["materials"].get<std::string>())) {
+            bool found = false;
+            if (profile_json["filament"].contains(material)) {
+                for (size_t i = 0; i < nozzle.diameters.size(); ++i) {
+                    if (!nozzle.selected[i])
+                        continue;
+                    const std::string compatible_model = nozzle.model + "++" + nozzle.diameters[i];
+                    if (profile_json["filament"][material].value("models", std::string()).find(compatible_model) != std::string::npos) {
+                        selected_filaments.emplace(material);
+                        found = true;
+                    }
+                }
+            }
+            if (found || material.find('@') != std::string::npos)
+                continue;
+            for (size_t i = 0; i < nozzle.diameters.size(); ++i) {
+                if (!nozzle.selected[i])
+                    continue;
+                std::string printer_material = material + " @" + nozzle.model;
+                if (profile_json["filament"].contains(printer_material)) {
+                    selected_filaments.emplace(printer_material);
+                } else {
+                    printer_material += " " + nozzle.diameters[i] + " nozzle";
+                    if (profile_json["filament"].contains(printer_material))
+                        selected_filaments.emplace(printer_material);
+                }
+            }
+        }
+    }
+
+    for (const std::string& material : selected_filaments) {
+        if (profile_json["filament"].contains(material))
+            profile_json["filament"][material]["selected"] = 1;
+    }
+
+    result.selected_printers = std::move(selected_printers);
+    result.profile_json      = std::move(profile_json);
+    result.valid             = true;
+    return result;
+}
+
+std::string GUI_App::handle_web_request(std::string cmd)
+{
+#if AUTO_CONVERT_3MF
+    return "";
+#endif
+
+    try {
+        //BBS use nlohmann json format
+        std::stringstream ss(cmd), oss;
+        pt::ptree root, response;
+        pt::read_json(ss, root);
+        if (root.empty())
+            return "";
+
+        boost::optional<std::string> sequence_id = root.get_optional<std::string>("sequence_id");
+        boost::optional<std::string> command = root.get_optional<std::string>("command");
+
+        wxString strInput  = cmd;
+
+        schedule_software_launch_analytics();
+
+        if (command.has_value()) {
+            std::string command_str = command.value();
+            if (command_str.compare("request_project_download") == 0) {
+                if (root.get_child_optional("data") != boost::none) {
+                    pt::ptree data_node = root.get_child("data");
+                    boost::optional<std::string> project_id = data_node.get_optional<std::string>("project_id");
+                    if (project_id.has_value()) {
+                        this->request_project_download(project_id.value());
+                    }
+                }
+            }
+            else if (command_str.compare("open_project") == 0) {
+                if (root.get_child_optional("data") != boost::none) {
+                    pt::ptree data_node = root.get_child("data");
+                    boost::optional<std::string> project_id = data_node.get_optional<std::string>("project_id");
+                    if (project_id.has_value()) {
+                        this->request_open_project(project_id.value());
+                    }
+                }
+            } else if (command_str.compare("trigger_login_check") == 0) {
+                json tmp_res;
+                tmp_res["command"] = "trigger_login_check";
+                tmp_res["context"] = "3mf_download_login";
+
+                wxString tmp_str = wxString::Format("window.handleStudioCmd(%s)", tmp_res.dump(-1, ' ', true));
+                GUI::wxGetApp().run_script(tmp_str);
+                
+            } else if (command_str.compare("get_login_info") == 0) {
+                CallAfter([this] {
+                        get_login_info();
+                    });
+            }
+            else if (command_str.compare("homepage_login_or_register") == 0) {
+                CallAfter([this] {
+                    this->request_login(true);
+                });
+            }
+            else if (command_str.compare("homepage_logout") == 0) {
+                CallAfter([this] {
+                    wxGetApp().request_user_logout();
+                });
+            }
+            else if (command_str.compare("homepage_modeldepot") == 0) {
+                CallAfter([this] {
+                    wxGetApp().open_mall_page_dialog();
+                });
+            }
+            else if (command_str.compare("homepage_newproject") == 0) {
+                this->request_open_project("<new>");
+            }
+            else if (command_str.compare("homepage_openproject") == 0) {
+                this->request_open_project({});
+            }
+            else if (command_str.compare("get_recent_projects") == 0) {
+                if (mainframe) {
+                    if (mainframe->m_webview) {
+                        mainframe->m_webview->SendRecentList(INT_MAX);
+                    }
+                }
+            }else if(command_str.compare("get_account_info") == 0){
+                CallAfter([this] {
+                    auto user_file = fs::path(data_dir()).append("user_info.json");
+                    json m_Res = json::object();
+                    m_Res["command"] = "get_account_info";
+                    
+                    json                    j;
+                    if (fs::exists(user_file))
+                    {
+                        try{
+                            boost::nowide::ifstream ifs(user_file.string());
+                            ifs >> j;
+                        }catch (const std::exception& e) {
+                            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(",  parse json failed, %1%.") % e.what();
+                        }
+                    }
+                    m_Res["account"] = json::object();
+                    if (j.contains("token")) {
+                        m_Res["account"]["token"] = j["token"];
+                        m_user.token = j["token"];
+                        m_user.bLogin = true;
+                    } 
+                    if (j.contains("nickName")) {
+                        m_Res["account"]["nickName"] = j["nickName"];
+                        m_user.nickName = j["nickName"];
+                    }
+                    if (j.contains("avatar")) {
+                        m_Res["account"]["avatar"] = j["avatar"];
+                        m_user.avatar = j["avatar"];
+                    }
+                    if (j.contains("userId")) {
+                        m_Res["account"]["userId"] = j["userId"];
+                        m_user.userId = j["userId"];
+                        
+                    }
+                    if (j.contains("region")) {
+                        m_Res["account"]["region"] = j["region"];
+                    }
+                    wxString strJS = wxString::Format("window.handleStudioCmd(%s)", m_Res.dump(-1, ' ', true));
+                    GUI::wxGetApp().run_script(strJS);
+
+                });
+
+            }else if(command_str.compare("login_account_success") == 0){
+                 CallAfter([this] {
+                        send_app_message("login");
+                     });
+            } else if (command_str.compare("update_account_info") == 0) {
+                pt::ptree                data_node = root.get_child("account");
+                auto user_file = fs::path(data_dir()).append("user_info.json");
+                std::ostringstream oss;
+                if(!data_node.empty())
+                {
+                    boost::property_tree::write_json(oss, data_node, true);
+                    boost::nowide::ofstream outFile(user_file.string(), std::ios::out | std::ios::trunc);
+                    if (outFile.is_open()) {
+                            // 将 std::ostringstream 中的内容写入文件
+                            outFile << oss.str();
+                            // 关闭文件
+                            outFile.close();
+                            //std::cout << "write sucessfull" << std::endl;
+                        } 
+                }else{
+                    if (fs::exists(user_file))
+                    {
+                        fs::remove(user_file);  
+                    } 
+                }   
+                std::vector<std::string> input;
+                model_downloaders_.clear();
+                for (auto& v : data_node) {
+                    input.emplace_back(v.second.data());
+                }
+                bool old_login = m_user.bLogin;
+                wxString old_token = m_user.token;
+                wxString old_uid = m_user.userId;
+                const bool next_login = input.size() >= 4;
+                const wxString next_uid = next_login ? wxString(input[3]) : wxString();
+                if (old_login != next_login || old_uid != next_uid) {
+                    // Finish old-account work before replacing credentials or presets.
+                    SyncUserPresets::getInstance().logout();
+                }
+                if (4 <= input.size()) {
+                    m_user.token    = input[0];
+                    m_user.nickName = input[1];
+                    m_user.avatar   = input[2];
+                    m_user.userId   = input[3];
+                    m_user.bLogin   = true;
+                    // #ifdef _DEBUG
+                    //                     m_user.token = "646cdf54baefd02364b91193f75a6e176db1b4738ebaf9a1349eed5b9fbbfd62";
+                    //                     m_user.userId = "4135518419";
+                    // #endif // _DEBUG
+
+                } else {
+                    m_user.token.clear();
+                    m_user.nickName.clear();
+                    m_user.avatar.clear();
+                    m_user.userId.clear();
+                    m_user.bLogin = false;
+                }
+                app_config->set("cloud", "user_id", m_user.userId);
+                app_config->set("cloud", "token", m_user.token);
+                NotifyAIChatLoginStatusChanged();
+
+                // 仅在登录状态发生变化时刷新模型库视图（避免不必要的刷新）。
+                 const bool login_unchanged = (old_login == m_user.bLogin);
+                const bool token_unchanged = (old_token == m_user.token);
+                const bool uid_unchanged   = (old_uid   == m_user.userId);
+                if (login_unchanged && token_unchanged && uid_unchanged)
+                    return "";
+                if (mainframe) {
+                    mainframe->update_model_webviews_user_agent();
+                }
+                // 统一刷新社区主页与在线模型库视图，并广播跨实例消息
+                //this->reload_homepage();
+                this->reload_region_sensitive_views();
+                send_app_message("CP_LOGIN_STATUS_CHANGED", true);
+                
+                if (preset_bundle)
+                    preset_bundle->remove_users_preset(*app_config);
+                 if (m_user.bLogin) {
+                     enable_user_preset_folder(true);
+                     if (preset_bundle) {
+                         preset_bundle->remove_users_preset(*app_config);
+                         preset_bundle->load_user_presets(m_user.userId, ForwardCompatibilitySubstitutionRule::Enable, true);
+                         mainframe->update_side_preset_ui();
+                     }
+                     if (app_config->get("sync_user_preset") == "true") {
+                         start_sync_user_preset();
+                     }
+                    
+                 } else {
+                     stop_sync_user_preset();
+                     enable_user_preset_folder(false);
+                     if (preset_bundle) {
+                         //preset_bundle->remove_users_preset(*app_config);
+                         //preset_bundle->load_user_presets(DEFAULT_USER_FOLDER_NAME, ForwardCompatibilitySubstitutionRule::Enable);
+                         preset_bundle->load_presets(*app_config, ForwardCompatibilitySubstitutionRule::EnableSilentDisableSystem);
+                     }
+                     if (mainframe)
+                         mainframe->update_side_preset_ui();
+                         CallAfter([this] {
+                            send_app_message("logout");
+                         });
+                         mainframe->get_printer_mgr_view()->destoryMqtt();
+                     app_config->set("sync_user_preset", "false");
+                 }
+
+                 DM::AppMgr::Ins().SystemUserChanged();
+                 
+            } else if (command_str.compare("set_begin_guide_version_mode") == 0) {
+                std:: string version_mode;
+                version_mode = root.get<std::string>("version_mode");
+                wxGetApp().app_config->set("easy_print_mode", version_mode == "ai" ? "1" : "0");
+                wxGetApp().app_config->save();
+                wxGetApp().Update_easy_mode_flag();
+                mainframe->topbar()->Refresh();
+            }
+            // else if (command_str.compare("modelmall_model_advise_get") == 0) {
+            //     if (mainframe && this->app_config->get("staff_pick_switch") == "true") {
+            //         if (mainframe->m_webview) {
+            //             mainframe->m_webview->SendDesignStaffpick(has_model_mall());
+            //         }
+            //     }
+            // }
+            // else if (command_str.compare("modelmall_model_open") == 0) {
+            //     if (root.get_child_optional("data") != boost::none) {
+            //         pt::ptree data_node = root.get_child("data");
+            //         boost::optional<std::string> id = data_node.get_optional<std::string>("id");
+            //         if (id.has_value() && mainframe->m_webview) {
+            //             mainframe->m_webview->OpenModelDetail(id.value(), m_agent);
+            //         }
+            //     }
+            // }
+            else if (command_str.compare("homepage_open_recentfile") == 0) {
+                if (root.get_child_optional("data") != boost::none) {
+                    pt::ptree data_node = root.get_child("data");
+                    boost::optional<std::string> path = data_node.get_optional<std::string>("path");
+                    if (path.has_value()) {
+                        this->request_open_project(path.value());
+                    }
+                }
+            }
+            else if (command_str.compare("homepage_delete_recentfile") == 0) {
+                if (root.get_child_optional("data") != boost::none) {
+                    pt::ptree                    data_node = root.get_child("data");
+                    boost::optional<std::string> path      = data_node.get_optional<std::string>("path");
+                    if (path.has_value()) {
+                        this->request_remove_project(path.value());
+                    }
+                }
+            }
+            else if (command_str.compare("homepage_delete_all_recentfile") == 0) {
+                this->request_remove_project("");
+            }
+            else if (command_str.compare("homepage_explore_recentfile") == 0) {
+                if (root.get_child_optional("data") != boost::none) {
+                    pt::ptree                    data_node = root.get_child("data");
+                    boost::optional<std::string> path      = data_node.get_optional<std::string>("path");
+                    if (path.has_value())
+                    {
+                        boost::filesystem::path NowFile(path.value());
+
+                        std::string FilePath = NowFile.make_preferred().string();
+                        desktop_open_any_folder(FilePath);
+                    }
+                }
+            }
+            else if (command_str.compare("homepage_open_hotspot") == 0) {
+                if (root.get_child_optional("data") != boost::none) {
+                    pt::ptree data_node = root.get_child("data");
+                    boost::optional<std::string> url = data_node.get_optional<std::string>("url");
+                    if (url.has_value()) {
+                        this->request_open_project(url.value());
+                    }
+                }
+            }
+            else if(command_str.compare("get_client_id") == 0){
+                    json tmp_res = json::object();
+                    tmp_res["command"] = "get_client_id";
+                    tmp_res["client_id"] = wxGetApp().get_client_id();
+
+                    wxString tmp_str = wxString::Format("window.handleStudioCmd(%s)", tmp_res.dump(-1, ' ', true));
+                    GUI::wxGetApp().run_script(tmp_str);
+            }
+            else if (command_str.compare("begin_network_plugin_download") == 0) {
+                // CallAfter([this] { wxGetApp().ShowDownNetPluginDlg(); });
+            }
+            else if (command_str.compare("get_web_shortcut") == 0) {
+                if (root.get_child_optional("key_event") != boost::none) {
+                    pt::ptree key_event_node = root.get_child("key_event");
+                    auto keyCode = key_event_node.get<int>("key");
+                    auto ctrlKey = key_event_node.get<bool>("ctrl");
+                    auto shiftKey = key_event_node.get<bool>("shift");
+                    auto cmdKey = key_event_node.get<bool>("cmd");
+
+                    wxKeyEvent e(wxEVT_CHAR_HOOK);
+#ifdef __APPLE__
+                    e.SetControlDown(cmdKey);
+                    e.SetRawControlDown(ctrlKey);
+#else
+                    e.SetControlDown(ctrlKey);
+#endif
+                    e.SetShiftDown(shiftKey);
+                    keyCode     = keyCode == 188 ? ',' : keyCode;
+                    e.m_keyCode = keyCode;
+                    e.SetEventObject(mainframe);
+                    wxPostEvent(mainframe, e);
+                }
+            }
+            else if (command_str.compare("userguide_wiki_open") == 0) {
+                if (root.get_child_optional("data") != boost::none) {
+                    pt::ptree                    data_node = root.get_child("data");
+                    boost::optional<std::string> path      = data_node.get_optional<std::string>("url");
+                    if (path.has_value()) {
+                        wxLaunchDefaultBrowser(path.value());
+                    }
+                }
+            }
+            else if (command_str.compare("homepage_open_ccabin") == 0) {
+                if (root.get_child_optional("data") != boost::none) {
+                    pt::ptree                    data_node = root.get_child("data");
+                    boost::optional<std::string> path      = data_node.get_optional<std::string>("file");
+                    if (path.has_value()) {
+                        std::string Fullpath = resources_dir() + "/web/homepage/model/" + path.value();
+
+                        this->request_open_project(Fullpath);
+                    }
+                }
+            }
+            else if (command_str.compare("common_openurl") == 0) {
+                boost::optional<std::string> path      = root.get_optional<std::string>("url");
+                if (path.has_value()) {
+                    wxLaunchDefaultBrowser(path.value());
+                }
+            } 
+            else if (command_str.compare("homepage_makerlab_get") == 0) {
+                //if (mainframe->m_webview) { mainframe->m_webview->SendMakerlabList(); }
+            }
+            else if (command_str.compare("makerworld_model_open") == 0) 
+            {
+                if (root.get_child_optional("model") != boost::none) {
+                    pt::ptree                    data_node = root.get_child("model");
+                    boost::optional<std::string> path      = data_node.get_optional<std::string>("url");
+                    if (path.has_value()) 
+                    { 
+                        wxString realurl = from_u8(path.value());
+                        wxGetApp().request_model_download(realurl);
+                    }
+                }
+            }
+            else if (command_str.compare("makerworld_model_list_open") == 0) {
+                if (root.get_child_optional("model") != boost::none) {
+                    pt::ptree data_node = root.get_child("model.url");
+                    for (auto& v : data_node) {
+                        wxString realurl = from_u8(v.second.data());
+                        wxGetApp().request_model_download(realurl);
+                    }
+                }
+            }
+            else if (command_str.compare("models_download_start") == 0) {
+                std::string userId = root.get_child("userId").data();
+                if (model_downloaders_.find(userId) == model_downloaders_.cend()) {
+                    model_downloaders_.emplace(userId, std::make_unique<ModelDownloader>(userId));
+                }
+                std::string modelId = root.get_child("modelId").data();
+                if (root.get_child_optional("files") != boost::none) {
+                    pt::ptree data_node = root.get_child("files");
+                    for (auto& v : data_node) {
+                        std::string url        = v.second.get_child("url").data();
+                        std::string fileId     = v.second.get_child("fileId").data();
+                        std::string fileFormat = v.second.get_child("fileFormat").data();
+                        std::string fileName   = v.second.get_child("fileName").data();
+                        model_downloaders_[userId]->start_download_model_group(url, modelId, fileId, fileFormat, fileName);
+                    }
+                }
+
+            }
+
+            else if (command_str.compare("3mf_download_start") == 0) {
+                std::string userId = root.get_child("userId").data();
+                if (model_downloaders_.find(userId) == model_downloaders_.cend()) {
+                    model_downloaders_.emplace(userId, std::make_unique<ModelDownloader>(userId));
+                }
+                std::string modelId = root.get_child("modelId").data();
+                wxGetApp().clear_cloud_model_download();
+                wxGetApp().set_cloud_model_download(modelId);
+                if (root.get_child_optional("files") != boost::none) {
+                    pt::ptree v = root.get_child("files");
+                    std::string url        = v.get_child("url").data();
+                    std::string fileId     = v.get_child("fileId").data();
+                    std::string fileFormat = v.get_child("fileFormat").data();
+                    std::string name       = v.get_child("name").data();
+                    if (!name.empty()) {
+                        name = std::regex_replace(name, std::regex("\n"), "");
+                        //name.pop_back();
+                    }
+                    wxString    wxUrl      = wxString::FromUTF8(url.c_str());
+                    
+                    //wxGetApp().request_model_download(wxUrl);
+                    AnalyticsDataUploadManager::getInstance().mark_analytics_project_info(url, modelId, fileId, fileFormat, name);
+                    model_downloaders_[userId]->start_download_3mf_group(url, modelId, fileId, fileFormat, name);
+                    // 始终显示 3MF 下载进度窗口；若存在遗留的同类窗口，先结束它。
+                    wxGetApp().CallAfter([userId, fileId]() {
+                        for (auto dialog : dialogStack) {
+                            if (auto *cdp = dynamic_cast<Slic3r::GUI::CloudDownloadProgressDialog *>(dialog)) {
+                                if (cdp->IsModal()) {
+                                    cdp->EndModal(wxID_ABORT);
+                                }
+                            }
+                        }
+
+#ifndef _WIN32
+                        auto *dlg = new Slic3r::GUI::CloudDownloadProgressDialog(_L("Downloading 3MF Project"), userId, fileId);
+                        dlg->Show(true);
+#else
+                        Slic3r::GUI::CloudDownloadProgressDialog dlg(_L("Downloading 3MF Project"), userId, fileId);
+                        int rc = dlg.ShowModal();
+                        if (wxGetApp().mainframe && !wxGetApp().mainframe->IsEnabled())
+                            wxGetApp().mainframe->Enable(true);
+                        (void)rc;
+#endif
+                    });
+                    
+                }
+
+            }
+
+            else if (command_str.compare("models_download_state") == 0) {
+                std::string userId = root.get_child("userId").data();
+
+                if (model_downloaders_.find(userId) == model_downloaders_.cend()) {
+                    model_downloaders_.emplace(userId, std::make_unique<ModelDownloader>(userId));
+                }
+                json j;
+                j["sequence_id"]   = "";
+                j["command"]       = "models_download_state";
+                j["userId"]        = userId.c_str();
+
+                auto cache_json = model_downloaders_[userId]->get_cache_json();
+                if (cache_json.is_object() && cache_json.contains("models")) {
+                    
+                    j["models"] = cache_json["models"];
+                } else {
+                    j["models"] = json::array();
+                }
+                if (cache_json.is_object() && cache_json.contains("3mfs")) {
+                    j["3mfs"] = cache_json["3mfs"];
+                } else {
+                    j["3mfs"] = json::array();
+                }
+                return j.dump(-1, ' ', true);
+            } else if (command_str.compare("models_download_delete") == 0) {
+                std::string userId = root.get_child("userId").data();
+
+                if (model_downloaders_.find(userId) == model_downloaders_.cend()) {
+                    return "";
+                }
+                pt::ptree data_node = root.get_child("modelIds");
+                for (auto& v : data_node) {
+                    model_downloaders_[userId]->cancel_download_model_group(v.second.data());
+                }
+            } else if (command_str.compare("3mfs_download_delete") == 0) {
+                std::string userId = root.get_child("userId").data();
+
+                if (model_downloaders_.find(userId) == model_downloaders_.cend()) {
+                    return "";
+                }
+                pt::ptree data_node = root.get_child("fileIds");
+                for (auto& v : data_node) {
+                    model_downloaders_[userId]->cancel_download_3mf_group(v.second.data());
+                }
+            }
+
+            else if (command_str.compare("3mf_download_import") == 0) {
+                if (root.get_child_optional("paths") != boost::none) {
+                    pt::ptree   v          = root.get_child("paths");
+                    std::string path       = v.get_child("path").data();
+                    std::string modelGroupId = v.get_child("modelGroupId").data();
+                    Plater*     plater       = wxGetApp().plater();
+                    wxString    wxPath       = from_u8(path);
+                    
+                    if (boost::filesystem::exists(path)) {
+                        plater->load_project(wxPath);
+                        plater->set_project_filename(wxPath);
+                        wxGetApp().clear_cloud_model_download();
+                        wxGetApp().set_cloud_model_download(modelGroupId);
+                    }
+                    
+                    /* plater->get_notification_manager()->push_import_finished_notification(target_path,
+                       target_path.parent_path().string(), false);*/
+                }
+            }
+
+            else if (command_str.compare("models_download_import") == 0) {
+                pt::ptree                data_node = root.get_child("paths");
+                std::vector<std::string> input_files;
+                for (auto& v : data_node) {
+                    input_files.emplace_back(v.second.data());
+                }
+                if (input_files.size()) {
+                    auto   filePath = input_files[0];
+                    size_t endPos   = filePath.find_last_of("\\");             // Find last backslash
+                    size_t startPos = filePath.find_last_of("\\", endPos - 1); // Find second-to-last backslash
+
+                    if (startPos != std::string::npos && endPos != std::string::npos) {
+                        std::string modelGroupId = filePath.substr(startPos + 1, endPos - startPos - 1);
+                        wxGetApp().set_cloud_model_download(modelGroupId);
+                    } else {
+                        std::cerr << "Substring not found" << std::endl;
+                    }
+
+                }
+
+                if (!mainframe->m_plater->load_files(input_files, LoadStrategy::LoadModel, true).empty()) {
+                    if (mainframe->m_plater->get_project_name() == _L("Untitled") && !input_files.empty()) {
+                        mainframe->m_plater->set_project_filename(wxString::FromUTF8(input_files[0]));
+                    }
+                    mainframe->update_title();
+                }
+            } else if (command_str.compare("get_preset_params") == 0) {
+                json j;
+                j["sequence_id"] = "";
+                j["command"]     = "get_preset_params";
+
+                auto cache_file = fs::path(data_dir()).append("system").append("Creality").append("profile_version.json");
+                if (!fs::exists(cache_file)) {
+                    auto src = fs::path(resources_dir()).append("profiles").append("Creality").append("profile_version.json");
+                    fs::copy_file(src, cache_file);
+                }
+                json cache_json;
+                if (fs::exists(cache_file)) {
+                    boost::nowide::ifstream ifs(cache_file.string());
+                    ifs >> cache_json;
+                }
+                j["data"] = cache_json["Creality"];
+                std::stringstream ss;
+                ss << j << std::endl;
+                return ss.str();
+            } else if (command_str.compare("set_user_preset_status") == 0) {
+                bool sync_user_preset = true;
+                if (root.get_child_optional("data") != boost::none) {
+                    pt::ptree             data_node = root.get_child("data");
+                    boost::optional<bool> status    = data_node.get_optional<bool>("status");
+                    if (status.has_value()) {
+                        sync_user_preset = status.value();
+                    }
+                }
+
+                app_config->set_bool("sync_user_preset", sync_user_preset);
+                if (sync_user_preset)
+                    start_sync_user_preset();
+                else
+                    stop_sync_user_preset();
+                /* json j;
+                j["sequence_id"] = "";
+                j["command"]     = "set_user_preset_status";
+                app_config->set_bool("sync_user_preset", true);
+                start_sync_user_preset();
+                json data;
+                data["status"] = app_config->get("sync_user_preset") == "true";
+
+                j["data"] = data;
+
+                std::stringstream ss;
+                ss << j << std::endl;
+                return ss.str();*/
+            } else if (command_str.compare("get_user_preset_status") == 0) {
+                json j;
+                j["sequence_id"] = "";
+                j["command"]     = "get_user_preset_status";
+                json data;
+                data["status"] = app_config->get("sync_user_preset") == "true";
+
+                j["data"] = data;
+
+                std::stringstream ss;
+                ss << j << std::endl;
+                return ss.str();
+            } else if (command_str.compare("get_user_preset_params") == 0) {
+                SyncUserPresets::getInstance().syncUserPresetsToFrontPage();
+                return "";
+
+                if(!m_user_syncing)
+                    m_user_query_type = 1;
+                return "";
+            } else if (command_str.compare("send_http_request") == 0) {
+                pt::ptree info_node = root.get_child("info");
+
+                std::string base_url = info_node.get_child("urlEncoded").data();
+
+                pt::ptree                          header_node = info_node.get_child("headers");
+                std::map<std::string, std::string> headers;
+                for (auto& v : header_node) {
+                    headers.emplace(v.first, v.second.data());
+                }
+                Http::set_extra_headers(headers);
+
+                json json_res = json::parse(cmd);
+                json j        = json_res["info"]["data"];
+
+                auto on_complete_func = [&](std::string body, unsigned status) {
+                    json j               = json::parse(body);
+                    json_res["error"]    = "";
+                    json_res["response"] = j;
+                    auto response_js = wxString::Format("window.handleStudioCmd(JSON.parse(\"%s\"))",
+                        wxString::FromUTF8(escapeForJS(json_res.dump())));
+                        run_script(response_js);
+                };
+
+                auto on_error_func = [&](std::string body, std::string error, unsigned status) {
+                    json j               = json::parse(body);
+                    json_res["error"]    = error;
+                    json_res["response"] = body;
+                     auto response_js = wxString::Format("window.handleStudioCmd(JSON.parse(\"%s\"))",
+                        wxString::FromUTF8(escapeForJS(json_res.dump())));
+                        run_script(response_js);
+                };
+
+                std::string method = info_node.get_child("method").data();
+                if (method == "post") {
+                    Http http = Http::post(Http::url_decode(base_url));
+                    http.set_post_body(j.dump()).timeout_connect(5).timeout_max(15)
+                        .on_complete([&](std::string body, unsigned status) { on_complete_func(body, status); })
+                        .on_error([&](std::string body, std::string error, unsigned status) { on_error_func(body, error, status); })
+                        .on_progress([&](Http::Progress progress, bool& cancel) {
+
+                        })
+                        .perform_sync();
+                } else if (method == "get") {
+                    Http http = Http::get(Http::url_decode(base_url));
+                    http.on_complete([&](std::string body, unsigned status) { on_complete_func(body, status); })
+                        .on_error([&](std::string body, std::string error, unsigned status) { on_error_func(body, error, status); })
+                        .on_progress([&](Http::Progress progress, bool& cancel) {})
+                        .perform_sync();
+                }
+
+                return "";
+            } else if (command_str.compare("update_preset_params") == 0) {
+                pt::ptree data_node = root.get_child("data");
+                auto filament_file = fs::path(data_dir()).append("system").append("Creality").append("materialList.json");
+                
+                if (!fs::exists(filament_file)) {
+                    std::string base_url              = get_cloud_api_url();
+                    auto        material_profile_url = "/api/cxy/v2/slice/profile/official/materialList";
+                    Http http2 = Http::post(base_url + material_profile_url);
+                    json        j2;
+                    j2["engineVersion"]  = "3.0.0";
+                    j2["pageSize"] = 1000;
+                    boost::uuids::uuid uuid = boost::uuids::random_generator()();
+                    http2.header("Content-Type", "application/json").header("__CXY_REQUESTID_", to_string(uuid)).set_post_body(j2.dump()).on_complete([=](std::string body, unsigned status) {
+                                    if(status!=200){
+                                        return false;
+                                    }
+                                     json j = json::parse(body);
+                                        json printer_list = j["result"]["list"];
+                                        if(printer_list.empty()){
+                                            return false;
+                                        }
+                                        json list;
+                                        list["materials"] = printer_list;
+                                        boost::nowide::ofstream c;
+                                        c.open(filament_file.string(), std::ios::out | std::ios::trunc);
+                                        c << std::setw(4) << list << std::endl;
+                                        c.close();
+                                        return true;
+                                }).perform_sync();
+                }
+                if(true){
+                        std::string base_url              = get_cloud_api_url();
+                        auto        preupload_profile_url = "/api/cxy/v2/slice/profile/official/printerList";
+                        Http::set_extra_headers(get_extra_header());
+                        Http http = Http::post(base_url + preupload_profile_url);
+                        json        j;
+                        j["engineVersion"]  = "3.0.0";
+                        boost::uuids::uuid uuid = boost::uuids::random_generator()();
+                            http.header("Content-Type", "application/json")
+                                .header("__CXY_REQUESTID_", to_string(uuid))
+                                .set_post_body(j.dump())
+                                .timeout_connect(TIMEOUT_CONNECT)
+                                .timeout_max(TIMEOUT_RESPONSE)
+                                .on_complete([&](std::string body, unsigned status) {
+                                    if(status!=200){
+                                        return;
+                                    }
+                                    try{
+                                        json j = json::parse(body);
+                                        json printer_list = j["result"];
+                                        auto out_printer_list_file = fs::path(data_dir()).append("system")
+                                                                         .append("Creality")
+                                                                         .append("machineList.json")
+                                                                         .string();
+                                        boost::nowide::ofstream c;
+                                        c.open(out_printer_list_file, std::ios::out | std::ios::trunc);
+                                        c << std::setw(4) << printer_list << std::endl;
+                                        c.close();
+                                    }catch(...){
+                                        return;
+                                    }
+                                }).perform_sync();
+                        
+                    }
+                json profile_json;
+                auto profile_file = fs::path(data_dir()).append("system").append("Creality.json");
+                if (fs::exists(profile_file)) {
+                    boost::nowide::ifstream ifs(profile_file.string());
+                    ifs >> profile_json;
+                    ifs.close();
+                }
+                auto cache_file = fs::path(data_dir()).append("system").append("Creality").append("profile_version.json");
+                json cache_json;
+                if (fs::exists(cache_file)) {
+                    boost::nowide::ifstream ifs(cache_file.string());
+                    ifs >> cache_json;
+                    ifs.close();
+                }
+                json materials_json;
+                
+                if (fs::exists(filament_file)) {
+                        boost::nowide::ifstream ifs(filament_file.string());
+                        ifs >> materials_json;
+                        ifs.close();
+                    }else{
+                        return "";
+                    }
+                const fs::path machine_list_file = fs::path(data_dir()).append("system")
+                                                                    .append("Creality")
+                                                                    .append("machineList.json");
+                const pt::ptree update_packages =
+                    include_multi_extruder_update_candidates(data_node, machine_list_file);
+                //下载机器参数包               
+                try{
+                    CurlConnectionPool pool(3);
+                    for(const auto &v:update_packages)
+                    {
+                        std::string zipUrl      = v.second.get_child("zipUrl").data();
+                        int         start_pos = zipUrl.find_last_of("/");
+                        boost::filesystem::path tmp_path = boost::filesystem::path(boost::filesystem::temp_directory_path()).append(zipUrl.substr(start_pos + 1));
+                        pool.addDownload(zipUrl, tmp_path.string());
+                    }
+                    
+                    pool.performDownloads();
+                } catch (const std::exception& e) {
+                    std::cerr << "Error: " << e.what() << std::endl;
+                    return "";
+                }
+                std::vector<boost::thread> threads;
+                const std::vector<pt::ptree> selected_packages = select_update_param_packages(update_packages);
+                std::set<std::string> updated_multi_extruder_models;
+                for(const pt::ptree& package : selected_packages)
+                {
+                    if (UpdateParamPackage(package,boost::ref(profile_json),boost::ref(cache_json),boost::ref(materials_json)) &&
+                        update_package_uses_bare_multi_extruder_name(package))
+                        updated_multi_extruder_models.insert(update_package_printer_model(package));
+                    //threads.emplace_back(UpdateParamPackage, v.second,boost::ref(profile_json),boost::ref(cache_json),boost::ref(materials_json));
+                }
+                update_multi_extruder_package_alias_versions(cache_json, update_packages,
+                                                              updated_multi_extruder_models);
+
+                // UpdateParamPackage removes selected archives. Remove the unselected
+                // aliases as well after inspecting their variant metadata.
+                for (const auto& item : update_packages) {
+                    const fs::path package_path = downloaded_update_package_path(item.second);
+                    if (!package_path.empty() && fs::exists(package_path))
+                        fs::remove(package_path);
+                }
+                
+                
+
+                // 等待所有线程完成
+                //for (auto& thread : threads) {
+                //    thread.join();
+                //}
+                boost::nowide::ofstream c;
+                c.open(profile_file.string(), std::ios::out | std::ios::trunc);
+                c << std::setw(4) << profile_json << std::endl;
+                c.close();
+                c.open(cache_file.string(), std::ios::out | std::ios::trunc);
+                c << std::setw(4) << cache_json << std::endl;
+                c.close();
+                CallAfter([this] { 
+                if(!wxGetApp().preset_bundle->printers.get_edited_preset().is_dirty&&!wxGetApp().preset_bundle->filaments.get_edited_preset().is_dirty&&!wxGetApp().preset_bundle->prints.get_edited_preset().is_dirty)
+                {
+                    auto* app_config = GUI::wxGetApp().app_config;
+                    GUI::wxGetApp().preset_bundle->load_presets(*app_config,
+                                                                    ForwardCompatibilitySubstitutionRule::EnableSilentDisableSystem);
+                    GUI::wxGetApp().load_current_presets();
+                    GUI::wxGetApp().plater()->set_bed_shape();
+                }
+                if (auto* plater = wxGetApp().plater()) {
+                    if (auto* canvas = plater->get_current_canvas3D())
+                        canvas->set_as_dirty();
+                    plater->Refresh();
+                }
+                UpdateParams::getInstance().hasUpdateParams();
+                });
+            } else if (command_str.compare("refresh_all_device") == 0) {
+                CallAfter([this] { 
+                if (wxGetApp().mainframe->get_printer_mgr_view()) {
+                    wxGetApp().mainframe->get_printer_mgr_view()->request_refresh_all_device();
+                }
+                });
+            } else if (command_str.compare("update_devices_list") == 0) {
+                boost::thread _thread = Slic3r::create_thread([this] {
+                    std::vector<std::string> prefix;
+                    prefix.push_back("CXSWBox");
+                    prefix.push_back("creality");
+                    prefix.push_back("Creality");
+                    std::vector<std::string> vtIp, vtBoxIp;
+                    auto                     vtDevice = cxnet::syncDiscoveryService(prefix);
+                    for (auto& item : vtDevice) {
+                        std::string answer = item.answer;
+                        if (answer.substr(0, 8) == "_CXSWBox") {
+                            vtBoxIp.push_back(item.machineIp);
+                        } else {
+                            vtIp.push_back(item.machineIp);
+                        }
+                    }
+
+                    nlohmann::json dataJson;
+                    dataJson["servers"] = vtIp;
+                    dataJson["boxs"]    = vtBoxIp;
+
+                    nlohmann::json commandJson;
+                    commandJson["command"] = "update_devices_list";
+                    commandJson["data"]    = dataJson;
+
+                    wxString strJS = wxString::Format("window.handleStudioCmd('%s');", commandJson.dump());
+                    wxGetApp().CallAfter([this, strJS] { run_script(strJS.ToStdString()); });
+                });
+            } else if (command_str.compare("get_is_first_install") == 0) {
+                std::string    res = app_config->get("is_first_install");
+                nlohmann::json dataJson;
+                nlohmann::json commandJson;
+                bool           onlyDefault = preset_bundle->printers.only_default_printers();
+                if (res == "1") {
+                    dataJson["deviceAddEnd"] = "1";
+                    commandJson["command"]   = "get_is_first_install";
+                    commandJson["data"]      = dataJson;
+                } else {
+                    if (onlyDefault) {
+                        dataJson["deviceAddEnd"] = "0";
+                        commandJson["command"]   = "get_is_first_install";
+                        dataJson["guideType"]    = "begin";
+#if GUI_SIMPLE
+                        dataJson["guideType"] = "new";
+#endif
+                        commandJson["data"]      = dataJson;
+
+
+                        if (!m_appconfig_new)
+                            m_appconfig_new = new AppConfig();
+                        #ifdef WIN32
+                           wxGetApp().mainframe->topbar()->DisableGuideModeItems();
+                        #endif
+                        #ifdef __APPLE__
+                           wxGetApp().mainframe->topbar()->DisableGuideModeItemsMac();
+                           Slic3r::macos_set_menu_bar_hidden(true);
+                        #endif
+                           wxGetApp().mainframe->select_tab(size_t(0));
+                           wxGetApp().mainframe->m_topbar->SetSelection(size_t(MainFrame::tpHome));
+                        #ifdef WIN32
+                            ShowWindow(wxGetApp().mainframe->GetHWND(), SW_SHOWMAXIMIZED);
+                        #else
+                            wxDisplay Screen;
+                            wxRect ClientRect = Screen.GetClientArea();
+                            wxGetApp().mainframe->SetSize(ClientRect);
+                        #endif
+                           
+                       } else
+                       {
+                           dataJson["deviceAddEnd"] = "1";
+                           commandJson["command"]   = "get_is_first_install";
+                           commandJson["data"]      = dataJson;
+
+                           //m_UITour->deleteStep(0);
+                          
+                           #ifdef WIN32
+                           mainframe->topbar()->EnableGuideModeItems();
+                           #endif
+                           #ifdef __APPLE__
+                           mainframe->topbar()->EnableGuideModeItemsMac();
+                           Slic3r::macos_set_menu_bar_hidden(false);
+                           #endif
+                           //mainframe->select_tab(size_t(1));
+                           //mainframe->m_topbar->SetSelection(size_t(MainFrame::tpPreview));
+                       }
+                   }
+                   wxString strJS = wxString::Format("window.handleStudioCmd('%s');", commandJson.dump());
+                   wxGetApp().CallAfter([this, strJS] { run_script(strJS.ToStdString()); });
+            } else if (command_str.compare("set_deviceAdd_end") == 0) {
+                json printersData = json::parse(cmd);
+                std::string request_sequence = printersData.value("sequence_id", std::string());
+                bool        background_prepared = printersData.value("_background_prepared", false);
+
+                auto send_result = [this, request_sequence](int result, bool finish_task = true) {
+                    if (finish_task)
+                        m_device_add_in_progress = false;
+
+                    nlohmann::json commandJson;
+                    commandJson["command"]         = "set_deviceAdd_end";
+                    commandJson["sequence_id"]     = request_sequence;
+                    commandJson["data"]["result"] = result;
+                    wxString strJS = wxString::Format("handleStudioCmd(%s)", commandJson.dump(-1, ' ', true));
+                    wxGetApp().CallAfter([this, strJS, result] {
+                        run_script(strJS.ToStdString());
+                        if (result)
+                            reload_homepage();
+                    });
+                };
+
+                if (!background_prepared) {
+                    if (m_device_add_in_progress.exchange(true)) {
+                        send_result(0, false);
+                        return "";
+                    }
+
+                    if (!m_appconfig_new)
+                        m_appconfig_new = new AppConfig();
+
+                    const auto enabled_vendors = app_config->vendors();
+                    const auto enabled_filaments = app_config->has_section(AppConfig::SECTION_FILAMENTS) ?
+                                                       app_config->get_section(AppConfig::SECTION_FILAMENTS) :
+                                                       std::map<std::string, std::string>();
+                    json selected_printers = printersData["selected_printers"];
+
+                    boost::thread prepare_thread = Slic3r::create_thread(
+                        [this, selected_printers = std::move(selected_printers), enabled_vendors, enabled_filaments,
+                         request_sequence, send_result]() mutable {
+                            try {
+                                ProfileFamilyLoader* loader = ProfileFamilyLoader::get_instance();
+                                loader->wait_until_loaded();
+                                json profile_json;
+                                json machine_json;
+                                bool load_custom_from_bundle = false;
+                                loader->get_result(profile_json, machine_json, load_custom_from_bundle);
+
+                                DeviceAddPreparation prepared = prepare_device_add(std::move(selected_printers), std::move(profile_json),
+                                                                                  enabled_vendors, enabled_filaments);
+                                if (!prepared.valid) {
+                                    send_result(0);
+                                    return;
+                                }
+
+                                json deferred_command;
+                                deferred_command["command"]               = "set_deviceAdd_end";
+                                deferred_command["sequence_id"]           = request_sequence;
+                                deferred_command["selected_printers"]     = std::move(prepared.selected_printers);
+                                deferred_command["_prepared_profile"]     = std::move(prepared.profile_json);
+                                deferred_command["_background_prepared"]  = true;
+                                const std::string deferred_payload = deferred_command.dump();
+                                wxGetApp().CallAfter([this, deferred_payload] { handle_web_request(deferred_payload); });
+                            } catch (const std::exception& e) {
+                                BOOST_LOG_TRIVIAL(error) << "Failed to prepare printer configuration: " << e.what();
+                                send_result(0);
+                            } catch (...) {
+                                BOOST_LOG_TRIVIAL(error) << "Failed to prepare printer configuration";
+                                send_result(0);
+                            }
+                        });
+                    prepare_thread.detach();
+                    return "";
+                }
+
+                if (!m_device_add_in_progress) {
+                    send_result(0, false);
+                    return "";
+                }
+
+                try {
+                json selectedPrintersJson = printersData["selected_printers"];
+
+                if (!background_prepared) {
+                for (auto it = selectedPrintersJson.begin(); it != selectedPrintersJson.end(); ++it) {
+                    json &OneSelect = it.value();
+                    if(OneSelect.contains("vendor"))
+                    {
+                        auto vendor = OneSelect["vendor"];
+                        //通过内部型号添加机器
+                        if(vendor == "")
+                        {
+                            OneSelect["vendor"] = "Creality";
+                            //获取机器内部型号
+                            auto model = OneSelect["model"].get<std::string>();
+                            //K1 and K1 Max内部型号需要转换
+                            if(model=="K1 Max")
+                            {
+                                model = "CR-K1 Max";
+                            }
+                            if(model=="K1")
+                            {
+                                model = "CR-K1";
+                            }
+                            fs::path printer_list_file = fs::path(resources_dir()).append("profiles").append("Creality").append("machineList.json").string();
+                            json printer_json;
+                            if (fs::exists(printer_list_file)) {
+                                boost::nowide::ifstream ifs(printer_list_file.string());
+                                ifs >> printer_json;
+                            }
+                            if(printer_json.contains("printerList"))
+                            {
+                                json pmodels = printer_json["printerList"];
+                                for (const auto& printer : pmodels) {
+                                auto printerIntName = printer["printerIntName"].get<std::string>();
+                                    if(printerIntName == model)
+                                    {
+                                        std::string nozzle_diameter = printer["nozzleDiameter"][0].get<std::string>();
+                                        std::string name = printer["name"].get<std::string>();
+                                        if(name.find("Creality")==std::string::npos&&name.find("SPARKX")==std::string::npos)
+                                        {
+                                            name = "Creality " + name;
+                                        }
+                                        OneSelect["model"] = name;
+                                        if(nozzle_diameter=="0.4")
+                                        {
+                                            OneSelect["nozzle_diameter"] = nozzle_diameter;
+                                        }else{
+                                            if(OneSelect["nozzle_diameter"].size()==0)
+                                            {
+                                                OneSelect["nozzle_diameter"] = nozzle_diameter;
+                                            }
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                }
+                
+                //std::string dump = selectedPrintersJson.dump();
+                //std::cout << "dump: " << dump;
+                
+                struct NozzleSelected
+                {
+                    int                      index;
+                    bool                     modify;
+                    std::string              model;
+                    int                      selected_size;
+                    std::vector<std::string> diameters;
+                    std::vector<int>         selected;
+                };
+                auto Loc_GetMaterials = [](const std::string& materials) {
+                    std::vector<std::string> results;
+                    int                      idx = 0;
+                    while (idx != std::string::npos && idx < materials.size()) {
+                        int index = materials.find(';', idx);
+                        if (idx < index) {
+                            std::string nozzle = materials.substr(idx, index - idx);
+                            results.emplace_back(nozzle);
+                            idx = index + 1;
+                        } else if (index == std::string::npos) {
+                            std::string nozzle = materials.substr(idx);
+                            results.emplace_back(nozzle);
+                            idx = index;
+                        } else {
+                            idx = std::string::npos;
+                        }
+                    }
+                    return results;
+                };
+                json m_ProfileJson = std::move(printersData["_prepared_profile"]);
+
+                if (!background_prepared) {
+                std::vector<NozzleSelected>        nozzle_selected;
+                std::set<std::string>              selected_filaments;
+                std::set<std::string>              un_selected_filaments;
+                json                               MSelected = selectedPrintersJson;
+                std::map<std::string, std::string> OldMSelectedMap;
+                int                                nModel = m_ProfileJson["model"].size();
+                for (int m = 0; m < nModel; m++) {
+                    json TmpModel = m_ProfileJson["model"][m];
+                    if (!TmpModel["nozzle_selected"].get<std::string>().empty())
+                        OldMSelectedMap.emplace(TmpModel["model"].get<std::string>(), TmpModel["nozzle_selected"].get<std::string>());
+                    m_ProfileJson["model"][m]["nozzle_selected"] = "";
+
+                    for (auto it = MSelected.begin(); it != MSelected.end(); ++it) {
+                        json OneSelect = it.value();
+
+                        std::string s1 = TmpModel["model"].get<std::string>();
+                        std::string s2 = OneSelect["model"].get<std::string>();
+                        if (s1.compare(s2) == 0) {
+                            m_ProfileJson["model"][m]["nozzle_selected"] = OneSelect["nozzle_diameter"];
+                            NozzleSelected nozzle;
+                            nozzle.model          = TmpModel["model"].get<std::string>();
+                            nozzle.index          = m;
+                            auto select_diameters = Loc_GetMaterials(OneSelect["nozzle_diameter"]);
+                            nozzle.selected_size  = Loc_GetMaterials(OneSelect["nozzle_diameter"]).size();
+                            nozzle.diameters      = Loc_GetMaterials(TmpModel["nozzle_diameter"]);
+                            nozzle.selected.resize(nozzle.diameters.size());
+                            for (int i = 0; i < nozzle.diameters.size(); ++i) {
+                                auto it = std::find(select_diameters.begin(), select_diameters.end(), nozzle.diameters[i]);
+                                if (it != select_diameters.end())
+                                    nozzle.selected[i] = 1;
+                                else
+                                    nozzle.selected[i] = 0;
+                            }
+                            nozzle_selected.emplace_back(nozzle);
+                            break;
+                        }
+                    }
+                }
+                if(nozzle_selected.size()==0)
+                {
+                    send_result(0);
+                    return "";
+                }
+                for (int i = 0; i < nozzle_selected.size(); ++i) {
+                    const NozzleSelected& nozzle = nozzle_selected[i];
+
+                    if (m_ProfileJson["model"][nozzle.index]["materials"].is_string()) {
+                        std::vector<std::string> materials = Loc_GetMaterials(m_ProfileJson["model"][nozzle.index]["materials"]);
+                        if (nozzle.selected_size > 0) {
+                            for (auto& material : materials) {
+                                bool bFindDefault = false;
+                                if (m_ProfileJson["filament"].contains(material)) {
+                                    // 判断耗材是否支持当前的喷嘴
+                                    for (int i = 0; i < nozzle.diameters.size(); ++i) {
+                                        if (nozzle.selected[i] > 0) {
+                                            std::string new_models = nozzle.model + "++" + nozzle.diameters[i];
+                                            if (m_ProfileJson["filament"][material]["models"].get<std::string>().find(new_models) !=
+                                                std::string::npos) {
+                                                bFindDefault = true;
+                                                selected_filaments.emplace(material);
+                                            }
+                                        }
+                                    }
+                                }
+                                if (!bFindDefault) {
+                                    size_t pos = material.find("@");
+                                    if (pos == std::string::npos) {
+                                        for (int i = 0; i < nozzle.diameters.size(); ++i) {
+                                            if (nozzle.selected[i] > 0) {
+                                                std::string new_material = material + " @" + nozzle.model;
+                                                if (m_ProfileJson["filament"].contains(new_material)) {
+                                                    selected_filaments.emplace(new_material);
+                                                } else {
+                                                    new_material += " " + nozzle.diameters[i] + " nozzle";
+                                                    if (m_ProfileJson["filament"].contains(new_material))
+                                                        selected_filaments.emplace(new_material);
+                                                }
+                                            }
+                                        }
+                                    }
+                                };
+                            }
+                        } else {
+                            for (auto& material : materials) {
+                                if (m_ProfileJson["filament"].contains(material))
+                                    un_selected_filaments.emplace(material);
+                                else {
+                                    size_t pos = material.find("@");
+                                    if (pos == std::string::npos) {
+                                        for (int i = 0; i < nozzle.diameters.size(); ++i) {
+                                            if (nozzle.selected[i] > 0) {
+                                                std::string new_material = material + " @" + nozzle.model;
+                                                if (m_ProfileJson["filament"].contains(new_material)) {
+                                                    un_selected_filaments.emplace(new_material);
+                                                } else {
+                                                    new_material += " " + nozzle.diameters[i] + " nozzle";
+                                                    if (m_ProfileJson["filament"].contains(new_material))
+                                                        un_selected_filaments.emplace(new_material);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                std::vector<std::string> diff_material;
+                std::set_difference(un_selected_filaments.begin(), un_selected_filaments.end(), selected_filaments.begin(),
+                                    selected_filaments.end(), std::inserter(diff_material, diff_material.begin()));
+
+                // set default material
+                for (auto& material : selected_filaments) {
+                    if (m_ProfileJson["filament"].contains(material)) {
+                        m_ProfileJson["filament"][material]["selected"] = 1;
+                    }
+                }
+                // remove un-used material
+                for (auto& material : diff_material) {
+                    if (m_ProfileJson["filament"].contains(material)) {
+                        m_ProfileJson["filament"][material]["selected"] = 0;
+                    }
+                }
+                }
+
+                // 处理打印机用户预设
+                wxGetApp().app_config->set_userPresets("", true);
+                PresetCollection* presetColl = &wxGetApp().preset_bundle->printers;
+                if (presetColl) {
+                    for (int i = 0; i < presetColl->get_presets().size(); i++) {
+                        Preset& preset = presetColl->preset(i, true); // true 返回  false 当前的copy
+                        if ((preset.is_visible) && (preset.is_user())) {
+                            preset.m_is_user_printer_hidden = true;
+                            string strModelName             = preset.name;
+
+                            json useSelected = selectedPrintersJson.value("user_data", json::array());
+                            for (auto it = useSelected.begin(); it != useSelected.end(); ++it) {
+                                json        useInfo    = it.value();
+                                std::string sFrontName = useInfo["name"].get<std::string>();
+                                if (strModelName == sFrontName && (!strModelName.empty() && !sFrontName.empty())) {
+                                    preset.m_is_user_printer_hidden = false;
+                                    wxGetApp().app_config->set_userPresets(strModelName);
+                                }
+                            }
+                        }
+                    }
+
+                    const Preset& presetSelect = presetColl->get_selected_preset();
+                    if (false == presetSelect.m_is_user_printer_hidden) {
+                        size_t idxCurrent = presetColl->get_selected_idx();
+                        size_t idx_new    = idxCurrent + 1;
+                        if (idx_new < presetColl->size()) {
+                            // for (; idx_new < presetColl->size() && !presetColl->preset(idx_new,true).is_visible; ++idx_new);
+                            while (idx_new < presetColl->size() && (!presetColl->preset(idx_new, true).is_visible ||
+                                                                    !presetColl->preset(idx_new, true).m_is_user_printer_hidden)) {
+                                ++idx_new;
+                            }
+                        }
+                        if (idx_new == presetColl->size()) {
+                            // for (idx_new = idxCurrent - 1; idx_new > 0 && !presetColl->preset(idx_new,true).is_visible; --idx_new);
+                            idx_new = idxCurrent - 1;
+                            while (idx_new > 0 && (!presetColl->preset(idx_new, true).is_visible ||
+                                                   !presetColl->preset(idx_new, true).m_is_user_printer_hidden)) {
+                                --idx_new;
+                            }
+                        }
+                        // presetColl->select_preset(idx_new);
+
+                        Preset& selPreset = presetColl->preset(idx_new);
+                        string  strName   = selPreset.name;
+                        wxGetApp().get_tab(Preset::TYPE_PRINTER)->select_preset(strName);
+                    }
+                }
+
+                SaveProfile(m_ProfileJson);
+                bool apply_keeped_changes = false;
+                if (!apply_config(app_config, m_appconfig_new, preset_bundle, preset_updater, apply_keeped_changes)) {
+                    send_result(0);
+                    return "";
+                }
+
+                if (apply_keeped_changes)
+                    apply_keeped_preset_modifications();
+
+                app_config->set_legacy_datadir(false);
+                update_mode();
+
+                load_current_presets();
+                delete m_appconfig_new;
+                m_appconfig_new = nullptr;
+
+                app_config->set("is_first_install", "1");
+                mainframe->select_tab(size_t(MainFrame::tp3DEditor));
+                mainframe->m_topbar->SetSelection(size_t(MainFrame::tp3DEditor));
+                CallAfter([this] {
+                    std::shared_ptr<wxTimer> tour_timer = std::make_shared<wxTimer>();
+                    tour_timer->Bind(wxEVT_TIMER, [this,tour_timer](wxTimerEvent&) {
+                        tour_timer->Stop();
+#ifdef __APPLE__
+                wxPlatformInfo platformInfo;
+                int major = platformInfo.GetOSMajorVersion();
+                if(major>=15)
+                {
+                    startTour();
+                }else{
+                    startTour_Apple();
+                }
+                mainframe->topbar()->EnableGuideModeItemsMac();
+                Slic3r::macos_set_menu_bar_hidden(false);
+#elif defined(__linux__) || defined(__LINUX__)
+                startTour_Apple();
+#else
+                startTour();
+                mainframe->topbar()->EnableGuideModeItems();
+#endif // 
+
+                        
+                    });
+                    tour_timer->StartOnce(1000);
+                });
+                send_result(1);
+                } catch (const std::exception& e) {
+                    BOOST_LOG_TRIVIAL(error) << "Failed to commit printer configuration: " << e.what();
+                    send_result(0);
+                } catch (...) {
+                    BOOST_LOG_TRIVIAL(error) << "Failed to commit printer configuration";
+                    send_result(0);
+                }
+
+            } else if (command_str.compare("finish_bind_device_guide") == 0) {
+                auto send_result = [this](int result) {
+                    nlohmann::json commandJson;
+                    commandJson["command"] = "finish_bind_device_guide";
+                    commandJson["data"]["result"] = result;
+
+                    wxString strJS = wxString::Format("handleStudioCmd(%s)", commandJson.dump(-1, ' ', true));
+                    wxGetApp().CallAfter([this, strJS, result] {
+                        run_script(strJS.ToStdString());
+                        if (result) {
+                            this->reload_homepage();
+                        }
+                    });
+                };
+
+                app_config->set("is_first_install", "1");
+                mainframe->select_tab(size_t(MainFrame::tp3DEditor));
+                mainframe->m_topbar->SetSelection(size_t(MainFrame::tp3DEditor));
+                send_result(1);
+                CallAfter([this] {
+                    std::shared_ptr<wxTimer> tour_timer = std::make_shared<wxTimer>();
+                    tour_timer->Bind(wxEVT_TIMER, [this, tour_timer](wxTimerEvent&) {
+                        tour_timer->Stop();
+#ifdef __APPLE__
+                        wxPlatformInfo platformInfo;
+                        int major = platformInfo.GetOSMajorVersion();
+                        if (major >= 15) {
+                            startTour();
+                        } else {
+                            startTour_Apple();
+                        }
+                        mainframe->topbar()->EnableGuideModeItemsMac();
+                        Slic3r::macos_set_menu_bar_hidden(false);
+#elif defined(__linux__) || defined(__LINUX__)
+                        startTour_Apple();
+#else
+                        startTour();
+                        mainframe->topbar()->EnableGuideModeItems();
+#endif
+                    });
+                    tour_timer->StartOnce(1000);
+                });
+            } else if (command_str.compare("get_devices_info") == 0) {
+                json res;
+                webGetDevicesInfo(res);
+
+                nlohmann::json commandJson;
+                commandJson["command"] = "get_devices_info_result";
+                commandJson["data"]    = res;
+
+                wxString strJS = wxString::Format("handleStudioCmd(%s)", commandJson.dump(-1, ' ', true));
+                wxGetApp().CallAfter([this, strJS] { run_script(strJS.ToStdString()); });
+            } else if (command_str.compare("get_machine_list") == 0) {
+                load_machine_preset_data();
+            } else if (command_str.compare("set_user_login_area") == 0) {
+                json        regionData = json::parse(strInput);
+                std::string region = regionData["region"];
+                AppConfig* config = GUI::wxGetApp().app_config;
+                const std::string previous_region = config->get("region");
+                config->set("region", region);
+                wxGetApp().update_publish_status();
+                // The printer catalogue differs per region, so the cached machine list has
+                // to be refetched; otherwise the add-printer tree keeps the old region's
+                // series until the next restart.
+                if (previous_region != region)
+                    wxGetApp().refresh_machine_list_for_region();
+            }
+            else if (command_str.compare("get_system_id") == 0) {
+                nlohmann::json systemInfo;
+                systemInfo["command"] = "get_system_id";
+                systemInfo["data"] = SystemId::get_system_id();
+                wxString strJS        = wxString::Format("handleStudioCmd(%s)", systemInfo.dump(-1, ' ', true));
+                wxGetApp().CallAfter([this, strJS] { run_script(strJS.ToStdString()); });
+            }
+        }
+    }
+    catch (...) {
+        BOOST_LOG_TRIVIAL(trace) << "parse json cmd failed " << cmd;
+        return "";
+    }
+    return "";
+}
+
+void GUI_App::handle_script_message(std::string msg)
+{
+    try {
+        json j = json::parse(msg);
+        if (j.contains("command")) {
+            wxString cmd = j["command"];
+            if (cmd == "user_login") {
+                if (m_agent) {
+                    m_agent->change_user(j.dump());
+                    if (m_agent->is_user_login()) {
+                        request_user_login(1);
+                    }
+                }
+            }
+        }
+    }
+    catch (...) {
+        ;
+    }
+}
+
+void GUI_App::request_model_download(wxString url)
+{
+    if (plater_) {
+        plater_->request_model_download(url);
+    }
+}
+
+//BBS download project by project id
+void GUI_App::download_project(std::string project_id)
+{
+    if (plater_) {
+        plater_->request_download_project(project_id);
+    }
+}
+
+void GUI_App::request_project_download(std::string project_id)
+{
+    if (!check_login()) return;
+
+    download_project(project_id);
+}
+
+void GUI_App::request_open_project(std::string project_id)
+{
+     wxGetApp().clear_cloud_model_download();
+    if (plater()->is_background_process_slicing()) {
+        Slic3r::GUI::show_info(nullptr, _L("new or open project file is not allowed during the slicing process!"), _L("Open Project"));
+        return;
+    }
+
+    if (project_id == "<new>")
+        plater()->new_project();
+    else if (project_id.empty())
+        plater()->load_project();
+    else if (std::find_if_not(project_id.begin(), project_id.end(),
+        [](char c) { return std::isdigit(c); }) == project_id.end())
+        ;
+    else if (boost::algorithm::starts_with(project_id, "http"))
+        ;
+    else
+        CallAfter([this, project_id] { 
+        mainframe->open_recent_project(-1, wxString::FromUTF8(project_id)); 
+            });
+}
+
+void GUI_App::request_remove_project(std::string project_id)
+{
+    mainframe->remove_recent_project(-1, wxString::FromUTF8(project_id));
+}
+
+void GUI_App::handle_http_error(unsigned int status, std::string body)
+{
+    // tips body size must less than 1024
+    auto evt = new wxCommandEvent(EVT_HTTP_ERROR);
+    evt->SetInt(status);
+    evt->SetString(wxString(body));
+    wxQueueEvent(this, evt);
+}
+
+void GUI_App::on_http_error(wxCommandEvent &evt)
+{
+    int status = evt.GetInt();
+
+    int code = 0;
+    std::string error;
+    wxString result;
+    if (status >= 400 && status < 500) {
+        try {
+        json j = json::parse(evt.GetString());
+        if (j.contains("code")) {
+            if (!j["code"].is_null())
+                code = j["code"].get<int>();
+        }
+        if (j.contains("error"))
+            if (!j["error"].is_null())
+                error = j["error"].get<std::string>();
+        }
+        catch (...) {}
+    }
+
+    // Version limit
+    if (code == HttpErrorVersionLimited) {
+        MessageDialog msg_dlg(nullptr, _L("The version of Creality Print is too low and needs to be updated to the latest version before it can be used normally"), "", wxAPPLY | wxOK);
+        if (msg_dlg.ShowModal() == wxOK) {
+        }
+
+    }
+
+    // request login
+    if (status == 401) {
+        if (m_agent) {
+            if (m_agent->is_user_login()) {
+                this->request_user_logout();
+
+                if (!m_show_http_errpr_msgdlg) {
+                    MessageDialog msg_dlg(nullptr, _L("Login information expired. Please login again."), "", wxAPPLY | wxOK);
+                    m_show_http_errpr_msgdlg = true;
+                    auto modal_result = msg_dlg.ShowModal();
+                    if (modal_result == wxOK || modal_result == wxCLOSE) {
+                        m_show_http_errpr_msgdlg = false;
+                        return;
+                    }
+                }
+            }
+        }
+        return;
+    }
+}
+
+void GUI_App::enable_user_preset_folder(bool enable)
+{
+    if (enable) {
+        std::string user_id = m_user.userId;
+        app_config->set("preset_folder", user_id);
+        GUI::wxGetApp().preset_bundle->update_user_presets_directory(user_id);
+    } else {
+        BOOST_LOG_TRIVIAL(info) << "preset_folder: set to empty";
+        app_config->set("preset_folder", "");
+        GUI::wxGetApp().preset_bundle->update_user_presets_directory(DEFAULT_USER_FOLDER_NAME);
+    }
+}
+
+void GUI_App::on_set_selected_machine(wxCommandEvent &evt)
+{
+    DeviceManager* dev = Slic3r::GUI::wxGetApp().getDeviceManager();
+    if (dev) {
+        dev->set_selected_machine(m_agent->get_user_selected_machine());
+    }
+}
+
+void GUI_App::on_update_machine_list(wxCommandEvent &evt)
+{
+    /* DeviceManager* dev = Slic3r::GUI::wxGetApp().getDeviceManager();
+     if (dev) {
+         dev->add_user_subscribe();
+     }*/
+}
+
+void GUI_App::on_user_login_handle(wxCommandEvent &evt)
+{
+    if (!m_agent) { return; }
+
+    int online_login = evt.GetInt();
+    m_agent->connect_server();
+
+    // get machine list
+    DeviceManager* dev = Slic3r::GUI::wxGetApp().getDeviceManager();
+    if (!dev) return;
+
+    boost::thread update_thread = boost::thread([this, dev] {
+        dev->update_user_machine_list_info();
+        auto evt = new wxCommandEvent(EVT_SET_SELECTED_MACHINE);
+        wxQueueEvent(this, evt);
+    });
+
+    if (online_login) {
+        remove_user_presets();
+        enable_user_preset_folder(true);
+        preset_bundle->load_user_presets(m_agent->get_user_id(), ForwardCompatibilitySubstitutionRule::Enable);
+        mainframe->update_side_preset_ui();
+
+        GUI::wxGetApp().mainframe->show_sync_dialog();
+    }
+}
+
+
+void GUI_App::check_track_enable()
+{
+    // Orca: alaways disable track event
+    if (m_agent) {
+        m_agent->track_enable(false);
+        m_agent->track_remove_files();
+    }
+}
+
+void GUI_App::on_user_login(wxCommandEvent &evt)
+{
+    if (!m_agent) { return; }
+    int online_login = evt.GetInt();
+    // check privacy before handle
+    check_privacy_version(online_login);
+    check_track_enable();
+}
+
+bool GUI_App::is_studio_active()
+{
+    auto curr_time = std::chrono::system_clock::now();
+    auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(curr_time - last_active_point);
+    if (diff.count() < STUDIO_INACTIVE_TIMEOUT) {
+        return true;
+    }
+    return false;
+}
+
+void GUI_App::reset_to_active()
+{
+    last_active_point = std::chrono::system_clock::now();
+}
+
+void GUI_App::process_msg_loop()
+{
+    if (wxEventLoopBase::GetActive())
+        wxEventLoopBase::GetActive()->YieldFor(wxEVT_CATEGORY_ALL);
+}
+
+void GUI_App::check_update(bool show_tips, int by_user)
+{
+#if defined(CREALITYPRINT_APP_STORE) && defined(__WXOSX__)
+    (void)show_tips;
+    (void)by_user;
+    return;
+#endif
+    if (version_info.version_str.empty()) return;
+    if (version_info.url.empty()) return;
+
+    auto curr_version = Semver::parse(SLIC3R_VERSION);
+    auto remote_version = Semver::parse(version_info.version_str);
+    if (curr_version && remote_version && (*remote_version > *curr_version)) {
+        if (version_info.force_upgrade) {
+            wxGetApp().app_config->set_bool("force_upgrade", version_info.force_upgrade);
+            wxGetApp().app_config->set("upgrade", "force_upgrade", true);
+            wxGetApp().app_config->set("upgrade", "description", version_info.description);
+            wxGetApp().app_config->set("upgrade", "version", version_info.version_str);
+            wxGetApp().app_config->set("upgrade", "url", version_info.url);
+            GUI::wxGetApp().enter_force_upgrade();
+        }
+        else {
+            GUI::wxGetApp().request_new_version(by_user);
+        }
+    } else {
+        wxGetApp().app_config->set("upgrade", "force_upgrade", false);
+        if (show_tips)
+            this->no_new_version();
+    }
+}
+
+void GUI_App::check_new_version_local(bool show_tips, int by_user)
+{
+#ifdef __WXMSW__
+    // 从配置文件读取updater_server_ip，如果没有配置则使用localhost:9000
+    std::string updater_server_ip = app_config->get("updater_server_ip");
+    std::string base_url = updater_server_ip.empty() ? std::string("http://localhost:9000") : 
+                          (updater_server_ip.find("http") == 0 ? updater_server_ip : "http://" + updater_server_ip);
+    if (base_url.empty())
+        return;
+    
+    // Convert version to 3-part format for Squirrel compatibility
+    std::string version_base = std::string(CREALITYPRINT_VERSION_MAJOR) + "." + 
+                               std::string(CREALITYPRINT_VERSION_MINOR) + "." + 
+                               std::string(CREALITYPRINT_VERSION_PATCH);
+    std::string version_extra = std::string(PROJECT_VERSION_EXTRA);
+    
+    // Convert version extra to lowercase for Squirrel compatibility
+    std::transform(version_extra.begin(), version_extra.end(), version_extra.begin(), 
+                   [](unsigned char c) { return (char)std::tolower(c); });
+    
+    std::string current_version = version_base;
+    if (!version_extra.empty()) {
+        current_version += "-" + version_extra;
+    }
+    
+    std::string platform = "windows";
+    std::string url = base_url;
+    if (!url.empty() && url.back() == '/')
+        url.pop_back();
+    url += "/api/update/check";
+
+    Http::set_extra_headers(get_extra_header());
+    Http http = Http::post(url);
+    nlohmann::json req_body;
+    req_body["currentVersion"] = current_version;
+    req_body["platform"] = platform;
+    http.header("accept", "application/json")
+        .header("Content-Type", "application/json")
+        .set_post_body(req_body.dump())
+        .timeout_connect(TIMEOUT_CONNECT)
+        .timeout_max(TIMEOUT_RESPONSE)
+        .on_error([this, show_tips](std::string body, std::string error, unsigned http_status) {
+            (void)body;
+            BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]check_new_version_local error http_status=" << http_status << " error=" << error;
+            if (show_tips) {
+                CallAfter([this]() {
+                    this->show_dialog(_L("Network connection timed out. Please check your network settings and try again."));
+                });
+            }
+        })
+        .on_complete([this, show_tips, by_user, base_url, current_version](std::string body, unsigned status) {
+            if (status != 200) {
+                BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]check_new_version_local unexpected status " << status;
+                if (show_tips) {
+                    CallAfter([this]() {
+                        this->show_dialog(_L("Failed to check for updates."));
+                    });
+                }
+                return;
+            }
+            try {
+                nlohmann::json j = nlohmann::json::parse(body);
+                bool has_update = j.value("hasUpdate", false);
+                if (!has_update) {
+                    if (show_tips) {
+                        CallAfter([this]() {
+                            this->no_new_version();
+                        });
+                    }
+                    return;
+                }
+
+                std::string base_package_name = j.value("basePackage", std::string());
+                std::string version = j.value("latestVersion", std::string());
+                std::string file_url = j.value("fileUrl", std::string());
+                if (version.empty())
+                    version = CREALITYPRINT_VERSION;
+
+                struct LocalPackageInfo {
+                    std::string name;
+                    std::string url;
+                    long long size;
+                    std::string sha1;
+                };
+                std::vector<LocalPackageInfo> delta_packages;
+                LocalPackageInfo              full_package;
+                bool                     has_full = false;
+
+                if (j.contains("fullFile") && j["fullFile"].is_object()) {
+                    auto& item = j["fullFile"];
+                    full_package.name = item.value("name", std::string());
+                    full_package.url  = item.value("url", std::string());
+                    full_package.size = item.value("size", static_cast<long long>(-1));
+                    full_package.sha1 = item.value("sha1", std::string());
+                    has_full = !full_package.name.empty() && !full_package.url.empty();
+                }
+
+                if (j.contains("deltaFiles") && j["deltaFiles"].is_array()) {
+                    for (auto& item : j["deltaFiles"]) {
+                        if (!item.is_object())
+                            continue;
+                        LocalPackageInfo p;
+                        p.name = item.value("name", std::string());
+                        p.url = item.value("url", std::string());
+                        p.size = item.value("size", static_cast<long long>(-1));
+                        p.sha1 = item.value("sha1", std::string());
+                        if (!p.url.empty() && !p.name.empty())
+                            delta_packages.push_back(std::move(p));
+                    }
+                }
+
+                std::vector<LocalPackageInfo> packages;
+                long long total_delta_size = 0;
+                for (const auto& p : delta_packages) {
+                    if (p.size > 0)
+                        total_delta_size += p.size;
+                }
+                bool use_delta = !delta_packages.empty();
+                if (has_full && total_delta_size > 0 && total_delta_size > full_package.size)
+                    use_delta = false;
+
+                if (use_delta) {
+                    for (const auto& p : delta_packages)
+                        packages.push_back(p);
+                } else if (has_full) {
+                    packages.push_back(full_package);
+                }
+
+                if (packages.empty()) {
+                    BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]no packages in update response";
+                    if (show_tips) {
+                        CallAfter([this]() {
+                            this->show_dialog(_L("No valid update packages found."));
+                        });
+                    }
+                    return;
+                }
+
+                // Convert to AppUpdater::PackageInfo
+                std::vector<PackageInfo> updater_packages;
+                for (const auto& p : packages) {
+                    PackageInfo info;
+                    info.name = p.name;
+                    info.url = p.url;
+                    info.size = p.size;
+                    info.sha1 = p.sha1;
+                    updater_packages.push_back(info);
+                }
+
+                // Save update packages to member variables
+                m_update_version = version;
+                m_update_base_package_name = base_package_name;
+                m_update_file_url = file_url;
+                m_update_packages.clear();
+                
+                for (const auto& p : packages) {
+                    PackageInfo info;
+                    info.name = p.name;
+                    info.url = p.url;
+                    info.size = p.size;
+                    info.sha1 = p.sha1;
+                    m_update_packages.push_back(info);
+                }
+
+                // Call process_update_packages to handle download and hot update
+                process_update_packages(updater_packages, version, base_package_name, file_url, show_tips, by_user);
+
+            } catch (const std::exception& e) {
+                BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]check_new_version_local exception: " << e.what();
+                if (show_tips) {
+                    CallAfter([this]() {
+                        this->show_dialog(_L("Failed to parse update information."));
+                    });
+                }
+            }
+        })
+        .perform();
+#else
+    (void)show_tips;
+    (void)by_user;
+#endif
+}
+
+// If the "Update Ready" dialog was shown before the "Restore unsaved project?"
+// prompt, call this after the update dialog is dismissed to release the deferred
+// restore so the user sees it next.
+void GUI_App::trigger_deferred_restore_project()
+{
+    if (m_restore_project_deferred) {
+        m_restore_project_deferred = false;
+        if (plater_)
+            plater_->trigger_restore_project(1);
+    }
+}
+
+void GUI_App::check_new_version(bool show_tips, int by_user)
+{
+#if defined(CREALITYPRINT_APP_STORE) && defined(__WXOSX__)
+    (void)show_tips;
+    (void)by_user;
+    return;
+#endif
+    std::string platform = "windows";
+
+#ifdef __WINDOWS__
+    platform = "windows";
+#endif
+#ifdef __APPLE__
+    platform = "macos";
+#endif
+#ifdef __LINUX__
+    platform = "linux";
+#endif
+    std::string query_params = (boost::format("?name=slicer&version=%1%&guide_version=%2%")
+        % VersionInfo::convert_full_version(SLIC3R_VERSION)
+        % VersionInfo::convert_full_version("0.0.0.1")
+        ).str();
+
+    std::string url = get_http_url(app_config->get_country_code()) + query_params;
+    Slic3r::Http http = Slic3r::Http::get(url);
+
+    http.header("accept", "application/json")
+        .timeout_connect(TIMEOUT_CONNECT)
+        .timeout_max(TIMEOUT_RESPONSE)
+        .on_complete([this, show_tips, by_user](std::string body, unsigned) {
+        try {
+            json j = json::parse(body);
+            if (j.contains("message")) {
+                if (j["message"].get<std::string>() == "success") {
+                    if (j.contains("software")) {
+                        if (j["software"].empty() && show_tips) {
+                            this->no_new_version();
+                        }
+                        else {
+                            if (j["software"].contains("url")
+                                && j["software"].contains("version")
+                                && j["software"].contains("description")) {
+                                version_info.url = j["software"]["url"].get<std::string>();
+                                version_info.version_str = j["software"]["version"].get<std::string>();
+                                version_info.description = j["software"]["description"].get<std::string>();
+                            }
+                            if (j["software"].contains("force_update")) {
+                                version_info.force_upgrade = j["software"]["force_update"].get<bool>();
+                            }
+                            CallAfter([this, show_tips, by_user](){
+                                this->check_update(show_tips, by_user);
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        catch (...) {
+            ;
+        }
+            })
+        .on_error([this](std::string body, std::string error, unsigned int status) {
+            handle_http_error(status, body);
+            BOOST_LOG_TRIVIAL(error) << "check new version error" << body;
+    }).perform();
+}
+
+//parse the string, if it doesn't contain a valid version string, return invalid version.
+// Supports 4-part version strings like "7.7.1.4375" by extracting only the first 3 segments.
+Semver get_version(const std::string& str, const std::regex& regexp) {
+    std::smatch match;
+    if (std::regex_search(str, match, regexp)) {
+        ParsedCrealityVersion version = parse_creality_version(match[0].str());
+        if (version.valid()) {
+            return version.semver;
+        }
+    }
+    return Semver::invalid();
+}
+void GUI_App::check_new_version_cx(bool show_tips, int by_user)
+{
+#if defined(CREALITYPRINT_APP_STORE) && defined(__WXOSX__)
+    (void)show_tips;
+    (void)by_user;
+    return;
+#endif
+
+    const bool automatic_startup_check = !show_tips && by_user == 0;
+    if (automatic_startup_check)
+        m_startup_update_check_running.store(true, std::memory_order_release);
+
+    int palform_ = 0;
+    #ifdef __WINDOWS__
+        palform_ = 1;
+        check_new_version_cx_updated(show_tips,by_user);
+        return ;
+    #endif
+    #ifdef __APPLE__
+        palform_ = 3;
+    #endif
+    #ifdef __LINUX__
+        palform_ = 2;
+    #endif
+    #if defined(__aarch64__) || defined(_M_ARM64)
+        palform_ = 4;
+    #endif
+    bool       check_stable_only = app_config->get_bool("check_stable_update_only");
+    std::string base_url = get_cloud_api_url();
+    auto        preupload_profile_url = "/api/cxy/search/softwareSearch";
+    Http::set_extra_headers(get_extra_header());
+    Http http = Http::post(base_url + preupload_profile_url);
+    json        j;
+    j["page"]                 = 1;
+    j["pageSize"]                 = 999;
+    j["type"]         = 7; //CrealityPrint
+    j["palform"] = palform_;
+    boost::uuids::uuid uuid = boost::uuids::random_generator()();
+    http.header("Content-Type", "application/json")
+        .header("__CXY_REQUESTID_", to_string(uuid))
+        .set_post_body(j.dump())
+        .on_error([this, automatic_startup_check](std::string body, std::string error, unsigned http_status) {
+          (void)body;
+          BOOST_LOG_TRIVIAL(error) << format("Error getting: `%1%`: HTTP %2%, %3%", "check_new_version_sf", http_status,
+                                             error);
+          if (automatic_startup_check) {
+              CallAfter([this]() {
+                  m_startup_update_check_running.store(false, std::memory_order_release);
+              });
+          }
+        })
+        .timeout_connect(2)
+        .timeout_max(10)
+        .on_complete([this, show_tips, palform_, by_user, automatic_startup_check](std::string body, unsigned status) {
+                Slic3r::ScopeGuard startup_check_completion([this, automatic_startup_check]() {
+                    if (automatic_startup_check) {
+                        CallAfter([this]() {
+                            m_startup_update_check_running.store(false, std::memory_order_release);
+                        });
+                    }
+                });
+                if (status != 200)
+                    return;
+               
+                try {
+                json j = json::parse(body);
+                    if (j.contains("result")) {
+                        json list = j["result"]["list"];
+                        if (list.empty() && show_tips) {
+                            this->no_new_version();
+                        } else {
+                             std::regex  matcher("[0-9]+\\.[0-9]+(\\.[0-9]+)*(-[A-Za-z0-9]+)?(\\+[A-Za-z0-9]+)?");
+                             const int   current_build_id    = parse_build_id_string(std::string(SLIC3R_BUILD_ID));
+                             std::string biggest_version_str = "0.0.1";
+                             for(auto& item : list){
+                                int pf = item["platform"].get<int>();
+                                if (pf != palform_)
+                                    continue;
+                                std::string version = item["versionNumber"];
+                                BOOST_LOG_TRIVIAL(warning) << "check_new_version_cx: " << version;
+                                if (!version.empty() && version[0] == 'V')
+                                    version.erase(0, 1);
+                                Semver tag_version = get_version(version, matcher);
+                                if (tag_version == Semver::invalid())
+                                    continue;
+                                if (compare_creality_versions(version, biggest_version_str) > 0) {
+                                    version_info.url = item["fileUrl"];
+                                    version_info.version_str = version;
+                                    auto description = item["description"];
+                                    version_info.description = "";
+                                    for(auto& item : description){
+                                        version_info.description += item;
+                                    }
+                                    version_info.force_upgrade = false;//item["force_update"];
+                                    biggest_version_str = version;
+                                }
+                             }
+                             if (compare_creality_versions(biggest_version_str, std::string(CREALITYPRINT_VERSION), -1, current_build_id) > 0) {
+                                wxCommandEvent* evt = new wxCommandEvent(EVT_SLIC3R_VERSION_ONLINE);
+                                evt->SetString(GUI::from_u8(version_info.version_str));
+                                evt->SetInt(by_user);
+                                GUI::wxGetApp().QueueEvent(evt);
+                                return;
+                             }else{
+                                if (show_tips)
+                                    this->no_new_version();
+                                }
+                        }
+                    }
+                } catch (...) {}
+        }).perform();
+}
+
+void GUI_App::check_new_version_cx_updated(bool show_tips, int by_user)
+{
+    const bool automatic_startup_check = !show_tips && by_user == 0;
+
+    // Convert version to 3-part format for compatibility
+    std::string version_base = std::string(CREALITYPRINT_VERSION);
+    // Add 'V' prefix for cloud API request
+    std::string request_version = "V" + version_base;
+    
+    std::string base_url = get_cloud_api_url();
+    auto update_check_url = "/api/cxy/v2/firmware/softwareUpCheck";
+    std::map<std::string, std::string> extra_headers = get_extra_header();
+    Http::set_extra_headers(extra_headers);
+    Http http = Http::post(base_url + update_check_url);
+    nlohmann::json req_body;
+    req_body["currentVersion"] = request_version;
+    req_body["platform"] = 1;
+    boost::uuids::uuid uuid = boost::uuids::random_generator()();
+    std::string req_body_str = req_body.dump();
+    BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]check_new_version_cx_updated request headers: ";
+    for (const auto& header : extra_headers) {
+        BOOST_LOG_TRIVIAL(error) << "  " << header.first << ": " << header.second;
+    }
+    BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]check_new_version_cx_updated request body: " << req_body_str;
+    http.header("Content-Type", "application/json")
+        .header("__CXY_REQUESTID_", to_string(uuid))
+        .set_post_body(req_body_str)
+        .timeout_connect(TIMEOUT_CONNECT)
+        .timeout_max(TIMEOUT_RESPONSE)
+        .on_error([this, show_tips, automatic_startup_check](std::string body, std::string error, unsigned http_status) {
+            BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]check_new_version_cx_updated error http_status=" << http_status << " error=" << error << " response body: " << body;
+            // Network failed — unblock deferred restore project (if any) on the UI thread.
+            CallAfter([this]() { this->trigger_deferred_restore_project(); });
+            if (automatic_startup_check) {
+                CallAfter([this]() {
+                    m_startup_update_check_running.store(false, std::memory_order_release);
+                });
+            }
+            if (show_tips) {
+                CallAfter([this]() {
+                    this->show_dialog(_L("Network connection timed out. Please check your network settings and try again."));
+                });
+            }
+        })
+        .on_complete([this, show_tips, by_user, automatic_startup_check](std::string body, unsigned status) {
+            Slic3r::ScopeGuard startup_check_completion([this, automatic_startup_check]() {
+                if (automatic_startup_check) {
+                    CallAfter([this]() {
+                        m_startup_update_check_running.store(false, std::memory_order_release);
+                    });
+                }
+            });
+            if (status != 200) {
+                BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]check_new_version_cx_updated unexpected status " << status;
+                CallAfter([this]() { this->trigger_deferred_restore_project(); });
+                if (show_tips) {
+                    CallAfter([this]() {
+                        this->show_dialog(_L("Failed to check for updates."));
+                    });
+                }
+                return;
+            }
+            try {
+                nlohmann::json j = nlohmann::json::parse(body);
+                
+                // Check if response contains result
+                if (!j.contains("result")) {
+                    BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]check_new_version_cx_updated invalid response format, response body: " << body;
+                    if (show_tips) {
+                        CallAfter([this]() {
+                            this->show_dialog(_L("Invalid response format."));
+                        });
+                    }
+                    return;
+                }
+                
+                nlohmann::json result = j["result"];
+                bool has_update = result.value("hasUpdate", false);
+                if (!has_update) {
+                    // No update available — unblock deferred restore project if any.
+                    CallAfter([this]() { this->trigger_deferred_restore_project(); });
+                    if (show_tips) {
+                        CallAfter([this]() {
+                            this->no_new_version();
+                        });
+                    }
+                    return;
+                }
+
+                std::string base_package_name = result.value("basePackage", std::string());
+                std::string version = result.value("versionNumber", std::string());
+                std::string file_url = result.value("fileUrl", std::string());
+                if (version.empty())
+                    version = CREALITYPRINT_VERSION;
+                
+                // Remove 'V' prefix if present
+                if (!version.empty() && version[0] == 'V')
+                    version.erase(0, 1);
+                
+                // Version comparison
+                std::regex matcher("[0-9]+\\.[0-9]+(\\.[0-9]+)*(-[A-Za-z0-9]+)?(\\+[A-Za-z0-9]+)?");
+                Semver current_version = get_version(CREALITYPRINT_VERSION, matcher);
+                Semver remote_version = get_version(version, matcher);
+
+                // Helper lambda to check if patch starts with '0' and reset it to 0
+                auto adjust_patch_if_zero_leading = [](Semver& ver, const std::string& ver_str) {
+                    // Extract patch part from version string (e.g., "1.2.034" -> "034")
+                    static const std::regex patch_regex(R"(^[Vv]?([0-9]+)\.([0-9]+)\.([0-9]+))");
+                    std::smatch match;
+                    if (std::regex_search(ver_str, match, patch_regex)) {
+                        std::string patch_str = match[3].str();
+                        // If patch starts with '0' and has more digits, treat as 0
+                        if (!patch_str.empty() && patch_str[0] == '0' && patch_str.length() > 1) {
+                            ver.set_patch(0);
+                        }
+                    }
+                };
+
+                // Adjust patch for both versions if it starts with '0'
+                adjust_patch_if_zero_leading(current_version, std::string(CREALITYPRINT_VERSION));
+
+                if (remote_version < current_version) {
+                    if (show_tips) {
+                        CallAfter([this]() {
+                            this->no_new_version();
+                        });
+                    }
+                    return;
+                }
+
+                // When semver parts are equal, compare build id so hotfix builds
+                // (e.g. 7.1.0.200 vs 7.1.0.100) also trigger the update dialog.
+                if (remote_version == current_version) {
+                    const int current_build_id = parse_creality_version(std::string(CREALITYPRINT_VERSION)).build_id;
+                    const int remote_build_id  = parse_creality_version(version).build_id;
+                    if (remote_build_id <= current_build_id) {
+                        if (show_tips) {
+                            CallAfter([this]() {
+                                this->no_new_version();
+                            });
+                        }
+                        return;
+                    }
+                }
+                
+                // Process description (may be an array)
+                std::string description = "";
+                if (result.contains("description")) {
+                    if (result["description"].is_array()) {
+                        for (auto& item : result["description"]) {
+                            description += item.get<std::string>();
+                        }
+                    } else if (result["description"].is_string()) {
+                        description = result["description"].get<std::string>();
+                    }
+                }
+                
+                // Update version_info
+                version_info.version_str = version;
+                version_info.description = description;
+                version_info.url = file_url;
+
+                struct LocalPackageInfo {
+                    std::string name;
+                    std::string url;
+                    long long size;
+                    std::string sha1;
+                };
+                std::vector<LocalPackageInfo> delta_packages;
+                LocalPackageInfo              full_package;
+                bool                     has_full = false;
+
+                if (result.contains("fullFile") && result["fullFile"].is_object()) {
+                    auto& item = result["fullFile"];
+                    full_package.name = item.value("name", std::string());
+                    full_package.url  = item.value("url", std::string());
+                    full_package.size = item.value("size", static_cast<long long>(-1));
+                    full_package.sha1 = item.value("sha1", std::string());
+                    has_full = !full_package.name.empty() && !full_package.url.empty();
+                }
+
+                if (result.contains("deltaFiles") && result["deltaFiles"].is_array()) {
+                    for (auto& item : result["deltaFiles"]) {
+                        if (!item.is_object())
+                            continue;
+                        LocalPackageInfo p;
+                        p.name = item.value("name", std::string());
+                        p.url = item.value("url", std::string());
+                        p.size = item.value("size", static_cast<long long>(-1));
+                        p.sha1 = item.value("sha1", std::string());
+                        if (!p.url.empty() && !p.name.empty())
+                            delta_packages.push_back(std::move(p));
+                    }
+                }
+
+                std::vector<LocalPackageInfo> packages;
+                long long total_delta_size = 0;
+                for (const auto& p : delta_packages) {
+                    if (p.size > 0)
+                        total_delta_size += p.size;
+                }
+                bool use_delta = !delta_packages.empty();
+                if (has_full && total_delta_size > 0 && total_delta_size >= full_package.size)
+                    use_delta = false;
+
+                // Hotfix: target shares the same major.minor.patch as the installed version
+                // (only the 4th build field differs). Delta packages are patched against a
+                // 3-part baseline and cannot distinguish same-3-part builds, so a hotfix must
+                // use the full package.
+                {
+                    int cur_maj = 0, cur_min = 0, cur_pat = 0;
+                    int new_maj = 0, new_min = 0, new_pat = 0;
+                    sscanf(std::string(CREALITYPRINT_VERSION).c_str(), "%d.%d.%d", &cur_maj, &cur_min, &cur_pat);
+                    sscanf(version.c_str(), "%d.%d.%d", &new_maj, &new_min, &new_pat);
+                    const bool is_hotfix = (new_maj == cur_maj && new_min == cur_min && new_pat == cur_pat);
+                    if (is_hotfix && has_full)
+                        use_delta = false;
+                }
+
+                if (use_delta) {
+                    for (const auto& p : delta_packages)
+                        packages.push_back(p);
+                } else if (has_full) {
+                    packages.push_back(full_package);
+                }
+
+                if (packages.empty()) {
+                    BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]no packages in update response";
+                    // No hot-update packages: fall back to showing the standard version dialog
+                    // so the user is still notified of the new version.
+                    wxCommandEvent* evt_fallback = new wxCommandEvent(EVT_SLIC3R_VERSION_ONLINE);
+                    evt_fallback->SetString(version);
+                    evt_fallback->SetInt(by_user);
+                    GUI::wxGetApp().QueueEvent(evt_fallback);
+                    return;
+                }
+                m_update_version = version;
+                m_update_base_package_name = base_package_name;
+                m_update_file_url = file_url;
+                m_update_packages.clear();
+                
+                // Convert to AppUpdater::PackageInfo
+                for (const auto& p : packages) {
+                    PackageInfo info;
+                    info.name = p.name;
+                    info.url = p.url;
+                    info.size = p.size;
+                    info.sha1 = p.sha1;
+                    m_update_packages.push_back(info);
+                }
+                
+                // Send event to show update dialog
+                wxCommandEvent* evt = new wxCommandEvent(EVT_SLIC3R_VERSION_ONLINE);
+                evt->SetString(version);
+                evt->SetInt(by_user);
+                GUI::wxGetApp().QueueEvent(evt);
+                return;
+
+            } catch (const std::exception& e) {
+                BOOST_LOG_TRIVIAL(error) << "[CrealityPrint Update]check_new_version_cx_updated exception: " << e.what();
+                if (show_tips) {
+                    CallAfter([this]() {
+                        this->show_dialog(_L("Failed to parse update information."));
+                    });
+                }
+            }
+        })
+        .perform();
+}
+
+void GUI_App::process_update_packages(const std::vector<PackageInfo>& updater_packages, 
+                                       const std::string& version, 
+                                       const std::string& base_package_name,
+                                       const std::string& manual_url,
+                                       bool show_tips, 
+                                       int by_user)
+{
+#ifdef __WXMSW__
+    // Propagate the hotfix flag to the updater. In a hotfix update the target shares the
+    // same major.minor.patch as the installed version, so the updater must be told to
+    // force-install the full package for a same-3-part version.
+    AppUpdater::getInstance().set_force_full(m_update_force_full);
+
+    // Check disk space before showing progress dialog
+    long long total_size = 0;
+    for (const auto& p : updater_packages) {
+        if (p.size > 0)
+            total_size += p.size;
+    }
+    
+    // Reserve 2GB for system safety
+    const long long required_space = total_size + (2LL * 1024 * 1024 * 1024);
+    long long available_space = 0;
+    
+    // Check LocalAppData drive space
+#ifdef _WIN32
+    PWSTR local_app_data_path = nullptr;
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &local_app_data_path))) {
+        ULARGE_INTEGER free_bytes;
+        if (GetDiskFreeSpaceExW(local_app_data_path, &free_bytes, nullptr, nullptr)) {
+            available_space = free_bytes.QuadPart;
+        }
+        CoTaskMemFree(local_app_data_path);
+    }
+#else
+    struct statvfs stat_buf;
+    if (statvfs("/tmp", &stat_buf) == 0) {
+        available_space = static_cast<long long>(stat_buf.f_bavail) * stat_buf.f_frsize;
+    }
+#endif
+    
+    if (available_space > 0 && available_space < required_space) {
+        CallAfter([]() {
+            MessageDialog msg_dlg(nullptr, 
+                _L("Insufficient storage space. Please free up some space and try again."), 
+                _L("Update Error"), wxICON_WARNING | wxOK);
+            msg_dlg.ShowModal();
+        });
+        return;
+    }
+    
+    // Show progress dialog immediately when triggered by user
+    if (by_user != 0 && show_tips) {
+        CallAfter([this]() {
+            if (!g_update_progress_dlg) {
+                g_update_progress_dlg = new AppUpdateProgressDialog(this->mainframe);
+            }
+            g_update_progress_dlg->update_progress(0, _L("Preparing to download..."));
+            g_update_progress_dlg->Show();
+        });
+    }
+    
+    CallAfter([this, updater_packages, version, base_package_name, manual_url, by_user]() {
+        if (!g_update_progress_dlg) {
+            g_update_progress_dlg = new AppUpdateProgressDialog(this->mainframe);
+            g_update_progress_dlg->Bind(wxEVT_CLOSE_WINDOW, [](wxCloseEvent& e) {
+                if (AppUpdater::getInstance().is_downloading()) {
+                    AppUpdater::getInstance().cancel_download();
+                    if (g_update_progress_dlg)
+                        g_update_progress_dlg->close_imgui_notification();
+                    if (g_update_progress_dlg)
+                        g_update_progress_dlg->Hide();
+                    e.Veto();
+                } else {
+                    e.Skip();
+                }
+            });
+            g_update_progress_dlg->Bind(wxEVT_BUTTON, [](wxCommandEvent& e) {
+                if (e.GetId() != wxID_CANCEL)
+                    return;
+                if (AppUpdater::getInstance().is_downloading()) {
+                    AppUpdater::getInstance().cancel_download();
+                    if (g_update_progress_dlg)
+                        g_update_progress_dlg->close_imgui_notification();
+                    if (g_update_progress_dlg)
+                        g_update_progress_dlg->Hide();
+                } else if (g_update_progress_dlg) {
+                    g_update_progress_dlg->close_imgui_notification();
+                    g_update_progress_dlg->Hide();
+                }
+            }, wxID_CANCEL);
+        }
+        
+        if (AppUpdater::getInstance().prepare_cached_hot_update(updater_packages, version, base_package_name, manual_url)) {
+            if (by_user == 0) {
+                if (g_update_progress_dlg) {
+                    g_update_progress_dlg->close_imgui_notification();
+                    g_update_progress_dlg->Hide();
+                }
+                return;
+            }
+            if (g_update_progress_dlg) {
+                g_update_progress_dlg->close_imgui_notification();
+                g_update_progress_dlg->Hide();
+            }
+            const int res = show_update_ready_dialog_guarded(this->mainframe);
+            if (res == wxID_YES) {
+                clear_pending_app_update(this->app_config);
+                set_install_attempted(version);
+                AppUpdater::getInstance().install_update();
+            } else {
+                set_pending_app_update(this->app_config, version);
+            }
+            return;
+        }
+        
+        g_update_progress_dlg->update_progress(0, _L("Preparing to download..."));
+        g_update_progress_dlg->Show();
+
+        // OTA analytics: report download start
+        {
+            BOOST_LOG_TRIVIAL(warning) << "[OTA_ANALYTICS] ota_download_start: about to call start_download";
+            AnalyticsEventPayload payload;
+            payload.type = AnalyticsDataEventType::ANALYTICS_OTA_DOWNLOAD_START;
+            AnalyticsDataUploadManager::getInstance().triggerUploadTasksWithPayload(payload);
+        }
+
+        AppUpdater::getInstance().start_download(updater_packages, version, base_package_name, manual_url);
+    });
+#else
+    (void)updater_packages;
+    (void)version;
+    (void)base_package_name;
+    (void)show_tips;
+    (void)by_user;
+#endif
+}
+void GUI_App::check_new_version_sf(bool show_tips, int by_user)
+{
+#if defined(CREALITYPRINT_APP_STORE) && defined(__WXOSX__)
+    (void)show_tips;
+    (void)by_user;
+    return;
+#endif
+    AppConfig* app_config = wxGetApp().app_config;
+    bool       check_stable_only = app_config->get_bool("check_stable_update_only");
+    auto       version_check_url = app_config->version_check_url(check_stable_only);
+    Http::get(version_check_url)
+        .on_error([&](std::string body, std::string error, unsigned http_status) {
+          (void)body;
+          BOOST_LOG_TRIVIAL(error) << format("Error getting: `%1%`: HTTP %2%, %3%", "check_new_version_sf", http_status,
+                                             error);
+        })
+        .timeout_connect(1)
+        .on_complete([this,by_user, check_stable_only](std::string body, unsigned http_status) {
+          // Http response OK
+          if (http_status != 200)
+            return;
+          try {
+            boost::trim(body);
+            // Orca: parse github release, inspired by SS
+            boost::property_tree::ptree root;
+            std::stringstream json_stream(body);
+            boost::property_tree::read_json(json_stream, root);
+
+            // at least two number, use '.' as separator. can be followed by -Az23 for prereleased and +Az42 for
+            // metadata
+            std::regex matcher("[0-9]+\\.[0-9]+(\\.[0-9]+)*(-[A-Za-z0-9]+)?(\\+[A-Za-z0-9]+)?");
+
+            const int   current_build_id     = parse_build_id_string(std::string(SLIC3R_BUILD_ID));
+            std::string best_pre_version     = "1.0.0";
+            std::string best_release_version = "1.0.0";
+            std::string best_pre_url;
+            std::string best_release_url;
+            std::string best_release_content;
+            std::string best_pre_content;
+            const std::regex reg_num("([0-9]+)");
+            if (check_stable_only) {
+                std::string tag = root.get<std::string>("tag_name");
+                if (tag[0] == 'v')
+                    tag.erase(0, 1);
+                for (std::regex_iterator it = std::sregex_iterator(tag.begin(), tag.end(), reg_num); it != std::sregex_iterator(); ++it) {}
+                Semver tag_version = get_version(tag, matcher);
+                if (tag_version != Semver::invalid()) {
+                    if (root.get<bool>("prerelease")) {
+                        if (compare_creality_versions(tag, best_pre_version) > 0) {
+                            best_pre_version = tag;
+                            best_pre_url     = root.get<std::string>("html_url");
+                            best_pre_content = root.get<std::string>("body");
+                        }
+                    } else {
+                        if (compare_creality_versions(tag, best_release_version) > 0) {
+                            best_release_version = tag;
+                            best_release_url     = root.get<std::string>("html_url");
+                            best_release_content = root.get<std::string>("body");
+                        }
+                    }
+                }
+            } else {
+                for (auto json_version : root) {
+                    std::string tag = json_version.second.get<std::string>("tag_name");
+                    if (tag[0] == 'v')
+                        tag.erase(0, 1);
+                    for (std::regex_iterator it = std::sregex_iterator(tag.begin(), tag.end(), reg_num); it != std::sregex_iterator();
+                         ++it) {}
+                    Semver tag_version = get_version(tag, matcher);
+                    if (tag_version == Semver::invalid())
+                        continue;
+                    if (json_version.second.get<bool>("prerelease")) {
+                        if (compare_creality_versions(tag, best_pre_version) > 0) {
+                            best_pre_version = tag;
+                            best_pre_url     = json_version.second.get<std::string>("html_url");
+                            best_pre_content = json_version.second.get<std::string>("body");
+                        }
+                    } else {
+                        if (compare_creality_versions(tag, best_release_version) > 0) {
+                            best_release_version = tag;
+                            best_release_url     = json_version.second.get<std::string>("html_url");
+                            best_release_content = json_version.second.get<std::string>("body");
+                        }
+                    }
+                }
+            }
+
+            // if release is more recent than beta, use release anyway
+            if (compare_creality_versions(best_pre_version, best_release_version) < 0) {
+                best_pre_version = best_release_version;
+                best_pre_url     = best_release_url;
+                best_pre_content = best_release_content;
+            }
+            // if we're the most recent, don't do anything
+            const std::string& latest_version = check_stable_only ? best_release_version : best_pre_version;
+            if (compare_creality_versions(latest_version, std::string(CREALITYPRINT_VERSION), -1, current_build_id) <= 0) {
+                if (by_user != 0)
+                    this->no_new_version();
+                return;
+            }
+
+            version_info.url           = check_stable_only ? best_release_url : best_pre_url;
+            version_info.version_str   = latest_version;
+            version_info.description   = check_stable_only ? best_release_content : best_pre_content;
+            version_info.force_upgrade = false;
+
+            wxCommandEvent* evt = new wxCommandEvent(EVT_SLIC3R_VERSION_ONLINE);
+            evt->SetString(GUI::from_u8(version_info.version_str));
+            GUI::wxGetApp().QueueEvent(evt);
+          } catch (...) {}
+        })
+        .perform();
+}
+
+//BBS pop up a dialog and download files
+void GUI_App::request_new_version(int by_user)
+{
+    wxCommandEvent* evt = new wxCommandEvent(EVT_SLIC3R_VERSION_ONLINE);
+    evt->SetString(GUI::from_u8(version_info.version_str));
+    evt->SetInt(by_user);
+    GUI::wxGetApp().QueueEvent(evt);
+}
+
+void GUI_App::enter_force_upgrade()
+{
+    wxCommandEvent *evt = new wxCommandEvent(EVT_ENTER_FORCE_UPGRADE);
+    GUI::wxGetApp().QueueEvent(evt);
+}
+
+void GUI_App::set_skip_version(bool skip)
+{
+    BOOST_LOG_TRIVIAL(info) << "set_skip_version, skip = " << skip << ", version = " <<version_info.version_str;
+    if (skip) {
+        app_config->set("skip_version", version_info.version_str);
+    }else {
+        app_config->set("skip_version", "");
+    }
+}
+
+void GUI_App::show_check_privacy_dlg(wxCommandEvent& evt)
+{
+    int online_login = evt.GetInt();
+    
+    PrivacyUpdateDialog privacy_dlg(this->mainframe, wxID_ANY, _L("User Experience Improvement Program"));
+    privacy_dlg.Bind(EVT_PRIVACY_UPDATE_CONFIRM, [this, online_login](wxCommandEvent &e) {
+        std::string version = std::string(CREALITYPRINT_VERSION);
+        bool found = false;
+        if (privacyData.contains("list") && !privacyData["list"].is_null()) {
+            for (auto& v : privacyData["list"]) {
+                if (v["version"] == version) {
+                    v["check"] = true;
+                    found = true;
+                    break;
+                } 
+            }
+        }
+        if (!found) {
+            if (!privacyData.contains("list") || privacyData["list"].is_null())
+                privacyData["list"] = nlohmann::json::array();
+            nlohmann::json item;
+            item["version"] = version;
+            item["check"]   = true;
+            privacyData["list"].push_back(item);
+        }
+        save_privacy_version();
+        save_app_first_launch_info();
+       /* app_config->set("privacy_version", privacy_version_info.version_str);
+        app_config->set_bool("privacy_update_checked", true);*/
+        request_user_handle(online_login);
+
+        reload_homepage();
+
+        CallAfter([this] {
+            wxTimer* upload_timer = new wxTimer();
+            upload_timer->Bind(wxEVT_TIMER, [upload_timer](wxTimerEvent&) {
+                AnalyticsDataUploadManager::getInstance().triggerUploadTasks(AnalyticsUploadTiming::ON_FIRST_LAUNCH, { AnalyticsDataEventType::ANALYTICS_FIRST_LAUNCH });
+                AnalyticsEventPayload payload;
+                payload.type = AnalyticsDataEventType::ANALYTICS_FIRST_LAUNCH;
+                AnalyticsDataUploadManager::getInstance().triggerUploadTasksWithPayload(payload);
+                upload_timer->Stop();
+                delete upload_timer;
+            });
+            upload_timer->StartOnce(3000);
+        });
+
+        });
+    privacy_dlg.Bind(EVT_PRIVACY_UPDATE_CANCEL, [this](wxCommandEvent &e) {
+            std::string version = std::string(CREALITYPRINT_VERSION);
+            bool found = false;
+            if (privacyData.contains("list") && !privacyData["list"].is_null()) {
+                for (auto& v : privacyData["list"]) {
+                    if (v["version"] == version) {
+                        v["check"] = false;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (!found) {
+                if (!privacyData.contains("list") || privacyData["list"].is_null())
+                    privacyData["list"] = nlohmann::json::array();
+                nlohmann::json item;
+                item["version"] = version;
+                item["check"]   = false;
+                privacyData["list"].push_back(item);
+            }
+            save_privacy_version();
+            app_config->set_bool("privacy_update_checked", false);
+            if (m_agent) {
+                m_agent->user_logout();
+            }
+        });
+
+    privacy_dlg.set_text(privacy_version_info.description);
+    privacy_dlg.on_show();
+
+}
+
+ void GUI_App::save_privacy_version()
+{
+
+    boost::filesystem::path device_file = boost::filesystem::path(Slic3r::data_dir()) / "privacyInfo.json";
+    boost::nowide::ofstream c;
+    c.open(device_file.string(), std::ios::out | std::ios::trunc);
+    c << std::setw(4) << privacyData << std::endl;
+
+}
+
+void GUI_App::check_user_lite_mode_dlg() 
+{
+    std::string key = "gcode_preview_lite_mode";
+    if (get_app_config()->get(key).empty())	
+	{
+        EnableLiteModeDialog dlg(this->mainframe, wxID_ANY, _L("Slicing Preview"));
+        wxGetApp().UpdateDlgDarkUI(&dlg);
+        bool enable = (dlg.ShowModal() == wxID_YES);
+        get_app_config()->set(key, enable ? "true" : "false");
+	}
+}
+
+void GUI_App::on_show_check_privacy_dlg(int online_login)
+{
+    auto evt = new wxCommandEvent(EVT_CHECK_PRIVACY_SHOW);
+    evt->SetInt(online_login);
+    wxQueueEvent(this, evt);
+}
+
+bool GUI_App::check_privacy_update()
+{
+    if (privacy_version_info.version_str.empty() || privacy_version_info.description.empty()
+        || privacy_version_info.url.empty()) {
+        return false;
+    }
+
+    std::string local_privacy_ver = app_config->get("privacy_version");
+    auto curr_version = Semver::parse(local_privacy_ver);
+    auto remote_version = Semver::parse(privacy_version_info.version_str);
+    if (curr_version && remote_version) {
+        if (*remote_version > *curr_version || app_config->get("privacy_update_checked") != "true") {
+            return true;
+        }
+    }
+    return false;
+}
+void GUI_App::reinit_downloader()
+{
+    std::string user_id = m_user.userId;
+    if(user_id.empty())
+        return;
+    if (model_downloaders_.find(user_id) != model_downloaders_.cend()) {
+        model_downloaders_[user_id]->init();
+    }
+}
+
+int GUI_App::get_3mf_download_progress(const std::string& user_id, const std::string& file_id)
+{
+    auto it = model_downloaders_.find(user_id);
+    if (it == model_downloaders_.cend()) {
+        model_downloaders_.emplace(user_id, std::make_unique<ModelDownloader>(user_id));
+        it = model_downloaders_.find(user_id);
+    }
+
+    auto cache_json = it->second->get_cache_json();
+    if (cache_json.is_object() && cache_json.contains("3mfs")) {
+        for (auto &file : cache_json["3mfs"]) {
+            try {
+                const std::string fid = file["fileId"].get<std::string>();
+                if (fid == file_id) {
+                    return file["progress"].get<int>();
+                }
+            } catch (...) {
+                // ignore malformed entries
+            }
+        }
+    }
+    return 0;
+}
+
+std::string GUI_App::get_3mf_download_path(const std::string& user_id, const std::string& file_id)
+{
+    auto it = model_downloaders_.find(user_id);
+    if (it == model_downloaders_.cend())
+        return {};
+
+    auto cache_json = it->second->get_cache_json();
+    if (cache_json.is_object() && cache_json.contains("3mfs")) {
+        for (auto &file : cache_json["3mfs"]) {
+            try {
+                const std::string fid = file["fileId"].get<std::string>();
+                if (fid == file_id && file.contains("path"))
+                    return file["path"].get<std::string>();
+            } catch (...) {}
+        }
+    }
+    return {};
+}
+
+void GUI_App::cancel_3mf_download(const std::string& user_id, const std::string& file_id)
+{
+    auto it = model_downloaders_.find(user_id);
+    if (it == model_downloaders_.cend()) {
+        model_downloaders_.emplace(user_id, std::make_unique<ModelDownloader>(user_id));
+        it = model_downloaders_.find(user_id);
+    }
+    it->second->cancel_download_3mf_group(file_id);
+}
+void GUI_App::on_check_privacy_update(wxCommandEvent& evt)
+{
+    int online_login = evt.GetInt();
+    bool result = check_privacy_update();
+    if (result)
+        on_show_check_privacy_dlg(online_login);
+    else
+        request_user_handle(online_login);
+}
+
+void GUI_App::check_privacy_version(int online_login)
+{
+    update_http_extra_header();
+    std::string query_params = "?policy/privacy=00.00.00.00";
+    std::string url = get_http_url(app_config->get_country_code()) + query_params;
+    Slic3r::Http http = Slic3r::Http::get(url);
+
+    http.header("accept", "application/json")
+        .timeout_connect(TIMEOUT_CONNECT)
+        .timeout_max(TIMEOUT_RESPONSE)
+        .on_complete([this, online_login](std::string body, unsigned) {
+            try {
+                json j = json::parse(body);
+                if (j.contains("message")) {
+                    if (j["message"].get<std::string>() == "success") {
+                        if (j.contains("resources")) {
+                            for (auto it = j["resources"].begin(); it != j["resources"].end(); it++) {
+                                if (it->contains("type")) {
+                                    if ((*it)["type"] == std::string("policy/privacy")
+                                        && it->contains("version")
+                                        && it->contains("description")
+                                        && it->contains("url")
+                                        && it->contains("force_update")) {
+                                        privacy_version_info.version_str = (*it)["version"].get<std::string>();
+                                        privacy_version_info.description = (*it)["description"].get<std::string>();
+                                        privacy_version_info.url = (*it)["url"].get<std::string>();
+                                        privacy_version_info.force_upgrade = (*it)["force_update"].get<bool>();
+                                        break;
+                                    }
+                                }
+                            }
+                            CallAfter([this, online_login]() {
+                                auto evt = new wxCommandEvent(EVT_CHECK_PRIVACY_VER);
+                                evt->SetInt(online_login);
+                                wxQueueEvent(this, evt);
+                            });
+                        }
+                    }
+                }
+            }
+            catch (...) {
+                request_user_handle(online_login);
+            }
+        })
+        .on_error([this, online_login](std::string body, std::string error, unsigned int status) {
+            request_user_handle(online_login);
+            BOOST_LOG_TRIVIAL(error) << "check privacy version error" << body;
+    }).perform();
+}
+
+void GUI_App::check_creality_privacy_version(bool bShowDlg)
+{ 
+    bool                    needUpdate  = true;
+    boost::filesystem::path device_file = boost::filesystem::path(Slic3r::data_dir()) / "privacyInfo.json";
+    std::string             version     = std::string(CREALITYPRINT_VERSION);
+    auto parse_major_version = [](const std::string& ver, int& major_out) -> bool {
+        size_t i = 0;
+        while (i < ver.size() && !std::isdigit(static_cast<unsigned char>(ver[i])))
+            ++i;
+        if (i >= ver.size())
+            return false;
+
+        size_t j = i;
+        while (j < ver.size() && std::isdigit(static_cast<unsigned char>(ver[j])))
+            ++j;
+
+        try {
+            major_out = std::stoi(ver.substr(i, j - i));
+            return true;
+        } catch (...) {
+            return false;
+        }
+    };
+
+    int  cur_major    = 0;
+    bool has_cur_major = parse_major_version(version, cur_major);
+    if (!boost::filesystem::exists(device_file)) {
+        
+        std::string    res = app_config->get("is_first_install");
+        std::cout<<"is_first_install"<<res<<bShowDlg<<std::endl;
+        if (res == "1" && !bShowDlg)
+            bShowDlg = true;
+        else
+            return;
+       
+    } else {
+        try{
+        boost::nowide::ifstream t(device_file.string());
+        std::stringstream       buffer;
+        buffer << t.rdbuf();
+
+        privacyData = json::parse(buffer);
+        if (privacyData.contains("list")) {
+            for (auto& v : privacyData["list"]) {
+                if (!v.contains("version") || !v["version"].is_string()) {
+                    needUpdate = true;
+                    continue;
+                }
+
+                const std::string stored_version = v["version"].get<std::string>();
+                int               stored_major   = 0;
+                const bool        has_stored_major = parse_major_version(stored_version, stored_major);
+                const bool        match_major      = has_cur_major && has_stored_major && stored_major == cur_major;
+                const bool        match_exact      = (!has_cur_major || !has_stored_major) && stored_version == version;
+
+                if (match_major) {
+                    if (v.contains("check") && v["check"].is_boolean())
+                        m_privacy_checked = v["check"].get<bool>();
+                    if(!match_exact)
+                    {
+                        v["version"] = version;
+                        save_privacy_version();
+                    }
+                    needUpdate = false;
+                    break;
+                }
+
+                needUpdate = true;
+            }
+        }
+        }catch(...){
+            
+        }
+        if(needUpdate)
+        {
+            bShowDlg = true;
+        }
+
+    }
+    if(!bShowDlg)
+    {
+        return;
+    }
+    if (needUpdate) {
+        on_show_check_privacy_dlg();
+    }
+}
+
+void GUI_App::no_new_version()
+{
+    wxCommandEvent* evt = new wxCommandEvent(EVT_SHOW_NO_NEW_VERSION);
+    GUI::wxGetApp().QueueEvent(evt);
+}
+
+std::string GUI_App::version_display = "";
+std::string GUI_App::format_display_version()
+{
+    if (!version_display.empty()) return version_display;
+
+    version_display = CREALITYPRINT_VERSION;
+    return version_display;
+}
+
+std::string GUI_App::format_IP(const std::string& ip)
+{
+    std::string format_ip = ip;
+    size_t pos_st = 0;
+    size_t pos_en = 0;
+
+    for (int i = 0; i < 2; i++) {
+        pos_en = format_ip.find('.', pos_st + 1);
+        if (pos_en == std::string::npos) {
+            return ip;
+        }
+        format_ip.replace(pos_st, pos_en - pos_st, "***");
+        pos_st = pos_en + 1;
+    }
+
+    return format_ip;
+}
+
+void GUI_App::show_dialog(wxString msg)
+{
+    if (m_info_dialog_content.empty()) {
+        wxCommandEvent* evt = new wxCommandEvent(EVT_SHOW_DIALOG);
+        evt->SetString(msg);
+        GUI::wxGetApp().QueueEvent(evt);
+        m_info_dialog_content = msg;
+    }
+}
+
+void  GUI_App::push_notification(wxString msg, wxString title, UserNotificationStyle style)
+{
+    if (!this->is_enable_multi_machine()) {
+        if (style == UserNotificationStyle::UNS_NORMAL) {
+            if (m_info_dialog_content.empty()) {
+                wxCommandEvent* evt = new wxCommandEvent(EVT_SHOW_DIALOG);
+                evt->SetString(msg);
+                GUI::wxGetApp().QueueEvent(evt);
+                m_info_dialog_content = msg;
+            }
+        }
+        else if (style == UserNotificationStyle::UNS_WARNING_CONFIRM) {
+            GUI::wxGetApp().CallAfter([msg, title] {
+                GUI::MessageDialog msg_dlg(nullptr, msg, title, wxICON_WARNING | wxOK);
+                msg_dlg.ShowModal();
+            });
+        }
+    }
+}
+
+void GUI_App::reload_settings(int                query_type,
+                              const std::string& url,
+                              const std::string& version,
+                              long long          update_time,
+                              const std::string& file_type,
+                              const std::string& setting_id,
+                              int                total_count)
+{
+    if (preset_bundle) {
+
+        auto http = Http::get(url);
+
+        std::string user = app_config->get("cloud", "user_id");
+        fs::path    user_folder(data_dir() + "/" + PRESET_USER_DIR);
+        if (!fs::exists(user_folder))
+            fs::create_directory(user_folder);
+
+        std::string dir_user_presets = data_dir() + "/" + PRESET_USER_DIR + "/" + user;
+        fs::path    dest_path(user_folder / user);
+        if (!fs::exists(dest_path))
+            fs::create_directory(dest_path);
+
+        http.on_header_callback([&](std::string header) {
+                std::string filename;
+
+                std::regex  r("filename=\"([^\"]*)\"");
+                std::smatch match;
+                if (std::regex_search(header.cbegin(), header.cend(), match, r)) {
+                    filename = match.str(1);
+                }
+
+                if (!filename.empty()) {
+                    dest_path = dest_path / filename;
+                }
+            })
+            .on_progress([](Http::Progress progress, bool& cancel) {
+            })
+            .on_error([](std::string body, std::string error, unsigned http_status) {
+            })
+            .on_complete([&](std::string body, unsigned /* http_status */) {
+                try {
+                    json                               j = json::parse(body);
+                    std::map<std::string, std::string> inner_map;
+                    for (auto& element : j.items()) {
+                        auto key   = element.key();
+                        auto value = element.value();
+                        if (value.is_array()) {
+                            for (int i = 0; i < value.size(); ++i) {
+                                inner_map[key] += value[i];
+                                if ("compatible_printers" == key) {
+                                    inner_map[key] += ";";
+                                } else {
+                                    inner_map[key] += ",";
+                                }
+                            }
+                            if (value.size()) {
+                                inner_map[key].pop_back();
+                            }
+                        } else if (!value.is_null()) {
+                            inner_map[key] = value;
+                        }
+                    }
+                    inner_map.emplace("type", file_type);
+                    inner_map.emplace("user_id", user);
+                    inner_map.emplace("version", version);
+                    inner_map.emplace("updated_time", std::to_string(update_time));
+                    inner_map.emplace("setting_id", setting_id);
+                    if (inner_map.find("base_id") == inner_map.cend()) {
+                        inner_map.emplace("base_id", "");
+                    }
+                    if (user_cloud_presets_.count(j["name"]) == 0) {
+                        user_cloud_presets_[j["name"]] = inner_map;
+                    } else {
+                        repeat_presets_++;
+                    }
+                } catch (const std::exception& e) {
+                    auto err = e.what();
+                    repeat_presets_++;
+                }
+                BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << __LINE__ << " cloud user preset number is: " << user_cloud_presets_.size();
+                if (total_count == user_cloud_presets_.size() + repeat_presets_) {
+                    if (query_type == 2) {
+                        preset_bundle->load_user_presets(*app_config, user_cloud_presets_, ForwardCompatibilitySubstitutionRule::Enable);
+                        preset_bundle->save_user_presets(*app_config, get_delete_cache_presets());
+                        CallAfter([=]() { mainframe->update_side_preset_ui(); });
+                    }
+                    send_user_presets();
+                }
+            })
+            .perform_sync();
+    }
+}
+
+void GUI_App::send_user_presets() {
+    json j;
+    j["sequence_id"]                        = "";
+    j["command"]                            = "get_user_preset_params";
+    json                         data_array = json::array();
+    static std::set<std::string> ignore     = {"base_id",
+                                               "filament_id",
+                                               "filament_settings_id",
+                                               "from",
+                                               "inherits",
+                                               "name",
+                                               "is_custom_defined",
+                                               "type",
+                                               "update_time",
+                                               "updated_time",
+                                               "printer_settings_id",
+                                               "print_settings_id",
+                                               "machine_start_gcode",
+                                               "machine_end_gcode",
+                                               "filament_start_gcode",
+                                               "filament_end_gcode",
+                                               "change_filament_gcode",
+                                               "layer_change_gcode",
+                                               "user_id",
+                                               "version",
+                                               "setting_id",
+                                               "printer_select_mac"};
+
+    int                                   i = 1;
+    std::unordered_map<std::string, json> printer_data;
+    for (auto item : user_cloud_presets_) {
+        std::vector<std::string> printer_names;
+        std::vector<std::string> printer_models;
+        std::vector<std::string> nozzles;
+        std::string printer_name;
+        std::string printer_model;
+        std::string nozzle;
+        std::string preset_type = item.second["type"];
+        std::string preset_type_path;
+        if (preset_type == "printer") {
+			preset_type_path = "machine";
+		} else if (preset_type == "filament") {
+			preset_type_path = "filament";
+		} else if (preset_type == "print") {
+			preset_type_path = "process";
+		}
+        if (preset_type == "printer") {
+            printer_name = item.second["inherits"];
+            if (printer_name.empty()) {
+                printer_model = item.second["printer_model"];
+                nozzle        = item.second["nozzle_diameter"];
+                printer_name  = printer_model + " " + nozzle + " nozzle";
+            } else {
+                auto pos     = printer_name.find_last_of("@");
+                printer_name = printer_name.substr(pos + 1);
+                std::regex  re(R"((\d+\.\d+ )nozzle)");
+                std::smatch match;
+
+                if (std::regex_search(printer_name, match, re)) {
+                    nozzle        = match[1];
+                    printer_model = printer_name.substr(0, match.position() - 1);
+                } else {
+                    printer_model = printer_name;
+                }
+            }
+            printer_models.emplace_back(printer_model);
+            nozzles.emplace_back(nozzle);
+            printer_names.emplace_back(printer_name);
+        } else {
+            if (item.second.find("compatible_printers") != item.second.cend()) {
+                printer_name = item.second["compatible_printers"];
+            }
+            if (printer_name.empty()) {
+                printer_name = item.second["inherits"];
+                auto pos     = printer_name.find_last_of("@");
+                printer_name = printer_name.substr(pos + 1);
+                printer_names.emplace_back(printer_name);
+            } else {
+                boost::split(printer_names, printer_name, boost::is_any_of(";"));
+            }
+            std::regex  re(R"((\d+\.\d+ )nozzle)");
+            std::smatch match;
+            for (auto& printer_name : printer_names) {
+                if (std::regex_search(printer_name, match, re)) {
+                    nozzle        = match[1];
+                    printer_model = printer_name.substr(0, match.position() - 1);
+                } else {
+                    std::string vendor_name;
+                    auto        pos = printer_name.find_first_of(" ");
+                    if (pos != std::string::npos) {
+                        vendor_name = printer_name.substr(0, pos);
+                    }
+                    auto inherit_preset      = item.second["inherits"];
+                    auto inherit_preset_file = (boost::filesystem::path(Slic3r::resources_dir()) / "profiles" / vendor_name /
+                                                preset_type_path / (inherit_preset + ".json"));
+                    json inherit_preset_json;
+
+                    if (fs::exists(inherit_preset_file)) {
+                        boost::nowide::ifstream ifs(inherit_preset_file.string());
+                        ifs >> inherit_preset_json;
+                    }
+                    if (inherit_preset_json.contains("compatible_printers")) {
+                        printer_name = inherit_preset_json["compatible_printers"][0];
+                        std::regex  re(R"((\d+\.\d+ )nozzle)");
+                        std::smatch match;
+
+                        if (std::regex_search(printer_name, match, re)) {
+                            nozzle        = match[1];
+                            printer_model = printer_name.substr(0, match.position() - 1);
+                        }
+                    } else {
+                        printer_model = printer_name;
+                    }
+                }
+                printer_models.emplace_back(printer_model);
+                nozzles.emplace_back(nozzle);
+            }
+        }
+        for (size_t i = 0; i < printer_names.size(); i++) {
+            printer_name = printer_names[i];
+            printer_model = printer_models[i];
+            nozzle = nozzles[i];
+            if (printer_data.find(printer_name) == printer_data.cend()) {
+                json data_object;
+                data_object["filament"]        = json::array();
+                data_object["process"]         = json::array();
+                data_object["printer"]         = json::array();
+                data_object["id"]              = i++;
+                data_object["printer_name"]    = printer_model;
+                data_object["nozzle_diameter"] = nozzle;
+                json preset_data_object;
+                preset_data_object["name"] = item.second["name"];
+                preset_data_object["id"]   = item.second["setting_id"];
+                long long  timestamp       = std::atoll(item.second["updated_time"].c_str());
+                wxDateTime dateTime;
+                dateTime.Set((time_t) timestamp);
+                preset_data_object["update_time"] = dateTime.FormatISOCombined(' ').ToStdString();
+                json modifycations_array          = json::array();
+                for (auto preset_data : item.second) {
+                    if (ignore.find(preset_data.first) != ignore.end()) {
+                        continue;
+                    }
+                    json                   modifycations_object;
+                    const ConfigOptionDef* config = print_config_def.get(preset_data.first);
+                    if (config) {
+                        modifycations_object["name"]  = Slic3r::I18N::translate(config->label);
+                        modifycations_object["value"] = preset_data.second;
+                        modifycations_array.push_back(modifycations_object);
+                    }
+                }
+                preset_data_object["modifycations"] = modifycations_array;
+                if (preset_type == "printer") {
+                    data_object["printer"].push_back(preset_data_object);
+                } else if (preset_type == "filament") {
+                    data_object["filament"].push_back(preset_data_object);
+                } else if (preset_type == "print") {
+                    data_object["process"].push_back(preset_data_object);
+                }
+                printer_data.emplace(printer_name, data_object);
+            } else {
+                auto& data_object = printer_data[printer_name];
+                json  preset_data_object;
+                preset_data_object["name"] = item.second["name"];
+                preset_data_object["id"]   = item.second["setting_id"];
+
+                long long  timestamp = std::atoll(item.second["updated_time"].c_str());
+                wxDateTime dateTime;
+                dateTime.Set((time_t) timestamp);
+                preset_data_object["update_time"] = dateTime.FormatISOCombined(' ').ToStdString();
+                json modifycations_array          = json::array();
+                for (auto preset_data : item.second) {
+                    if (ignore.find(preset_data.first) != ignore.end()) {
+                        continue;
+                    }
+                    json                   modifycations_object;
+                    const ConfigOptionDef* config = print_config_def.get(preset_data.first);
+                    if (config) {
+                        modifycations_object["name"]  = Slic3r::I18N::translate(config->label);
+                        modifycations_object["value"] = preset_data.second;
+                        modifycations_array.push_back(modifycations_object);
+                    }
+                }
+                preset_data_object["modifycations"] = modifycations_array;
+                if (preset_type == "printer") {
+                    data_object["printer"].push_back(preset_data_object);
+                } else if (preset_type == "filament") {
+                    data_object["filament"].push_back(preset_data_object);
+                } else if (preset_type == "print") {
+                    data_object["process"].push_back(preset_data_object);
+                }
+            }
+        }
+    }
+
+    for (auto item : printer_data) {
+       data_array.push_back(item.second);
+    }
+    auto data_temp = data_array.dump();
+    j["data"]      = wxBase64Encode(data_temp.data(), data_temp.size()).ToStdString();
+    auto temp      = j.dump();
+    boost::replace_all(temp, "\\", "\\\\");
+    boost::replace_all(temp, "'", "");
+
+    auto response_js = wxString::Format("window.handleStudioCmd('%s')", temp);
+    CallAfter([=]() {
+        run_script(response_js);
+    });
+    /*j["data"] = data_array;
+    auto temp = j.dump();
+    boost::replace_all(temp, "\\", "\\\\");
+    boost::replace_all(temp, "'", "");
+
+    auto response_js = wxString::Format("window.handleStudioCmd('%s')", wxString::FromUTF8(temp));
+    run_script(response_js);*/
+}
+
+// BBS reload when logout
+void GUI_App::remove_user_presets()
+{
+    if (preset_bundle) {
+        preset_bundle->remove_users_preset(*app_config);
+
+        // Not remove user preset cache
+        //std::string user_id = m_agent->get_user_id();
+        //preset_bundle->remove_user_presets_directory(user_id);
+
+        //update ui
+            mainframe->update_side_preset_ui();
+    }
+}
+
+void GUI_App::sync_preset(Preset* preset)
+{
+    int result = -1;
+    unsigned int http_code = 200;
+    std::string updated_info;
+    long long update_time = 0;
+    // only sync user's preset
+    if (!preset->is_user()) return;
+    if (preset->is_custom_defined()) return;
+
+    auto setting_id = preset->setting_id;
+    std::map<std::string, std::string> values_map;
+    
+    // update sync_info preset info in file
+    auto result_callback = [&]() {
+        if (result == 0) {
+            // PresetBundle* preset_bundle = wxGetApp().preset_bundle;
+            if (!this->preset_bundle)
+                return;
+
+            BOOST_LOG_TRIVIAL(trace) << "sync_preset: sync operation: " << preset->sync_info << " success! preset = " << preset->name;
+            if (preset->type == Preset::Type::TYPE_FILAMENT) {
+                preset_bundle->filaments.set_sync_info_and_save(preset->name, setting_id, updated_info, update_time);
+            } else if (preset->type == Preset::Type::TYPE_PRINT) {
+                preset_bundle->prints.set_sync_info_and_save(preset->name, setting_id, updated_info, update_time);
+            } else if (preset->type == Preset::Type::TYPE_PRINTER) {
+                preset_bundle->printers.set_sync_info_and_save(preset->name, setting_id, updated_info, update_time);
+            }
+        }
+    };
+
+    if (setting_id.empty() && preset->sync_info.empty()) {
+        if (m_create_preset_blocked[preset->type])
+            return;
+        int ret = preset_bundle->get_differed_values_to_update(*preset, values_map);
+        if (!ret) {
+            std::string base_url = get_cloud_api_url();
+            std::string new_setting_id;
+            auto        preupload_profile_url = "/api/cxy/v2/slice/profile/user/preUploadProfile";
+            Http::set_extra_headers(get_extra_header());
+            Http        http = Http::post(base_url + preupload_profile_url);
+            std::string file_type;
+            json        j;
+            j["md5"]                = get_file_md5(preset->file);
+            j["type"]               = preset->get_cloud_type_string(preset->type);
+            boost::uuids::uuid uuid = boost::uuids::random_generator()();
+            http.header("Content-Type", "application/json")
+                .header("__CXY_REQUESTID_", to_string(uuid))
+                .set_post_body(j.dump())
+                .on_complete([&](std::string body, unsigned status) {
+                    json j = json::parse(body);
+                    if (j["code"] != 0) {
+                        return;
+                    }
+                    new_setting_id             = j["result"]["id"];
+                    auto        lastModifyTime = j["result"]["lastModifyTime"];
+                    auto        uploadPolicy   = j["result"]["uploadPolicy"];
+                    std::string OSSAccessKeyId = uploadPolicy["OSSAccessKeyId"];
+                    std::string Signature      = uploadPolicy["Signature"];
+                    std::string Policy         = uploadPolicy["Policy"];
+                    std::string Key            = uploadPolicy["Key"];
+                    std::string Callback       = uploadPolicy["Callback"];
+                    std::string Host           = uploadPolicy["Host"];
+                    Http        http           = Http::post(Host);
+                    http.form_add("OSSAccessKeyId", OSSAccessKeyId)
+                        .form_add("Signature", Signature)
+                        .form_add("Policy", Policy)
+                        .form_add("Key", Key)
+                        .form_add("Callback", Callback)
+                        .form_add_file("File", preset->file, preset->name)
+                        .on_complete([&](std::string body, unsigned status) {
+                            result = 0;
+                            result_callback();
+                        })
+                        .on_error([&](std::string body, std::string error, unsigned status) {
+                            result       = 0;
+                            updated_info = "hold";
+                            result_callback();
+                        })
+                        .on_progress([&](Http::Progress progress, bool& cancel) {
+
+                        })
+                        .perform_sync();
+                })
+                .on_error([&](std::string body, std::string error, unsigned status) {
+
+                })
+                .on_progress([&](Http::Progress progress, bool& cancel) {
+
+                })
+                .perform_sync();
+
+            if (!new_setting_id.empty()) {
+                setting_id           = new_setting_id;
+                result               = 0;
+                auto update_time_str = values_map[BBL_JSON_KEY_UPDATE_TIME];
+                if (!update_time_str.empty())
+                    update_time = std::atoll(update_time_str.c_str());
+                result_callback();
+            } else {
+                result = -1;
+            }
+        } else {
+            BOOST_LOG_TRIVIAL(trace) << "[sync_preset]create: can not generate differed preset";
+        }
+    }
+    else if (preset->sync_info.compare("create") == 0) {
+        if (m_create_preset_blocked[preset->type])
+            return;
+        int ret = preset_bundle->get_differed_values_to_update(*preset, values_map);
+        if (!ret) {
+            std::string base_url     = get_cloud_api_url();
+            std::string new_setting_id;
+            auto preupload_profile_url = "/api/cxy/v2/slice/profile/user/preUploadProfile";
+            Http::set_extra_headers(get_extra_header());
+            Http http                  = Http::post(base_url + preupload_profile_url);
+            std::string file_type;
+            json               j;
+            j["md5"]                = get_file_md5(preset->file);
+            j["type"]               = preset->get_cloud_type_string(preset->type);
+            boost::uuids::uuid uuid = boost::uuids::random_generator()();
+            http.header("Content-Type", "application/json")
+                .header("__CXY_REQUESTID_", to_string(uuid))
+                .set_post_body(j.dump())
+                .on_complete([&](std::string body, unsigned status) {
+                    json j = json::parse(body);
+                    if (j["code"] != 0) {
+                        return;
+                    }
+                    new_setting_id = j["result"]["id"];
+                    auto        lastModifyTime = j["result"]["lastModifyTime"];
+                    auto        uploadPolicy   = j["result"]["uploadPolicy"];
+                    std::string OSSAccessKeyId = uploadPolicy["OSSAccessKeyId"];
+                    std::string Signature      = uploadPolicy["Signature"];
+                    std::string Policy         = uploadPolicy["Policy"];
+                    std::string Key            = uploadPolicy["Key"];
+                    std::string Callback       = uploadPolicy["Callback"];
+                    std::string Host           = uploadPolicy["Host"];
+                    Http        http           = Http::post(Host);
+                    http.form_add("OSSAccessKeyId", OSSAccessKeyId)
+                        .form_add("Signature", Signature)
+                        .form_add("Policy", Policy)
+                        .form_add("Key", Key)
+                        .form_add("Callback", Callback)
+                        .form_add_file("File", preset->file, preset->name)
+                        .on_complete([&](std::string body, unsigned status) {
+                            result = 0;
+                            result_callback();
+                        })
+                        .on_error([&](std::string body, std::string error, unsigned status) {
+                            result       = 0;
+                            updated_info = "hold";
+                            result_callback();
+                        })
+                        .on_progress([&](Http::Progress progress, bool& cancel) {
+
+                        })
+                        .perform_sync();
+                })
+                .on_error([&](std::string body, std::string error, unsigned status) {
+
+                })
+                .on_progress([&](Http::Progress progress, bool& cancel) {
+
+                })
+                .perform_sync();
+
+            if (!new_setting_id.empty()) {
+                setting_id = new_setting_id;
+                result = 0;
+                auto update_time_str = values_map[BBL_JSON_KEY_UPDATE_TIME];
+                if (!update_time_str.empty())
+                    update_time = std::atoll(update_time_str.c_str());
+            } else {
+                    result = -1;
+            }
+        } else {
+            BOOST_LOG_TRIVIAL(trace) << "[sync_preset]create: can not generate differed preset";
+        }
+    } else if (preset->sync_info.compare("update") == 0) {
+        if (!setting_id.empty()) {
+            int ret = preset_bundle->get_differed_values_to_update(*preset, values_map);
+            if (!ret) {
+                if (auto iter = values_map.find(BBL_JSON_KEY_BASE_ID); iter != values_map.end() && iter->second == setting_id) {
+                    //clear the setting_id in this case ???
+                    setting_id.clear();
+                    result = 0;
+                } else {
+                    std::string version_type = get_vertion_type();
+                    std::string base_url              = get_cloud_api_url();
+                    auto        preupload_profile_url = "/api/cxy/v2/slice/profile/user/editProfile";
+                    Http::set_extra_headers(get_extra_header());
+                    Http        http = Http::post(base_url + preupload_profile_url);
+                    std::string file_type;
+                    json        j;
+                    j["id"]                 = setting_id;
+                    boost::uuids::uuid uuid = boost::uuids::random_generator()();
+                    http.header("Content-Type", "application/json")
+                        .header("__CXY_REQUESTID_", to_string(uuid))
+                        .set_post_body(j.dump())
+                        .on_complete([&](std::string body, unsigned status) {
+                            json j = json::parse(body);
+                            if (j["code"] != 0) {
+                                return;
+                            }
+                            std::string setting_id     = j["result"]["id"];
+                            auto        lastModifyTime = j["result"]["lastModifyTime"];
+                            auto        uploadPolicy   = j["result"]["uploadPolicy"];
+                            std::string OSSAccessKeyId = uploadPolicy["OSSAccessKeyId"];
+                            std::string Signature      = uploadPolicy["Signature"];
+                            std::string Policy         = uploadPolicy["Policy"];
+                            std::string Key            = uploadPolicy["Key"];
+                            std::string Callback       = uploadPolicy["Callback"];
+                            std::string Host           = uploadPolicy["Host"];
+                            Http        http           = Http::post(Host);
+                            http.form_add("OSSAccessKeyId", OSSAccessKeyId)
+                                .form_add("Signature", Signature)
+                                .form_add("Policy", Policy)
+                                .form_add("Key", Key)
+                                .form_add("Callback", Callback)
+                                .form_add_file("File", preset->file, preset->name)
+                                .on_complete([&](std::string body, unsigned status) {
+                                    auto update_time_str = values_map[BBL_JSON_KEY_UPDATE_TIME];
+                                    if (!update_time_str.empty())
+                                        update_time = std::atoll(update_time_str.c_str());
+                                    result = 0;
+                                    result_callback();
+                                })
+                                .on_error([&](std::string body, std::string error, unsigned status) {
+                                    result       = 0;
+                                    updated_info = "hold";
+                                    result_callback();
+                                })
+                                .on_progress([&](Http::Progress progress, bool& cancel) {
+
+                                })
+                                .perform_sync();
+                        })
+                        .on_error([&](std::string body, std::string error, unsigned status) {
+                            result       = 0;
+                            updated_info = "hold";
+                            result_callback();
+                        })
+                        .on_progress([&](Http::Progress progress, bool& cancel) {
+
+                        })
+                        .perform_sync();
+                    if (http_code >= 400) {
+                        BOOST_LOG_TRIVIAL(error) << "[sync_preset] put setting_id = " << setting_id << " failed, http_code = " << http_code;
+                    } else {
+                    }
+                }
+
+            }
+            else {
+                BOOST_LOG_TRIVIAL(trace) << "[sync_preset]update: can not generate differed key-values, we need to skip this preset "<< preset->name;
+                result = 0;
+            }
+        }
+        else {
+            //clear the sync_info
+            result = 0;
+        }
+    }
+
+    if (http_code >= 400 && values_map["code"] == "14") { // Limit
+        m_create_preset_blocked[preset->type] = true;
+        CallAfter([this] {
+            plater()->get_notification_manager()->push_notification(NotificationType::BBLUserPresetExceedLimit);
+            static bool dialog_notified = false;
+            if (dialog_notified)
+                return;
+            dialog_notified = true;
+            if (mainframe == nullptr)
+                return;
+            auto msg = _L("The number of user presets cached in the cloud has exceeded the upper limit, newly created user presets can only be used locally.");
+            MessageDialog(mainframe, msg, _L("Sync user presets"), wxICON_WARNING | wxOK).ShowModal();
+        });
+        return; // this error not need hold, and should not hold
+    }
+
+}
+bool GUI_App::wait_cloud_token()
+{
+    auto token = app_config->get("cloud", "token");
+    int wait_time = 160; // 16s
+    while(token== app_config->get("cloud", "token"))
+    {
+        std::cout <<"token" <<app_config->get("cloud", "token")<< std::endl;
+        boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+        wait_time--;
+         if (wait_time <= 0) {
+            return false;
+        }
+    }
+    return true;
+}
+void GUI_App::save_user_default_filaments(AppConfig *new_app_config)
+{
+    std::set<std::string> selected_models;
+    for (const auto& vendor : new_app_config->vendors()) {
+        for (const auto& model : vendor.second) {
+            if (!model.second.empty())
+                selected_models.emplace(model.first);
+        }
+    }
+
+    auto add_filament_to_sessiton = [this,new_app_config](std::string machine_name,std::string default_materials){
+        std::string section_name = AppConfig::SECTION_FILAMENTS;
+            if (new_app_config->has_section(section_name)) {
+            const std::map<std::string, std::string> &installed = new_app_config->get_section(section_name);
+            auto has = [&installed](const std::string &name) {
+                auto it = installed.find(name);
+                return it != installed.end() && ! it->second.empty();
+            };
+            std::vector<std::string> materials;
+            boost::algorithm::split(materials, default_materials, boost::is_any_of(";"));
+            bool bInstalled = false;
+            for (const auto& str : materials) {
+                std::string basename =  str + " @"+machine_name;
+                    bool is_visible = has(basename);
+                    if (is_visible) {
+                        bInstalled = true;
+                    }
+            }
+            if(bInstalled)
+                return;
+            for (const auto& str : materials) {
+                std::string basename =  str + " @"+machine_name;
+                        new_app_config->set(section_name, basename, "true");
+            }
+             //app_config->save();
+             
+        }
+    };
+    fs::path creality_file = fs::path(resources_dir()).append("profiles").append("Creality.json");
+    if(fs::exists(creality_file))
+    {
+        try{
+        boost::nowide::ifstream t(creality_file.string());
+        std::stringstream buffer;
+        buffer << t.rdbuf();
+        json jLocal = json::parse(buffer.str());
+        auto machine_list = jLocal["machine_model_list"];
+        for (const auto& item : machine_list)
+        {
+            std::string name = item["name"];
+            if (!selected_models.empty() && selected_models.find(name) == selected_models.end())
+                continue;
+
+            std::string sub_path = item["sub_path"];
+            fs::path machine_file = fs::path(resources_dir()).append("profiles").append("Creality").append(sub_path);
+            boost::nowide::ifstream m(machine_file.string());
+            std::stringstream buffer2;
+            buffer2 << m.rdbuf();
+            json j = json::parse(buffer2.str());
+            std::string nozzle_diameter = j["nozzle_diameter"];
+            std::vector<std::string> diameters;
+            boost::algorithm::split(diameters, nozzle_diameter, boost::is_any_of(";"));
+            auto default_materials = j["default_materials"];
+            for (const auto& diameter : diameters) {
+                std::string machine_name = (boost::format( "%1% %2% nozzle") % name % diameter).str();
+                add_filament_to_sessiton(machine_name,default_materials);
+            }
+        
+        }
+        
+        
+    }catch(std::exception e){
+
+        }
+   
+    }
+
+}
+void GUI_App::start_sync_user_preset(bool with_progress_dlg)
+{
+    if (!is_login()) {
+        BOOST_LOG_TRIVIAL(error) << "start_sync_user_preset login is false";
+        return;
+    }
+    if (app_config->get("stealth_mode") == "true") {
+        BOOST_LOG_TRIVIAL(error) << "start_sync_user_preset stealth_mode is true";
+        return;
+    }
+
+    auto token = app_config->get("cloud", "token");
+    if (token.empty()) {
+        BOOST_LOG_TRIVIAL(error) << "start_sync_user_preset token is empty";
+        return;
+    }
+    auto user_id = app_config->get("cloud", "user_id");
+    SyncUserPresets::getInstance().startSync();
+    SyncUserPresets::getInstance().syncUserPresetsToLocal();
+    return;
+
+    // has already start sync
+    if (m_user_sync_token) return;
+
+    ProgressFn progressFn;
+    WasCancelledFn cancelFn;
+    std::function<void(bool,int, const std::string&, const std::string&, long long, const std::string&, const std::string&, int)> finishFn;
+
+    BOOST_LOG_TRIVIAL(info) << "start_sync_service...";
+    // BBS
+    m_user_sync_token.reset(new int(0));
+    m_user_query_type = 2;
+    if (with_progress_dlg) {
+        auto dlg = new ProgressDialog(_L("Loading"), "", 100, this->mainframe, wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_CAN_ABORT);
+        dlg->Update(0, _L("Loading user preset"));
+        progressFn = [this, dlg](int percent) {
+            CallAfter([=]{
+                dlg->Update(percent, _L("Loading user preset"));
+            });
+        };
+        cancelFn = [this, dlg]() {
+            return m_is_closing || dlg->WasCanceled();
+        };
+        finishFn = [this, userid = user_id, dlg,
+                    t = std::weak_ptr<int>(m_user_sync_token)](bool ok, int query_type, const std::string& url, const std::string& version,
+                                                               long long update_time, const std::string& file_type,
+                                                               const std::string& setting_id, int total_count) {
+            CallAfter([=]{
+                dlg->Destroy();
+                if (ok && t.lock() == m_user_sync_token && userid == app_config->get("cloud", "user_id"))
+                    reload_settings(query_type, url, version, update_time, file_type, setting_id, total_count);
+            });
+        };
+    }
+    else {
+        finishFn = [this, userid = user_id, t = std::weak_ptr<int>(m_user_sync_token)](bool ok, int query_type, const std::string& url,
+                                                                                       const std::string& version, long long update_time,
+                                                                                       const std::string& file_type,
+                                                                                       const std::string& setting_id, int total_count) {
+            if (ok && t.lock() == m_user_sync_token && userid == app_config->get("cloud", "user_id"))
+                reload_settings(query_type, url, version, update_time, file_type, setting_id, total_count);
+        };
+    }
+
+    m_sync_update_thread = Slic3r::create_thread(
+        [this, progressFn, cancelFn, finishFn, t = std::weak_ptr<int>(m_user_sync_token)] {
+            // get setting list, update setting list
+            std::string version               = ""; // preset_bundle->get_vendor_profile_version(PresetBundle::BBL_BUNDLE).to_string();
+            std::string version_type = get_vertion_type(); 
+            std::string base_url              = get_cloud_api_url();
+            auto preupload_profile_url = "/api/cxy/v2/slice/profile/user/list";
+            Http::set_extra_headers(get_extra_header());
+            Http        http = Http::post(base_url + preupload_profile_url);
+            std::string file_type;
+            json        j;
+            j["version"]            = version;
+            boost::uuids::uuid uuid = boost::uuids::random_generator()();
+            int count = 0, sync_count = 0;
+            std::vector<Preset> presets_to_sync;
+            while (!t.expired()) {
+                if (m_user_syncing) {
+                    boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+                    continue;
+                }
+                if (m_user_query_type != 0) {
+                    user_cloud_presets_.clear();
+                    repeat_presets_ = 0;
+                    int query_type = m_user_query_type;
+                    m_user_syncing = true;
+                    http.header("Content-Type", "application/json")
+                        .header("__CXY_REQUESTID_", to_string(uuid))
+                        .set_post_body(j.dump())
+                        .on_complete([&, query_type = std::move(query_type)](std::string body, unsigned status) {
+                            json j = json::parse(body);
+                            if (j["code"] != 0) {
+                                m_user_syncing = false;
+                                return;
+                            }
+                            int total_count = 0;
+                            for (auto& file : j["result"]["list"]) {
+                                file_type = file["type"];
+                                if (file_type == "materia" || file_type == "process" || file_type == "printer") {
+                                    ++total_count;
+                                }
+                            }
+                            if (total_count == 0) {
+                                send_user_presets();
+                            }
+                            for (auto& file : j["result"]["list"]) {
+                                auto        setting_id  = file["id"];
+                                long long   update_time = file["lastModifyTime"];
+                                std::string version     = file["version"];
+                                file_type               = file["type"];
+                                auto zipUrl             = file["zipUrl"];
+                                bool need_sync          = false;
+                                if (file_type == "materia") {
+                                    file_type = "filament";
+                                    if (query_type == 1) {
+                                        need_sync = true;
+                                    } else {
+                                        need_sync = preset_bundle->filaments.need_sync("", setting_id, update_time);
+                                        if (!need_sync)
+                                            --total_count;
+                                    }
+                                } else if (file_type == "process") {
+                                    file_type = "print";
+                                    if (query_type == 1) {
+                                        need_sync = true;
+                                    } else {
+                                        need_sync = preset_bundle->prints.need_sync("", setting_id, update_time);
+                                        if (!need_sync)
+                                            --total_count;
+                                    }
+                                } else if (file_type == "printer") {
+                                    file_type = "printer";
+                                    if (query_type == 1) {
+                                        need_sync = true;
+                                    } else {
+                                        need_sync = preset_bundle->printers.need_sync("", setting_id, update_time);
+                                        if (!need_sync)
+                                            --total_count;
+                                    }
+                                } else if (file_type == "local_device") {
+                                    need_sync = false;
+
+                                    if (zipUrl.is_string()) {
+                                        Http http = Http::get(zipUrl);
+                                        http.on_complete([&](std::string body, unsigned status) {
+                                                if (status != 200)
+                                                    return;
+
+                                                json j     = json::parse(body);
+                                                bool check = false;
+                                                if (j["accounts"].type() == detail::value_t::array) {
+                                                    for (const auto& account_json : j["accounts"]) {
+                                                        if (account_json.find("my_devices") != account_json.cend()) {
+                                                            check = true;
+                                                        }
+                                                    }
+                                                }
+
+                                                if (check) {
+                                                    std::filesystem::path accout_device_file = (std::filesystem::path(
+                                                                                                    get_local_device_dir()) /
+                                                                                                account_device_json_file())
+                                                                                                   .make_preferred();
+
+                                                    std::lock_guard<std::mutex> lock(AccountDeviceMgr::getFileMutex());
+
+                                                    std::ofstream temp_file(accout_device_file.string());
+                                                    if (!temp_file.is_open()) {
+                                                        return;
+                                                    }
+                                                    temp_file << j;
+                                                    temp_file.close();
+
+                                                    AccountDeviceMgr::getInstance().load();
+                                                    AccountDeviceMgr::getInstance().reset_account_device_file_id(setting_id);
+                                                }
+                                            })
+                                            .perform_sync();
+                                    }
+
+                                } else {
+                                    ;
+                                }
+                                finishFn(need_sync, query_type, zipUrl, version, update_time, file_type, setting_id, total_count);
+                            }
+                            m_user_syncing    = false;
+                        })
+                        .on_error([&](std::string body, std::string error, unsigned status) {
+
+                        })
+                        .on_progress([&](Http::Progress progress, bool& cancel) {
+
+                        })
+                        .perform_sync();
+                    m_user_query_type = 0;
+                    continue;
+                }
+                count++;
+                if (count % 50 == 0) {
+                    if (true) {
+                        //if (!m_agent->is_user_login()) {
+                        //    continue;
+                        //}
+                        //sync preset
+                        if (!preset_bundle) continue;
+
+                        int total_count = 0;
+                        sync_count = preset_bundle->prints.get_user_presets(preset_bundle, presets_to_sync);
+                        if (sync_count > 0) {
+                            for (Preset& preset : presets_to_sync) {
+                                sync_preset(&preset);
+                                boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+                            }
+                        }
+                        total_count += sync_count;
+
+                        sync_count = preset_bundle->filaments.get_user_presets(preset_bundle, presets_to_sync);
+                        if (sync_count > 0) {
+                            for (Preset& preset : presets_to_sync) {
+                                sync_preset(&preset);
+                                boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+                            }
+                        }
+                        total_count += sync_count;
+
+                        sync_count = preset_bundle->printers.get_user_presets(preset_bundle, presets_to_sync);
+                        if (sync_count > 0) {
+                            for (Preset& preset : presets_to_sync) {
+                                sync_preset(&preset);
+                                boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+                            }
+                        }
+                        total_count += sync_count;
+
+                        if (total_count == 0) {
+                            CallAfter([this] {
+                                if (!m_is_closing)
+                                    plater()->get_notification_manager()->close_notification_of_type(NotificationType::BBLUserPresetExceedLimit);
+                            });
+                        }
+
+                        unsigned int http_code = 200;
+
+                        /* get list witch need to be deleted*/
+                        std::vector<string> delete_cache_presets = get_delete_cache_presets_lock();
+                        for (auto it = delete_cache_presets.begin(); it != delete_cache_presets.end();) {
+                            if ((*it).empty()) continue;
+                            std::string del_setting_id = *it;
+
+                            std::string base_url              = get_cloud_api_url();
+                            auto        preupload_profile_url = "/api/cxy/v2/slice/profile/user/deleteProfile";
+                            Http::set_extra_headers(get_extra_header());
+                            Http http = Http::post(base_url + preupload_profile_url);
+                            json        j;
+                            j["id"]                 = del_setting_id;
+                            boost::uuids::uuid uuid = boost::uuids::random_generator()();
+                            http.header("Content-Type", "application/json")
+                                .header("__CXY_REQUESTID_", to_string(uuid))
+                                .set_post_body(j.dump())
+                                .on_complete([&](std::string body, unsigned status) {
+                                    json j = json::parse(body);
+                                    if (j["code"] == 0) {
+                                        preset_deleted_from_cloud(del_setting_id);
+                                        it                      = delete_cache_presets.erase(it);
+                                        m_create_preset_blocked = {false, false, false, false, false, false};
+                                        BOOST_LOG_TRIVIAL(trace)
+                                            << "sync_preset: sync operation: delete success! setting id = " << del_setting_id;
+                                    } else {
+                                        BOOST_LOG_TRIVIAL(info) << "delete setting = " << del_setting_id << " failed";
+                                        it++;
+                                    }
+                                })
+                                .on_error([&](std::string body, std::string error, unsigned status) {
+
+                                })
+                                .on_progress([&](Http::Progress progress, bool& cancel) {
+
+                                })
+                                .perform_sync();
+                        }
+                    }
+                } else {
+                    boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+                }
+            }
+        });
+}
+
+void GUI_App::stop_sync_user_preset()
+{
+    SyncUserPresets::getInstance().stopSync();
+    return;
+
+    if (!m_user_sync_token)
+        return;
+
+    m_user_sync_token.reset();
+    if (m_sync_update_thread.joinable()) {
+        if (m_is_closing)
+            m_sync_update_thread.join();
+        else
+            m_sync_update_thread.detach();
+    }
+}
+
+void GUI_App::start_http_server()
+{
+    if (!m_http_server.is_started())
+        m_http_server.start();
+}
+void GUI_App::stop_http_server()
+{
+    m_http_server.stop();
+}
+
+void GUI_App::switch_staff_pick(bool on)
+{
+    mainframe->m_webview->SendDesignStaffpick(on);
+}
+
+bool GUI_App::switch_language()
+{
+    if (select_language()) {
+        recreate_GUI(_L("Switching application language") + dots);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+#ifdef __linux__
+static const wxLanguageInfo* linux_get_existing_locale_language(const wxLanguageInfo* language,
+                                                                const wxLanguageInfo* system_language)
+{
+    constexpr size_t max_len = 50;
+    char path[max_len] = "";
+    std::vector<std::string> locales;
+    const std::string lang_prefix = into_u8(language->CanonicalName.BeforeFirst('_'));
+
+    // Call locale -a so we can parse the output to get the list of available locales
+    // We expect lines such as "en_US.utf8". Pick ones starting with the language code
+    // we are switching to. Lines with different formatting will be removed later.
+    FILE* fp = popen("locale -a", "r");
+    if (fp != NULL) {
+        while (fgets(path, max_len, fp) != NULL) {
+            std::string line(path);
+            line = line.substr(0, line.find('\n'));
+            if (boost::starts_with(line, lang_prefix))
+                locales.push_back(line);
+        }
+        pclose(fp);
+    }
+
+    // locales now contain all candidates for this language.
+    // Sort them so ones containing anything about UTF-8 are at the end.
+    std::sort(locales.begin(), locales.end(), [](const std::string& a, const std::string& b)
+    {
+        auto has_utf8 = [](const std::string & s) {
+            auto S = boost::to_upper_copy(s);
+            return S.find("UTF8") != std::string::npos || S.find("UTF-8") != std::string::npos;
+        };
+        return ! has_utf8(a) && has_utf8(b);
+    });
+
+    // Remove the suffix behind a dot, if there is one.
+    for (std::string& s : locales)
+        s = s.substr(0, s.find("."));
+
+    // We just hope that dear Linux "locale -a" returns country codes
+    // in ISO 3166-1 alpha-2 code (two letter) format.
+    // https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
+    // To be sure, remove anything not looking as expected
+    // (any number of lowercase letters, underscore, two uppercase letters).
+    locales.erase(std::remove_if(locales.begin(),
+                                 locales.end(),
+                                 [](const std::string& s) {
+                                     return ! std::regex_match(s,
+                                         std::regex("^[a-z]+_[A-Z]{2}$"));
+                                 }),
+                   locales.end());
+
+    // Is there a candidate matching a country code of a system language? Move it to the end,
+    // while maintaining the order of matches, so that the best match ends up at the very end.
+    std::string temp_local = into_u8(system_language->CanonicalName.AfterFirst('_'));
+    if (temp_local.size() >= 2) {
+        temp_local = temp_local.substr(0, 2);
+    }
+    std::string system_country = "_" + temp_local;
+    int cnt = locales.size();
+    for (int i=0; i<cnt; ++i)
+        if (locales[i].find(system_country) != std::string::npos) {
+            locales.emplace_back(std::move(locales[i]));
+            locales[i].clear();
+        }
+
+    // Now try them one by one.
+    for (auto it = locales.rbegin(); it != locales.rend(); ++ it)
+        if (! it->empty()) {
+            const std::string &locale = *it;
+            const wxLanguageInfo* lang = wxLocale::FindLanguageInfo(from_u8(locale));
+            if (wxLocale::IsAvailable(lang->Language))
+                return lang;
+        }
+    return language;
+}
+
+static bool check_has_C_language_set() 
+{
+    setenv("LANG", "C", 1);
+    char* current_locale = setlocale(LC_ALL, nullptr);
+    if (current_locale != nullptr) {
+        printf("Current locale: %s\n", current_locale);
+        std::string lang = current_locale;
+        return lang == "C" || lang == "C.UTF-8";
+    }
+    return false;
+}
+#endif
+
+void GUI_App::bind_shader(const GLShaderProgram* p_shader)
+{
+    m_opengl_mgr.bind_shader(p_shader);
+}
+
+void GUI_App::unbind_shader()
+{
+    m_opengl_mgr.unbind_shader();
+}
+
+int GUI_App::GetSingleChoiceIndex(const wxString& message,
+                                const wxString& caption,
+                                const wxArrayString& choices,
+                                int initialSelection)
+{
+#ifdef _WIN32
+    wxSingleChoiceDialog dialog(nullptr, message, caption, choices);
+    dialog.SetBackgroundColour(*wxWHITE);
+    wxGetApp().UpdateDlgDarkUI(&dialog);
+
+    dialog.SetSelection(initialSelection);
+    return dialog.ShowModal() == wxID_OK ? dialog.GetSelection() : -1;
+#else
+    return wxGetSingleChoiceIndex(message, caption, choices, initialSelection);
+#endif
+}
+
+// select language from the list of installed languages
+bool GUI_App::select_language()
+{
+	wxArrayString translations = wxTranslations::Get()->GetAvailableTranslations(SLIC3R_APP_KEY);
+    std::vector<const wxLanguageInfo*> language_infos;
+    language_infos.emplace_back(wxLocale::GetLanguageInfo(wxLANGUAGE_ENGLISH));
+    for (size_t i = 0; i < translations.GetCount(); ++ i) {
+	    const wxLanguageInfo *langinfo = wxLocale::FindLanguageInfo(translations[i]);
+        if (langinfo != nullptr)
+            language_infos.emplace_back(langinfo);
+    }
+    sort_remove_duplicates(language_infos);
+	std::sort(language_infos.begin(), language_infos.end(), [](const wxLanguageInfo* l, const wxLanguageInfo* r) { return l->Description < r->Description; });
+
+    wxArrayString names;
+    names.Alloc(language_infos.size());
+
+    // Some valid language should be selected since the application start up.
+    const wxLanguage current_language = wxLanguage(m_wxLocale->GetLanguage());
+    int 		     init_selection   		= -1;
+    int 			 init_selection_alt     = -1;
+    int 			 init_selection_default = -1;
+    for (size_t i = 0; i < language_infos.size(); ++ i) {
+        if (wxLanguage(language_infos[i]->Language) == current_language)
+        	// The dictionary matches the active language and country.
+            init_selection = i;
+        else if ((language_infos[i]->CanonicalName.BeforeFirst('_') == m_wxLocale->GetCanonicalName().BeforeFirst('_')) ||
+        		 // if the active language is Slovak, mark the Czech language as active.
+        	     (language_infos[i]->CanonicalName.BeforeFirst('_') == "cs" && m_wxLocale->GetCanonicalName().BeforeFirst('_') == "sk"))
+        	// The dictionary matches the active language, it does not necessarily match the country.
+        	init_selection_alt = i;
+        if (language_infos[i]->CanonicalName.BeforeFirst('_') == "en")
+        	// This will be the default selection if the active language does not match any dictionary.
+        	init_selection_default = i;
+        names.Add(language_infos[i]->Description);
+    }
+    if (init_selection == -1)
+    	// This is the dictionary matching the active language.
+    	init_selection = init_selection_alt;
+    if (init_selection != -1)
+    	// This is the language to highlight in the choice dialog initially.
+    	init_selection_default = init_selection;
+
+    const long index = GetSingleChoiceIndex(_L("Select the language"), _L("Language"), names, init_selection_default);
+	// Try to load a new language.
+    if (index != -1 && (init_selection == -1 || init_selection != index)) {
+    	const wxLanguageInfo *new_language_info = language_infos[index];
+    	if (this->load_language(new_language_info->CanonicalName, false)) {
+			// Save language at application config.
+            // Which language to save as the selected dictionary language?
+            // 1) Hopefully the language set to wxTranslations by this->load_language(), but that API is weird and we don't want to rely on its
+            //    stability in the future:
+            //    wxTranslations::Get()->GetBestTranslation(SLIC3R_APP_KEY, wxLANGUAGE_ENGLISH);
+            // 2) Current locale language may not match the dictionary name, see GH issue #3901
+            //    m_wxLocale->GetCanonicalName()
+            // 3) new_language_info->CanonicalName is a safe bet. It points to a valid dictionary name.
+			app_config->set("language", new_language_info->CanonicalName.ToUTF8().data());
+    		return true;
+        }
+    }
+
+    return false;
+}
+
+// Load gettext translation files and activate them at the start of the application,
+// based on the "language" key stored in the application config.
+bool GUI_App::load_language(wxString language, bool initial)
+{
+    BOOST_LOG_TRIVIAL(info) << boost::format("%1%: language %2%, initial: %3%") %__FUNCTION__ %language %initial;
+    
+    AICloudService::getInstance()->cleanup();
+    if (initial) {
+    	// There is a static list of lookup path prefixes in wxWidgets. Add ours.
+	    wxFileTranslationsLoader::AddCatalogLookupPathPrefix(from_u8(localization_dir()));
+    	// Get the active language from PrusaSlicer.ini, or empty string if the key does not exist.
+        language = app_config->get("language");
+        if (! language.empty())
+        	BOOST_LOG_TRIVIAL(info) << boost::format("language provided by CrealityPrint.conf: %1%") % language;
+        else {
+            // Get the system language.
+            const wxLanguage lang_system = wxLanguage(wxLocale::GetSystemLanguage());
+            if (lang_system != wxLANGUAGE_UNKNOWN) {
+                m_language_info_system = wxLocale::GetLanguageInfo(lang_system);
+#ifdef __WXMSW__
+                WCHAR wszLanguagesBuffer[LOCALE_NAME_MAX_LENGTH];
+                ::LCIDToLocaleName(LOCALE_USER_DEFAULT, wszLanguagesBuffer, LOCALE_NAME_MAX_LENGTH, 0);
+                wxString lang(wszLanguagesBuffer);
+                lang.Replace('-', '_');
+                if (auto info = wxLocale::FindLanguageInfo(lang))
+                    m_language_info_system = info;
+#endif
+                BOOST_LOG_TRIVIAL(info) << boost::format("System language detected (user locales and such): %1%") % m_language_info_system->CanonicalName.ToUTF8().data();
+                // BBS set language to app config
+                app_config->set("language", m_language_info_system->CanonicalName.ToUTF8().data());
+            } else {
+                {
+                    // Allocating a temporary locale will switch the default wxTranslations to its internal wxTranslations instance.
+                    wxLocale temp_locale;
+                    temp_locale.Init();
+                    // Set the current translation's language to default, otherwise GetBestTranslation() may not work (see the wxWidgets source code).
+                    wxTranslations::Get()->SetLanguage(wxLANGUAGE_DEFAULT);
+                    // Let the wxFileTranslationsLoader enumerate all translation dictionaries for PrusaSlicer
+                    // and try to match them with the system specific "preferred languages".
+                    // There seems to be a support for that on Windows and OSX, while on Linuxes the code just returns wxLocale::GetSystemLanguage().
+                    // The last parameter gets added to the list of detected dictionaries. This is a workaround
+                    // for not having the English dictionary. Let's hope wxWidgets of various versions process this call the same way.
+                    wxString best_language = wxTranslations::Get()->GetBestTranslation(SLIC3R_APP_KEY, wxLANGUAGE_ENGLISH);
+                    if (!best_language.IsEmpty()) {
+                        m_language_info_best = wxLocale::FindLanguageInfo(best_language);
+                        BOOST_LOG_TRIVIAL(info) << boost::format("Best translation language detected (may be different from user locales): %1%") %
+                                                        m_language_info_best->CanonicalName.ToUTF8().data();
+                        app_config->set("language", m_language_info_best->CanonicalName.ToUTF8().data());
+                    }
+#ifdef __linux__
+                    wxString lc_all;
+                    if (wxGetEnv("LC_ALL", &lc_all) && !lc_all.IsEmpty()) {
+                        // Best language returned by wxWidgets on Linux apparently does not respect LC_ALL.
+                        // Disregard the "best" suggestion in case LC_ALL is provided.
+                        m_language_info_best = nullptr;
+                    }
+#endif
+                }
+            }
+        }
+    }
+
+	const wxLanguageInfo *language_info = language.empty() ? nullptr : wxLocale::FindLanguageInfo(language);
+	if (! language.empty() && (language_info == nullptr || language_info->CanonicalName.empty())) {
+		// Fix for wxWidgets issue, where the FindLanguageInfo() returns locales with undefined ANSII code (wxLANGUAGE_KONKANI or wxLANGUAGE_MANIPURI).
+		language_info = nullptr;
+    	BOOST_LOG_TRIVIAL(error) << boost::format("Language code \"%1%\" is not supported") % language.ToUTF8().data();
+	}
+
+	if (language_info != nullptr && language_info->LayoutDirection == wxLayout_RightToLeft) {
+    	BOOST_LOG_TRIVIAL(trace) << boost::format("The following language code requires right to left layout, which is not supported by CrealityPrint: %1%") % language_info->CanonicalName.ToUTF8().data();
+		language_info = nullptr;
+	}
+
+    if (language_info == nullptr) {
+        // PrusaSlicer does not support the Right to Left languages yet.
+        if (m_language_info_system != nullptr && m_language_info_system->LayoutDirection != wxLayout_RightToLeft)
+            language_info = m_language_info_system;
+        if (m_language_info_best != nullptr && m_language_info_best->LayoutDirection != wxLayout_RightToLeft)
+        	language_info = m_language_info_best;
+	    if (language_info == nullptr)
+			language_info = wxLocale::GetLanguageInfo(wxLANGUAGE_ENGLISH_US);
+    }
+
+	BOOST_LOG_TRIVIAL(trace) << boost::format("Switching wxLocales to %1%") % language_info->CanonicalName.ToUTF8().data();
+
+    // Select language for locales. This language may be different from the language of the dictionary.
+    //if (language_info == m_language_info_best || language_info == m_language_info_system) {
+    //    // The current language matches user's default profile exactly. That's great.
+    //} else if (m_language_info_best != nullptr && language_info->CanonicalName.BeforeFirst('_') == m_language_info_best->CanonicalName.BeforeFirst('_')) {
+    //    // Use whatever the operating system recommends, if it the language code of the dictionary matches the recommended language.
+    //    // This allows a Swiss guy to use a German dictionary without forcing him to German locales.
+    //    language_info = m_language_info_best;
+    //} else if (m_language_info_system != nullptr && language_info->CanonicalName.BeforeFirst('_') == m_language_info_system->CanonicalName.BeforeFirst('_'))
+    //    language_info = m_language_info_system;
+
+    // Alternate language code.
+    wxLanguage language_dict = wxLanguage(language_info->Language);
+    if (language_info->CanonicalName.BeforeFirst('_') == "sk") {
+    	// Slovaks understand Czech well. Give them the Czech translation.
+    	language_dict = wxLANGUAGE_CZECH;
+		BOOST_LOG_TRIVIAL(info) << "Using Czech dictionaries for Slovak language";
+    }
+
+#ifdef __linux__
+    // If we can't find this locale , try to use different one for the language
+    // instead of just reporting that it is impossible to switch.
+    if (! wxLocale::IsAvailable(language_info->Language) && m_language_info_system) {
+        std::string original_lang = into_u8(language_info->CanonicalName);
+        language_info = linux_get_existing_locale_language(language_info, m_language_info_system);
+        BOOST_LOG_TRIVIAL(info) << boost::format("Can't switch language to %1% (missing locales). Using %2% instead.")
+                                    % original_lang % language_info->CanonicalName.ToUTF8().data();
+    }
+#endif
+
+    if (! wxLocale::IsAvailable(language_info->Language)&&initial) {
+        language_info = wxLocale::GetLanguageInfo(wxLANGUAGE_ENGLISH_UK);
+        app_config->set("language", language_info->CanonicalName.ToUTF8().data());
+    }
+    else if (initial) {
+        // bbs supported languages
+        //TODO: use a global one with Preference
+        //wxLanguage supported_languages[]{
+        //    wxLANGUAGE_ENGLISH,
+        //    wxLANGUAGE_CHINESE_SIMPLIFIED,
+        //    wxLANGUAGE_GERMAN,
+        //    wxLANGUAGE_FRENCH,
+        //    wxLANGUAGE_SPANISH,
+        //    wxLANGUAGE_SWEDISH,
+        //    wxLANGUAGE_DUTCH,
+        //    wxLANGUAGE_HUNGARIAN,
+        //    wxLANGUAGE_JAPANESE,
+        //    wxLANGUAGE_ITALIAN
+        //};
+        //std::string cur_language = app_config->get("language");
+        //if (cur_language != "") {
+        //    //cleanup the language wrongly set before
+        //    const wxLanguageInfo *langinfo = nullptr;
+        //    bool embedded_language = false;
+        //    int language_num = sizeof(supported_languages) / sizeof(supported_languages[0]);
+        //    for (auto index = 0; index < language_num; index++) {
+        //        langinfo = wxLocale::GetLanguageInfo(supported_languages[index]);
+        //        std::string temp_lan = langinfo->CanonicalName.ToUTF8().data();
+        //        if (cur_language == temp_lan) {
+        //            embedded_language = true;
+        //            break;
+        //        }
+        //    }
+        //    if (!embedded_language)
+        //        app_config->erase("app", "language");
+        //}
+    }
+
+    if (! wxLocale::IsAvailable(language_info->Language)) {
+    	// Loading the language dictionary failed.
+        BOOST_LOG_TRIVIAL(warning) << "load_language: locale not available. requested locale=" << language_info->CanonicalName.ToUTF8().data()
+                                   << ", dict_lang=" << static_cast<int>(language_dict)
+                                   << ", initial=" << (initial ? "true" : "false")
+                                   << ", config.language=" << app_config->get("language");
+        boost::log::core::get()->flush();
+    	wxString message = "Switching  CrealityPrint to language " + language_info->CanonicalName + " failed.";
+        bool     had_C_lang_set = false;
+#if !defined(_WIN32) && !defined(__APPLE__)
+        // likely some linux system
+        message += "\nYou may need to reconfigure the missing locales, likely by running the \"locale-gen\" and \"dpkg-reconfigure locales\" commands.\n";
+        //had_C_lang_set = check_has_C_language_set();
+#endif
+        if (initial)
+        	message + "\n\nApplication will close.";
+        wxMessageBox(message, "CrealityPrint - Switching language failed", wxOK | wxICON_ERROR);
+        if (initial) {
+            if (!had_C_lang_set)
+                std::exit(EXIT_FAILURE);
+        }
+		else
+			return false;
+    }
+
+    // Release the old locales, create new locales.
+    //FIXME wxWidgets cause havoc if the current locale is deleted. We just forget it causing memory leaks for now.
+    m_wxLocale.release();
+    m_wxLocale = Slic3r::make_unique<wxLocale>();
+    m_wxLocale->Init(language_info->Language);
+    // Override language at the active wxTranslations class (which is stored in the active m_wxLocale)
+    // to load possibly different dictionary, for example, load Czech dictionary for Slovak language.
+    wxTranslations::Get()->SetLanguage(language_dict);
+    m_wxLocale->AddCatalog(SLIC3R_PROCESS_NAME);
+    BOOST_LOG_TRIVIAL(warning) << "load_language: wxLocale initialized. canonical=" << m_wxLocale->GetCanonicalName().ToUTF8().data()
+                               << ", locale=" << m_wxLocale->GetLocale().ToUTF8().data()
+                               << ", dict_lang=" << static_cast<int>(language_dict)
+                               << ", initial=" << (initial ? "true" : "false");
+    boost::log::core::get()->flush();
+    m_imgui->set_language(into_u8(language_info->CanonicalName));
+    //use the language to dump the log
+    GlobalConfig::getInstance()->setCurrentLanguage(into_u8(language_info->CanonicalName));
+    //FIXME This is a temporary workaround, the correct solution is to switch to "C" locale during file import / export only.
+    //wxSetlocale(LC_NUMERIC, "C");
+    Preset::update_suffix_modified((_L("*") + " ").ToUTF8().data());
+    HintDatabase::get_instance().reinit();
+	return true;
+}
+
+Tab* GUI_App::get_tab(Preset::Type type)
+{
+    for (Tab* tab: tabs_list)
+        if (tab->type() == type)
+            return tab->completed() ? tab : nullptr; // To avoid actions with no-completed Tab
+    return nullptr;
+}
+
+Tab* GUI_App::get_plate_tab()
+{
+    return plate_tab;
+}
+
+Tab* GUI_App::get_model_tab(bool part)
+{
+    return model_tabs_list[part ? 1 : 0];
+}
+
+Tab* GUI_App::get_layer_tab()
+{
+    return model_tabs_list[2];
+}
+
+ConfigOptionMode GUI_App::get_mode()
+{
+    if (!app_config->has("user_mode"))
+        return comSimple;
+    //BBS
+    const auto mode = app_config->get("user_mode");
+    return mode == "advanced" ? comAdvanced :
+           mode == "simple" ? comSimple :
+           mode == "develop" ? comDevelop : comSimple;
+}
+
+std::string GUI_App::get_mode_str()
+{
+    if (!app_config->has("user_mode"))
+        return "simple";
+    return app_config->get("user_mode");
+}
+
+void GUI_App::save_mode(const /*ConfigOptionMode*/ int mode, bool need_save)
+{
+    //BBS
+    const std::string mode_str = mode == comAdvanced ? "advanced" :
+                                 mode == comSimple ? "simple" :
+                                 mode == comDevelop ? "develop" : "simple";
+    if (need_save) {
+        app_config->set("user_mode", mode_str);
+    }
+    update_mode(mode);
+}
+
+void GUI_App::update_develop_state()
+{
+    std::string mode = app_config->get("user_mode");
+    ConfigOptionMode savedMode = mode == "develop" ? comDevelop : 
+                                mode == "advanced" ? comAdvanced :
+                                mode == "comSimple" ? comSimple : comAdvanced;
+
+
+    std::string isDevelop = app_config->get("is_factory_mode");
+    app_config->set("is_factory_mode", isDevelop == "true" ? "false" : "true");
+    app_config->save();
+    update_mode(savedMode);
+}
+
+// Update view mode according to selected menu
+void GUI_App::update_mode(const int mode)
+{
+    sidebar().update_mode(mode);
+
+    //BBS: GUI refactor
+    if (mainframe->m_param_panel)
+        mainframe->m_param_panel->update_mode();
+    if (mainframe->m_param_dialog)
+        mainframe->m_param_dialog->panel()->update_mode();
+#if !AUTO_CONVERT_3MF
+    mainframe->m_webview->update_mode();
+#endif
+    if (mainframe->m_topbar)
+        mainframe->m_topbar->update_mode(mode);
+
+#ifdef _MSW_DARK_MODE
+    if (!wxGetApp().tabs_as_menu())
+        dynamic_cast<Notebook*>(mainframe->m_tabpanel)->UpdateMode();
+#endif
+
+    for (auto tab : tabs_list) {
+        tab->update_mode();
+        if (tab->type() == Preset::TYPE_PRINT) {
+            if (mode == comSimple) {
+                std::string selectedItemName = plater()->get_process_toolbar().get_selected_item();
+                if (selectedItemName == "Speed" || selectedItemName.empty()) {
+                    auto item = plater()->get_process_toolbar().get_item(L("Speed"), false);
+                    if (item) {
+                        item->set_state(ProcessBar::GLToolbarItem::EState::Normal);
+                    }
+                    plater()->get_process_toolbar().select_item(L("Quality"));
+                    tab->select_item(L("Quality"));
+                }
+            }
+        }
+    }
+    for (auto tab : model_tabs_list)
+        tab->update_mode();
+
+    //BBS plater()->update_menus();
+
+    plater()->canvas3D()->update_gizmos_on_off_state();
+    plater()->update_mode();
+}
+
+void GUI_App::update_internal_development() {
+    mainframe->m_webview->update_mode();
+}
+
+void GUI_App::show_ip_address_enter_dialog(wxString title)
+{
+    auto evt = new wxCommandEvent(EVT_SHOW_IP_DIALOG);
+    evt->SetString(title);
+    wxQueueEvent(this, evt);
+}
+
+bool GUI_App::show_modal_ip_address_enter_dialog(wxString title)
+{
+    DeviceManager* dev = Slic3r::GUI::wxGetApp().getDeviceManager();
+    if (!dev) return false;
+    if (!dev->get_selected_machine()) return false;
+    auto obj = dev->get_selected_machine();
+
+    InputIpAddressDialog dlg(nullptr);
+    dlg.set_machine_obj(obj);
+    if (!title.empty()) dlg.update_title(title);
+
+    dlg.Bind(EVT_ENTER_IP_ADDRESS, [this, obj](wxCommandEvent& e) {
+        auto selection_data_arr = wxSplit(e.GetString().ToStdString(), '|');
+
+        if (selection_data_arr.size() == 2) {
+            auto ip_address = selection_data_arr[0];
+            auto access_code = selection_data_arr[1];
+
+            BOOST_LOG_TRIVIAL(info) << "User enter IP address is " << ip_address;
+            if (!ip_address.empty()) {
+                wxGetApp().app_config->set_str("ip_address", obj->dev_id, ip_address.ToStdString());
+                wxGetApp().app_config->save();
+
+                obj->dev_ip = ip_address.ToStdString();
+                obj->set_user_access_code(access_code.ToStdString());
+            }
+        }
+    });
+
+    if (dlg.ShowModal() == wxID_YES) {
+        return true;
+    }
+    return false;
+}
+
+void  GUI_App::show_ip_address_enter_dialog_handler(wxCommandEvent& evt)
+{
+    wxString title = evt.GetString();
+    show_modal_ip_address_enter_dialog(title);
+}
+
+//void GUI_App::add_config_menu(wxMenuBar *menu)
+//void GUI_App::add_config_menu(wxMenu *menu)
+//{
+//    auto local_menu = new wxMenu();
+//    wxWindowID config_id_base = wxWindow::NewControlId(int(ConfigMenuCnt));
+//
+//    const auto config_wizard_name = _(ConfigWizard::name(true));
+//    const auto config_wizard_tooltip = from_u8((boost::format(_utf8(L("Open %s"))) % config_wizard_name).str());
+//    // Cmd+, is standard on OS X - what about other operating systems?
+//    if (is_editor()) {
+//        local_menu->Append(config_id_base + ConfigMenuWizard, config_wizard_name + dots, config_wizard_tooltip);
+//        local_menu->Append(config_id_base + ConfigMenuUpdate, _L("Check for Configuration Updates"), _L("Check for configuration updates"));
+//        local_menu->AppendSeparator();
+//    }
+//    local_menu->Append(config_id_base + ConfigMenuPreferences, _L("Preferences") + dots +
+//#ifdef __APPLE__
+//        "\tCtrl+,",
+//#else
+//        "\tCtrl+P",
+//#endif
+//        _L("Application preferences"));
+//    wxMenu* mode_menu = nullptr;
+//    if (is_editor()) {
+//        local_menu->AppendSeparator();
+//        mode_menu = new wxMenu();
+//        mode_menu->AppendRadioItem(config_id_base + ConfigMenuModeSimple, _L("Simple"), _L("Simple Mode"));
+//        mode_menu->AppendRadioItem(config_id_base + ConfigMenuModeAdvanced, _L("Advanced"), _L("Advanced Mode"));
+//        Bind(wxEVT_UPDATE_UI, [this](wxUpdateUIEvent& evt) { if (get_mode() == comSimple) evt.Check(true); }, config_id_base + ConfigMenuModeSimple);
+//        Bind(wxEVT_UPDATE_UI, [this](wxUpdateUIEvent& evt) { if (get_mode() == comAdvanced) evt.Check(true); }, config_id_base + ConfigMenuModeAdvanced);
+//
+//        local_menu->AppendSubMenu(mode_menu, _L("Mode"), wxString::Format(_L("%s Mode"), SLIC3R_APP_NAME));
+//    }
+//    local_menu->AppendSeparator();
+//    local_menu->Append(config_id_base + ConfigMenuLanguage, _L("Language"));
+//    if (is_editor()) {
+//        local_menu->AppendSeparator();
+//    }
+//
+//    local_menu->Bind(wxEVT_MENU, [this, config_id_base](wxEvent &event) {
+//        switch (event.GetId() - config_id_base) {
+//        case ConfigMenuWizard:
+//            run_wizard(ConfigWizard::RR_USER);
+//            break;
+//		case ConfigMenuUpdate:
+//			check_updates(true);
+//			break;
+//#ifdef __linux__
+//        case ConfigMenuDesktopIntegration:
+//            show_desktop_integration_dialog();
+//            break;
+//#endif
+//        case ConfigMenuSnapshots:
+//            //BBS do not support task snapshot
+//            break;
+//        case ConfigMenuPreferences:
+//        {
+//            //BBS GUI refactor: remove unuse layout logic
+//            //bool app_layout_changed = false;
+//            {
+//                // the dialog needs to be destroyed before the call to recreate_GUI()
+//                // or sometimes the application crashes into wxDialogBase() destructor
+//                // so we put it into an inner scope
+//                PreferencesDialog dlg(mainframe);
+//                dlg.ShowModal();
+//                //BBS GUI refactor: remove unuse layout logic
+//                //app_layout_changed = dlg.settings_layout_changed();
+//                if (dlg.seq_top_layer_only_changed())
+//                    this->plater_->refresh_print();
+//
+//                if (dlg.recreate_GUI()) {
+//                    recreate_GUI(_L("Restart application") + dots);
+//                    return;
+//                }
+//#ifdef _WIN32
+//                if (is_editor()) {
+//                    if (app_config->get("associate_3mf") == "true")
+//                        associate_3mf_files();
+//                    if (app_config->get("associate_stl") == "true")
+//                        associate_stl_files();
+//                }
+//                else {
+//                    if (app_config->get("associate_gcode") == "true")
+//                        associate_gcode_files();
+//                }
+//#endif // _WIN32
+//            }
+//            //BBS GUI refactor: remove unuse layout logic
+//            /*if (app_layout_changed) {
+//                // hide full main_sizer for mainFrame
+//                mainframe->GetSizer()->Show(false);
+//                mainframe->update_layout();
+//                mainframe->select_tab(size_t(0));
+//            }*/
+//            break;
+//        }
+//        case ConfigMenuLanguage:
+//        {
+//            /* Before change application language, let's check unsaved changes on 3D-Scene
+//             * and draw user's attention to the application restarting after a language change
+//             */
+//            {
+//                // the dialog needs to be destroyed before the call to switch_language()
+//                // or sometimes the application crashes into wxDialogBase() destructor
+//                // so we put it into an inner scope
+//                wxString title = is_editor() ? wxString(SLIC3R_APP_NAME) : wxString(GCODEVIEWER_APP_NAME);
+//                title += " - " + _L("Choose language");
+//                //wxMessageDialog dialog(nullptr,
+//                MessageDialog dialog(nullptr,
+//                    _L("Switching the language requires application restart.\n") + "\n\n" +
+//                    _L("Do you want to continue?"),
+//                    title,
+//                    wxICON_QUESTION | wxOK | wxCANCEL);
+//                if (dialog.ShowModal() == wxID_CANCEL)
+//                    return;
+//            }
+//
+//            switch_language();
+//            break;
+//        }
+//        case ConfigMenuFlashFirmware:
+//            //BBS FirmwareDialog::run(mainframe);
+//            break;
+//        default:
+//            break;
+//        }
+//    });
+//
+//    using std::placeholders::_1;
+//
+//    if (mode_menu != nullptr) {
+//        auto modfn = [this](int mode, wxCommandEvent&) { if (get_mode() != mode) save_mode(mode); };
+//        mode_menu->Bind(wxEVT_MENU, std::bind(modfn, comSimple, _1), config_id_base + ConfigMenuModeSimple);
+//        mode_menu->Bind(wxEVT_MENU, std::bind(modfn, comAdvanced, _1), config_id_base + ConfigMenuModeAdvanced);
+//    }
+//
+//    // BBS
+//    //menu->Append(local_menu, _L("Configuration"));
+//    menu->AppendSubMenu(local_menu, _L("Configuration"));
+//}
+
+void GUI_App::open_upload_3mf(size_t open_on_tab, const std::string& highlight_option) {
+    Upload3mfToCloudDialog dlg(nullptr);
+    dlg.ShowModal();
+}
+    
+void GUI_App::open_preferences(size_t open_on_tab, const std::string& highlight_option)
+{
+    bool app_layout_changed = false;
+    {
+        // the dialog needs to be destroyed before the call to recreate_GUI()
+        // or sometimes the application crashes into wxDialogBase() destructor
+        // so we put it into an inner scope
+        PreferencesDialog dlg(mainframe, open_on_tab, highlight_option);
+        dlg.ShowModal();
+        this->plater_->get_current_canvas3D()->force_set_focus();
+        // BBS
+        //app_layout_changed = dlg.settings_layout_changed();
+#if ENABLE_GCODE_LINES_ID_IN_H_SLIDER
+        if (dlg.seq_top_layer_only_changed() || dlg.seq_seq_top_gcode_indices_changed())
+#else
+        if (dlg.seq_top_layer_only_changed())
+#endif // ENABLE_GCODE_LINES_ID_IN_H_SLIDER
+            this->plater_->refresh_print();
+#ifdef _WIN32
+        if (is_editor()) {
+            if (app_config->get("associate_3mf") == "true")
+                associate_files(L"3mf");
+            if (app_config->get("associate_stl") == "true")
+                associate_files(L"stl");
+            if (app_config->get("associate_step") == "true") {
+                associate_files(L"step");
+                associate_files(L"stp");
+            }
+            associate_url(L"crealityprint");
+        }
+        else {
+            if (app_config->get("associate_gcode") == "true")
+                associate_files(L"gcode");
+        }
+#endif // _WIN32
+    }
+
+    // BBS
+    /*
+    if (app_layout_changed) {
+        // hide full main_sizer for mainFrame
+        mainframe->GetSizer()->Show(false);
+        mainframe->update_layout();
+        mainframe->select_tab(size_t(0));
+    }*/
+}
+
+void GUI_App::open_config_relate(size_t open_on_tab, const std::string& highlight_option)
+{
+    bool app_layout_changed = false;
+    {
+        // the dialog needs to be destroyed before the call to recreate_GUI()
+        // or sometimes the application crashes into wxDialogBase() destructor
+        // so we put it into an inner scope
+        // PreferencesDialog dlg(mainframe, open_on_tab, highlight_option);
+        ConfigRelateDialog dlg(mainframe, open_on_tab, highlight_option);
+        dlg.ShowModal();
+        this->plater_->get_current_canvas3D()->force_set_focus();
+        // BBS
+        // app_layout_changed = dlg.settings_layout_changed();
+#if ENABLE_GCODE_LINES_ID_IN_H_SLIDER
+        if (dlg.seq_top_layer_only_changed() || dlg.seq_seq_top_gcode_indices_changed())
+#else
+        if (dlg.seq_top_layer_only_changed())
+#endif // ENABLE_GCODE_LINES_ID_IN_H_SLIDER
+            this->plater_->refresh_print();
+#ifdef _WIN32
+        if (is_editor()) {
+            if (app_config->get("associate_3mf") == "true")
+                associate_files(L"3mf");
+            if (app_config->get("associate_stl") == "true")
+                associate_files(L"stl");
+            if (app_config->get("associate_step") == "true") {
+                associate_files(L"step");
+                associate_files(L"stp");
+            }
+            associate_url(L"crealityprint");
+        } else {
+            if (app_config->get("associate_gcode") == "true")
+                associate_files(L"gcode");
+        }
+#endif // _WIN32
+    }
+
+    // BBS
+    /*
+    if (app_layout_changed) {
+        // hide full main_sizer for mainFrame
+        mainframe->GetSizer()->Show(false);
+        mainframe->update_layout();
+        mainframe->select_tab(size_t(0));
+    }*/
+}
+
+bool GUI_App::has_unsaved_preset_changes() const
+{
+    PrinterTechnology printer_technology = preset_bundle->printers.get_edited_preset().printer_technology();
+    for (const Tab* const tab : tabs_list) {
+        if (tab->supports_printer_technology(printer_technology) && tab->saved_preset_is_dirty())
+            return true;
+    }
+    return false;
+}
+
+bool GUI_App::has_current_preset_changes() const
+{
+    PrinterTechnology printer_technology = preset_bundle->printers.get_edited_preset().printer_technology();
+    for (const Tab* const tab : tabs_list) {
+        if (tab->supports_printer_technology(printer_technology) && tab->current_preset_is_dirty())
+            return true;
+    }
+    return false;
+}
+
+void GUI_App::update_saved_preset_from_current_preset()
+{
+    PrinterTechnology printer_technology = preset_bundle->printers.get_edited_preset().printer_technology();
+    for (Tab* tab : tabs_list) {
+        if (tab->supports_printer_technology(printer_technology))
+            tab->update_saved_preset_from_current_preset();
+    }
+}
+
+std::vector<std::pair<unsigned int, std::string>> GUI_App::get_selected_presets() const
+{
+    std::vector<std::pair<unsigned int, std::string>> ret;
+    PrinterTechnology printer_technology = preset_bundle->printers.get_edited_preset().printer_technology();
+    for (Tab* tab : tabs_list) {
+        if (tab->supports_printer_technology(printer_technology)) {
+            const PresetCollection* presets = tab->get_presets();
+            ret.push_back({ static_cast<unsigned int>(presets->type()), presets->get_selected_preset_name() });
+        }
+    }
+    return ret;
+}
+
+// To notify the user whether he is aware that some preset changes will be lost,
+// UnsavedChangesDialog: "Discard / Save / Cancel"
+// This is called when:
+// - Close Application & Current project isn't saved
+// - Load Project      & Current project isn't saved
+// - Undo / Redo with change of print technologie
+// - Loading snapshot
+// - Loading config_file/bundle
+// UnsavedChangesDialog: "Don't save / Save / Cancel"
+// This is called when:
+// - Exporting config_bundle
+// - Taking snapshot
+bool GUI_App::check_and_save_current_preset_changes(const wxString& caption, const wxString& header, bool remember_choice/* = true*/, bool dont_save_insted_of_discard/* = false*/)
+{
+    if (has_current_preset_changes()) {
+        int act_buttons = ActionButtons::SAVE;
+        if (dont_save_insted_of_discard)
+            act_buttons |= ActionButtons::DONT_SAVE;
+        if (remember_choice)
+            act_buttons |= ActionButtons::REMEMBER_CHOISE;
+        UnsavedChangesDialog dlg(caption, header, "", act_buttons);
+        if (dlg.ShowModal() == wxID_CANCEL)
+            return false;
+
+        if (dlg.discard()) {
+            PrinterTechnology printer_technology = preset_bundle->printers.get_edited_preset().printer_technology();
+            for (const Tab* const tab : tabs_list) {
+                if (tab->supports_printer_technology(printer_technology) && tab->current_preset_is_dirty())
+                    tab->m_presets->discard_current_changes();
+            }
+            load_current_presets(false);
+        }
+        else if (dlg.save_preset())  // save selected changes
+        {
+            //BBS: add project embedded preset relate logic
+            for (const UnsavedChangesDialog::PresetData& nt : dlg.get_names_and_types())
+                preset_bundle->save_changes_for_preset(nt.name, nt.type, dlg.get_unselected_options(nt.type), nt.save_to_project);
+            //for (const std::pair<std::string, Preset::Type>& nt : dlg.get_names_and_types())
+            //    preset_bundle->save_changes_for_preset(nt.first, nt.second, dlg.get_unselected_options(nt.second));
+
+            load_current_presets(false);
+
+            // if we saved changes to the new presets, we should to
+            // synchronize config.ini with the current selections.
+            preset_bundle->export_selections(*app_config);
+
+            //MessageDialog(nullptr, _L_PLURAL("Modifications to the preset have been saved",
+            //                                 "Modifications to the presets have been saved", dlg.get_names_and_types().size())).ShowModal();
+        }
+    }
+
+    return true;
+}
+
+void GUI_App::apply_keeped_preset_modifications()
+{
+    PrinterTechnology printer_technology = preset_bundle->printers.get_edited_preset().printer_technology();
+    for (Tab* tab : tabs_list) {
+        if (tab->supports_printer_technology(printer_technology))
+            tab->apply_config_from_cache();
+    }
+    load_current_presets(false);
+}
+
+// This is called when creating new project or load another project
+// OR close ConfigWizard
+// to ask the user what should we do with unsaved changes for presets.
+// New Project          => Current project is saved    => UnsavedChangesDialog: "Keep / Discard / Cancel"
+//                      => Current project isn't saved => UnsavedChangesDialog: "Keep / Discard / Save / Cancel"
+// Close ConfigWizard   => Current project is saved    => UnsavedChangesDialog: "Keep / Discard / Save / Cancel"
+// Note: no_nullptr postponed_apply_of_keeped_changes indicates that thie function is called after ConfigWizard is closed
+bool GUI_App::check_and_keep_current_preset_changes(const wxString& caption, const wxString& header, int action_buttons, bool* postponed_apply_of_keeped_changes/* = nullptr*/)
+{
+    if (has_current_preset_changes()) {
+        bool is_called_from_configwizard = postponed_apply_of_keeped_changes != nullptr;
+
+        UnsavedChangesDialog dlg(caption, header, "", action_buttons);
+        if (dlg.ShowModal() == wxID_CANCEL)
+            return false;
+
+        auto reset_modifications = [this, is_called_from_configwizard]() {
+            //if (is_called_from_configwizard)
+            //    return; // no need to discared changes. It will be done fromConfigWizard closing
+
+            PrinterTechnology printer_technology = preset_bundle->printers.get_edited_preset().printer_technology();
+            for (const Tab* const tab : tabs_list) {
+                if (tab->supports_printer_technology(printer_technology) && tab->current_preset_is_dirty())
+                    tab->m_presets->discard_current_changes();
+            }
+            load_current_presets(false);
+        };
+
+        if (dlg.discard())
+            reset_modifications();
+        else  // save selected changes
+        {
+            //BBS: add project embedded preset relate logic
+            const auto& preset_names_and_types = dlg.get_names_and_types();
+            if (dlg.save_preset()) {
+                for (const UnsavedChangesDialog::PresetData& nt : preset_names_and_types)
+                    preset_bundle->save_changes_for_preset(nt.name, nt.type, dlg.get_unselected_options(nt.type), nt.save_to_project);
+
+                // if we saved changes to the new presets, we should to
+                // synchronize config.ini with the current selections.
+                preset_bundle->export_selections(*app_config);
+
+                //wxString text = _L_PLURAL("Modifications to the preset have been saved",
+                //    "Modifications to the presets have been saved", preset_names_and_types.size());
+                //if (!is_called_from_configwizard)
+                //    text += "\n\n" + _L("All modifications will be discarded for new project.");
+
+                //MessageDialog(nullptr, text).ShowModal();
+                reset_modifications();
+            }
+            else if (dlg.transfer_changes() && (dlg.has_unselected_options() || is_called_from_configwizard)) {
+                // execute this part of code only if not all modifications are keeping to the new project
+                // OR this function is called when ConfigWizard is closed and "Keep modifications" is selected
+                for (const UnsavedChangesDialog::PresetData& nt : preset_names_and_types) {
+                    Preset::Type type = nt.type;
+                    Tab* tab = get_tab(type);
+                    std::vector<std::string> selected_options = dlg.get_selected_options(type);
+                    if (type == Preset::TYPE_PRINTER) {
+                        auto it = std::find(selected_options.begin(), selected_options.end(), "extruders_count");
+                        if (it != selected_options.end()) {
+                            // erase "extruders_count" option from the list
+                            selected_options.erase(it);
+                            // cache the extruders count
+                            static_cast<TabPrinter*>(tab)->cache_extruder_cnt();
+                        }
+                    }
+                    std::vector<std::string> selected_options2;
+                    std::transform(selected_options.begin(), selected_options.end(), std::back_inserter(selected_options2), [](auto & o) {
+                        auto i = o.find('#');
+                        return i != std::string::npos ? o.substr(0, i) : o;
+                    });
+                    tab->cache_config_diff(selected_options2);
+                    if (!is_called_from_configwizard)
+                        tab->m_presets->discard_current_changes();
+                }
+                if (is_called_from_configwizard)
+                    *postponed_apply_of_keeped_changes = true;
+                else
+                    apply_keeped_preset_modifications();
+            }
+        }
+    }
+
+    return true;
+}
+
+bool GUI_App::can_load_project()
+{
+    return true;
+}
+
+bool GUI_App::check_print_host_queue()
+{
+    wxString dirty;
+    std::vector<std::pair<std::string, std::string>> jobs;
+    // Get ongoing jobs from dialog
+    mainframe->m_printhost_queue_dlg->get_active_jobs(jobs);
+    if (jobs.empty())
+        return true;
+    // Show dialog
+    wxString job_string = wxString();
+    for (const auto& job : jobs) {
+        job_string += format_wxstr("   %1% : %2% \n", job.first, job.second);
+    }
+    wxString message;
+    message += _(L("The uploads are still ongoing")) + ":\n\n" + job_string +"\n" + _(L("Stop them and continue anyway?"));
+    //wxMessageDialog dialog(mainframe,
+    MessageDialog dialog(mainframe,
+        message,
+        wxString(SLIC3R_APP_NAME) + " - " + _(L("Ongoing uploads")),
+        wxICON_QUESTION | wxYES_NO | wxNO_DEFAULT);
+    if (dialog.ShowModal() == wxID_YES)
+        return true;
+
+    // TODO: If already shown, bring forward
+    mainframe->m_printhost_queue_dlg->Show();
+    return false;
+}
+
+bool GUI_App::checked_tab(Tab* tab)
+{
+    bool ret = true;
+    if (find(tabs_list.begin(), tabs_list.end(), tab) == tabs_list.end() &&
+        find(model_tabs_list.begin(), model_tabs_list.end(), tab) == model_tabs_list.end())
+        ret = false;
+    return ret;
+}
+
+// Update UI / Tabs to reflect changes in the currently loaded presets
+//BBS: add preset combo box re-activate logic
+void GUI_App::load_current_presets(bool active_preset_combox/*= false*/, bool check_printer_presets_ /*= true*/)
+{
+    // check printer_presets for the containing information about "Print Host upload"
+    // and create physical printer from it, if any exists
+    if (check_printer_presets_)
+        check_printer_presets();
+
+    PrinterTechnology printer_technology = preset_bundle->printers.get_edited_preset().printer_technology();
+	this->plater()->set_printer_technology(printer_technology);
+    for (Tab *tab : tabs_list)
+		if (tab->supports_printer_technology(printer_technology)) {
+			if (tab->type() == Preset::TYPE_PRINTER) {
+				static_cast<TabPrinter*>(tab)->update_pages();
+				// Mark the plater to update print bed by tab->load_current_preset() from Plater::on_config_change().
+				this->plater()->force_print_bed_update();
+			}
+			tab->load_current_preset();
+			//BBS: add preset combox re-active logic
+			if (active_preset_combox)
+				tab->reactive_preset_combo_box();
+		}
+    // BBS: model config
+    for (Tab *tab : model_tabs_list)
+		if (tab->supports_printer_technology(printer_technology)) {
+            tab->request_page_tree_rebuild();
+        }
+}
+
+static std::mutex mutex_delete_cache_presets;
+
+std::vector<std::string> & GUI_App::get_delete_cache_presets()
+{
+    return need_delete_presets;
+}
+
+std::vector<std::string> GUI_App::get_delete_cache_presets_lock()
+{
+    std::scoped_lock l(mutex_delete_cache_presets);
+    return need_delete_presets;
+}
+
+void GUI_App::delete_preset_from_cloud(std::string setting_id)
+{
+    std::scoped_lock l(mutex_delete_cache_presets);
+    need_delete_presets.push_back(setting_id);
+}
+
+void GUI_App::preset_deleted_from_cloud(std::string setting_id)
+{
+    std::scoped_lock l(mutex_delete_cache_presets);
+    need_delete_presets.erase(std::remove(need_delete_presets.begin(), need_delete_presets.end(), setting_id), need_delete_presets.end());
+}
+
+wxString GUI_App::filter_string(wxString str)
+{
+    std::string result = str.utf8_string();
+    std::string input = str.utf8_string();
+
+
+    std::regex domainRegex(R"(([a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?))");
+    std::sregex_iterator it(input.begin(), input.end(), domainRegex);
+    std::sregex_iterator end;
+
+    while (it != end) {
+        std::smatch match = *it;
+        std::string domain = match.str();
+        result.replace(match.position(), domain.length(), "[***]");
+        ++it;
+    }
+
+    return wxString::FromUTF8(result);
+}
+
+bool GUI_App::OnExceptionInMainLoop()
+{
+    generic_exception_handle();
+    return false;
+}
+
+#ifdef __APPLE__
+// This callback is called from wxEntry()->wxApp::CallOnInit()->NSApplication run
+// that is, before GUI_App::OnInit(), so we have a chance to switch GUI_App
+// to a G-code viewer.
+void GUI_App::OSXStoreOpenFiles(const wxArrayString &fileNames)
+{
+    //BBS: remove GCodeViewer as seperate APP logic
+    /*size_t num_gcodes = 0;
+    for (const wxString &filename : fileNames)
+        if (is_gcode_file(into_u8(filename)))
+            ++ num_gcodes;
+    if (fileNames.size() == num_gcodes) {
+        // Opening PrusaSlicer by drag & dropping a G-Code onto CrealityPrint icon in Finder,
+        // just G-codes were passed. Switch to G-code viewer mode.
+        m_app_mode = EAppMode::GCodeViewer;
+        unlock_lockfile(get_instance_hash_string() + ".lock", data_dir() + "/cache/");
+        if(app_config != nullptr)
+            delete app_config;
+        app_config = nullptr;
+        init_app_config();
+    }*/
+    wxApp::OSXStoreOpenFiles(fileNames);
+}
+
+void GUI_App::MacOpenURL(const wxString& url)
+{
+    if (url.empty())
+        return;
+    start_download(boost::nowide::narrow(url));
+}
+
+// wxWidgets override to get an event on open files.
+void GUI_App::MacOpenFiles(const wxArrayString &fileNames)
+{
+    bool single_instance = app_config->get("app", "single_instance") == "true";
+    if (m_post_initialized && !single_instance) {
+        bool has3mf = false;
+        std::vector<wxString> names;
+        for (auto & n : fileNames) {
+            has3mf |= n.EndsWith(".3mf");
+            names.push_back(n);
+        }
+        if (has3mf) {
+            start_new_slicer(names);
+            return;
+        }
+    }
+    std::vector<std::string> files;
+    std::vector<wxString>    gcode_files;
+    std::vector<wxString>    non_gcode_files;
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ", open files, size " << fileNames.size();
+    for (const auto& filename : fileNames) {
+        if (is_gcode_file(into_u8(filename)))
+            gcode_files.emplace_back(filename);
+        else {
+            files.emplace_back(into_u8(filename));
+            non_gcode_files.emplace_back(filename);
+        }
+    }
+    //BBS: remove GCodeViewer as seperate APP logic
+    /*if (m_app_mode == EAppMode::GCodeViewer) {
+        // Running in G-code viewer.
+        // Load the first G-code into the G-code viewer.
+        // Or if no G-codes, send other files to slicer.
+        if (! gcode_files.empty())
+            this->plater()->load_gcode(gcode_files.front());
+        if (!non_gcode_files.empty())
+            start_new_slicer(non_gcode_files, true);
+    } else*/
+    {
+        if (! files.empty()) {
+            if (m_post_initialized) {
+                wxArrayString input_files;
+                for (size_t i = 0; i < non_gcode_files.size(); ++i) {
+                    input_files.push_back(non_gcode_files[i]);
+                }
+                this->plater()->load_files(input_files);
+            } else {
+                for (size_t i = 0; i < files.size(); ++i) {
+                    this->init_params->input_files.emplace_back(files[i]);
+                }
+            }
+        } else {
+            if (m_post_initialized) {
+                this->plater()->load_gcode(gcode_files.front());
+            } else {
+                this->init_params->input_gcode = true;
+                this->init_params->input_files = { into_u8(gcode_files.front()) };
+            }
+        }
+        /*for (const wxString &filename : gcode_files)
+            start_new_gcodeviewer(&filename);*/
+    }
+}
+
+#endif /* __APPLE */
+
+Sidebar& GUI_App::sidebar()
+{
+    return plater_->sidebar();
+}
+
+GizmoObjectManipulation *GUI_App::obj_manipul()
+{
+    // If this method is called before plater_ has been initialized, return nullptr (to avoid a crash)
+    return (plater_ != nullptr) ? &plater_->get_view3D_canvas3D()->get_gizmos_manager().get_object_manipulation() : nullptr;
+}
+
+ObjectSettings* GUI_App::obj_settings()
+{
+    return sidebar().obj_settings();
+}
+
+ObjectList* GUI_App::obj_list()
+{
+    return sidebar().obj_list();
+}
+
+ObjectLayers* GUI_App::obj_layers()
+{
+    return sidebar().obj_layers();
+}
+
+Plater* GUI_App::plater()
+{
+    return plater_;
+}
+
+const Plater* GUI_App::plater() const
+{
+    return plater_;
+}
+
+ParamsPanel* GUI_App::params_panel()
+{
+    if (mainframe)
+        return mainframe->m_param_panel;
+    return nullptr;
+}
+
+ParamsDialog* GUI_App::params_dialog()
+{
+    if (mainframe)
+        return mainframe->m_param_dialog;
+    return nullptr;
+}
+
+PrinterDialog* GUI_App::printer_dialog()
+{
+    if (mainframe)
+        return mainframe->m_printer_dialog;
+    return nullptr;
+}
+
+Model& GUI_App::model()
+{
+    return plater_->model();
+}
+
+Downloader* GUI_App::downloader()
+{
+    return m_downloader.get();
+}
+
+void GUI_App::load_url(wxString url)
+{
+    if (mainframe)
+        return mainframe->load_url(url);
+}
+
+void GUI_App::open_mall_page_dialog()
+{
+    std::string host_url;
+    std::string model_url;
+    std::string link_url;
+
+    int result = -1;
+
+    //model api url
+    host_url = get_model_http_url(app_config->get_country_code());
+
+    //model url
+
+    wxString language_code = this->current_language_code().BeforeFirst('_');
+    model_url = language_code.ToStdString();
+
+    if (getAgent() && mainframe) {
+
+        //login already
+        if (getAgent()->is_user_login()) {
+            std::string ticket;
+            result = getAgent()->request_bind_ticket(&ticket);
+
+            if(result == 0){
+                link_url = host_url + "api/sign-in/ticket?to=" + host_url + url_encode(model_url) + "&ticket=" + ticket;
+            }
+        }
+    }
+
+    if (result < 0) {
+       link_url = host_url + model_url;
+    }
+
+    if (link_url.find("?") != std::string::npos) {
+        link_url += "&from=crealityprint";
+    } else {
+        link_url += "?from=crealityprint";
+    }
+
+    wxLaunchDefaultBrowser(link_url);
+}
+
+void GUI_App::open_publish_page_dialog()
+{
+    std::string host_url;
+    std::string model_url;
+    std::string link_url;
+
+    int result = -1;
+
+    //model api url
+    host_url = get_model_http_url(app_config->get_country_code());
+
+    //publish url
+    wxString language_code = this->current_language_code().BeforeFirst('_');
+    model_url += (language_code.ToStdString() + "/my/models/publish");
+
+    if (getAgent() && mainframe) {
+
+        //login already
+        if (getAgent()->is_user_login()) {
+            std::string ticket;
+            result = getAgent()->request_bind_ticket(&ticket);
+
+            if (result == 0) {
+                link_url = host_url + "api/sign-in/ticket?to=" + host_url + url_encode(model_url) + "&ticket=" + ticket;
+            }
+        }
+    }
+
+    if (result < 0) {
+        link_url = host_url + model_url;
+    }
+
+    wxLaunchDefaultBrowser(link_url);
+}
+
+char GUI_App::from_hex(char ch) {
+    return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
+}
+
+std::string GUI_App::url_decode(std::string value) {
+    return Http::url_decode(value);
+}
+
+std::string GUI_App::url_encode(std::string value) {
+    return Http::url_encode(value);
+}
+
+void GUI_App::popup_ping_bind_dialog()
+{
+    if (m_ping_code_binding_dialog == nullptr) {
+        m_ping_code_binding_dialog = new PingCodeBindDialog();
+        m_ping_code_binding_dialog->ShowModal();
+        remove_ping_bind_dialog();
+    }
+}
+
+void GUI_App::remove_ping_bind_dialog()
+{
+    if (m_ping_code_binding_dialog != nullptr) {
+        m_ping_code_binding_dialog->Destroy();
+        delete m_mall_publish_dialog;
+        m_ping_code_binding_dialog = nullptr;
+    }
+}
+
+void GUI_App::SaveProfile(json profileJson)
+{
+    if (!m_appconfig_new)
+        return;
+
+    app_config->set(std::string("firstguide"), "finish", "1");
+
+    app_config->save();
+
+    BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << " begin";
+
+    // set filaments to app_config
+    const std::string&                 section_name = AppConfig::SECTION_FILAMENTS;
+    std::map<std::string, std::string> section_new;
+    m_appconfig_new->clear_section(section_name);
+    for (auto it = profileJson["filament"].begin(); it != profileJson["filament"].end(); ++it) {
+        if (it.value()["selected"] == 1) {
+            section_new[it.key()] = "true";
+        }
+    }
+    m_appconfig_new->set_section(section_name, section_new);
+    // set vendors to app_config
+    Slic3r::AppConfig::VendorMap empty_vendor_map;
+    m_appconfig_new->set_vendors(empty_vendor_map);
+    for (auto it = profileJson["model"].begin(); it != profileJson["model"].end(); ++it) {
+        if (it.value().is_object()) {
+            json        temp_model  = it.value();
+            std::string model_name  = temp_model["model"];
+            std::string vendor_name = temp_model["vendor"];
+            std::string selected    = temp_model["nozzle_selected"];
+            boost::trim(selected);
+            std::string nozzle;
+            while (selected.size() > 0) {
+                auto pos = selected.find(';');
+                if (pos != std::string::npos) {
+                    nozzle = selected.substr(0, pos);
+                    m_appconfig_new->set_variant(vendor_name, model_name, nozzle, "true");
+                    BOOST_LOG_TRIVIAL(info) << __FUNCTION__
+                                            << boost::format("vendor_name %1%, model_name %2%, nozzle %3% selected") % vendor_name %
+                                                   model_name % nozzle;
+                    selected = selected.substr(pos + 1);
+                    boost::trim(selected);
+                } else {
+                    m_appconfig_new->set_variant(vendor_name, model_name, selected, "true");
+                    BOOST_LOG_TRIVIAL(info) << __FUNCTION__
+                                            << boost::format("vendor_name %1%, model_name %2%, nozzle %3% selected") % vendor_name %
+                                                   model_name % selected;
+                    break;
+                }
+            }
+        }
+    }
+
+    save_user_default_filaments(m_appconfig_new);
+
+    return;
+}
+
+bool GUI_App::apply_config(AppConfig* app_config, AppConfig* app_config_new, PresetBundle* preset_bundle, const PresetUpdater* updater, bool& apply_keeped_changes)
+{
+    if(!app_config_new)
+        return false;
+    const auto enabled_vendors     = app_config_new->vendors();
+    const auto old_enabled_vendors = app_config->vendors();
+
+    const auto enabled_filaments     = app_config_new->has_section(AppConfig::SECTION_FILAMENTS) ?
+                                           app_config_new->get_section(AppConfig::SECTION_FILAMENTS) :
+                                           std::map<std::string, std::string>();
+    const auto old_enabled_filaments = app_config->has_section(AppConfig::SECTION_FILAMENTS) ?
+                                           app_config->get_section(AppConfig::SECTION_FILAMENTS) :
+                                           std::map<std::string, std::string>();
+
+    bool                     check_unsaved_preset_changes = false;
+    std::vector<std::string> install_bundles;
+    std::vector<std::string> remove_bundles;
+    const auto               vendor_dir = (boost::filesystem::path(Slic3r::data_dir()) / PRESET_SYSTEM_DIR).make_preferred();
+    for (const auto& it : enabled_vendors) {
+        if (it.second.size() > 0) {
+            auto vendor_file = vendor_dir / (it.first + ".json");
+            if (!fs::exists(vendor_file)) {
+                install_bundles.emplace_back(it.first);
+            }
+        }
+    }
+
+    // add the removed vendor bundles
+    for (const auto& it : old_enabled_vendors) {
+        if (it.second.size() > 0) {
+            if (enabled_vendors.find(it.first) != enabled_vendors.end())
+                continue;
+            auto vendor_file = vendor_dir / (it.first + ".json");
+            if (fs::exists(vendor_file)) {
+                remove_bundles.emplace_back(it.first);
+            }
+        }
+    }
+
+    check_unsaved_preset_changes = (enabled_vendors != old_enabled_vendors) || (enabled_filaments != old_enabled_filaments);
+    wxString header              = _L("The configuration package is changed in previous Config Guide");
+    wxString caption             = _L("Configuration package changed");
+    int      act_btns            = ActionButtons::KEEP | ActionButtons::SAVE;
+
+    if (check_unsaved_preset_changes && !wxGetApp().check_and_keep_current_preset_changes(caption, header, act_btns, &apply_keeped_changes))
+        return false;
+
+    if (install_bundles.size() > 0) {
+        // Install bundles from resources.
+        // Don't create snapshot - we've already done that above if applicable.
+        if (!updater->install_bundles_rsrc(std::move(install_bundles), false))
+            return false;
+    } else {
+        BOOST_LOG_TRIVIAL(info) << "No bundles need to be installed from resource directory";
+    }
+
+    std::string       preferred_model;
+    std::string       preferred_variant;
+    PrinterTechnology preferred_pt   = ptFFF;
+    auto get_preferred_printer_model = [preset_bundle, enabled_vendors, old_enabled_vendors, preferred_pt](const std::string& bundle_name,
+                                                                                                           std::string&       variant) {
+        const auto config = enabled_vendors.find(bundle_name);
+        if (config == enabled_vendors.end())
+            return std::string();
+
+        const std::map<std::string, std::set<std::string>>& model_maps = config->second;
+        // for (const auto& vendor_profile : preset_bundle->vendors) {
+        for (const auto model_it : model_maps) {
+            if (model_it.second.size() > 0) {
+                // Prefer the standard nozzle when selecting a newly added printer.
+                const auto default_variant = model_it.second.find("0.4");
+                variant = default_variant != model_it.second.end() ? *default_variant : *model_it.second.begin();
+                const auto config_old = old_enabled_vendors.find(bundle_name);
+                if (config_old == old_enabled_vendors.end())
+                    return model_it.first;
+                const auto model_it_old = config_old->second.find(model_it.first);
+                if (model_it_old == config_old->second.end())
+                    return model_it.first;
+                else if (model_it_old->second != model_it.second) {
+                    for (const auto& var : model_it.second)
+                        if (model_it_old->second.find(var) == model_it_old->second.end()) {
+                            variant = var;
+                            return model_it.first;
+                        }
+                }
+            }
+        }
+        //}
+        if (!variant.empty())
+            variant.clear();
+        return std::string();
+    };
+    // Prusa printers are considered first, then 3rd party.
+    if (preferred_model = get_preferred_printer_model(PresetBundle::BBL_BUNDLE, preferred_variant); preferred_model.empty()) {
+        for (const auto& bundle : enabled_vendors) {
+            if (bundle.first == PresetBundle::BBL_BUNDLE) {
+                continue;
+            }
+            if (preferred_model = get_preferred_printer_model(bundle.first, preferred_variant); !preferred_model.empty())
+                break;
+        }
+    }
+
+    std::string first_added_filament;
+
+    // update the app_config
+    app_config->set_section(AppConfig::SECTION_FILAMENTS, enabled_filaments);
+    app_config->set_vendors(*m_appconfig_new);
+    app_config->set_userPresets(*m_appconfig_new);
+
+    if (check_unsaved_preset_changes)
+        preset_bundle->load_presets(*app_config, ForwardCompatibilitySubstitutionRule::EnableSilentDisableSystem,
+                                    {preferred_model, preferred_variant, first_added_filament, std::string()});
+
+    // Update the selections from the compatibilty.
+    preset_bundle->export_selections(*app_config);
+
+    return true;
+}
+
+void GUI_App::remove_mall_system_dialog()
+{
+    if (m_mall_publish_dialog != nullptr) {
+        m_mall_publish_dialog->Destroy();
+        delete m_mall_publish_dialog;
+    }
+}
+
+void GUI_App::run_script(wxString js)
+{
+    if (mainframe)
+        return mainframe->RunScript(js);
+}
+
+Notebook* GUI_App::tab_panel() const
+{
+    if (mainframe)
+        return mainframe->m_tabpanel;
+    return nullptr;
+}
+
+NotificationManager * GUI_App::notification_manager()
+{
+    // During shutdown the Plater (and its pimpl) may already be destroyed while the
+    // plater_ pointer is not yet null, so guard against use-after-free by also checking
+    // the closing flag.
+    if (m_is_closing || !plater_)
+        return nullptr;
+    return plater_->get_notification_manager();
+}
+
+// Called right before closing the app to launch an update. Marks the app as closing and
+// tears down any pending update progress UI so that lingering EVT_APP_UPDATE_* handlers or
+// imgui notification callbacks cannot reach a Plater that is being destroyed.
+void GUI_App::prepare_close_for_update()
+{
+    if (AppUpdater::getInstance().is_downloading())
+        AppUpdater::getInstance().cancel_download();
+
+    // Tear down the update progress notification while the Plater is still alive. This must
+    // happen BEFORE setting m_is_closing, otherwise notification_manager() returns nullptr
+    // and the imgui notification would be left registered, to be touched later during the
+    // Plater destruction.
+    if (g_update_progress_dlg) {
+        g_update_progress_dlg->close_imgui_notification();
+        g_update_progress_dlg->Hide();
+    }
+
+    // From here on, any lingering EVT_APP_UPDATE_* handler or notification callback that
+    // reaches notification_manager() will get nullptr instead of a destroyed pimpl.
+    m_is_closing = true;
+}
+
+// extruders count from selected printer preset
+int GUI_App::extruders_cnt() const
+{
+    const Preset& preset = preset_bundle->printers.get_selected_preset();
+    return preset.printer_technology() == ptSLA ? 1 :
+           preset.config.option<ConfigOptionFloats>("nozzle_diameter")->values.size();
+}
+
+// extruders count from edited printer preset
+int GUI_App::extruders_edited_cnt() const
+{
+    const Preset& preset = preset_bundle->printers.get_edited_preset();
+    return preset.printer_technology() == ptSLA ? 1 :
+           preset.config.option<ConfigOptionFloats>("nozzle_diameter")->values.size();
+}
+
+// BBS
+int GUI_App::filaments_cnt() const
+{
+    return preset_bundle->filament_presets.size();
+}
+
+PrintSequence GUI_App::global_print_sequence() const
+{
+    PrintSequence global_print_seq = PrintSequence::ByDefault;
+    auto curr_preset_config = preset_bundle->prints.get_edited_preset().config;
+    if (curr_preset_config.has("print_sequence"))
+        global_print_seq = curr_preset_config.option<ConfigOptionEnum<PrintSequence>>("print_sequence")->value;
+    return global_print_seq;
+}
+
+wxString GUI_App::current_language_code_safe() const
+{
+	// Translate the language code to a code, for which Prusa Research maintains translations.
+	const std::map<wxString, wxString> mapping {
+		{ "cs", 	"cs_CZ", },
+		{ "sk", 	"cs_CZ", },
+		{ "de", 	"de_DE", },
+		{ "nl", 	"nl_NL", },
+		{ "sv", 	"sv_SE", },
+		{ "es", 	"es_ES", },
+		{ "fr", 	"fr_FR", },
+		{ "it", 	"it_IT", },
+		{ "ja", 	"ja_JP", },
+		{ "ko", 	"ko_KR", },
+		{ "pl", 	"pl_PL", },
+		{ "uk", 	"uk_UA", },
+		{ "zh", 	"zh_CN", },
+		{ "ru", 	"ru_RU", },
+        { "tr", 	"tr_TR", },
+        { "pt", 	"pt_BR", },
+        { "vi",     "vi_VN", },
+        { "id",     "id_ID", },
+        { "th",     "th_TH", },
+	};
+	wxString language_code = this->current_language_code().BeforeFirst('_');
+	auto it = mapping.find(language_code);
+	if (it != mapping.end())
+		language_code = it->second;
+	else
+		language_code = "en_US";
+	return language_code;
+}
+
+wxString GUI_App::current_frontend_language_code() const
+{
+    const wxString language_code = this->current_language_code();
+
+    // Chinese variants must be matched before removing the region because both share the "zh" prefix.
+    if (language_code == "zh_TW")
+        return "zh_TW";
+    if (language_code == "zh_CN")
+        return "zh_CN";
+
+    const std::map<wxString, wxString> mapping {
+        { "en", "en_GB" },
+        { "ca", "ca_ES" },
+        { "cs", "cs_CZ" },
+        { "sk", "cs_CZ" },
+        { "de", "de_DE" },
+        { "es", "es_ES" },
+        { "fr", "fr_FR" },
+        { "hu", "hu_HU" },
+        { "id", "id_ID" },
+        { "it", "it_IT" },
+        { "ja", "ja_JP" },
+        { "ko", "ko_KR" },
+        { "nl", "nl_NL" },
+        { "pl", "pl_PL" },
+        { "pt", "pt_BR" },
+        { "ru", "ru_RU" },
+        { "sv", "sv_SE" },
+        { "th", "th_TH" },
+        { "tr", "tr_TR" },
+        { "uk", "uk_UA" },
+        { "vi", "vi_VN" },
+        { "zh", "zh_CN" },
+    };
+
+    const auto it = mapping.find(language_code.BeforeFirst('_'));
+    return it != mapping.end() ? it->second : "en_GB";
+}
+
+void GUI_App::open_web_page_localized(const std::string &http_address)
+{
+    open_browser_with_warning_dialog(http_address + "&lng=" + this->current_language_code_safe());
+}
+
+// If we are switching from the FFF-preset to the SLA, we should to control the printed objects if they have a part(s).
+// Because of we can't to print the multi-part objects with SLA technology.
+bool GUI_App::may_switch_to_SLA_preset(const wxString& caption)
+{
+    if (model_has_multi_part_objects(model())) {
+        // BBS: remove SLA related message
+        return false;
+    }
+    return true;
+}
+
+bool GUI_App::run_wizard(ConfigWizard::RunReason reason, ConfigWizard::StartPage start_page)
+{
+    wxCHECK_MSG(mainframe != nullptr, false, "Internal error: Main frame not created / null");
+
+    //if (reason == ConfigWizard::RR_USER) {
+    //    //TODO: turn off it currently, maybe need to turn on in the future
+    //    if (preset_updater->config_update(app_config->orig_version(), PresetUpdater::UpdateParams::FORCED_BEFORE_WIZARD) == PresetUpdater::R_ALL_CANCELED)
+    //        return false;
+    //}
+
+    //auto wizard_t = new ConfigWizard(mainframe);
+    //const bool res = wizard_t->run(reason, start_page);
+
+    std::string strFinish = wxGetApp().app_config->get("firstguide", "finish");
+    long        pStyle    = wxCAPTION | wxCLOSE_BOX | wxSYSTEM_MENU | wxRESIZE_BORDER;
+    if (strFinish == "false" || strFinish.empty())
+        pStyle = wxCAPTION | wxTAB_TRAVERSAL;
+
+
+    const Preset& preset = preset_bundle->printers.get_selected_preset();
+    if ((start_page == ConfigWizard::SP_FILAMENTS) && (preset.m_is_non_standard_printer))
+    {
+        MessageDialog msg(nullptr, _L("Selected model not a system model; no system consumables"), _L("Information"), wxOK);
+        if (msg.ShowModal())
+        {
+            return false;
+        }
+    }
+
+    GuideFrame wizard(this, pStyle);
+    auto page = start_page == ConfigWizard::SP_WELCOME ? GuideFrame::BBL_WELCOME :
+                start_page == ConfigWizard::SP_FILAMENTS ? GuideFrame::BBL_FILAMENT_ONLY :
+                start_page == ConfigWizard::SP_PRINTERS ? GuideFrame::BBL_MODELS_ONLY :
+                GuideFrame::BBL_MODELS_ONLY;
+    wizard.SetStartPage(page,false);
+    bool       res = wizard.run();
+
+    if (res) {
+        load_current_presets();
+        update_publish_status();
+        mainframe->refresh_plugin_tips();
+        // BBS: remove SLA related message
+    }
+
+    return true;
+}
+
+void GUI_App::show_desktop_integration_dialog()
+{
+#ifdef __linux__
+    //wxCHECK_MSG(mainframe != nullptr, false, "Internal error: Main frame not created / null");
+    DesktopIntegrationDialog dialog(mainframe);
+    dialog.ShowModal();
+#endif //__linux__
+}
+
+#if ENABLE_THUMBNAIL_GENERATOR_DEBUG
+void GUI_App::gcode_thumbnails_debug()
+{
+    const std::string BEGIN_MASK = "; thumbnail begin";
+    const std::string END_MASK = "; thumbnail end";
+    std::string gcode_line;
+    bool reading_image = false;
+    unsigned int width = 0;
+    unsigned int height = 0;
+
+    wxFileDialog dialog(GetTopWindow(), _L("Select a G-code file:"), "", "", "G-code files (*.gcode)|*.gcode;*.GCODE;", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    if (dialog.ShowModal() != wxID_OK)
+        return;
+
+    std::string in_filename = into_u8(dialog.GetPath());
+    std::string out_path = boost::filesystem::path(in_filename).remove_filename().append(L"thumbnail").string();
+
+    boost::nowide::ifstream in_file(in_filename.c_str());
+    std::vector<std::string> rows;
+    std::string row;
+    if (in_file.good())
+    {
+        while (std::getline(in_file, gcode_line))
+        {
+            if (in_file.good())
+            {
+                if (boost::starts_with(gcode_line, BEGIN_MASK))
+                {
+                    reading_image = true;
+                    gcode_line = gcode_line.substr(BEGIN_MASK.length() + 1);
+                    std::string::size_type x_pos = gcode_line.find('x');
+                    std::string width_str = gcode_line.substr(0, x_pos);
+                    width = (unsigned int)::atoi(width_str.c_str());
+                    std::string height_str = gcode_line.substr(x_pos + 1);
+                    height = (unsigned int)::atoi(height_str.c_str());
+                    row.clear();
+                }
+                else if (reading_image && boost::starts_with(gcode_line, END_MASK))
+                {
+                    std::string out_filename = out_path + std::to_string(width) + "x" + std::to_string(height) + ".png";
+                    boost::nowide::ofstream out_file(out_filename.c_str(), std::ios::binary);
+                    if (out_file.good())
+                    {
+                        std::string decoded;
+                        decoded.resize(boost::beast::detail::base64::decoded_size(row.size()));
+                        decoded.resize(boost::beast::detail::base64::decode((void*)&decoded[0], row.data(), row.size()).first);
+
+                        out_file.write(decoded.c_str(), decoded.size());
+                        out_file.close();
+                    }
+
+                    reading_image = false;
+                    width = 0;
+                    height = 0;
+                    rows.clear();
+                } else if (reading_image)
+                    row += gcode_line.substr(2);
+            }
+        }
+
+        in_file.close();
+    }
+}
+#endif // ENABLE_THUMBNAIL_GENERATOR_DEBUG
+
+void GUI_App::window_pos_save(wxTopLevelWindow* window, const std::string &name)
+{
+    if (name.empty()) { return; }
+    const auto config_key = (boost::format("window_%1%") % name).str();
+
+    WindowMetrics metrics = WindowMetrics::from_window(window);
+    app_config->set(config_key, metrics.serialize());
+    app_config->save();
+}
+
+bool GUI_App::window_pos_restore(wxTopLevelWindow* window, const std::string &name, bool default_maximized)
+{
+    if (name.empty()) { return false; }
+    const auto config_key = (boost::format("window_%1%") % name).str();
+
+    if (! app_config->has(config_key)) {
+        //window->Maximize(default_maximized);
+        return false;
+    }
+
+    auto metrics = WindowMetrics::deserialize(app_config->get(config_key));
+    if (! metrics) {
+        window->Maximize(default_maximized);
+        return true;
+    }
+
+    const wxRect& rect = metrics->get_rect();
+    window->SetPosition(rect.GetPosition());
+    window->SetSize(rect.GetSize());
+    window->Maximize(metrics->get_maximized());
+    return true;
+}
+
+void GUI_App::window_pos_sanitize(wxTopLevelWindow* window)
+{
+    /*unsigned*/int display_idx = wxDisplay::GetFromWindow(window);
+    wxRect display;
+    if (display_idx == wxNOT_FOUND) {
+        display = wxDisplay(0u).GetClientArea();
+        window->Move(display.GetTopLeft());
+    } else {
+        display = wxDisplay(display_idx).GetClientArea();
+    }
+
+    auto metrics = WindowMetrics::from_window(window);
+    metrics.sanitize_for_display(display);
+    if (window->GetScreenRect() != metrics.get_rect()) {
+        window->SetSize(metrics.get_rect());
+    }
+}
+
+void GUI_App::window_pos_center(wxTopLevelWindow *window)
+{
+    /*unsigned*/int display_idx = wxDisplay::GetFromWindow(window);
+    wxRect display;
+    if (display_idx == wxNOT_FOUND) {
+        display = wxDisplay(0u).GetClientArea();
+        window->Move(display.GetTopLeft());
+    } else {
+        display = wxDisplay(display_idx).GetClientArea();
+    }
+
+    auto metrics = WindowMetrics::from_window(window);
+    metrics.center_for_display(display);
+    if (window->GetScreenRect() != metrics.get_rect()) {
+        window->SetSize(metrics.get_rect());
+    }
+}
+
+bool GUI_App::config_wizard_startup()
+{
+#if defined(CREALITYPRINT_APP_STORE)
+    // App Store builds: only offer the legacy wizard when the SPA guide was
+    // never finished. Other platforms keep the original condition unchanged.
+    const bool guide_finished = app_config->get("firstguide", "finish") == "1";
+    if (!guide_finished && (!m_app_conf_exists || preset_bundle->printers.only_default_printers()))
+#else
+    if (!m_app_conf_exists || preset_bundle->printers.only_default_printers())
+#endif
+    {
+        BOOST_LOG_TRIVIAL(info) << "run wizard...";
+        run_wizard(ConfigWizard::RR_DATA_EMPTY, ConfigWizard::SP_CUSTOM);
+        BOOST_LOG_TRIVIAL(info) << "finished run wizard";
+        return true;
+    } /*else if (get_app_config()->legacy_datadir()) {
+        // Looks like user has legacy pre-vendorbundle data directory,
+        // explain what this is and run the wizard
+
+        MsgDataLegacy dlg;
+        dlg.ShowModal();
+
+        run_wizard(ConfigWizard::RR_DATA_LEGACY);
+        return true;
+    }*/
+    return false;
+}
+
+void GUI_App::check_updates(const bool verbose)
+{
+	PresetUpdater::UpdateResult updater_result;
+	try {
+		updater_result = preset_updater->config_update(app_config->orig_version(), verbose ? PresetUpdater::UpdateParams::SHOW_TEXT_BOX : PresetUpdater::UpdateParams::SHOW_NOTIFICATION);
+		if (updater_result == PresetUpdater::R_INCOMPAT_EXIT) {
+			mainframe->Close();
+		}
+		else if (updater_result == PresetUpdater::R_INCOMPAT_CONFIGURED) {
+            m_app_conf_exists = true;
+		}
+		else if (verbose && updater_result == PresetUpdater::R_NOOP) {
+			MsgNoUpdates dlg;
+			dlg.ShowModal();
+		}
+	}
+	catch (const std::exception & ex) {
+		show_error(nullptr, ex.what());
+	}
+}
+
+void GUI_App::check_app_first_launch_info()
+{
+    boost::filesystem::path launch_file = boost::filesystem::path(Slic3r::data_dir()) / "launchInfo.json";
+    if (!boost::filesystem::exists(launch_file)) {
+        // for override setup, the launchInfo.json may not exist
+        save_app_first_launch_info();
+    }
+
+    try {
+        boost::nowide::ifstream c(launch_file.string());
+        if (!c.is_open())
+            return ;
+
+        c >> m_app_first_launch_data;
+
+    } catch (...) {
+    }
+}
+
+void GUI_App::save_app_first_launch_info()
+{
+    try
+    {
+        boost::uuids::uuid uuid = boost::uuids::random_generator()();
+        std::string uuid_str = boost::uuids::to_string(uuid);
+
+        m_app_first_launch_data["uuid"] = uuid_str;
+
+        boost::filesystem::path launch_file = boost::filesystem::path(Slic3r::data_dir()) / "launchInfo.json";
+        boost::nowide::ofstream c;
+        c.open(launch_file.string(), std::ios::out | std::ios::trunc);
+        c << std::setw(4) << m_app_first_launch_data << std::endl;
+    }
+    catch (...)
+    {
+
+    }
+}
+
+bool GUI_App::open_browser_with_warning_dialog(const wxString& url, int flags/* = 0*/)
+{
+    return wxLaunchDefaultBrowser(url, flags);
+}
+
+// static method accepting a wxWindow object as first parameter
+// void warning_catcher{
+//     my($self, $message_dialog) = @_;
+//     return sub{
+//         my $message = shift;
+//         return if $message = ~/ GLUquadricObjPtr | Attempt to free unreferenced scalar / ;
+//         my @params = ($message, 'Warning', wxOK | wxICON_WARNING);
+//         $message_dialog
+//             ? $message_dialog->(@params)
+//             : Wx::MessageDialog->new($self, @params)->ShowModal;
+//     };
+// }
+
+// Do we need this function???
+// void GUI_App::notify(message) {
+//     auto frame = GetTopWindow();
+//     // try harder to attract user attention on OS X
+//     if (!frame->IsActive())
+//         frame->RequestUserAttention(defined(__WXOSX__/*&Wx::wxMAC */)? wxUSER_ATTENTION_ERROR : wxUSER_ATTENTION_INFO);
+//
+//     // There used to be notifier using a Growl application for OSX, but Growl is dead.
+//     // The notifier also supported the Linux X D - bus notifications, but that support was broken.
+//     //TODO use wxNotificationMessage ?
+// }
+
+
+#ifdef __WXMSW__
+static bool set_into_win_registry(HKEY hkeyHive, const wchar_t* pszVar, const wchar_t* pszValue)
+{
+    // see as reference: https://stackoverflow.com/questions/20245262/c-program-needs-an-file-association
+    wchar_t szValueCurrent[1000];
+    DWORD dwType;
+    DWORD dwSize = sizeof(szValueCurrent);
+
+    int iRC = ::RegGetValueW(hkeyHive, pszVar, nullptr, RRF_RT_ANY, &dwType, szValueCurrent, &dwSize);
+
+    bool bDidntExist = iRC == ERROR_FILE_NOT_FOUND;
+
+    if ((iRC != ERROR_SUCCESS) && !bDidntExist)
+        // an error occurred
+        return false;
+
+    if (!bDidntExist) {
+        if (dwType != REG_SZ)
+            // invalid type
+            return false;
+
+        if (::wcscmp(szValueCurrent, pszValue) == 0)
+            // value already set
+            return false;
+    }
+
+    DWORD dwDisposition;
+    HKEY hkey;
+    iRC = ::RegCreateKeyExW(hkeyHive, pszVar, 0, 0, 0, KEY_ALL_ACCESS, nullptr, &hkey, &dwDisposition);
+    bool ret = false;
+    if (iRC == ERROR_SUCCESS) {
+        iRC = ::RegSetValueExW(hkey, L"", 0, REG_SZ, (BYTE*)pszValue, (::wcslen(pszValue) + 1) * sizeof(wchar_t));
+        if (iRC == ERROR_SUCCESS)
+            ret = true;
+    }
+
+    RegCloseKey(hkey);
+    return ret;
+}
+
+static bool del_win_registry(HKEY hkeyHive, const wchar_t *pszVar, const wchar_t *pszValue)
+{
+    wchar_t szValueCurrent[1000];
+    DWORD   dwType;
+    DWORD   dwSize = sizeof(szValueCurrent);
+
+    int iRC = ::RegGetValueW(hkeyHive, pszVar, nullptr, RRF_RT_ANY, &dwType, szValueCurrent, &dwSize);
+
+    bool bDidntExist = iRC == ERROR_FILE_NOT_FOUND;
+
+    if ((iRC != ERROR_SUCCESS) && !bDidntExist)
+        return false;
+
+    if (!bDidntExist) {
+        DWORD dwDisposition;
+        HKEY  hkey;
+        iRC      = ::RegDeleteKeyExW(hkeyHive, pszVar, KEY_ALL_ACCESS, 0);
+        if (iRC == ERROR_SUCCESS) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+#endif // __WXMSW__
+
+void GUI_App::associate_files(std::wstring extend)
+{
+    return ;
+#ifdef WIN32
+    wchar_t app_path[MAX_PATH];
+    ::GetModuleFileNameW(nullptr, app_path, sizeof(app_path));
+
+    std::wstring prog_path = L"\"" + std::wstring(app_path) + L"\"";
+    std::wstring prog_id = L" Creality.Slicer.1";
+    std::wstring prog_desc = L"CrealityPrint";
+    std::wstring prog_command = prog_path + L" \"%1\"";
+    std::wstring reg_base = L"Software\\Classes";
+    std::wstring reg_extension = reg_base + L"\\." + extend;
+    std::wstring reg_prog_id = reg_base + L"\\" + prog_id;
+    std::wstring reg_prog_id_command = reg_prog_id + L"\\Shell\\Open\\Command";
+
+    bool is_new = false;
+    is_new |= set_into_win_registry(HKEY_CURRENT_USER, reg_extension.c_str(), prog_id.c_str());
+    is_new |= set_into_win_registry(HKEY_CURRENT_USER, reg_prog_id.c_str(), prog_desc.c_str());
+    is_new |= set_into_win_registry(HKEY_CURRENT_USER, reg_prog_id_command.c_str(), prog_command.c_str());
+    if (is_new)
+        // notify Windows only when any of the values gets changed
+        ::SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
+#endif // WIN32
+}
+
+void GUI_App::disassociate_files(std::wstring extend)
+{
+    
+#ifdef WIN32
+    return;
+    wchar_t app_path[MAX_PATH];
+    ::GetModuleFileNameW(nullptr, app_path, sizeof(app_path));
+
+    std::wstring prog_path = L"\"" + std::wstring(app_path) + L"\"";
+    std::wstring prog_id = L" Creality.Slicer.1";
+    std::wstring prog_desc = L"CrealityPrint";
+    std::wstring prog_command = prog_path + L" \"%1\"";
+    std::wstring reg_base = L"Software\\Classes";
+    std::wstring reg_extension = reg_base + L"\\." + extend;
+    std::wstring reg_prog_id = reg_base + L"\\" + prog_id;
+    std::wstring reg_prog_id_command = reg_prog_id + L"\\Shell\\Open\\Command";
+
+    bool is_new = false;
+    is_new |= del_win_registry(HKEY_CURRENT_USER, reg_extension.c_str(), prog_id.c_str());
+
+    bool is_associate_3mf  = app_config->get("associate_3mf") == "true";
+    bool is_associate_stl  = app_config->get("associate_stl") == "true";
+    bool is_associate_step = app_config->get("associate_step") == "true";
+    if (!is_associate_3mf && !is_associate_stl && !is_associate_step)
+    {
+        is_new |= del_win_registry(HKEY_CURRENT_USER, reg_prog_id.c_str(), prog_desc.c_str());
+        is_new |= del_win_registry(HKEY_CURRENT_USER, reg_prog_id_command.c_str(), prog_command.c_str());
+    }
+
+    if (is_new)
+       ::SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
+#endif // WIN32
+}
+
+bool GUI_App::check_url_association(std::wstring url_prefix, std::wstring& reg_bin)
+{
+    reg_bin = L"";
+#ifdef WIN32
+    return false;
+    wxRegKey key_full(wxRegKey::HKCU, "Software\\Classes\\" + url_prefix + "\\shell\\open\\command");
+    if (!key_full.Exists()) {
+        return false;
+    }
+    reg_bin = key_full.QueryDefaultValue().ToStdWstring();
+
+    boost::filesystem::path binary_path(boost::filesystem::canonical(boost::dll::program_location()));
+    std::wstring key_string = L"\"" + binary_path.wstring() + L"\" \"%1\"";
+    return key_string == reg_bin;
+#else
+    return false;
+#endif // WIN32
+}
+
+void GUI_App::associate_url(std::wstring url_prefix)
+{
+#ifdef WIN32
+    return ;
+    boost::filesystem::path binary_path(boost::filesystem::canonical(boost::dll::program_location()));
+    // the path to binary needs to be correctly saved in string with respect to localized characters
+    wxString wbinary = wxString::FromUTF8(binary_path.string());
+    std::string binary_string = (boost::format("%1%") % wbinary).str();
+    BOOST_LOG_TRIVIAL(info) << "Downloader registration: Path of binary: " << binary_string;
+
+    std::string key_string = "\"" + binary_string + "\" \"%1\"";
+
+    wxRegKey key_first(wxRegKey::HKCU, "Software\\Classes\\" + url_prefix);
+    wxRegKey key_full(wxRegKey::HKCU, "Software\\Classes\\" + url_prefix + "\\shell\\open\\command");
+    if (!key_first.Exists()) {
+        key_first.Create(false);
+    }
+    key_first.SetValue("URL Protocol", "");
+
+    if (!key_full.Exists()) {
+        key_full.Create(false);
+    }
+    key_full = key_string;
+#elif defined(__linux__) && defined(SLIC3R_DESKTOP_INTEGRATION)
+    DesktopIntegrationDialog::perform_downloader_desktop_integration(boost::nowide::narrow(url_prefix));
+#endif // WIN32
+}
+
+void GUI_App::disassociate_url(std::wstring url_prefix)
+{
+#ifdef WIN32
+    return ;
+    wxRegKey key_full(wxRegKey::HKCU, "Software\\Classes\\" + url_prefix + "\\shell\\open\\command");
+    if (!key_full.Exists()) {
+        return;
+    }
+    key_full = "";
+#endif // WIN32
+}
+
+
+void GUI_App::start_download(std::string url)
+{
+    std::cout << "start_download: "<<url;
+    if (!plater_) {
+        BOOST_LOG_TRIVIAL(error) << "Could not start URL download: plater is nullptr.";
+        return;
+    }
+    if(boost::starts_with(url, "crealityprintlink://open?code=")||boost::starts_with(url, "crealityprintlink://open/?code="))
+    {
+            wxTimer *m_timer = new wxTimer(this, wxID_ANY);
+           
+            Bind(wxEVT_TIMER, [=](wxTimerEvent& event) mutable {
+
+                post_openlink_cmd(url);
+
+                }, m_timer->GetId());
+
+            m_timer->Start(5000,true);
+            return;
+    }
+    //lets always init so if the download dest folder was changed, new dest is used
+    boost::filesystem::path dest_folder(app_config->get("download_path"));
+    if (!boost::filesystem::exists(dest_folder)) {
+		    boost::filesystem::create_directory(dest_folder);
+	    }
+    if (dest_folder.empty() || !boost::filesystem::is_directory(dest_folder)) {
+        std::string msg = _u8L("Could not start URL download. Destination folder is not set. Please choose destination folder in Configuration Wizard.");
+        BOOST_LOG_TRIVIAL(error) << msg;
+        show_error(nullptr, msg);
+        return;
+    }
+    m_downloader->init(dest_folder);
+    m_downloader->start_download(url);
+
+}
+
+bool is_soluble_filament(int extruder_id)
+{
+    auto& filament_presets = Slic3r::GUI::wxGetApp().preset_bundle->filament_presets;
+    auto& filaments = Slic3r::GUI::wxGetApp().preset_bundle->filaments;
+
+    if (extruder_id >= filament_presets.size()) return false;
+
+    Slic3r::Preset* filament = filaments.find_preset(filament_presets[extruder_id]);
+    if (filament == nullptr) return false;
+
+    Slic3r::ConfigOptionBools* support_option = dynamic_cast<Slic3r::ConfigOptionBools*>(filament->config.option("filament_soluble"));
+    if (support_option == nullptr) return false;
+
+    return support_option->get_at(0);
+};
+
+bool has_filaments(const std::vector<string>& model_filaments) {
+    auto& filament_presets = Slic3r::GUI::wxGetApp().preset_bundle->filament_presets;
+    auto model_objects = Slic3r::GUI::wxGetApp().plater()->model().objects;
+    const Slic3r::DynamicPrintConfig& config = wxGetApp().preset_bundle->full_config();
+    Model::setExtruderParams(config, filament_presets.size());
+
+    auto get_filament_name = [](int id) { return Model::extruderParamsMap.find(id) != Model::extruderParamsMap.end() ? Model::extruderParamsMap.at(id).materialName : "PLA"; };
+    for (const ModelObject* mo : model_objects) {
+        for (auto vol : mo->volumes) {
+            auto ve = vol->get_extruders();
+            for (auto id : ve) {
+                auto name = get_filament_name(id);
+                if (find(model_filaments.begin(), model_filaments.end(), name) != model_filaments.end()) return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool is_support_filament(int extruder_id, bool strict_check)
+{
+    auto& filament_presets = Slic3r::GUI::wxGetApp().preset_bundle->filament_presets;
+    auto& filaments = Slic3r::GUI::wxGetApp().preset_bundle->filaments;
+
+    if (extruder_id >= filament_presets.size()) return false;
+
+    Slic3r::Preset* filament = filaments.find_preset(filament_presets[extruder_id]);
+    if (filament == nullptr) return false;
+
+    std::string filament_type = filament->config.option<ConfigOptionStrings>("filament_type")->values[0];
+
+    Slic3r::ConfigOptionBools* support_option = dynamic_cast<Slic3r::ConfigOptionBools*>(filament->config.option("filament_is_support"));
+
+    if (!strict_check && (filament_type == "PETG" || filament_type == "PLA")) {
+        std::vector<string> model_filaments;
+        if (filament_type == "PETG")
+            model_filaments.emplace_back("PLA");
+        else {
+            model_filaments = { "PETG", "TPU", "TPU-AMS" };
+        }
+        if (has_filaments(model_filaments)) return true;
+    }
+    if (support_option == nullptr) return false;
+    return support_option->get_at(0);
+};
+
+bool GUI_App::LoadFile(std::string jPath, std::string& sContent)\
+{
+    try {
+        boost::nowide::ifstream t(jPath);
+        std::stringstream       buffer;
+        buffer << t.rdbuf();
+        sContent = buffer.str();
+        BOOST_LOG_TRIVIAL(trace) << __FUNCTION__ << boost::format(", load %1% into buffer") % jPath;
+    } catch (std::exception& e) {
+        BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ",  got exception: " << e.what();
+        return false;
+    }
+
+    return true;
+}
+
+int GUI_App::load_machine_preset_data()
+{
+    boost::filesystem::path vendor_dir = (boost::filesystem::path(Slic3r::data_dir()) / PRESET_SYSTEM_DIR).make_preferred();
+    if (!boost::filesystem::exists((vendor_dir / "Creality" / "machineList").replace_extension(".json")))
+    {
+        vendor_dir = (boost::filesystem::path(Slic3r::resources_dir()) / PRESET_PROFILES_DIR).make_preferred();
+    }
+    if (boost::filesystem::exists((vendor_dir / "Creality" / "machineList").replace_extension(".json"))) {
+        std::string             vendor_preset_path = vendor_dir.string() + "/Creality/machineList.json";
+        boost::filesystem::path file_path(vendor_preset_path);
+
+        boost::filesystem::path vendor_dir = boost::filesystem::absolute(file_path.parent_path() / "machineList").make_preferred();
+        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(",  vendor path %1%.") % vendor_dir.string();
+        try {
+            std::string contents;
+            LoadFile(vendor_preset_path, contents);
+            json jLocal  = json::parse(contents);
+            json pmodels = jLocal["printerList"];
+
+            nlohmann::json commandJson;
+            commandJson["command"] = "get_machine_list";
+            commandJson["data"]    = pmodels;
+
+            wxString strJS = wxString::Format("handleStudioCmd(%s)", commandJson.dump(-1, ' ', true));
+            wxGetApp().CallAfter([this, strJS] { run_script(strJS.ToStdString()); });
+
+            //wxString strJS         = wxString::Format("window.handleStudioCmd('%s');",
+            //                                          RemotePrint::Utils::url_encode(commandJson.dump(-1, ' ', true)));
+            //run_script(strJS.ToStdString());
+        } catch (nlohmann::detail::parse_error& err) {
+            BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": parse " << vendor_preset_path
+                                     << " got a nlohmann::detail::parse_error, reason = " << err.what();
+            return -1;
+        } catch (std::exception& e) {
+            BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": parse " << vendor_preset_path << " got exception: " << e.what();
+            return -1;
+        }
+    } else {
+        auto        printer_list_file     = fs::path(data_dir()).append("system").append("Creality").append("machineList.json").string();
+        std::string base_url              = get_cloud_api_url();
+        auto        preupload_profile_url = "/api/cxy/v2/slice/profile/official/printerList";
+        Http::set_extra_headers(Slic3r::GUI::wxGetApp().get_extra_header());
+        Http http = Http::post(base_url + preupload_profile_url);
+        json j;
+        j["engineVersion"]      = "3.0.0";
+        boost::uuids::uuid uuid = boost::uuids::random_generator()();
+        http.header("Content-Type", "application/json")
+            .header("__CXY_REQUESTID_", to_string(uuid))
+            .set_post_body(j.dump())
+            .on_complete([&](std::string body, unsigned status) {
+                if (status != 200) {
+                    return -1;
+                }
+                try {
+                    json j            = json::parse(body);
+                    json printer_list = j["result"];
+                    json list         = printer_list["printerList"];
+
+                    nlohmann::json commandJson;
+                    commandJson["command"] = "get_machine_list";
+                    commandJson["data"]    = list;
+                    wxString strJS         = wxString::Format("window.handleStudioCmd('%s');",
+                                                              RemotePrint::Utils::url_encode(commandJson.dump(-1, ' ', true)));
+                    run_script(strJS.ToStdString());
+
+                    if (list.empty()) {
+                        return -1;
+                    }
+
+                    auto out_printer_list_file = fs::path(data_dir()).append("system").append("Creality").append("machineList.json").string();
+                    boost::nowide::ofstream c;
+                    c.open(out_printer_list_file, std::ios::out | std::ios::trunc);
+                    c << std::setw(4) << printer_list << std::endl;
+
+                } catch (...) {
+                    return -1;
+                }
+                return 0;
+            })
+            .perform_sync();
+    }
+    return 0;
+}
+
+//mouse scheme
+void GUI_App::on_interinstance_message(const std::string& msg)
+{
+    // 登录状态变更：优先同步本实例的账号信息（从 user_info.json 读取），
+    // 再刷新社区与模型库视图，确保多实例的 token/cookies 一致。
+    if (msg == std::string("CP_LOGIN_STATUS_CHANGED")) {
+        try {
+            auto user_file = fs::path(data_dir()).append("user_info.json");
+            if (fs::exists(user_file)) {
+                nlohmann::json j;
+                boost::nowide::ifstream ifs(user_file.string());
+                ifs >> j;
+
+                UserInfo user;
+                user.token    = j.value("token", "");
+                user.nickName = j.value("nickName", "");
+                user.avatar   = j.value("avatar", "");
+                user.userId   = j.value("userId", "");
+
+                m_user.token    = user.token;
+                m_user.nickName = user.nickName;
+                m_user.avatar   = user.avatar;
+                m_user.userId   = user.userId;
+                m_user.bLogin   = !m_user.token.empty();
+
+                app_config->set("cloud", "user_id", m_user.userId);
+                app_config->set("cloud", "token", m_user.token);
+                NotifyAIChatLoginStatusChanged();
+            } else {
+                // 文件不存在表示登出，清空本实例的账号信息
+                m_user.token.clear();
+                m_user.nickName.clear();
+                m_user.avatar.clear();
+                m_user.userId.clear();
+                m_user.bLogin = false;
+                app_config->set("cloud", "user_id", m_user.userId);
+                app_config->set("cloud", "token", m_user.token);
+                NotifyAIChatLoginStatusChanged();
+            }
+        } catch (...) {
+            // 解析失败时不中断流程，仅继续刷新以尽量保持一致
+        }
+
+        // 刷新模型库 UA 与 Cookies（依赖 app_config 的最新 token/uid）
+        if (mainframe) {
+            mainframe->update_model_webviews_user_agent();
+        }
+        // 刷新社区与模型库视图，避免手动 F5
+        this->reload_homepage();
+        this->reload_region_sensitive_views();
+
+        // 同步刷新设备管理页，确保云设备组在多实例登录变更后立即更新
+        if (mainframe && mainframe->get_printer_mgr_view()) {
+            wxGetApp().CallAfter([this] {
+                if (mainframe) mainframe->refresh_device_page();
+            });
+        }
+        return;
+    }
+    static constexpr const char* kPrefix = "CP_MOUSE_SCHEME=";
+    if (msg.rfind(kPrefix, 0) == 0) { 
+        int scheme = 0;
+        try {
+            scheme = std::stoi(msg.substr(std::strlen(kPrefix)));
+        } catch (...) {
+            return;
+        }
+
+        if (app_config)
+            app_config->set("mouse_scheme", scheme ? "1" : "0");
+
+        if (auto* plater = this->plater()) {
+            auto apply = [&](Slic3r::GUI::GLCanvas3D* c) {
+                if (!c)
+                    return;
+                c->set_mouse_scheme(scheme);
+                if (auto* win = c->get_wxglcanvas()) {
+                    win->Refresh(false);
+#ifdef __WXMSW__
+                    win->Update();
+#endif
+                }
+            };
+            apply(plater->get_view3D_canvas3D());
+            apply(plater->get_preview_canvas3D());
+            apply(plater->get_assmeble_canvas3D());
+            apply(plater->get_current_canvas3D(false));
+        }
+    }
+}
+
+} // GUI
+} //Slic3r
+void GUI_App::OpenEshopRecommendedGoods(const std::string& materialColor, const std::string& materialType, const std::string& materialName)
+{
+    using nlohmann::json;
+    // Region code (used for site and CN shortcut)
+    std::string country_code;
+    // try {
+    //     country_code = wxGetApp().app_config->get_country_code();
+    //     // CN: open Tmall directly
+    //     if (country_code == "CN") {
+    //         wxLaunchDefaultBrowser(wxString::FromUTF8("https://creality3d.tmall.com/"));
+    //         return;
+    //     }
+    // } catch (...) {
+    //     // If region detection fails, continue with normal flow
+    //     country_code.clear();
+    // }
+
+    // if (materialColor.empty()) {
+    //     wxLogError("OpenEshopRecommendedGoods: materialColor is required by protocol");
+    //     return;
+    // }
+    country_code = wxGetApp().app_config->get_country_code();
+    // API endpoint from protocol document
+    std::string base_url = get_cloud_api_url();
+    std::string endpoint = "/api/rest/lottery/eshop/dtc/filaments/getRecommendedGoods";
+    std::string api_url  = base_url + endpoint;
+    // Build request body: array of item objects per protocol
+    json body = json::array();
+    json data = json::object();
+    if (!materialType.empty())
+        data["materialType"] = materialType;
+    if (!materialName.empty())
+        data["materialName"] = materialName;
+    data["materialColor"] = materialColor;
+    data["site"] = country_code;
+    // Required tracking fields
+    json dataTrace = json::object();
+    dataTrace["utm_medium"] = "creality_print";
+    dataTrace["utm_source"] = "creality_cloud";
+    data["trace"] = dataTrace;
+    body.push_back(data);
+    // Set required headers and post request
+    Http::set_extra_headers(this->get_extra_header());
+    Http http = Http::post(api_url);
+    http.header("Content-Type", "application/json");
+    http.set_post_body(body.dump());
+
+    http.on_complete([this](std::string resp_body, unsigned http_status) {
+        try {
+            auto j    = json::parse(resp_body);
+            int  code = j.value("code", -1);
+            if (http_status >= 200 && http_status < 300 && code == 0) {
+                if (!j.contains("result")) {
+                    wxLogWarning("OpenEshopRecommendedGoods: result missing in response");
+                    return;
+                }
+                const auto& result = j.at("result");
+                std::string goodsUrl;
+                if (result.is_array()) {
+                    for (const auto& item : result) {
+                        if (item.is_object()) {
+                            auto url = item.value("goodsUrl", std::string());
+                            if (!url.empty()) { goodsUrl = url; break; }
+                        }
+                    }
+                } else if (result.is_object()) {
+                    goodsUrl = result.value("goodsUrl", std::string());
+                }
+
+                if (!goodsUrl.empty()) {
+                    wxString url = wxString::FromUTF8(goodsUrl);
+                    wxLaunchDefaultBrowser(url);
+                    return;
+                }
+                wxLogWarning("OpenEshopRecommendedGoods: goodsUrl missing in result");
+            } else {
+                wxLogWarning("OpenEshopRecommendedGoods: http=%u code=%d body=%s", http_status, code, wxString::FromUTF8(resp_body));
+            }
+        } catch (std::exception& e) {
+            wxLogError("OpenEshopRecommendedGoods: parse error: %s", e.what());
+        }
+    })
+        .on_error([this](std::string body, std::string error, unsigned http_status) {
+            wxLogError("OpenEshopRecommendedGoods: request failed http=%u error=%s", http_status, error);
+        })
+        .timeout_connect(TIMEOUT_CONNECT)
+        .timeout_max(TIMEOUT_RESPONSE)
+        .perform();
+}
+
+bool GUI_App::easy_mode()
+{
+    return wxGetApp().app_config->get("easy_print_mode") == "1" ? true : false;
+}
+
+void GUI_App::Update_easy_mode_flag()
+{
+    // m_is_easy_mode = easy_mode();
+    // if(m_is_easy_mode) {
+    //     wxGetApp().app_config->set("gcode_preview_lite_mode", "true");
+    // }
+
+    // AI/Pro switching triggers a cascade of Show/Hide/Layout/Refresh on the
+    // topbar, sidebar, embedded AI dock and 3D canvas. Without batching, each
+    // widget repaints independently and the user sees a visible flicker.
+    // Freeze the top-level frame so all sub-window repaints coalesce into a
+    // single composite frame on Thaw.
+    Plater* plater_ptr = wxGetApp().plater();
+    if (plater_ptr == nullptr)
+        return;
+
+    MainFrame* main_frame = wxGetApp().mainframe;
+    wxWindow*  freeze_target = main_frame ? static_cast<wxWindow*>(main_frame)
+                                          : static_cast<wxWindow*>(plater_ptr);
+    wxWindowUpdateLocker ui_locker(freeze_target);
+
+    if (auto* canvas = plater_ptr->get_view3D_canvas3D())
+        canvas->on_easy_mode_switch();
+    plater_ptr->update();
+
+    // When switching back to Pro mode, the right-side settings tabs were hidden
+    // (and their pages not re-activated) while in AI mode. If the config changed
+    // during that time (e.g. loading a 3mf that enables support), the parameter
+    // panel's field enable/disable linkage (toggle_options) is stale — the value
+    // shows correctly but dependent fields stay greyed out. Force a reload +
+    // update so the linkage is recomputed against the current config.
+    if (!easy_mode()) {
+        for (Preset::Type type : {Preset::TYPE_PRINT, Preset::TYPE_FILAMENT, Preset::TYPE_PRINTER}) {
+            if (Tab* tab = get_tab(type)) {
+                tab->update_dirty();
+                tab->reload_config();
+                tab->update();
+            }
+        }
+    }
+
+    if (main_frame != nullptr && main_frame->topbar() != nullptr)
+        main_frame->topbar()->Refresh();
+
+    // AI / 专业版切换后，实时把新版本（ai/pro）推送给内嵌的 AIChatPage，使其埋点 mode
+    // 立即同步。version_mode 只在加载 URL 时拼接一次，切换版本后并不会刷新页面，因此必须
+    // 通过 JS 主动推送，避免切换到专业版后埋点仍上报旧的 version_mode=ai。
+    NotifyAIChatEditionChanged();
+}

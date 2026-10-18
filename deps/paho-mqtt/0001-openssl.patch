@@ -1,0 +1,13 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1155844..0cdde2b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -52,7 +52,7 @@ endif()
+ ## --- Find Paho C or build it, if reqested ---
+ 
+ if(PAHO_WITH_SSL)
+-    find_package(OpenSSL REQUIRED)
++    find_package(OpenSSL 1.1 REQUIRED)
+     set(PAHO_MQTT_C_LIB paho-mqtt3as)
+ else()
+     set(PAHO_MQTT_C_LIB paho-mqtt3a)

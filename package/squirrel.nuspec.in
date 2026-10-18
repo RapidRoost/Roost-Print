@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>@SQUIRREL_ID@</id>
+    <title>@CPACK_NSIS_DISPLAY_NAME@</title>
+    <version>@SQUIRREL_VERSION@</version>
+    <authors>@VENDOR_NAME@</authors>
+    <owners>@VENDOR_NAME@</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>@SQUIRREL_DESCRIPTION@</description>
+    <projectUrl>https://www.creality.com</projectUrl>
+    <iconUrl>@SQUIRREL_ICON_URL@</iconUrl>
+    <tags>creality slicer</tags>
+    <dependencies>
+      <!-- Empty group to declare target framework for Squirrel's releasify step -->
+      <group targetFramework="net45" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System" targetFramework="net45" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <!-- NuGet patterns use forward slashes; exclude only a few installer exe -->
+    <file src="**"
+          target="lib\\net45"
+          exclude="**/STLThumb-Windows_0.5.0.exe;**/MicrosoftEdgeWebView2RuntimeInstallerX64.exe;**/MicrosoftEdgeSetup.exe" />
+  </files>
+</package>

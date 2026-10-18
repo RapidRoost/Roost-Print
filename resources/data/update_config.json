@@ -1,0 +1,10 @@
+{
+  "provider": "squirrel.windows",
+  "channel": "stable",
+  "update_feed": "http://172.20.180.14/shared/crealityprint/windows",
+  "releases_file": "RELEASES",
+  "bootstrapper": "CrealityPrintSetup.exe",
+  "package_prefix": "CrealityPrint",
+  "artifact_dir": "Releases",
+  "signature": "sha256"
+}
