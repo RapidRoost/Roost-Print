@@ -17,15 +17,15 @@
 <defs>
 <linearGradient id="PSgrad_0" x1="0%" x2="0%" y1="100%" y2="0%">
   <stop offset="59%" stop-color="rgb(138,176,51)" stop-opacity="1" />
-  <stop offset="100%" stop-color="rgb(20,87,49)" stop-opacity="1" />
+  <stop offset="100%" stop-color="rgb(22,61,85)" stop-opacity="1" />
 </linearGradient>
 <linearGradient id="PSgrad_1" x1="0%" x2="0%" y1="100%" y2="0%">
-  <stop offset="0%" stop-color="rgb(19,91,49)" stop-opacity="1" />
-  <stop offset="100%" stop-color="rgb(50,151,64)" stop-opacity="1" />
+  <stop offset="0%" stop-color="rgb(21,63,89)" stop-opacity="1" />
+  <stop offset="100%" stop-color="rgb(53,111,148)" stop-opacity="1" />
 </linearGradient>
 <linearGradient id="PSgrad_2" x1="0%" x2="0%" y1="100%" y2="0%">
   <stop offset="25%" stop-color="rgb(138,176,51)" stop-opacity="1" />
-  <stop offset="100%" stop-color="rgb(20,87,49)" stop-opacity="1" />
+  <stop offset="100%" stop-color="rgb(22,61,85)" stop-opacity="1" />
 </linearGradient>
 
 </defs>

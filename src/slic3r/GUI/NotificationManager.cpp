@@ -756,7 +756,7 @@ void NotificationManager::PopNotification::render_close_button(ImGuiWrapper& img
 
     // Colors
     ImVec4 col_n = m_is_dark ? ImVec4(0.82f, 0.86f, 0.92f, 1.0f) : ImVec4(0.52f, 0.58f, 0.66f, 1.0f);
-    ImVec4 col_h = ImVec4(0.00f, 0.588f, 0.533f, 1.0f);
+    ImVec4 col_h = ImVec4(0.118f, 0.565f, 0.847f, 1.0f);
     ImU32 col = ImGui::ColorConvertFloat4ToU32(hovered ? col_h : col_n);
 
     ImDrawList* dl = ImGui::GetWindowDrawList();
@@ -864,7 +864,7 @@ void NotificationManager::PopNotification::bbl_render_left_sign(ImGuiWrapper &im
 
 	ImVec2 rect_pos = round_rect_pos + ImVec2(m_WindowRadius, 0);
     ImVec2 rect_size = ImVec2(round_rect_size.x / 2, round_rect_size.y);
-	ImU32 clr = ImGui::GetColorU32(ImVec4(0, 0.588, 0.533, m_current_fade_opacity));
+	ImU32 clr = ImGui::GetColorU32(ImVec4(0.118f, 0.565f, 0.847f, m_current_fade_opacity));
 
     draw_list->AddRectFilled(round_rect_pos, round_rect_pos + round_rect_size, clr, m_WindowRadius);
     draw_list->AddRectFilled(rect_pos, rect_pos + rect_size, clr, 0);
@@ -914,7 +914,7 @@ void NotificationManager::PopNotification::render_minimize_button(ImGuiWrapper& 
 
     // Colors
     ImVec4 col_n = m_is_dark ? ImVec4(0.82f, 0.86f, 0.92f, 1.0f) : ImVec4(0.52f, 0.58f, 0.66f, 1.0f);
-    ImVec4 col_h = ImVec4(0.00f, 0.588f, 0.533f, 1.0f);
+    ImVec4 col_h = ImVec4(0.118f, 0.565f, 0.847f, 1.0f);
     ImU32 col = ImGui::ColorConvertFloat4ToU32(hovered ? col_h : col_n);
     
 
@@ -1261,7 +1261,7 @@ void NotificationManager::ProgressBarNotification::render_bar(ImGuiWrapper& imgu
     ImColor bg_color(74, 74, 77, alpha);   
     ImColor fg_color(23, 204, 95, alpha);  
 
-    ImVec4 orange_color         = ImVec4(0, 0.588, 0.533, 1);
+    ImVec4 orange_color         = ImVec4(0.118f, 0.565f, 0.847f, 1);
     ImVec4 gray_color           = ImVec4(.7f, .7f, .7f, 1.0f);
 	ImVec2 lineEnd				= ImVec2(win_pos_x - m_window_width_offset, win_pos_y + win_size_y / 2 + (m_multiline ? m_line_height / 2 : 0));
 	ImVec2 lineStart			= ImVec2(win_pos_x - win_size_x + m_left_indentation, win_pos_y + win_size_y / 2 + (m_multiline ? m_line_height / 2 : 0));

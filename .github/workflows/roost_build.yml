@@ -1,0 +1,85 @@
+# Roost Print for Windows: builds the app on GitHub's Windows machines and keeps the result as a
+# download (a zip: unzip it anywhere and run RoostPrint.exe).
+#
+# The libraries it needs take an hour or two to build the first time; after that they're kept
+# (cached) and a build takes about half an hour. Run it from the Actions tab ("Run workflow"), or
+# push to main. Tagging a version (v1.0.0) also makes a GitHub Release with the zip on it.
+name: Build Roost Print
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths-ignore: ['**.md', 'doc/**', 'Creality_doc/**']
+  workflow_dispatch:
+
+concurrency:
+  group: roost-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "~3.28.0"
+
+      - uses: microsoft/setup-msbuild@v2
+
+      - name: Libraries (from the cache when nothing in deps/ changed)
+        id: deps
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/deps/build/OrcaSlicer_dep
+          key: roost-win-deps-${{ hashFiles('deps/**') }}
+
+      - name: Build the libraries
+        if: steps.deps.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          choco install strawberryperl -y --no-progress
+          call test_build.bat deps
+
+      - name: Get the WebView2 runtime installer (shipped with the app)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force package/runtime | Out-Null
+          Invoke-WebRequest -Uri https://github.com/CrealityOfficial/CrealityPrint/releases/download/tools/MicrosoftEdgeWebView2RuntimeInstallerX64.exe -OutFile package/runtime/MicrosoftEdgeWebView2RuntimeInstallerX64.exe
+
+      - name: Build Roost Print
+        shell: cmd
+        env:
+          WindowsSdkDir: 'C:\Program Files (x86)\Windows Kits\10\'
+          WindowsSDKVersion: '10.0.22000.0\'
+        run: call test_build.bat slicer
+
+      - name: Pack it up
+        shell: pwsh
+        run: |
+          $out = "build/OrcaSlicer"
+          if (-not (Test-Path "$out/RoostPrint.exe")) { Get-ChildItem build -Recurse -Filter RoostPrint.exe | Select-Object -First 5 | ForEach-Object { $_.FullName }; throw "RoostPrint.exe not found in $out" }
+          Copy-Item tools/roost/README-download.txt "$out/READ ME.txt"
+          $name = "RoostPrint-Windows-$(Get-Date -Format 'yyyyMMdd')-$($env:GITHUB_SHA.Substring(0,7)).zip"
+          Compress-Archive -Path "$out/*" -DestinationPath $name
+          "ZIP=$name" | Out-File -Append -FilePath $env:GITHUB_ENV -Encoding utf8
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RoostPrint-Windows
+          path: ${{ env.ZIP }}
+          retention-days: 30
+
+      - name: Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP }}
+          name: Roost Print ${{ github.ref_name }}

@@ -100,7 +100,7 @@ private:
         }
 
         dc.SetFont(GetFont());
-        dc.SetTextForeground(m_hovered ? wxColour("#00AE42")
+        dc.SetTextForeground(m_hovered ? wxColour("#1E90D8")
                                        : StateColor::darkModeColorFor(wxColour("#262E30")));
         wxSize ts = dc.GetTextExtent(m_text);
         int x = (sz.GetWidth()  - ts.GetWidth())  / 2;
@@ -1562,8 +1562,8 @@ wxBoxSizer* MixedFilamentDialog::create_button_panel(wxWindow* parent)
     m_btn_cancel->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { commit_ratio_editor(false); EndModal(wxID_CANCEL); });
 
     m_btn_ok = new Button(parent, _L("OK"));
-    m_btn_ok->SetBackgroundColor(wxColour("#00AE42"));
-    m_btn_ok->SetBorderColor(wxColour("#00AE42"));
+    m_btn_ok->SetBackgroundColor(wxColour("#1E90D8"));
+    m_btn_ok->SetBorderColor(wxColour("#1E90D8"));
     m_btn_ok->SetCornerRadius(FromDIP(4));
     m_btn_ok->SetTextColor(wxColour("#FFFFFE"));
     m_btn_ok->SetMinSize(wxSize(FromDIP(72), FromDIP(28)));
@@ -2096,8 +2096,8 @@ void MixedFilamentDialog::update_ok_button_state()
         m_btn_ok->SetBorderColor(wxColour("#CECECE"));
         m_btn_ok->SetToolTip(_L("Cannot mix different filament types"));
     } else {
-        m_btn_ok->SetBackgroundColor(wxColour("#00AE42"));
-        m_btn_ok->SetBorderColor(wxColour("#00AE42"));
+        m_btn_ok->SetBackgroundColor(wxColour("#1E90D8"));
+        m_btn_ok->SetBorderColor(wxColour("#1E90D8"));
         m_btn_ok->SetToolTip(wxEmptyString);
     }
 

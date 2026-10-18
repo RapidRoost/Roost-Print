@@ -162,7 +162,7 @@ UpdatePluginDialog::UpdatePluginDialog(wxWindow* parent /*= nullptr*/)
 
     auto sizer_button = new wxBoxSizer(wxHORIZONTAL);
 
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(0, 137, 123), StateColor::Pressed), std::pair<wxColour, int>(wxColour(38, 166, 154), StateColor::Hovered),
+    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
         std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
 
     StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
@@ -390,8 +390,8 @@ UpdateVersionDialog::UpdateVersionDialog(wxWindow *parent)
                                                    wxHL_ALIGN_LEFT);
     m_link_open_in_browser->SetFont(Label::Body_14);
     
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(18, 162, 76), StateColor::Pressed), std::pair<wxColour, int>(wxColour(40, 210, 100), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(21, 191, 89), StateColor::Normal));
+    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(22, 105, 158), StateColor::Pressed), std::pair<wxColour, int>(wxColour(44, 143, 206), StateColor::Hovered),
+                            std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Normal));
 
     StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
@@ -729,7 +729,7 @@ SecondaryCheckDialog::SecondaryCheckDialog(wxWindow* parent, wxWindowID id, cons
 
     auto bottom_sizer = new wxBoxSizer(wxVERTICAL);
     auto sizer_button = new wxBoxSizer(wxHORIZONTAL);
-    btn_bg_green = StateColor(std::pair<wxColour, int>(wxColour(0, 137, 123), StateColor::Pressed), std::pair<wxColour, int>(wxColour(38, 166, 154), StateColor::Hovered),
+    btn_bg_green = StateColor(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
         std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
 
     btn_bg_white = StateColor(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
@@ -1347,9 +1347,9 @@ ConfirmBeforeSendDialog::ConfirmBeforeSendDialog(wxWindow* parent, wxWindowID id
 
     auto bottom_sizer = new wxBoxSizer(wxVERTICAL);
     auto sizer_button = new wxBoxSizer(wxHORIZONTAL);
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(21, 191, 89), StateColor::Pressed), 
-        std::pair<wxColour, int>(wxColour(21, 191, 89), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(21, 191, 89), StateColor::Normal));
+    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), 
+        std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Normal));
 
     StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
         std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
@@ -1583,7 +1583,7 @@ void ConfirmBeforeSendDialog::disable_button_ok()
 void ConfirmBeforeSendDialog::enable_button_ok()
 {
     m_button_ok->Enable();
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(38, 166, 154), StateColor::Pressed), std::pair<wxColour, int>(wxColour(38, 166, 154), StateColor::Hovered),
+    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
         std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
     m_button_ok->SetBackgroundColor(btn_bg_green);
     m_button_ok->SetBorderColor(btn_bg_green);
@@ -1657,7 +1657,7 @@ InputIpAddressDialog::InputIpAddressDialog(wxWindow* parent)
     m_input_area->Add(m_input_access_code, 0, wxALIGN_CENTER, 0);
 
     m_test_right_msg = new Label(this, Label::Body_13, wxEmptyString, LB_AUTO_WRAP);
-    m_test_right_msg->SetForegroundColour(wxColour(38, 166, 154));
+    m_test_right_msg->SetForegroundColour(wxColour(74, 168, 228));
     m_test_right_msg->Hide();
 
     
@@ -1680,7 +1680,7 @@ InputIpAddressDialog::InputIpAddressDialog(wxWindow* parent)
 
     auto m_sizer_button = new wxBoxSizer(wxHORIZONTAL);
 
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(38, 166, 154), StateColor::Pressed), std::pair<wxColour, int>(wxColour(38, 166, 154), StateColor::Hovered),
+    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
         std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
 
     StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
@@ -1865,7 +1865,7 @@ void InputIpAddressDialog::set_machine_obj(MachineObject* obj)
     auto str_access_code = m_input_access_code->GetTextCtrl()->GetValue();
     if (isIp(str_ip.ToStdString()) && str_access_code.Length() == 8) {
         m_button_ok->Enable(true);
-        StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(0, 137, 123), StateColor::Pressed), std::pair<wxColour, int>(wxColour(38, 166, 154), StateColor::Hovered),
+        StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
             std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
         m_button_ok->SetTextColor(StateColor::darkModeColorFor("#FFFFFE"));
         m_button_ok->SetBackgroundColor(btn_bg_green);
@@ -2025,7 +2025,7 @@ void InputIpAddressDialog::on_check_ip_address_failed(wxCommandEvent& evt)
     }
     
     m_button_ok->Enable(true);
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(0, 137, 123), StateColor::Pressed), std::pair<wxColour, int>(wxColour(38, 166, 154), StateColor::Hovered),
+    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
         std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
     m_button_ok->SetTextColor(StateColor::darkModeColorFor("#FFFFFE"));
     m_button_ok->SetBackgroundColor(btn_bg_green);
@@ -2038,7 +2038,7 @@ void InputIpAddressDialog::on_text(wxCommandEvent& evt)
 
     if (isIp(str_ip.ToStdString()) && str_access_code.Length() == 8) {
         m_button_ok->Enable(true);
-        StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(0, 137, 123), StateColor::Pressed), std::pair<wxColour, int>(wxColour(38, 166, 154), StateColor::Hovered),
+        StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
             std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Normal));
         m_button_ok->SetTextColor(StateColor::darkModeColorFor("#FFFFFE"));
         m_button_ok->SetBackgroundColor(btn_bg_green);

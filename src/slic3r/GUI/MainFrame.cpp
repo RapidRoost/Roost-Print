@@ -1188,6 +1188,9 @@ void MainFrame::update_layout()
                 // Resolve the window ID before passing the page index to Notebook.
                 select_tab(tpAICreation);
                 return;
+            } else if (evt.GetId() == tpPrintCam) {
+                select_tab(tpPrintCam);
+                return;
             }
             evt.Skip();
         });
@@ -1334,6 +1337,7 @@ void MainFrame::destroy_webviews_for_recreate()
     destroy_view(m_webview);
     destroy_view(m_webmodellibrary_view);
     destroy_view(m_ai_creation_view);
+    destroy_view(m_printcam_view);
     destroy_view(m_printer_view);
     destroy_view(m_printer_mgr_view);
 }
@@ -1448,6 +1452,11 @@ void MainFrame::init_tabpanel() {
                 topbar_sel = static_cast<size_t>(tpAICreation);
                 ensure_web_model_view_ready(m_ai_creation_view);
             }
+            else if (panel == m_printcam_view)
+            {
+                topbar_sel = static_cast<size_t>(tpPrintCam);
+                m_printcam_view->on_show();
+            }
             else if (panel == m_webview)
                 topbar_sel = static_cast<size_t>(tpHome);
             m_topbar->SetSelection(topbar_sel);
@@ -1535,7 +1544,7 @@ void MainFrame::init_tabpanel() {
 
         m_param_panel = new ProcessParamsPanel(m_tabpanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBK_LEFT | wxTAB_TRAVERSAL);
         //m_param_panel->create_image_tooltip_panel();
-        m_param_panel->set_border_panel_color(wxColour(49, 139, 86));
+        m_param_panel->set_border_panel_color(wxColour(51, 104, 137));
     }
 
     m_plater = new Plater(this, this);
@@ -1575,6 +1584,13 @@ void MainFrame::init_tabpanel() {
     m_ai_creation_view->SetStartPage(wxString::FromUTF8(get_ai_creation_webaddress()));
     m_tabpanel->AddPage(m_ai_creation_view, _L("AI Creation"), "tab_ai_creation_active", "tab_ai_creation", false);
     m_ai_creation_view->Hide();
+    // Roost Print: PrintCam's page, in its own tab (appended, like AI Creation, so indices stay put).
+    m_printcam_view = new RoostPrintCamPanel(m_tabpanel);
+    m_printcam_view->SetId(tpPrintCam);
+    m_tabpanel->AddPage(m_printcam_view, _L("PrintCam"), std::string("tab_monitor_active"), std::string("tab_monitor_active"), false);
+    m_printcam_view->Hide();
+    // And start PrintCam in the background now (if it's on this computer), so the cameras run while you slice.
+    CallAfter([] { RoostPrintCam::ensure_started(); });
     if(m_plater) {
         m_plater->create_send_to_printer_dlg();  // BBS : pre create the send dialog on program startup
     }
@@ -2638,9 +2654,9 @@ void MainFrame::update_side_button_style()
     m_slice_btn->SetExtraSize(wxSize(FromDIP(38), FromDIP(10)));
     m_slice_btn->SetBottomColour(wxColour(0x3B4446));*/
     StateColor m_btn_bg_enable = StateColor(
-        std::pair<wxColour, int>(wxColour(0, 137, 123), StateColor::Pressed), 
-        std::pair<wxColour, int>(wxColour(48, 221, 112), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0, 150, 136), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), 
+        std::pair<wxColour, int>(wxColour(52, 153, 217), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal)
     );
 
     // m_publish_btn->SetMinSize(wxSize(FromDIP(125), FromDIP(24)));
@@ -4104,7 +4120,7 @@ void MainFrame::init_menubar_as_gcodeviewer()
             [](wxCommandEvent&) { start_new_slicer(); }, "", nullptr,
             []() {return true; }, this);
         fileMenu->AppendSeparator();
-        append_menu_item(fileMenu, wxID_EXIT, _L("&Quit"), wxString::Format(_L("Quit %s"), SLIC3R_APP_NAME),
+        append_menu_item(fileMenu, wxID_EXIT, _L("&Quit"), wxString::Format(_L("Quit %s"), SLIC3R_APP_FULL_NAME),
             [this](wxCommandEvent&) { Close(false); });
     }
 
@@ -4224,7 +4240,7 @@ public:
         pBtnCreateCopy->SetSize(wxSize(FromDIP(128), FromDIP(32)));
         pBtnCreateCopy->SetMinSize(wxSize(FromDIP(128), FromDIP(32)));
         pBtnCreateCopy->SetForegroundColour(wxColour("#FFFFFF"));
-        pBtnCreateCopy->SetBackgroundColour(wxColour("#18CC5C"));
+        pBtnCreateCopy->SetBackgroundColour(wxColour("#1E90D8"));
         pBtnCreateCopy->Bind(wxEVT_LEFT_DOWN, [this](wxMouseEvent& e) {
             m_nClickedButtonValue = 4;
             EndModal(wxID_OK);
@@ -4326,7 +4342,7 @@ public:
         pBtnCreateCopy->SetSize(wxSize(FromDIP(128), FromDIP(32)));
         pBtnCreateCopy->SetMinSize(wxSize(FromDIP(128), FromDIP(32)));
         pBtnCreateCopy->SetForegroundColour(wxColour("#FFFFFF"));
-        pBtnCreateCopy->SetBackgroundColour(wxColour("#18CC5C"));
+        pBtnCreateCopy->SetBackgroundColour(wxColour("#1E90D8"));
         pBtnCreateCopy->Bind(wxEVT_LEFT_DOWN, [this](wxMouseEvent& e) {
             m_nClickedButtonValue = 4;
             EndModal(wxID_OK);
@@ -4827,12 +4843,22 @@ void MainFrame::select_tab(size_t tab/* = size_t(-1)*/)
                 return;
             new_selection = static_cast<size_t>(page_idx);
         }
+        if (tab == tpPrintCam) {
+            if (!m_printcam_view)
+                return;
+            const int page_idx = m_tabpanel->FindPage(m_printcam_view);
+            if (page_idx == wxNOT_FOUND)
+                return;
+            new_selection = static_cast<size_t>(page_idx);
+        }
 
         if (m_tabpanel->GetSelection() != (int)new_selection)
         {
             m_tabpanel->SetSelection(new_selection);
             if(this->topbar())
-                this->topbar()->SetSelection(m_tabpanel->GetCurrentPage() == m_ai_creation_view ? tpAICreation : new_selection);
+                this->topbar()->SetSelection(m_tabpanel->GetCurrentPage() == m_ai_creation_view ? tpAICreation :
+                                             m_tabpanel->GetCurrentPage() == m_printcam_view    ? tpPrintCam :
+                                                                                                   new_selection);
         }
 #ifdef _MSW_DARK_MODE
         /*if (wxGetApp().tabs_as_menu()) {
@@ -5437,8 +5463,8 @@ std::string MainFrame::get_dir_name(const wxString &full_name) const
 // ----------------------------------------------------------------------------
 
 SettingsDialog::SettingsDialog(MainFrame* mainframe)
-:DPIDialog(NULL, wxID_ANY, wxString(SLIC3R_APP_NAME) + " - " + _L("Settings"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, "settings_dialog"),
-//: DPIDialog(mainframe, wxID_ANY, wxString(SLIC3R_APP_NAME) + " - " + _L("Settings"), wxDefaultPosition, wxDefaultSize,
+:DPIDialog(NULL, wxID_ANY, wxString(SLIC3R_APP_FULL_NAME) + " - " + _L("Settings"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, "settings_dialog"),
+//: DPIDialog(mainframe, wxID_ANY, wxString(SLIC3R_APP_FULL_NAME) + " - " + _L("Settings"), wxDefaultPosition, wxDefaultSize,
 //        wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxMINIMIZE_BOX | wxMAXIMIZE_BOX, "settings_dialog"),
     m_main_frame(mainframe)
 {

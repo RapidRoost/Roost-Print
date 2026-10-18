@@ -1846,7 +1846,7 @@ static BOOL CALLBACK EnumWindowsProc(_In_ HWND   hwnd, _In_ LPARAM lParam)
 			return true;
 		std::wstring classNameString(className);
 		std::wstring wndTextString(wndText);
-		if (wndTextString.find(L"CrealityPrint") != std::wstring::npos && classNameString == L"wxWindowNR") {
+		if (wndTextString.find(L"RoostPrint") != std::wstring::npos && classNameString == L"wxWindowNR") {
 			//check if other instances has same instance hash
 			//if not it is not same version(binary) as this version 
 			HANDLE   handle = GetProp(hwnd, L"Instance_Hash_Minor");
@@ -5004,6 +5004,7 @@ bool GUI_App::on_init_inner(bool isdump_launcher)
             // installation of a compatible system preset, thus nullifying the system preset substitutions.
             init_user_profile();
             init_params->preset_substitutions = preset_bundle->load_presets(*app_config, ForwardCompatibilitySubstitutionRule::EnableSystemSilent);
+            roost_install_fleet();
         }catch(ConfigurationError &ex)
         {
             int ret = wxMessageBox(_L("Detected corruption in the Creality Print configuration file, attempted to rebuild, \nplease manually restart the software."), _L("Error"), wxOK | wxICON_ERROR);
@@ -5600,7 +5601,7 @@ bool GUI_App::dark_mode()
 
 const wxColour GUI_App::get_label_default_clr_system()
 {
-    return dark_mode() ? wxColour(35, 59, 44) : wxColour(220, 246, 230);
+    return dark_mode() ? wxColour(35, 59, 44) : wxColour(221, 236, 245);
 }
 
 const wxColour GUI_App::get_label_default_clr_modified()
@@ -5732,7 +5733,7 @@ void GUI_App::UpdateDarkUI(wxWindow* window, bool highlited/* = false*/, bool ju
         auto orig_col = window->GetBackgroundColour();
         auto bg_col = StateColor::darkModeColorFor(orig_col);
         // there are cases where the background color of an item is bright, specifically:
-        // * the background color of a button: #009688  -- 73
+        // * the background color of a button: #1E90D8  -- 73
         if (bg_col != orig_col) {
             window->SetBackgroundColour(bg_col);
         }
@@ -13927,6 +13928,38 @@ void GUI_App::window_pos_center(wxTopLevelWindow *window)
     }
 }
 
+void GUI_App::roost_install_fleet()
+{
+    // Only on a fresh start (no printers chosen yet), so it never undoes what's been set up since.
+    if (!preset_bundle || !app_config || !preset_bundle->printers.only_default_printers())
+        return;
+    try {
+        namespace fs = boost::filesystem;
+        const std::string vendor = "Creality";
+        // The shop's printers: 5 K2 Plus and 10 K1C, all with 0.4 mm nozzles.
+        const std::vector<std::string> models = {"Creality K2 Plus", "Creality K1C"};
+        const auto vendor_file = (fs::path(data_dir()) / PRESET_SYSTEM_DIR / (vendor + ".json")).make_preferred();
+        if (!fs::exists(vendor_file)) {
+            if (!preset_updater || !preset_updater->install_bundles_rsrc({vendor}, false)) {
+                BOOST_LOG_TRIVIAL(warning) << "Roost Print: couldn't install the Creality printer profiles";
+                return;
+            }
+        }
+        for (const auto& model : models)
+            app_config->set_variant(vendor, model, "0.4", true);
+        preset_bundle->load_presets(*app_config, ForwardCompatibilitySubstitutionRule::EnableSilentDisableSystem,
+                                    {models.front(), "0.4", std::string(), std::string()});
+        preset_bundle->export_selections(*app_config);
+        // The printers are chosen, so the first-run printer picker isn't needed.
+        app_config->set("is_first_install", "1");
+        app_config->set_legacy_datadir(false);
+        app_config->save();
+        BOOST_LOG_TRIVIAL(info) << "Roost Print: Rapid Roost's printers set up";
+    } catch (const std::exception& ex) {
+        BOOST_LOG_TRIVIAL(error) << "Roost Print: setting up the printers failed: " << ex.what();
+    }
+}
+
 bool GUI_App::config_wizard_startup()
 {
 #if defined(CREALITYPRINT_APP_STORE)
@@ -14121,8 +14154,8 @@ void GUI_App::associate_files(std::wstring extend)
     ::GetModuleFileNameW(nullptr, app_path, sizeof(app_path));
 
     std::wstring prog_path = L"\"" + std::wstring(app_path) + L"\"";
-    std::wstring prog_id = L" Creality.Slicer.1";
-    std::wstring prog_desc = L"CrealityPrint";
+    std::wstring prog_id = L" RapidRoost.RoostPrint.1";
+    std::wstring prog_desc = L"Roost Print";
     std::wstring prog_command = prog_path + L" \"%1\"";
     std::wstring reg_base = L"Software\\Classes";
     std::wstring reg_extension = reg_base + L"\\." + extend;
@@ -14148,8 +14181,8 @@ void GUI_App::disassociate_files(std::wstring extend)
     ::GetModuleFileNameW(nullptr, app_path, sizeof(app_path));
 
     std::wstring prog_path = L"\"" + std::wstring(app_path) + L"\"";
-    std::wstring prog_id = L" Creality.Slicer.1";
-    std::wstring prog_desc = L"CrealityPrint";
+    std::wstring prog_id = L" RapidRoost.RoostPrint.1";
+    std::wstring prog_desc = L"Roost Print";
     std::wstring prog_command = prog_path + L" \"%1\"";
     std::wstring reg_base = L"Software\\Classes";
     std::wstring reg_extension = reg_base + L"\\." + extend;

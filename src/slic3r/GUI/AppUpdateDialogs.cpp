@@ -70,7 +70,7 @@ public:
     {
         wxUnusedVar(is_dark);
         m_normal_bg = normal_bg;
-        m_border_color = wxColour("#15BF59");
+        m_border_color = wxColour("#1877B4");
         m_border_width = FromDIP(1);
         m_bmp = bmp;
 
@@ -168,7 +168,7 @@ private:
             const int width = std::max(0, size.x - w);
             const int height = std::max(0, size.y - w);
             dc.SetBrush(*wxTRANSPARENT_BRUSH);
-            dc.SetPen(wxPen(m_border_color.IsOk() ? m_border_color : wxColour("#15BF59"), w));
+            dc.SetPen(wxPen(m_border_color.IsOk() ? m_border_color : wxColour("#1877B4"), w));
             dc.DrawRectangle(inset + 1, inset, width, height);
         }
     }
@@ -393,7 +393,7 @@ void AppUpdateProgressDialog::apply_theme()
     const wxColour line = is_dark ? wxColour("#616165") : wxColour("#E8EAEE");
     const wxColour border = is_dark ? wxColour("#6E6E72") : wxColour("#DBDBDB");
     const wxColour progress_track = is_dark ? wxColour("#616165") : wxColour("#E8EAEE");
-    const wxColour progress_fill = wxColour("#15BF59");
+    const wxColour progress_fill = wxColour("#1877B4");
 
     SetBackgroundColour(bg);
 
@@ -632,9 +632,9 @@ void AppUpdateFinishDialog::apply_theme()
     const wxColour content_bg = is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF");
     const wxColour fg = is_dark ? *wxWHITE : *wxBLACK;
     const wxColour line = is_dark ? wxColour("#616165") : wxColour("#E8EAEE");
-    const wxColour accent = is_dark ? wxColour("#15C059") : wxColour("#15BF59");
-    const wxColour now_hover = is_dark ? wxColour("#19D567") : wxColour("#19D567");
-    const wxColour now_pressed = is_dark ? wxColour("#12AA50") : wxColour("#12AA50");
+    const wxColour accent = is_dark ? wxColour("#197DBC") : wxColour("#1877B4");
+    const wxColour now_hover = is_dark ? wxColour("#1E8BD0") : wxColour("#1E8BD0");
+    const wxColour now_pressed = is_dark ? wxColour("#166EA6") : wxColour("#166EA6");
     const wxColour cancel_border = is_dark ? wxColour("#6E6E72") : wxColour("#DBDBDB");
     const wxColour cancel_hover_bg = is_dark ? wxColour("#535355") : wxColour("#F3F4F6");
     const wxColour cancel_pressed_bg = is_dark ? wxColour("#434345") : wxColour("#E8EAEE");

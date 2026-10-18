@@ -353,6 +353,8 @@ set(SLIC3R_GUI_SOURCES
     GUI/AppleSignIn.cpp
     GUI/PrinterWebView.cpp
     GUI/PrinterWebView.hpp
+    GUI/RoostPrintCam.cpp
+    GUI/RoostPrintCam.hpp
     GUI/print_manage/PrinterMgr.cpp
     GUI/print_manage/PrinterMgr.hpp
     GUI/print_manage/App/PrinterMgrView.cpp

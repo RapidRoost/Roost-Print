@@ -175,7 +175,7 @@ const ImVec4 ImGuiWrapper::COL_BUTTON_ACTIVE     = COL_BUTTON_HOVERED;
 //BBS
 
 const ImVec4 ImGuiWrapper::COL_BLUE_LIGHT        = ImVec4(0.122f, 0.557f, 0.918f, 1.0f);
-const ImVec4 ImGuiWrapper::COL_GREEN_LIGHT       = ImVec4(0.86f, 0.99f, 0.91f, 1.0f);
+const ImVec4 ImGuiWrapper::COL_GREEN_LIGHT       = ImVec4(0.863f, 0.937f, 0.984f, 1.0f);
 const ImVec4 ImGuiWrapper::COL_HOVER             = { 0.933f, 0.933f, 0.933f, 1.0f };
 const ImVec4 ImGuiWrapper::COL_ACTIVE            = { 0.675f, 0.675f, 0.675f, 1.0f };
 const ImVec4 ImGuiWrapper::COL_SEPARATOR         = { 0.93f, 0.93f, 0.93f, 1.0f };
@@ -186,7 +186,7 @@ const ImVec4 ImGuiWrapper::COL_WINDOW_BG         = { 1.000f, 1.000f, 1.000f, 1.0
 const ImVec4 ImGuiWrapper::COL_WINDOW_BG_DARK    = { 75 / 255.f, 75 / 255.f, 77 / 255.f, 1.f };
 //const ImVec4 ImGuiWrapper::COL_WINDOW_BG_DARK    = {0.294f, 0.294f, 0.302f, 1.f};
 const ImVec4 ImGuiWrapper::COL_ORCA              = to_ImVec4(ColorRGBA::ORCA());
-const ImVec4 ImGuiWrapper::COL_CREALITY          = ImVec4{0.090f, 0.80f, 0.373, 1.0f};
+const ImVec4 ImGuiWrapper::COL_CREALITY          = ImVec4{0.118f, 0.565f, 0.847f, 1.0f};
 
 int ImGuiWrapper::TOOLBAR_WINDOW_FLAGS = ImGuiWindowFlags_AlwaysAutoResize
                                  | ImGuiWindowFlags_NoMove
@@ -2760,7 +2760,7 @@ void ImGuiWrapper::push_confirm_button_style() {
     if (m_is_dark_mode) {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(23.f / 255.f, 204.f / 255.f, 95.f / 255.f, 1.f));
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(23.f / 255.f, 204.f / 255.f, 95.f / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, to_ImVec4(decode_color_to_float_array("#267E73")));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, to_ImVec4(decode_color_to_float_array("#285B7C")));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(27.f / 255.f, 136.f / 255.f, 68.f / 255.f, 1.f));
         ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.f, 1.f, 1.f, 0.88f));
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 0.88f));
@@ -2768,7 +2768,7 @@ void ImGuiWrapper::push_confirm_button_style() {
     else {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(23.f / 255.f, 204.f / 255.f, 95.f / 255.f, 1.f));
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(23.f / 255.f, 204.f / 255.f, 95.f / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, to_ImVec4(decode_color_to_float_array("#56DF3D")));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, to_ImVec4(decode_color_to_float_array("#419FDB")));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(27.f / 255.f, 136.f / 255.f, 68.f / 255.f, 1.f));
         ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.f, 1.f, 1.f, 1.f));
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
@@ -3898,7 +3898,7 @@ static void recolor_greenish_pixels(unsigned char* rgba, int n_pixels, bool to_w
         if (a == 0)
             continue;
 
-        // Heuristic: "green-ish" pixels (covers #17CC5F plus antialiased edges).
+        // Heuristic: "green-ish" pixels (covers #1E90D8 plus antialiased edges).
         // Keep non-green strokes (often gray) unchanged.
         const int g_dominance = int(g) - std::max(int(r), int(b));
         const bool greenish   = (g_dominance >= 25) && (g >= 60) && (r <= 200) && (b <= 200);

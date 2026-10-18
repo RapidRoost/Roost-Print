@@ -174,11 +174,11 @@ void ColorSlider::UpdatePaletteFromEnv()
     const bool dark = IsDarkAppearance();
     if (dark) {
         mTrackBg   = wxColour(43, 43, 43);
-        mThumbFill = wxColour(31, 202, 99);
+        mThumbFill = wxColour(30, 144, 216);
         mThumbRing = wxColour(219, 219, 219);
     } else {
         mTrackBg   = wxColour(225, 228, 233);
-        mThumbFill = wxColour(21, 192, 89);
+        mThumbFill = wxColour(25, 125, 188);
         mThumbRing = wxColour(255, 255, 255);
     }
 }

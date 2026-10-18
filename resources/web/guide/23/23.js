@@ -656,7 +656,7 @@ function changeTheme () {
 	$('#AcceptBtn').hover(function () {
 		$(this).css({ background: '#fff' , color: '#333', border: '1px solid #333'})
 	}, function () {
-		$(this).css({ background: '#17CC5F' , color: '#fff', border: '1px solid transparent'})
+		$(this).css({ background: '#1E90D8' , color: '#fff', border: '1px solid transparent'})
 	})
 }
 

@@ -6548,8 +6548,8 @@ void ObjectList::render_plate(ObjectDataViewModelNode* plate)
             ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(ImGuiWrapper::COL_CREALITY));
             ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(ImGuiWrapper::COL_CREALITY));
         } else {
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(ImVec4{0.090f, 0.80f, 0.373, 0.15f}));
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(ImVec4{0.090f, 0.80f, 0.373, 0.15f}));
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(ImVec4{0.118f, 0.565f, 0.847f, 0.15f}));
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(ImVec4{0.118f, 0.565f, 0.847f, 0.15f}));
         }
     } else {
         ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, IM_COL32_BLACK_TRANS);
@@ -6778,8 +6778,8 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
             ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(ImGuiWrapper::COL_CREALITY));
             ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(ImGuiWrapper::COL_CREALITY));
         } else {
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(ImVec4{0.090f, 0.80f, 0.373, 0.15f}));
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(ImVec4{0.090f, 0.80f, 0.373, 0.15f}));
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(ImVec4{0.118f, 0.565f, 0.847f, 0.15f}));
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(ImVec4{0.118f, 0.565f, 0.847f, 0.15f}));
         }
 
     } else {

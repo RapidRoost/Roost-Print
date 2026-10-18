@@ -199,7 +199,7 @@ static bool render_simple_tool_window_close_button(ImGuiWindow* window)
         // ImDrawList* draw_list = ImGui::GetWindowDrawList();
         ImDrawList* draw_list = ImGui::GetForegroundDrawList();
         if (hovered || held) {
-            const ImU32 hover_col = ImGui::GetColorU32(ImVec4(0.082f, 0.749f, 0.349f, 1.0f));
+            const ImU32 hover_col = ImGui::GetColorU32(ImVec4(0.094f, 0.467f, 0.706f, 1.0f));
             draw_list->AddRect(bb.Min, bb.Max, hover_col, 2.0f * scale, 0, 1.0f * scale);
         }
 
@@ -221,7 +221,7 @@ static bool render_simple_tool_window_close_button(ImGuiWindow* window)
     if (draw_list == nullptr)
         draw_list = ImGui::GetForegroundDrawList();
     if (hovered || held) {
-        const ImU32 hover_col = ImGui::GetColorU32(ImVec4(0.082f, 0.749f, 0.349f, 1.0f));
+        const ImU32 hover_col = ImGui::GetColorU32(ImVec4(0.094f, 0.467f, 0.706f, 1.0f));
         draw_list->AddRect(bb.Min, bb.Max, hover_col, 2.0f * scale, 0, 1.0f * scale);
     }
 

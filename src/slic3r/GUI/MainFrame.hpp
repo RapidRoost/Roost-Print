@@ -26,6 +26,7 @@
 #include "calib_dlg.hpp"
 #include "MultiMachinePage.hpp"
 #include "print_manage/App/PrinterMgrView.hpp"
+#include "RoostPrintCam.hpp"
 
 #define ENABEL_PRINT_ALL 0
 
@@ -217,6 +218,8 @@ public:
         toDebugTool     = 9,
         tpDeviceMgr     = 10,
         tpAICreation    = 11,
+        // Roost Print: the PrintCam tab (RoostPrintCam.cpp).
+        tpPrintCam      = 12,
     };
 
     //BBS: add slice&&print status update logic
@@ -414,6 +417,7 @@ public:
     PrinterMgrView*       m_printer_mgr_view{nullptr};
     WebModelLibraryView*  m_webmodellibrary_view{ nullptr };
     WebModelLibraryView*  m_ai_creation_view{ nullptr };
+    RoostPrintCamPanel*   m_printcam_view{ nullptr };
     wxLogWindow*          m_log_window { nullptr };
     // BBS
     //wxBookCtrlBase*       m_tabpanel { nullptr };

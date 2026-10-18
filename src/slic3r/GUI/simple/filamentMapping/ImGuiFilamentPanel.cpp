@@ -784,7 +784,7 @@ void ImGuiFilamentPanel::render_item(ImGuiFilamentItemState &item)
     }
 
     const ImU32 map_border_default = IM_COL32(208, 212, 222, 255); // light grey border
-    const ImU32 map_border_hover   = ImGui::GetColorU32(ImVec4(0.08f, 0.65f, 0.25f, 1.0f)); // green highlight
+    const ImU32 map_border_hover   = ImGui::GetColorU32(ImVec4(0.094f, 0.427f, 0.635f, 1.0f)); // green highlight
     const ImU32 map_border = map_hovered ? map_border_hover : map_border_default;
     dl->AddRectFilled(map_pos, map_br, map_bg, 6.f);
     dl->AddRect(map_pos, map_br, map_border, 6.f, 0, map_hovered ? 2.0f : 1.0f);
@@ -957,7 +957,7 @@ void ImGuiFilamentPanel::render_item(ImGuiFilamentItemState &item)
                         }
                         const bool disable_hover = (type_mismatch || no_color);
                         const bool hov = !disable_hover && hov_raw;
-                        ImU32 border_col = hov ? ImGui::GetColorU32(ImVec4(0.08f, 0.65f, 0.25f, 1.0f))
+                        ImU32 border_col = hov ? ImGui::GetColorU32(ImVec4(0.094f, 0.427f, 0.635f, 1.0f))
                                                : IM_COL32(208, 212, 222, 255);
                         
                         // When the device material cannot match current filament, draw disabled texture background
@@ -1060,7 +1060,7 @@ void ImGuiFilamentPanel::render_external_item(float scale)
 
     const ImU32 map_bg            = IM_COL32(255, 255, 255, 255);
     const ImU32 map_border_default = IM_COL32(208, 212, 222, 255);
-    const ImU32 map_border_hover   = ImGui::GetColorU32(ImVec4(0.08f, 0.65f, 0.25f, 1.0f));
+    const ImU32 map_border_hover   = ImGui::GetColorU32(ImVec4(0.094f, 0.427f, 0.635f, 1.0f));
     const ImU32 map_border         = map_hovered ? map_border_hover : map_border_default;
     const ImU32 map_text_color     = IM_COL32(38, 44, 52, 255);
 

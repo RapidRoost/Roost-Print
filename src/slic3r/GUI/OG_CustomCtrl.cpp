@@ -1623,7 +1623,7 @@ void OG_CustomCtrl::CtrlLine::render(wxDC& dc, wxCoord h_pos, wxCoord v_pos)
 
         const auto layout = ctrl->get_field_layout(og_line);
         if (layout.label_width > 0) {
-            wxColour blink_color = StateColor::darkModeColorFor("#15BF59");
+            wxColour blink_color = StateColor::darkModeColorFor("#1877B4");
             const wxColour* text_clr = field->blink() ? &blink_color : field->label_color();
             draw_text(dc, wxPoint(layout.label_x, v_pos), og_line.label, text_clr,
                       layout.label_width, false, true);
@@ -1676,7 +1676,7 @@ void OG_CustomCtrl::CtrlLine::render(wxDC& dc, wxCoord h_pos, wxCoord v_pos)
 
     const bool leading_actions = ctrl->uses_leading_action_layout(og_line);
     wxString label = og_line.label;
-    wxColour blink_color = StateColor::darkModeColorFor("#15BF59");
+    wxColour blink_color = StateColor::darkModeColorFor("#1877B4");
     bool is_url_string = false;
     if (ctrl->opt_group->label_width != 0 && !label.IsEmpty()) {
         const wxColour* text_clr = field ? field->label_color() : og_line.label_color();
@@ -1862,7 +1862,7 @@ wxCoord OG_CustomCtrl::CtrlLine::draw_text(wxDC &dc, wxPoint pos, const wxString
             *text_rect = bounds;
 
         wxColour old_clr = dc.GetTextForeground();
-        wxColor clr_url = StateColor::darkModeColorFor("#15BF59");
+        wxColor clr_url = StateColor::darkModeColorFor("#1877B4");
         if ((is_main && is_focused) || (text_rect != nullptr && focused_option >= 0 &&
             size_t(focused_option) < rects_option_label.size() && text_rect == &rects_option_label[size_t(focused_option)])) {
         // temporary workaround for the OSX because of strange Bold font behavior on BigSerf

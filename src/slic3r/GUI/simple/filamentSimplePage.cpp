@@ -115,7 +115,7 @@ void GLCanvas3D::_draw_filament_menu_contents()
     // Adjust text/check colors per theme so dark mode stays readable.
     const bool dark = wxGetApp().dark_mode();
     const ImVec4 text_col  = dark ? ImVec4(0.90f, 0.93f, 0.97f, 1.0f) : ImVec4(0.18f, 0.21f, 0.24f, 1.0f);
-    const ImVec4 check_col = dark ? ImVec4(0.18f, 0.80f, 0.38f, 1.0f) : ImVec4(0.08f, 0.65f, 0.25f, 1.0f);
+    const ImVec4 check_col = dark ? ImVec4(0.196f, 0.557f, 0.784f, 1.0f) : ImVec4(0.094f, 0.427f, 0.635f, 1.0f);
     const ImU32 col_on  = ImGui::GetColorU32(check_col);
     const ImU32 col_off = ImGui::GetColorU32(dark ? ImVec4(0.82f, 0.84f, 0.88f, 1.0f) : ImVec4(0.38f, 0.41f, 0.45f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_Text, text_col);
@@ -123,7 +123,7 @@ void GLCanvas3D::_draw_filament_menu_contents()
 
     //// The panel background is white, so enforce dark text for readability in this scope.
     //ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.18f, 0.21f, 0.24f, 1.0f));   // near #30373D
-    //ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.08f, 0.65f, 0.25f, 1.0f)); // green check for radios
+    //ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.094f, 0.427f, 0.635f, 1.0f)); // green check for radios
 
     // 顶部单选：启用CFS / 使用外置料架 + 打印校准(复选框)
     int  source_mode = (m_imgui_filament_panel->mode() == ImGuiFilamentPanel::Mode::CFS) ? 0 : 1; // 0=CFS, 1=EXT
@@ -143,7 +143,7 @@ void GLCanvas3D::_draw_filament_menu_contents()
         const float r_outer = 7.0f * scale;
         const float ring_thickness = 1.5f;
         const ImU32 col_off = ImGui::GetColorU32(ImVec4(0.75f, 0.77f, 0.80f, 1.0f));
-        const ImU32 col_on  = ImGui::GetColorU32(ImVec4(0.08f, 0.65f, 0.25f, 1.0f));
+        const ImU32 col_on  = ImGui::GetColorU32(ImVec4(0.094f, 0.427f, 0.635f, 1.0f));
         ImVec2 center(start.x + r_outer, start.y + r_outer);
         ImVec2 text_sz = ImGui::CalcTextSize(label);
         const float text_gap = 8.0f * scale;

@@ -711,7 +711,7 @@ function toggleChecked (val, event) {
 function isShowCheckboxArea (val) {
     $(val).find('.card-list-item-checked-printer-wrapper').show()
     $(val).addClass('hover-bth-selected')
-    $(val).find('svg path:nth-of-type(2)').attr('fill', isChangeColor ? '#17CC5F' : '#fff')
+    $(val).find('svg path:nth-of-type(2)').attr('fill', isChangeColor ? '#1E90D8' : '#fff')
 }
 
 function hideCheckBox (val, event) {

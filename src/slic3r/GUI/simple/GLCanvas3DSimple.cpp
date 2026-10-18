@@ -666,9 +666,9 @@ void GLCanvas3D::_render_device_list_dropdown_panel_simple() const
 void GLCanvas3D::_render_slice_control_simple() const
 {
     auto push_green_button_style = [](){
-        ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.16f, 0.74f, 0.33f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.14f, 0.66f, 0.30f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.12f, 0.58f, 0.26f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.176f, 0.514f, 0.725f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.153f, 0.455f, 0.647f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.133f, 0.400f, 0.569f, 1.00f));
         ImGui::PushStyleColor(ImGuiCol_Text,          ImVec4(1,1,1,1));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f);
     };
@@ -803,9 +803,9 @@ void GLCanvas3D::render_preview_top_buttons_simple()
                               ImGuiWindowFlags_NoBackground;
 
     auto push_green_button_style = [](){
-        ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.16f, 0.74f, 0.33f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.14f, 0.66f, 0.30f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.12f, 0.58f, 0.26f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.176f, 0.514f, 0.725f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.153f, 0.455f, 0.647f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.133f, 0.400f, 0.569f, 1.00f));
         ImGui::PushStyleColor(ImGuiCol_Text,          ImVec4(1,1,1,1));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f);
     };
@@ -2036,9 +2036,9 @@ void GLCanvas3D::_render_ai_chat_toggle()
         // }
 
     if (ImGui::Begin("##ai_chat_toggle", nullptr, ai_flags)) {
-        // ImGui::PushStyleColor(ImGuiCol_Button,         ImVec4(0.00f, 0.73f, 0.42f, 1.0f));
-        // ImGui::PushStyleColor(ImGuiCol_ButtonHovered,  ImVec4(0.00f, 0.63f, 0.36f, 1.0f));
-        // ImGui::PushStyleColor(ImGuiCol_ButtonActive,   ImVec4(0.00f, 0.53f, 0.30f, 1.0f));
+        // ImGui::PushStyleColor(ImGuiCol_Button,         ImVec4(0.020f, 0.443f, 0.710f, 1.0f));
+        // ImGui::PushStyleColor(ImGuiCol_ButtonHovered,  ImVec4(0.016f, 0.384f, 0.616f, 1.0f));
+        // ImGui::PushStyleColor(ImGuiCol_ButtonActive,   ImVec4(0.012f, 0.322f, 0.518f, 1.0f));
         // ImGui::PushStyleColor(ImGuiCol_Text,           ImVec4(1, 1, 1, 1));
         // ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, btn_w / 2);
         //

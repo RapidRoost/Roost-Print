@@ -109,7 +109,7 @@ public:
 
 private:
     int      m_cornerRadius = 5;                   // Corner radius
-    wxColour m_bgColor      = wxColour("#15BF59"); // Button background color
+    wxColour m_bgColor      = wxColour("#1877B4"); // Button background color
     wxColour m_textColor    = *wxWHITE;            // Button text color
     wxBitmap m_icon;
 

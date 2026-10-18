@@ -428,7 +428,7 @@ void Tab::Highlighter::init(wxWindow* window, bool* show_blink_ptr, bool highlig
     m_highlight_foreground = highlight_foreground;
     if (m_highlight_foreground) {
         m_original_colour = m_custom_ctrl->GetForegroundColour();
-        m_custom_ctrl->SetForegroundColour("#15BF59");
+        m_custom_ctrl->SetForegroundColour("#1877B4");
     }
 
     *m_show_blink_ptr = true;
@@ -457,7 +457,7 @@ void Tab::Highlighter::blink()
     if (m_custom_ctrl && m_show_blink_ptr) {
         *m_show_blink_ptr = !*m_show_blink_ptr;
         if (m_highlight_foreground)
-            m_custom_ctrl->SetForegroundColour(*m_show_blink_ptr ? wxColour("#15BF59") : m_original_colour);
+            m_custom_ctrl->SetForegroundColour(*m_show_blink_ptr ? wxColour("#1877B4") : m_original_colour);
         m_custom_ctrl->Refresh();
     }
     else
@@ -3977,7 +3977,7 @@ wxSizer* TabPrint::create_limit_mess_enable_widget(const std::string& title, wxW
                                        std::pair<wxColour, int>(wxColour(is_dark ? 0x4B4B4D : 0xFFFFFF), StateColor::Hovered),
                                        std::pair<wxColour, int>(wxColour(is_dark ? 0x4B4B4D : 0xFFFFFF), StateColor::Normal)));
     btn->Bind(wxEVT_ENTER_WINDOW, [=](wxMouseEvent& e) {
-        btn->SetBorderColor(wxColour("#18CC5C"));
+        btn->SetBorderColor(wxColour("#1E90D8"));
     });
     btn->Bind(wxEVT_LEAVE_WINDOW, [=](wxMouseEvent& e) {
         btn->SetBorderColor(wxColour("#DBDBDB"));
@@ -4054,7 +4054,7 @@ wxSizer* TabPrint::create_flush_into_skeleton_widget(wxWindow* parent)
     m_flush_into_skeleton_btn = btn;
     update_flush_into_skeleton_button_state();
     btn->Bind(wxEVT_ENTER_WINDOW, [=](wxMouseEvent& e) {
-        btn->SetBorderColor(wxColour("#18CC5C"));
+        btn->SetBorderColor(wxColour("#1E90D8"));
     });
     btn->Bind(wxEVT_LEAVE_WINDOW, [=](wxMouseEvent& e) {
         btn->SetBorderColor(wxColour("#DBDBDB"));

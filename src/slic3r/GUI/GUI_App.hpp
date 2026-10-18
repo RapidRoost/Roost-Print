@@ -866,6 +866,8 @@ private:
     bool            select_language();
 
     bool            config_wizard_startup();
+    // Roost Print: on a fresh install, Rapid Roost's printers (K2 Plus, K1C) are set up straight away.
+    void            roost_install_fleet();
 	void            check_updates(const bool verbose);
 
     void            save_app_first_launch_info();

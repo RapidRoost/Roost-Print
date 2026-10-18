@@ -400,9 +400,9 @@ void MeshBooleanUI::draw_action_buttons()
     enable_button = is_ok_button_enabled();
 
     // OK button (green)
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.082353f, 0.752941f, 0.349020f, 1.00f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.00f, 0.6f, 0.20f, 1.00f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.00f, 0.60f, 0.22f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.098f, 0.490f, 0.737f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.016f, 0.365f, 0.584f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.016f, 0.365f, 0.584f, 1.00f));
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     bool ok_clicked = false;
@@ -1290,7 +1290,7 @@ void MeshBooleanUI::draw_progress_bar()
 
     // Draw progress bar
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f);
-    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.00f, 0.68f, 0.26f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.016f, 0.412f, 0.663f, 1.00f));
     ImVec2 progress_size(progress_bar_width, 0.0f);
     ImGui::BBLProgressBar2(progress / 100.0f, progress_size);
     ImGui::PopStyleColor(1);

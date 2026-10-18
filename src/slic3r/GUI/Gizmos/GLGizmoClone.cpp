@@ -111,7 +111,7 @@ bool GLGizmoClone::_render_object_clone_panel()
     ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.81f, 0.81f, 0.81f, 1.0f));
-    const ImVec4 COL_CREALITY = ImVec4{0.090f, 0.80f, 0.373, 1.0f};
+    const ImVec4 COL_CREALITY = ImVec4{0.118f, 0.565f, 0.847f, 1.0f};
     ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, COL_CREALITY);
 
     // bool slider_number_change = imgui->bbl_slider_int_style("##Number of copies:", &m_clone_settings.clone_num, 1, 100, "%d", true,

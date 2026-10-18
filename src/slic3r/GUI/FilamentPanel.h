@@ -181,7 +181,7 @@ public:
 
 const wxColour MENU_COLORS[8] = {
     wxColour(255, 0, 0),     // 01
-    wxColour(144, 238, 144), // 02
+    wxColour(146, 201, 236), // 02
     wxColour(0, 255, 0),     // 03
     wxColour(255, 0, 255),   // 04
     wxColour(255, 0, 0),     // 05

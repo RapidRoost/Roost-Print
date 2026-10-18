@@ -1206,9 +1206,9 @@ void AccelerationAndSpeedLimitDialog::build_dialog(bool bDefaultCheckbox, const 
     okBtn->SetMaxSize(wxSize(FromDIP(104), FromDIP(32)));
     okBtn->SetFont(Label::Body_13);
     okBtn->SetBorderColor(wxColour(wxGetApp().dark_mode() ? "#6C6E71" : "#A6ACB4"));
-    okBtn->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour("#1FCA63"), StateColor::Pressed),
-                                         std::pair<wxColour, int>(wxColour("#1FCA63"), StateColor::Hovered),
-                                         std::pair<wxColour, int>(wxColour("#1FCA63"), StateColor::Normal)));
+    okBtn->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour("#1E90D8"), StateColor::Pressed),
+                                         std::pair<wxColour, int>(wxColour("#1E90D8"), StateColor::Hovered),
+                                         std::pair<wxColour, int>(wxColour("#1E90D8"), StateColor::Normal)));
     okBtn->Bind(wxEVT_BUTTON, [this](wxEvent&) {
         if (s_hasShowErrorDlg) {
             return;

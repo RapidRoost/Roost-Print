@@ -2363,7 +2363,7 @@ Sidebar::Sidebar(Plater* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, 
 
         // the border style of the search control
         //   p->pSearchBk = new StaticBox(p->scrolled);
-        // p->pSearchBk->SetBorderColor(StateColor(std::make_pair(0xDBDBDB, (int)StateColor::Disabled), std::make_pair(0x15BF59,
+        // p->pSearchBk->SetBorderColor(StateColor(std::make_pair(0xDBDBDB, (int)StateColor::Disabled), std::make_pair(0x1877B4,
         // (int)StateColor::Hovered), 	std::make_pair(0xDBDBDB, (int)StateColor::Normal)));
         //   //p->pSearchBk->SetBackgroundColor(StateColor(std::make_pair(0xF0F0F1, (int)StateColor::Disabled), std::make_pair(*wxWHITE,
         //   (int)StateColor::Normal))); p->pSearchBk->SetCornerRadius(0); p->pSearchBk->SetBorderWidth(1);
@@ -2379,7 +2379,7 @@ Sidebar::Sidebar(Plater* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, 
         //   //p->m_search_bar->ShowSearchButton(true);
         //   //p->m_search_bar->ShowCancelButton(true);
         //   p->m_search_bar->SetDescriptiveText(_L("Search plate, object and part."));
-        //   p->m_search_bar->SetForegroundColour("#15BF59");
+        //   p->m_search_bar->SetForegroundColour("#1877B4");
 
         //   p->m_search_bar->Bind(wxEVT_SET_FOCUS, [this](wxFocusEvent&) {
         //       this->p->on_search_update();
@@ -4337,8 +4337,8 @@ namespace {
 // Filament color blending functions for mixed filament UI
 wxColour blend_pair_filament_mixer(const wxColour &left, const wxColour &right, float t)
 {
-    const wxColour safe_left = left.IsOk() ? left : wxColour("#26A69A");
-    const wxColour safe_right = right.IsOk() ? right : wxColour("#26A69A");
+    const wxColour safe_left = left.IsOk() ? left : wxColour("#4AA8E4");
+    const wxColour safe_right = right.IsOk() ? right : wxColour("#4AA8E4");
 
     unsigned char out_r = static_cast<unsigned char>(safe_left.Red());
     unsigned char out_g = static_cast<unsigned char>(safe_left.Green());
@@ -4357,7 +4357,7 @@ wxColour blend_pair_filament_mixer(const wxColour &left, const wxColour &right, 
 wxColour blend_multi_filament_mixer(const std::vector<wxColour> &colors, const std::vector<double> &weights)
 {
     if (colors.empty() || weights.empty())
-        return wxColour("#26A69A");
+        return wxColour("#4AA8E4");
 
     unsigned char out_r = 0;
     unsigned char out_g = 0;
@@ -4370,7 +4370,7 @@ wxColour blend_multi_filament_mixer(const std::vector<wxColour> &colors, const s
         if (weight <= 0.0)
             continue;
 
-        const wxColour safe = colors[i].IsOk() ? colors[i] : wxColour("#26A69A");
+        const wxColour safe = colors[i].IsOk() ? colors[i] : wxColour("#4AA8E4");
         const unsigned char r = static_cast<unsigned char>(safe.Red());
         const unsigned char g = static_cast<unsigned char>(safe.Green());
         const unsigned char b = static_cast<unsigned char>(safe.Blue());
@@ -4393,7 +4393,7 @@ wxColour blend_multi_filament_mixer(const std::vector<wxColour> &colors, const s
     }
 
     if (!has_color)
-        return wxColour("#26A69A");
+        return wxColour("#4AA8E4");
 
     return wxColour(out_r, out_g, out_b);
 }
@@ -4632,10 +4632,10 @@ public:
             if (id >= 1 && id <= palette.size())
                 m_colors.emplace_back(palette[id - 1]);
             else
-                m_colors.emplace_back(wxColour("#26A69A"));
+                m_colors.emplace_back(wxColour("#4AA8E4"));
         }
         if (m_colors.empty())
-            m_colors.emplace_back(wxColour("#26A69A"));
+            m_colors.emplace_back(wxColour("#4AA8E4"));
 
         auto *root = new wxBoxSizer(wxVERTICAL);
         auto *hint = new wxStaticText(this, wxID_ANY, _L("Pick a point in the gradient map to control multi-filament mix."));
@@ -5103,7 +5103,7 @@ private:
     std::vector<wxColour>       m_palette;
     std::vector<unsigned int>   m_sequence;
     bool                        m_same_layer { false };
-    wxColour                    m_fallback { wxColour(38, 166, 154) };
+    wxColour                    m_fallback { wxColour(74, 168, 228) };
     wxString                    m_left_overlay;
     wxString                    m_right_overlay;
 };
@@ -5664,7 +5664,7 @@ void MixedFilamentConfigPanel::build_ui()
         for (size_t fid = 0; fid < m_num_physical; ++fid) {
             wxButton *btn = new wxButton(this, wxID_ANY, wxString::Format("%d", int(fid + 1)),
                                          wxDefaultPosition, wxSize(FromDIP(24), FromDIP(22)), wxBU_EXACTFIT);
-            const wxColour chip_color = (fid < m_palette.size()) ? m_palette[fid] : wxColour("#26A69A");
+            const wxColour chip_color = (fid < m_palette.size()) ? m_palette[fid] : wxColour("#4AA8E4");
             btn->SetBackgroundColour(chip_color);
             btn->SetToolTip(wxString::Format(_L("Append filament %d to pattern"), int(fid + 1)));
             quick_buttons->Add(btn, 0, wxRIGHT, FromDIP(4));
@@ -5696,8 +5696,8 @@ void MixedFilamentConfigPanel::build_ui()
             decode_gradient_weights(m_mf.gradient_component_weights, selected_gradient_ids.size()),
             selected_gradient_ids.size());
 
-        wxColour color_a = (component_a >= 1 && component_a <= int(m_palette.size())) ? m_palette[component_a - 1] : wxColour("#26A69A");
-        wxColour color_b = (component_b >= 1 && component_b <= int(m_palette.size())) ? m_palette[component_b - 1] : wxColour("#26A69A");
+        wxColour color_a = (component_a >= 1 && component_a <= int(m_palette.size())) ? m_palette[component_a - 1] : wxColour("#4AA8E4");
+        wxColour color_b = (component_b >= 1 && component_b <= int(m_palette.size())) ? m_palette[component_b - 1] : wxColour("#4AA8E4");
         m_blend_selector = new MixedGradientSelector(this, color_a, color_b, std::clamp(m_mf.mix_b_percent, 0, 100));
         m_blend_selector->SetBackgroundColour(panel_bg);
         const bool same_layer_mode = row_distribution_mode == int(MixedFilament::SameLayerPointillisme);
@@ -5799,8 +5799,8 @@ void MixedFilamentConfigPanel::build_ui()
             m_mf.manual_pattern.clear();
             m_mf.pointillism_all_filaments = false;
 
-            const wxColour color_a = (a >= 1 && a <= int(m_palette.size())) ? m_palette[size_t(a - 1)] : wxColour("#26A69A");
-            const wxColour color_b = (b >= 1 && b <= int(m_palette.size())) ? m_palette[size_t(b - 1)] : wxColour("#26A69A");
+            const wxColour color_a = (a >= 1 && a <= int(m_palette.size())) ? m_palette[size_t(a - 1)] : wxColour("#4AA8E4");
+            const wxColour color_b = (b >= 1 && b <= int(m_palette.size())) ? m_palette[size_t(b - 1)] : wxColour("#4AA8E4");
             if (m_blend_selector) {
                 if (!simple_mode && multi_gradient_mode) {
                     std::vector<wxColour> corner_colors;
@@ -5840,7 +5840,7 @@ void MixedFilamentConfigPanel::build_ui()
             preview_sequence = build_weighted_pair_sequence(m_mf.component_a, m_mf.component_b, m_mf.mix_b_percent);
 
         if (selected_gradient_ids.size() >= 3 || !preview_sequence.empty()) {
-            m_mf.display_color = blend_from_sequence(m_physical_colors, preview_sequence, "#26A69A");
+            m_mf.display_color = blend_from_sequence(m_physical_colors, preview_sequence, "#4AA8E4");
             if (m_blend_label) {
                 if (selected_gradient_ids.size() >= 3) {
                     m_blend_label->SetLabel(wxString::Format(same_layer_mode ? _L("%d-color pointillisme") : _L("%d-color layer cycle"),
@@ -5904,7 +5904,7 @@ void MixedFilamentConfigPanel::build_ui()
                 const bool is_selected = int(i) == backing_choice->GetSelection();
                 const wxString item_label = wxString::Format("F%d%s", int(i + 1), is_selected ? " (Selected)" : "");
                 auto *menu_item = new wxMenuItem(&menu, item_id, item_label, wxEmptyString, wxITEM_NORMAL);
-                const wxColour item_color = (i < m_palette.size()) ? m_palette[i] : wxColour("#26A69A");
+                const wxColour item_color = (i < m_palette.size()) ? m_palette[i] : wxColour("#4AA8E4");
                 menu_item->SetBitmap(make_color_chip_bitmap(item_color));
                 menu.Append(menu_item);
             }
@@ -6024,7 +6024,7 @@ void MixedFilamentConfigPanel::update_component_picker_visuals()
         if (sel < 0)
             return;
 
-        const wxColour color = (size_t(sel) < m_palette.size()) ? m_palette[size_t(sel)] : wxColour("#26A69A");
+        const wxColour color = (size_t(sel) < m_palette.size()) ? m_palette[size_t(sel)] : wxColour("#4AA8E4");
         if (swatch) {
             swatch->SetBackgroundColour(color);
             swatch->Refresh();
@@ -6220,7 +6220,7 @@ public:
 
         const bool hovered = m_hovered_sash_rect == rect;
         const int  line_size = hovered ? 2 : 1;
-        dc.SetBrush(wxBrush(hovered ? wxColour("#15C059") : sash_color));
+        dc.SetBrush(wxBrush(hovered ? wxColour("#197DBC") : sash_color));
 
         if (orientation == wxVERTICAL) {
             const int x = rect.x + (rect.width - line_size) / 2;
@@ -7852,7 +7852,7 @@ wxColour Plater::get_next_color_for_filament()
                                                    wxColour(0, 35, 100),
                                                    wxColour(255, 0, 255),
                                                    wxColour(8, 37, 103),
-                                                   wxColour(127, 255, 212),
+                                                   wxColour(130, 205, 252),
                                                    wxColour(255, 191, 0)};
     return colors[curr_color_filamenet++ % FILAMENT_SYSTEM_COLORS_NUM];
 }
@@ -8192,7 +8192,7 @@ void Plater::priv::set_easy_ai_resize_handle_active(bool active)
     if (m_easy_ai_resize_handle == nullptr)
         return;
 
-    m_easy_ai_resize_handle->SetBackgroundColour(active ? wxColour(47, 196, 106) : wxColour(78, 86, 96));
+    m_easy_ai_resize_handle->SetBackgroundColour(active ? wxColour(51, 137, 192) : wxColour(78, 86, 96));
     m_easy_ai_resize_handle->Refresh();
 }
 
@@ -15232,7 +15232,7 @@ void Plater::priv::set_project_name(const wxString& project_name)
     m_project_name = project_name;
     // update topbar title
 #ifdef __WINDOWS__
-    wxGetApp().mainframe->SetTitle(m_project_name + " - CrealityPrint");
+    wxGetApp().mainframe->SetTitle(m_project_name + " - RoostPrint");
     wxGetApp().mainframe->topbar()->SetTitle(m_project_name);
 #else
     wxGetApp().mainframe->SetTitle(m_project_name);
@@ -19669,9 +19669,9 @@ ProjectDropDialog::ProjectDropDialog(const std::string& filename)
     wxBoxSizer* m_sizer_right = new wxBoxSizer(wxHORIZONTAL);
 
     m_confirm = new Button(this, _L("OK"));
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(21, 191, 89), StateColor::Pressed),
-                            std::pair<wxColour, int>(wxColour(21, 191, 89), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(21, 191, 89), StateColor::Normal));
+    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed),
+                            std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Hovered),
+                            std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Normal));
 
     m_confirm->SetBackgroundColor(btn_bg_green);
     m_confirm->SetBorderColor(wxColour(255, 255, 255));
@@ -26006,7 +26006,7 @@ void Sidebar::update_mixed_filament_panel(bool sync_manager)
     palette.reserve(physical_colors.size());
     for (auto &s : physical_colors) {
         wxColour c(s);
-        if (!c.IsOk()) c = wxColour("#26A69A");
+        if (!c.IsOk()) c = wxColour("#4AA8E4");
         palette.emplace_back(c);
     }
     std::vector<std::string> physical_types;
@@ -26402,7 +26402,7 @@ void Sidebar::update_mixed_filament_panel(bool sync_manager)
             wxSize sz = comp_box->GetClientSize();
             dc.SetBrush(*wxTRANSPARENT_BRUSH);
             if (*comp_hovered)
-                dc.SetPen(wxPen(wxColour("#00AE42"), 1));
+                dc.SetPen(wxPen(wxColour("#1E90D8"), 1));
             else
                 dc.SetPen(wxPen(border_color, 1));
             dc.DrawRoundedRectangle(0, 0, sz.x, sz.y, 4);
@@ -26446,7 +26446,7 @@ void Sidebar::update_mixed_filament_panel(bool sync_manager)
         btn_merge->SetBackgroundColor(StateColor(std::make_pair(row_bg_used, (int)StateColor::Normal)));
         btn_merge->SetBorderColor(StateColor(
             std::make_pair(row_bg_used, (int)StateColor::Disabled),
-            std::make_pair(wxColour(0x15BF59), (int)StateColor::Hovered),
+            std::make_pair(wxColour(0x1877B4), (int)StateColor::Hovered),
             std::make_pair(row_bg_used, (int)StateColor::Normal)));
         btn_merge->SetToolTip_(has_warning ? warning_tooltip : _L("Merge this mixed filament into another filament"));
         if (!has_warning) {
@@ -26465,7 +26465,7 @@ void Sidebar::update_mixed_filament_panel(bool sync_manager)
         btn_delete->SetBackgroundColor(StateColor(std::make_pair(row_bg_used, (int)StateColor::Normal)));
         btn_delete->SetBorderColor(StateColor(
             std::make_pair(row_bg_used, (int)StateColor::Disabled),
-            std::make_pair(wxColour(0x15BF59), (int)StateColor::Hovered),
+            std::make_pair(wxColour(0x1877B4), (int)StateColor::Hovered),
             std::make_pair(row_bg_used, (int)StateColor::Normal)));
         btn_delete->SetToolTip_(_L("Delete this mixed filament"));
         btn_delete->Bind(wxEVT_LEFT_DOWN, [this, mf_stable_id = mf.stable_id](auto&) {

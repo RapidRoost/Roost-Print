@@ -2860,9 +2860,9 @@ XY_Offset_Calibration_Dlg::XY_Offset_Calibration_Dlg(wxWindow* parent, wxWindowI
     add_row(_L("Nozzle diameter"), m_cb_nozzle_diameter, nozzle_choices, sizeof(nozzle_choices) / sizeof(wxString), _L("mm"), 0);
     add_row(_L("Measurement step"), m_cb_step, step_choices, sizeof(step_choices) / sizeof(wxString), _L("mm"), 1);
 
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(0, 137, 123), StateColor::Pressed),
-                            std::pair<wxColour, int>(wxColour(38, 166, 154), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(0, 150, 136), StateColor::Normal));
+    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed),
+                            std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
+                            std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal));
 
     m_btn_confirm = new Button(this, _L("Confirm"));
     m_btn_confirm->SetBackgroundColor(btn_bg_green);

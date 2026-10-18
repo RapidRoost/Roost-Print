@@ -3,11 +3,11 @@
 
 set(SLIC3R_APP_NAME "CrealityPrint")
 set(SLIC3R_APP_KEY "Creality")
-set(SLIC3R_APP_USE_FORDER "Creality Print")
+set(SLIC3R_APP_USE_FORDER "Roost Print")
 if(NOT DEFINED PROCESS_NAME)
-set(PROCESS_NAME "CrealityPrint")
+set(PROCESS_NAME "RoostPrint")
 endif()
-set(VENDOR_NAME "Creality")
+set(VENDOR_NAME "Rapid Roost")
 set(STARTUP_PROJECT_NAME "${PROCESS_NAME}_app_gui")
 set(SOLUTION_NAME "${PROCESS_NAME}")
 
@@ -35,7 +35,7 @@ set(SLIC3R_BUILD_ID "$ENV{BUILD_ID}")
 endif()
 
 if(NOT DEFINED PROJECT_VERSION_EXTRA)
-set(PROJECT_VERSION_EXTRA "Beta")
+set(PROJECT_VERSION_EXTRA "Roost")
 endif()
 
 string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)" CXSW3D ${CREALITYPRINT_VERSION})

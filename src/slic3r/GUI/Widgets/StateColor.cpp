@@ -7,7 +7,7 @@ static bool operator<(wxColour const &l, wxColour const &r) { return l.GetRGBA()
 
 static std::map<wxColour, wxColour> gDarkColors{
     {"#07110b", "#07110b"}, // AI creation text stays dark on the green selected tab.
-    {"#009688", "#00675b"}, // rgb(0, 150, 136)    ORCA color
+    {"#1E90D8", "#033f64"}, // rgb(30, 144, 216)    ORCA color
     {"#1F8EEA", "#2778D2"}, // rgb(31, 142, 234)   ???
     {"#FF6F00", "#D15B00"}, // rgb(255, 111, 0)    Secondary color
     {"#D01B1B", "#BB2A3A"}, // rgb(208, 27, 27)    ???
@@ -24,7 +24,7 @@ static std::map<wxColour, wxColour> gDarkColors{
     {"#F1F1F1", "#36363B"}, // rgb(241, 241, 241)  Sidebar > Titlebar > Gradient Bottom
     {"#3B4446", "#2D2D30"}, // rgb(59, 68, 78)     Top Bar / Main tab bar bg color
     {"#CECECE", "#54545B"}, // rgb(206, 206, 206)  Sidebar wxPanel bg | 
-    {"#DBFDD5", "#3B3B40"}, // rgb(219, 253, 213)  Not Used anymore // Was used for BBS combo boxes etc
+    {"#D6EDFC", "#3B3B40"}, // rgb(214, 237, 252)  Not Used anymore // Was used for BBS combo boxes etc
     {"#000000", "#FFFFFE"}, // rgb(0, 0, 0)        Mostly Text color wxBlack
     {"#F4F4F4", "#36363D"}, // rgb(244, 244, 244)  ???
     {"#DBDBDB", "#6C6C70"}, // rgb(219, 219, 219)  Input/Combo Box Border Color
@@ -44,7 +44,7 @@ static std::map<wxColour, wxColour> gDarkColors{
     {"#D9D9D9", "#2D2D32"}, // rgb(217, 217, 217)  Sidebar > Toggle button track color
     //{"#F0F0F0", "#4C4C54"},
     // ORCA
-    {"#BFE1DE", "#223C3C"}, // rgb(191, 225, 222)  Dropdown checked item background color > ORCA color with %25 opacity
+    {"#C0D4E0", "#223C3C"}, // rgb(192, 212, 224)  Dropdown checked item background color > ORCA color with %25 opacity
     {"#E5F0EE", "#283232"}, // rgb(229, 240, 238)  Combo / Dropdown focused background color > ORCA color with %10 opacity
     {"#6E6E73", "#6E6E73"}, //rgb(110, 110, 115) prompt tip yse/no button grey
     {"#96969B", "#96969B"}, //rgb(150, 150, 155)

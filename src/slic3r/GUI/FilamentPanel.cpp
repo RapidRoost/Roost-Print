@@ -1565,7 +1565,7 @@ FilamentItem::FilamentItem(wxWindow* parent, const Data& data, const wxSize& siz
     std::string filament_color = m_preset_bundle->project_config.opt_string("filament_colour", (unsigned int) m_data.index);
     m_bk_color                 = Slic3r::GUI::FilamentColorAppearance::parse(filament_color);
 
-    m_checked_border_color = wxColour("#1FCA63");
+    m_checked_border_color = wxColour("#1E90D8");
 
 	m_small_state = data.small_state;
 	wxSize sz(size);
@@ -2971,11 +2971,11 @@ bool FilamentPanel::show_filament_grouping_dialog(bool slice_all, bool* mapping_
     confirm_button->SetFont(Label::Body_13);
     confirm_button->SetCornerRadius(4);
     confirm_button->SetForegroundColour(*wxWHITE);
-    confirm_button->SetBorderColor(wxColour("#1FCA63"));
+    confirm_button->SetBorderColor(wxColour("#1E90D8"));
     confirm_button->SetBackgroundColor(StateColor(
-        std::pair<wxColour, int>(wxColour("#18B957"), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour("#2AD672"), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour("#1FCA63"), StateColor::Normal)));
+        std::pair<wxColour, int>(wxColour("#1C7AB5"), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour("#2E92D2"), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour("#1E90D8"), StateColor::Normal)));
     confirm_button->SetTextColor(StateColor(
         std::pair<wxColour, int>(*wxWHITE, StateColor::Pressed),
         std::pair<wxColour, int>(*wxWHITE, StateColor::Hovered),
@@ -4061,7 +4061,7 @@ void BoxColorPopPanel::OnFirstColumnButtonClicked(wxCommandEvent& event)
         }
 
         // 设置选中按钮的样式
-        button->SetBackgroundColour(wxColour(0, 225, 0)); // 设置选中按钮的背景色为绿色
+        button->SetBackgroundColour(wxColour(6, 137, 219)); // 设置选中按钮的背景色为绿色
         button->Refresh();
 
         // 使用 std::intptr_t 来存储指针值

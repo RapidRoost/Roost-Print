@@ -184,9 +184,9 @@ PrintHostSendDialog::PrintHostSendDialog(const fs::path &path, PrintHostPostUplo
 
     content_sizer->AddSpacer(40);
 
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(21, 191, 89), StateColor::Pressed),
-                        std::pair<wxColour, int>(wxColour(21, 191, 89), StateColor::Hovered),
-                        std::pair<wxColour, int>(wxColour(21, 191, 89), StateColor::Normal));
+    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed),
+                        std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Hovered),
+                        std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Normal));
 
     add_button(wxID_CANCEL,false, _L("Cancel"));
 

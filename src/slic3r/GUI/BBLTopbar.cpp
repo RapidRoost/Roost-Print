@@ -290,7 +290,7 @@ void ButtonsCtrl::SetSelection(int sel)
     if(-1!=sel && m_mapPageButtons.end() == m_mapPageButtons.find(sel))//not found
     {
         if (m_selection >= 0) {
-            wxColour   hover_bg = is_dark ? wxColour(76, 213, 130) : wxColour(68, 205, 122);
+            wxColour   hover_bg = is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202);
             StateColor bg_color = StateColor(std::pair{hover_bg, (int) StateColor::Hovered},
                                              std::pair{is_dark ? wxColour(1, 1, 1) : wxColour(214, 214, 220), (int) StateColor::Normal});
             m_mapPageButtons[m_selection]->SetBackgroundColor(bg_color);
@@ -305,7 +305,7 @@ void ButtonsCtrl::SetSelection(int sel)
     if (-1 == sel) 
     {
         if (m_selection >= 0) {
-            wxColour   hover_bg = is_dark ? wxColour(76, 213, 130) : wxColour(68, 205, 122);
+            wxColour   hover_bg = is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202);
             StateColor bg_color = StateColor(std::pair{hover_bg, (int) StateColor::Hovered},
                                              std::pair{is_dark ? wxColour(1, 1, 1) : wxColour(214, 214, 220), (int) StateColor::Normal});
             m_mapPageButtons[m_selection]->SetBackgroundColor(bg_color);
@@ -318,9 +318,9 @@ void ButtonsCtrl::SetSelection(int sel)
     }
 
     // BBS: change button color
-    wxColour selected_btn_bg("#009688"); // Gradient #009688
+    wxColour selected_btn_bg("#1E90D8"); // Gradient #1E90D8
     if (m_selection >= 0) {
-        wxColour   hover_bg = is_dark ? wxColour(76, 213, 130) : wxColour(68, 205, 122);
+        wxColour   hover_bg = is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202);
         StateColor bg_color = StateColor(std::pair{hover_bg, (int) StateColor::Hovered},
                                          std::pair{is_dark ? wxColour(1, 1, 1) : wxColour(214, 214, 220), (int) StateColor::Normal});
         m_mapPageButtons[m_selection]->SetBackgroundColor(bg_color);
@@ -334,8 +334,8 @@ void ButtonsCtrl::SetSelection(int sel)
     m_mapPageButtons[m_selection]->SetSelected(true);
     ApplyButtonStyle(m_selection, true);
 
-    StateColor bg_color = StateColor(std::pair{ wxColour(68, 205, 122), (int)StateColor::Hovered },
-                                     std::pair{is_dark ? wxColour(31, 202, 99) : wxColour(21, 192, 89), (int) StateColor::Normal});
+    StateColor bg_color = StateColor(std::pair{ wxColour(71, 151, 202), (int)StateColor::Hovered },
+                                     std::pair{is_dark ? wxColour(30, 144, 216) : wxColour(25, 125, 188), (int) StateColor::Normal});
     m_mapPageButtons[m_selection]->SetBackgroundColor(bg_color);
     m_mapPageButtons[m_selection]->SetFocus();
 
@@ -371,7 +371,7 @@ void ButtonsCtrl::RefreshColor()
     wxColour default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#010101") : wxColour(214, 214, 220); // Gradient #414B4E
     SetBackgroundColour(default_btn_bg);
     for (auto& [index, button] : m_mapPageButtons) {
-        wxColour   hover_bg = is_dark ? wxColour(76, 213, 130) : wxColour(68, 205, 122);
+        wxColour   hover_bg = is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202);
         StateColor bg_color = StateColor(std::pair{hover_bg, (int) StateColor::Hovered},
                                          std::pair{is_dark ? wxColour(1, 1, 1) : wxColour(214, 214, 220), (int) StateColor::Normal});
         button->SetCornerRadius(FromDIP(3));
@@ -382,8 +382,8 @@ void ButtonsCtrl::RefreshColor()
         if (m_selection == index)
         {
             button->SetSelected(true);
-            bg_color = StateColor(std::pair{wxColour(68, 205, 122), (int) StateColor::Hovered},
-                std::pair{is_dark ? wxColour(31, 202, 99) : wxColour(21, 192, 89), (int) StateColor::Normal});
+            bg_color = StateColor(std::pair{wxColour(71, 151, 202), (int) StateColor::Hovered},
+                std::pair{is_dark ? wxColour(30, 144, 216) : wxColour(25, 125, 188), (int) StateColor::Normal});
             button->SetBackgroundColor(bg_color);
             button->SetTextColor(DefaultTextColor(true));
         }
@@ -449,7 +449,7 @@ bool ButtonsCtrl::InsertPage(
     // BBS set size for button
     btn->SetMinSize({(text.empty() ? FromDIP(40) : FromDIP(100)), FromDIP(30)});
     bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
-    wxColour   hover_bg = is_dark ? wxColour(76, 213, 130) : wxColour(68, 205, 122);
+    wxColour   hover_bg = is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202);
     StateColor bg_color = StateColor(std::pair{hover_bg, (int) StateColor::Hovered},
                                      std::pair{is_dark ? wxColour("1, 1, 1") : wxColour(214, 214, 220), (int) StateColor::Normal});
 
@@ -508,11 +508,11 @@ bool ButtonsCtrl::InsertPage(
             const bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
             const bool selected = m_selection == static_cast<int>(index);
             const wxColour normal_bg = selected
-                ? (is_dark ? wxColour(31, 202, 99) : wxColour(21, 192, 89))
+                ? (is_dark ? wxColour(30, 144, 216) : wxColour(25, 125, 188))
                 : (is_dark ? wxColour(1, 1, 1) : wxColour(214, 214, 220));
             const wxColour hover_bg = selected
-                ? wxColour(68, 205, 122)
-                : (is_dark ? wxColour(76, 213, 130) : wxColour(68, 205, 122));
+                ? wxColour(71, 151, 202)
+                : (is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202));
             btn->SetBackgroundColor(StateColor(std::pair{hover_bg, (int) StateColor::Hovered},
                                                 std::pair{normal_bg, (int) StateColor::Normal}));
             btn->Refresh();
@@ -817,7 +817,7 @@ void BBLTopbarArt::DrawButton(wxDC& dc, wxWindow* wnd, const wxAuiToolBarItem& i
     {
         if (item.GetState() & wxAUI_BUTTON_STATE_PRESSED)
         {
-            dc.SetPen(wxPen(StateColor::darkModeColorFor("#15BF59"))); // ORCA
+            dc.SetPen(wxPen(StateColor::darkModeColorFor("#1877B4"))); // ORCA
             dc.SetBrush(*wxTRANSPARENT_BRUSH);
             if (UPLOAD_BTN_CODE != item.GetUserData()) {
                 dc.DrawRoundedRectangle(rect, wnd->FromDIP(5));
@@ -825,13 +825,13 @@ void BBLTopbarArt::DrawButton(wxDC& dc, wxWindow* wnd, const wxAuiToolBarItem& i
         }
         else if ((item.GetState() & wxAUI_BUTTON_STATE_HOVER) || item.IsSticky())
         {
-            dc.SetPen(wxPen(StateColor::darkModeColorFor("#15BF59"))); // ORCA
-            //dc.SetBrush(wxBrush(StateColor::darkModeColorFor("#009688"))); // ORCA
+            dc.SetPen(wxPen(StateColor::darkModeColorFor("#1877B4"))); // ORCA
+            //dc.SetBrush(wxBrush(StateColor::darkModeColorFor("#1E90D8"))); // ORCA
 
             // draw an even lighter background for checked item hovers (since
             // the hover background is the same color as the check background)
             if (item.GetState() & wxAUI_BUTTON_STATE_CHECKED)
-                dc.SetBrush(wxBrush(StateColor::darkModeColorFor("#009688"))); // ORCA
+                dc.SetBrush(wxBrush(StateColor::darkModeColorFor("#1E90D8"))); // ORCA
 
             // dc.DrawRoundedRectangle(rect, 3);
             wxGraphicsContext* gc = wxGraphicsContext::CreateFromUnknownDC(dc);
@@ -863,14 +863,14 @@ void BBLTopbarArt::DrawButton(wxDC& dc, wxWindow* wnd, const wxAuiToolBarItem& i
         else if (item.GetState() & wxAUI_BUTTON_STATE_CHECKED)
         {
             if (HOME_BTN_CODE_CHECKED == item.GetUserData()) {
-                dc.SetPen(wxPen(StateColor::darkModeColorFor("#15BF59")));     // ORCA
-                dc.SetBrush(wxBrush(StateColor::darkModeColorFor("#15BF59"))); // ORCA
+                dc.SetPen(wxPen(StateColor::darkModeColorFor("#1877B4")));     // ORCA
+                dc.SetBrush(wxBrush(StateColor::darkModeColorFor("#1877B4"))); // ORCA
                 dc.DrawRoundedRectangle(rect, wnd->FromDIP(5));
             } else {
                 // it's important to put this code in an else statement after the
                 // hover, otherwise hovers won't draw properly for checked items
-                dc.SetPen(wxPen(StateColor::darkModeColorFor("#009688"))); // ORCA
-                // dc.SetBrush(wxBrush(StateColor::darkModeColorFor("#009688"))); // ORCA
+                dc.SetPen(wxPen(StateColor::darkModeColorFor("#1E90D8"))); // ORCA
+                // dc.SetBrush(wxBrush(StateColor::darkModeColorFor("#1E90D8"))); // ORCA
                 dc.DrawRectangle(rect);
             }
         }
@@ -1059,6 +1059,8 @@ void BBLTopbar::Init(wxFrame* parent)
     pCtr->InsertPage(MainFrame::tp3DEditor, _L("Prepare"), 0);
     pCtr->InsertPage(MainFrame::tpPreview, _L("Preview"), 0);
     pCtr->InsertPage(MainFrame::tpDeviceMgr, _L("Device"), 0);
+    // Roost Print: the shop's cameras (PrintCam), next to Device.
+    pCtr->InsertPage(MainFrame::tpPrintCam, _L("PrintCam"), 0);
     if (!cxagent_hidden_switch_enabled() && cxagent_config_is_dev())
         set_cxagent_config_api_base(cxagent_restore_api_base(), true);
     pCtr->SetDevMode(cxagent_hidden_switch_enabled() && cxagent_config_is_dev());
