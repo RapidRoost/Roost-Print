@@ -1,9 +1,12 @@
 # Roost Print for Windows: builds the app on GitHub's Windows machines and keeps the result as a
 # download (a zip: unzip it anywhere and run RoostPrint.exe).
 #
-# The libraries it needs take an hour or two to build the first time; after that they're kept
-# (cached) and a build takes about half an hour. Run it from the Actions tab ("Run workflow"), or
-# push to main. Tagging a version (v1.0.0) also makes a GitHub Release with the zip on it.
+# Two jobs: the libraries it needs (an hour or two the first time, then kept in the cache until
+# something in deps/ changes), then the app itself (about half an hour). Run it from the Actions
+# tab ("Run workflow"), or push to main. Tagging a version (v1.0.0) also makes a GitHub Release.
+#
+# Each build step keeps its full output in a log file; if a step fails, its last lines are posted
+# as an error note on the run, so the reason shows on the run page.
 name: Build Roost Print
 
 on:
@@ -20,33 +23,64 @@ concurrency:
 permissions:
   contents: write
 
+env:
+  DEPS_DIR: ${{ github.workspace }}/deps/build/OrcaSlicer_dep
+
 jobs:
-  windows:
-    name: Windows
-    runs-on: windows-latest
-    timeout-minutes: 350
+  deps:
+    name: Libraries
+    # Visual Studio 2022 (the build scripts ask for it by name).
+    runs-on: windows-2022
+    timeout-minutes: 340
+    outputs:
+      key: ${{ steps.key.outputs.key }}
     steps:
       - uses: actions/checkout@v4
+
+      - id: key
+        shell: pwsh
+        run: '"key=roost-win-deps-${{ hashFiles(''deps/**'') }}" | Out-File -Append -FilePath $env:GITHUB_OUTPUT -Encoding utf8'
+
+      - name: Already built?
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DEPS_DIR }}
+          key: ${{ steps.key.outputs.key }}
+
+      - uses: lukka/get-cmake@latest
+        if: steps.cache.outputs.cache-hit != 'true'
+        with:
+          cmakeVersion: "~3.28.0"
+
+      - name: Build the libraries
+        if: steps.cache.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          choco install strawberryperl -y --no-progress | Out-Null
+          $env:PATH = "C:\Strawberry\perl\bin;C:\Strawberry\c\bin;$env:PATH"
+          & tools/roost/ci_run.ps1 -Log deps.log -Command 'call test_build.bat deps' -Check "$env:DEPS_DIR/usr/local"
+
+  app:
+    name: Roost Print
+    needs: deps
+    runs-on: windows-2022
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The libraries
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.DEPS_DIR }}
+          key: ${{ needs.deps.outputs.key }}
+          fail-on-cache-miss: true
 
       - uses: lukka/get-cmake@latest
         with:
           cmakeVersion: "~3.28.0"
 
       - uses: microsoft/setup-msbuild@v2
-
-      - name: Libraries (from the cache when nothing in deps/ changed)
-        id: deps
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/deps/build/OrcaSlicer_dep
-          key: roost-win-deps-${{ hashFiles('deps/**') }}
-
-      - name: Build the libraries
-        if: steps.deps.outputs.cache-hit != 'true'
-        shell: cmd
-        run: |
-          choco install strawberryperl -y --no-progress
-          call test_build.bat deps
 
       - name: Get the WebView2 runtime installer (shipped with the app)
         shell: pwsh
@@ -55,17 +89,16 @@ jobs:
           Invoke-WebRequest -Uri https://github.com/CrealityOfficial/CrealityPrint/releases/download/tools/MicrosoftEdgeWebView2RuntimeInstallerX64.exe -OutFile package/runtime/MicrosoftEdgeWebView2RuntimeInstallerX64.exe
 
       - name: Build Roost Print
-        shell: cmd
+        shell: pwsh
         env:
           WindowsSdkDir: 'C:\Program Files (x86)\Windows Kits\10\'
           WindowsSDKVersion: '10.0.22000.0\'
-        run: call test_build.bat slicer
+        run: '& tools/roost/ci_run.ps1 -Log app.log -Command "call test_build.bat slicer" -Check build/OrcaSlicer/RoostPrint.exe'
 
       - name: Pack it up
         shell: pwsh
         run: |
           $out = "build/OrcaSlicer"
-          if (-not (Test-Path "$out/RoostPrint.exe")) { Get-ChildItem build -Recurse -Filter RoostPrint.exe | Select-Object -First 5 | ForEach-Object { $_.FullName }; throw "RoostPrint.exe not found in $out" }
           Copy-Item tools/roost/README-download.txt "$out/READ ME.txt"
           $name = "RoostPrint-Windows-$(Get-Date -Format 'yyyyMMdd')-$($env:GITHUB_SHA.Substring(0,7)).zip"
           Compress-Archive -Path "$out/*" -DestinationPath $name
