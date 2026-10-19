@@ -416,9 +416,12 @@ private:
     // Update renamed_from and alias maps of system profiles.
     void 						update_system_maps();
 
+public:
+    // Roost Print: public so the Polymaker set can be shown right after it's turned on.
     // Set the is_visible flag for filaments and sla materials,
     // apply defaults based on enabled printers when no filaments/materials are installed.
     void                        load_installed_filaments(AppConfig &config);
+private:
     void                        load_installed_sla_materials(AppConfig &config);
 
     void                        sync_project_filament_mapping_count(size_t filament_count);
