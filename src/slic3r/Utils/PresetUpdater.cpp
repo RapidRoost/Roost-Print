@@ -1225,7 +1225,9 @@ Updates PresetUpdater::priv::get_printer_config_updates(bool update) const
     }
     Updates updates;
     Version version;
-    version.config_version = resc_version;
+    // Roost Print: a missing or odd version.txt must not stop the app from starting.
+    if (auto parsed = Semver::parse(resc_version))
+        version.config_version = *parsed;
     std::string change_log;
     if (update) {
         std::string changelog_file = (resc_folder / "printer.json").string();
