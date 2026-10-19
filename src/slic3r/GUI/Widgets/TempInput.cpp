@@ -20,8 +20,8 @@ END_EVENT_TABLE()
 
 
 TempInput::TempInput()
-    : label_color(std::make_pair(wxColour(0xAC,0xAC,0xAC), (int) StateColor::Disabled),std::make_pair(0x323A3C, (int) StateColor::Normal))
-    , text_color(std::make_pair(wxColour(0xAC,0xAC,0xAC), (int) StateColor::Disabled), std::make_pair(0x6B6B6B, (int) StateColor::Normal))
+    : label_color(std::make_pair(wxColour(0xAC,0xAC,0xAC), (int) StateColor::Disabled),std::make_pair(0x243B4A, (int) StateColor::Normal))
+    , text_color(std::make_pair(wxColour(0xAC,0xAC,0xAC), (int) StateColor::Disabled), std::make_pair(0x547082, (int) StateColor::Normal))
 {
     hover  = false;
     radius = 4;
@@ -420,7 +420,7 @@ void TempInput::render(wxDC &dc)
         pt.y = (size.y - labelSize.y) / 2;
     }
 
-    dc.SetTextForeground(StateColor::darkModeColorFor("#323A3C"));
+    dc.SetTextForeground(StateColor::darkModeColorFor("#243B4A"));
     dc.DrawText(text, pt);
 
     // separator

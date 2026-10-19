@@ -461,17 +461,17 @@ wxBoxSizer* EditGCodeDialog::create_btn_sizer(long flags)
     );
 
     StateColor cancel_btn_bg(
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal)
     );
 
     StateColor cancel_btn_bd_(
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal)
     );
 
     StateColor cancel_btn_text(
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal)
     );
 
 

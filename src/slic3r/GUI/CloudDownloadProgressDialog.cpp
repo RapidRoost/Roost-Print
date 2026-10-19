@@ -23,7 +23,7 @@ CloudDownloadProgressDialog::CloudDownloadProgressDialog(wxString title,
     wxBoxSizer *m_sizer_main = new wxBoxSizer(wxVERTICAL);
 
     auto m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1));
-    m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
     m_sizer_main->Add(m_line_top, 0, wxEXPAND, 0);
 
     m_simplebook_status = new wxSimplebook(this);

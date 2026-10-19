@@ -38,19 +38,19 @@ constexpr int kAxisArrowHalf    = 5;   // half-base of the axis arrow triangle (
 constexpr int kAxisArrowLen     = 10;  // length of the axis arrow triangle (DIP)
 
 // Light-mode design tokens from Figma. Resolved through StateColor::darkModeColorFor()
-// at paint time so the editor follows the app theme (#EEEEEE -> #4C4C55, #6B6B6B ->
-// #818183, #262E30 -> #EFEFF0, *wxWHITE -> #2D2D31). Don't read these directly in paint;
+// at paint time so the editor follows the app theme (#EBEFF1 -> #3A5667, #547082 ->
+// #6A879A, #1B2F3B -> #EDF0F2, *wxWHITE -> #1D3341). Don't read these directly in paint;
 // always go through the resolved locals declared at the top of on_paint().
-const wxColour kGridColor   (238, 238, 238);   // #EEEEEE grey 300
-const wxColour kAxisColor   (107, 107, 107);   // #6B6B6B grey 700
-const wxColour kLabelMuted  (107, 107, 107);   // #6B6B6B grey 700
-const wxColour kLabelStrong ( 38,  46,  48);   // #262E30 grey 900
+const wxColour kGridColor   (238, 238, 238);   // #EBEFF1 grey 300
+const wxColour kAxisColor   (107, 107, 107);   // #547082 grey 700
+const wxColour kLabelMuted  (107, 107, 107);   // #547082 grey 700
+const wxColour kLabelStrong ( 38,  46,  48);   // #1B2F3B grey 900
 
 // LAB (DeltaE76) threshold for "curve color is too close to the background". Below this
 // we paint a subtle axis-color outline so the curve doesn't visually vanish; above this
 // we draw the curve plain. ~15 is "perceptible but still close", looser than the strict
 // 5.0 used by FlushPredict::is_similar_color but loose enough that a pastel pink on white
-// or a charcoal on #2B2B2B still triggers an outline.
+// or a charcoal on #1B2F3B still triggers an outline.
 constexpr float kBgSimilarThreshold = 15.0f;
 constexpr int   kOutlineExtraDip    = 2;
 
@@ -461,8 +461,8 @@ void GradientCurveEditor::on_paint(wxPaintEvent& /*evt*/)
     // from the bg without competing with the structural axis/grid: light mode uses a pale
     // grey, dark mode uses a slightly-above-bg grey (gDarkColors has no entry for these).
     const wxColour outline_color = wxGetApp().dark_mode()
-        ? wxColour(90,  90,  94)    // > bg #2B2B2B, < axis #818183
-        : wxColour(200, 200, 200);  // > grid #EEEEEE, < axis #6B6B6B
+        ? wxColour(69,  97,  115)    // > bg #1B2F3B, < axis #6A879A
+        : wxColour(191, 202, 209);  // > grid #EBEFF1, < axis #547082
     auto needs_outline = [&](const wxColour& c) {
         return calc_color_distance(c, bg) < kBgSimilarThreshold;
     };

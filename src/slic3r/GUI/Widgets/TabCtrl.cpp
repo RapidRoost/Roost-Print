@@ -35,7 +35,7 @@ TabCtrl::TabCtrl(wxWindow *      parent,
     radius = 1;
 #endif
     border_width = 0;
-    SetBorderColor(0xcecece);
+    SetBorderColor(0xC6D0D6);
     sizer = new wxBoxSizer(wxVERTICAL);
     sizer->AddSpacer(10);
     SetSizer(sizer);

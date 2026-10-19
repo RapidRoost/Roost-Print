@@ -586,8 +586,8 @@ private:
             }
         }
 
-        const wxColour foreground = light_background ? wxColour("#20242A") : *wxWHITE;
-        const wxColour separator = light_background ? wxColour(32, 36, 42, 85)
+        const wxColour foreground = light_background ? wxColour("#172833") : *wxWHITE;
+        const wxColour separator = light_background ? wxColour(23, 40, 51, 85)
                                                     : wxColour(255, 255, 255, 90);
         dc.SetTextForeground(foreground);
         const int number_height = std::min(size.GetHeight(), FromDIP(20));
@@ -2620,25 +2620,25 @@ bool FilamentPanel::show_filament_grouping_dialog(bool slice_all, bool* mapping_
     }
 
     const bool dark_mode = wxGetApp().dark_mode();
-    const wxColour dialog_background      = dark_mode ? wxColour("#2B2B2B") : wxColour("#EFF0F6");
-    const wxColour card_title_background  = dark_mode ? wxColour("#565658") : wxColour("#F5F6FA");
-    const wxColour card_body_background   = dark_mode ? wxColour("#303031") : wxColour("#FFFFFF");
-    const wxColour card_border             = dark_mode ? wxColour("#4B4C4E") : wxColour("#C5CBD5");
-    const wxColour card_hover_border       = dark_mode ? wxColour("#73767B") : wxColour("#AEB7C4");
+    const wxColour dialog_background      = dark_mode ? wxColour("#1B2F3B") : wxColour("#EFF0F6");
+    const wxColour card_title_background  = dark_mode ? wxColour("#405C6E") : wxColour("#F5F6FA");
+    const wxColour card_body_background   = dark_mode ? wxColour("#1E3543") : wxColour("#FFFFFF");
+    const wxColour card_border             = dark_mode ? wxColour("#365263") : wxColour("#C5CBD5");
+    const wxColour card_hover_border       = dark_mode ? wxColour("#5F7C8F") : wxColour("#AEB7C4");
     const wxColour incompatible_border     = dark_mode ? wxColour("#C75450") : wxColour("#D94841");
     const wxColour incompatible_text       = dark_mode ? wxColour("#FF8A84") : wxColour("#C9362F");
     const wxColour recommendation_text     = wxColour(255, 191, 0); // Existing slice-warning yellow.
-    const wxColour primary_text             = dark_mode ? wxColour("#F2F2F3") : wxColour("#4A535F");
-    const wxColour secondary_text           = dark_mode ? wxColour("#9B9BA0") : wxColour("#7A8492");
-    const wxColour selector_background      = dark_mode ? wxColour("#565658") : wxColour("#FFFFFF");
-    const wxColour selector_border          = dark_mode ? wxColour("#696A6D") : wxColour("#D5D9E1");
-    const wxColour footer_background        = dark_mode ? wxColour("#2B2B2B") : wxColour("#FFFFFF");
-    const wxColour close_icon_colour        = dark_mode ? wxColour("#D7D9DC") : wxColour("#3F4854");
-    const wxColour close_hover_background  = dark_mode ? wxColour("#3A3A3C") : wxColour("#E0E4EC");
-    const wxColour cancel_border             = dark_mode ? wxColour("#6C6E71") : wxColour("#8F98A5");
-    const wxColour cancel_normal             = dark_mode ? wxColour("#2B2B2B") : wxColour("#FFFFFF");
-    const wxColour cancel_hover              = dark_mode ? wxColour("#38383A") : wxColour("#F8F9FB");
-    const wxColour cancel_pressed            = dark_mode ? wxColour("#242425") : wxColour("#F4F5F8");
+    const wxColour primary_text             = dark_mode ? wxColour("#F1F3F4") : wxColour("#4A535F");
+    const wxColour secondary_text           = dark_mode ? wxColour("#8EA1AD") : wxColour("#7A8492");
+    const wxColour selector_background      = dark_mode ? wxColour("#405C6E") : wxColour("#FFFFFF");
+    const wxColour selector_border          = dark_mode ? wxColour("#547082") : wxColour("#D5D9E1");
+    const wxColour footer_background        = dark_mode ? wxColour("#1B2F3B") : wxColour("#FFFFFF");
+    const wxColour close_icon_colour        = dark_mode ? wxColour("#D4DBDF") : wxColour("#3F4854");
+    const wxColour close_hover_background  = dark_mode ? wxColour("#27404F") : wxColour("#E0E4EC");
+    const wxColour cancel_border             = dark_mode ? wxColour("#577486") : wxColour("#8F98A5");
+    const wxColour cancel_normal             = dark_mode ? wxColour("#1B2F3B") : wxColour("#FFFFFF");
+    const wxColour cancel_hover              = dark_mode ? wxColour("#253D4D") : wxColour("#F8F9FB");
+    const wxColour cancel_pressed            = dark_mode ? wxColour("#162833") : wxColour("#F4F5F8");
 
     wxDialog dialog(dialog_parent, wxID_ANY, _L("Nozzle filament settings"), wxDefaultPosition, wxDefaultSize,
                     wxBORDER_NONE | wxTAB_TRAVERSAL);
@@ -3959,7 +3959,7 @@ BoxColorPopPanel::BoxColorPopPanel(wxWindow* parent)
     m_secondColumnSizer = new wxBoxSizer(wxVERTICAL);
 
 	    // Set background color
-    SetBackgroundColour(wxColour(54, 54, 56)); // Light grey background color
+    SetBackgroundColour(wxColour(36, 59, 74)); // Light grey background color
 	SetSize(FromDIP(200), FromDIP(200));
 
     // Create a panel for the second column and add it to the main sizer
@@ -4055,7 +4055,7 @@ void BoxColorPopPanel::OnFirstColumnButtonClicked(wxCommandEvent& event)
         for (auto& child : m_firstColumnSizer->GetChildren()) {
             wxButton* btn = dynamic_cast<wxButton*>(child->GetWindow());
             if (btn) {
-                btn->SetBackgroundColour(wxColour("#E2E5E9")); // 重置为默认背景色
+                btn->SetBackgroundColour(wxColour("#E2E6E9")); // 重置为默认背景色
                 btn->Refresh();
             }
         }
@@ -4142,7 +4142,7 @@ void BoxColorPopPanel::OnFirstColumnButtonClicked(wxCommandEvent& event)
                 if (!has_exact_material) {
                     DM::Material tmp_material;
                     tmp_material.material_id = material_id;
-                    tmp_material.color      = "#808080"; // grey
+                    tmp_material.color      = "#688698"; // grey
                     tmp_material.type       = "?";
                     int state = 0;
                     const DM::MaterialBox* src_box = is_ext_material ? ext_material_box_info : material_box_info;
@@ -4448,7 +4448,7 @@ void ManagedPopupWindow::OnPaint(wxPaintEvent& event)
 {
     wxAutoBufferedPaintDC dc(this); // 双缓冲避免闪烁
     bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
-    wxColour bgColor = is_dark ? "#313131" : "#FFFFFF";
+    wxColour bgColor = is_dark ? "#1F3543" : "#FFFFFF";
     // 第一步：绘制50%透明阴影 (#768EAB)
     wxGraphicsContext* gc = wxGraphicsContext::Create(dc);
     if (gc) {
@@ -4508,9 +4508,9 @@ MaterialContextMenu::MaterialContextMenu(wxWindow* parent, int index) : m_index(
         const int size = parent->FromDIP(14);
         wxBitmap bitmap(size, size);
         wxMemoryDC dc(bitmap);
-        dc.SetBackground(wxBrush(color.IsOk() ? color : wxColour("#CCCCCC")));
+        dc.SetBackground(wxBrush(color.IsOk() ? color : wxColour("#C4CED4")));
         dc.Clear();
-        dc.SetPen(wxPen(wxColour("#808080")));
+        dc.SetPen(wxPen(wxColour("#688698")));
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
         dc.DrawRectangle(0, 0, size, size);
         dc.SelectObject(wxNullBitmap);
@@ -4539,7 +4539,7 @@ MaterialContextMenu::MaterialContextMenu(wxWindow* parent, int index) : m_index(
                 ? wxString::Format(_L("Mixed %u (F%u+...)"), (unsigned int)(i + 1), mf.component_a)
                 : wxString::Format(_L("Mixed %u (F%u + F%u)"), (unsigned int)(i + 1), mf.component_a, mf.component_b);
             const uint64_t stable_id = mf.stable_id;
-            add_target(slot, label, wxColour(mf.display_color.empty() ? "#CCCCCC" : mf.display_color),
+            add_target(slot, label, wxColour(mf.display_color.empty() ? "#C4CED4" : mf.display_color),
                        [index, stable_id]() {
                 wxGetApp().plater()->sidebar().merge_physical_to_mixed(static_cast<size_t>(index), stable_id);
             });
@@ -4718,7 +4718,7 @@ void MaterialContextMenu::OnDecomposeColor()
                 case DecomposeBaseColor::Red:     col = wxColour(255, 0, 0); break;
                 case DecomposeBaseColor::Green:   col = wxColour(0, 255, 0); break;
                 case DecomposeBaseColor::Blue:    col = wxColour(0, 0, 255); break;
-                default:                          col = wxColour(204, 204, 204); break;
+                default:                          col = wxColour(196, 206, 212); break;
                 }
             }
             new_colors.push_back(col);
@@ -4849,7 +4849,7 @@ void MaterialContextMenu::OnDecomposeColor()
         if (colour_opt && i < colour_opt->values.size() && !colour_opt->values[i].empty())
             current_physical_colours.push_back(colour_opt->values[i]);
         else
-            current_physical_colours.push_back("#CCCCCC");
+            current_physical_colours.push_back("#C4CED4");
     }
 
     // Record the current mixed-filament count so we can locate the newly added row.

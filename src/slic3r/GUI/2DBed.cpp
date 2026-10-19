@@ -77,7 +77,7 @@ void Bed_2D::repaint(const std::vector<Vec2d>& shape)
         // Fill DC with the background on Windows & Linux / GTK.
         wxColour color;
         if (wxGetApp().dark_mode()) {// SetBackgroundColour
-            color = wxColour(45, 45, 49);
+            color = wxColour(29, 51, 65);
         }
         else {
             color = *wxWHITE;
@@ -136,7 +136,7 @@ void Bed_2D::repaint(const std::vector<Vec2d>& shape)
     // Use cached grid intersection to avoid heavy work during repaint
     const Polylines& polylines = m_cached_grid;
 
-    dc.SetPen(wxPen(wxColour(230, 230, 230), 1, wxPENSTYLE_SOLID));
+    dc.SetPen(wxPen(wxColour(226, 231, 234), 1, wxPENSTYLE_SOLID));
 	for (auto pl : polylines)
 	{
 		for (size_t i = 0; i < pl.points.size()-1; i++) {

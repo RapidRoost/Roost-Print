@@ -21,16 +21,16 @@ END_EVENT_TABLE()
  */
 
 TextInput::TextInput()
-    : label_color(std::make_pair(0x909090, (int) StateColor::Disabled),
-                 std::make_pair(0x6B6B6B, (int) StateColor::Normal))
-    , text_color(std::make_pair(0x909090, (int) StateColor::Disabled),
-                 std::make_pair(0x262E30, (int) StateColor::Normal))
+    : label_color(std::make_pair(0x7D94A3, (int) StateColor::Disabled),
+                 std::make_pair(0x547082, (int) StateColor::Normal))
+    , text_color(std::make_pair(0x7D94A3, (int) StateColor::Disabled),
+                 std::make_pair(0x1B2F3B, (int) StateColor::Normal))
 {
     radius = 4;
     border_width = 1;
-    border_color = StateColor(std::make_pair(0xDBDBDB, (int) StateColor::Disabled), std::make_pair(0x1877B4, (int) StateColor::Hovered),
-                              std::make_pair(0xDBDBDB, (int) StateColor::Normal));
-    background_color = StateColor(std::make_pair(0xF0F0F1, (int) StateColor::Disabled), std::make_pair(*wxWHITE, (int) StateColor::Normal));
+    border_color = StateColor(std::make_pair(0xD5DCE1, (int) StateColor::Disabled), std::make_pair(0x1877B4, (int) StateColor::Hovered),
+                              std::make_pair(0xD5DCE1, (int) StateColor::Normal));
+    background_color = StateColor(std::make_pair(0xEEF1F3, (int) StateColor::Disabled), std::make_pair(*wxWHITE, (int) StateColor::Normal));
     SetFont(Label::Body_12);
 }
 

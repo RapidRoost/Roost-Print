@@ -53,8 +53,8 @@ void AMSMaterialsSetting::create()
     m_button_confirm->Bind(wxEVT_BUTTON, &AMSMaterialsSetting::on_select_ok, this);
 
     m_button_reset = new Button(this, _L("Reset"));
-    m_btn_bg_gray = StateColor(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(*wxWHITE, StateColor::Focused),
-        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    m_btn_bg_gray = StateColor(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(*wxWHITE, StateColor::Focused),
+        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
         std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
     m_button_reset->SetBackgroundColor(m_btn_bg_gray);
     m_button_reset->SetBorderColor(AMS_MATERIALS_SETTING_GREY900);
@@ -147,8 +147,8 @@ void AMSMaterialsSetting::create_panel_normal(wxWindow* parent)
     m_sizer_filament->Add(m_comboBox_filament, 1, wxALIGN_CENTER, 0);
 
     m_readonly_filament = new TextInput(parent, wxEmptyString, "", "", wxDefaultPosition, AMS_MATERIALS_SETTING_COMBOX_WIDTH, wxTE_READONLY | wxRIGHT);
-    m_readonly_filament->SetBorderColor(StateColor(std::make_pair(0xDBDBDB, (int)StateColor::Focused), std::make_pair(0x1E90D8, (int)StateColor::Hovered),
-        std::make_pair(0xDBDBDB, (int)StateColor::Normal)));
+    m_readonly_filament->SetBorderColor(StateColor(std::make_pair(0xD5DCE1, (int)StateColor::Focused), std::make_pair(0x1E90D8, (int)StateColor::Hovered),
+        std::make_pair(0xD5DCE1, (int)StateColor::Normal)));
     m_readonly_filament->SetFont(::Label::Body_14);
     m_readonly_filament->SetLabelColor(AMS_MATERIALS_SETTING_GREY800);
     m_readonly_filament->GetTextCtrl()->Bind(wxEVT_SET_FOCUS, [](auto& e) {});
@@ -1251,7 +1251,7 @@ void ColorPicker::doRender(wxDC& dc)
     }
 
     if (m_show_full) {
-        dc.SetPen(wxPen(wxColour(0x6B6B6B)));
+        dc.SetPen(wxPen(wxColour(0x547082)));
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
         dc.DrawCircle(size.x / 2, size.y / 2, radius);
 
@@ -1335,9 +1335,9 @@ ColorPickerPopup::ColorPickerPopup(wxWindow* parent)
     m_def_colors.push_back(wxColour(0xfcecd6));
     m_def_colors.push_back(wxColour(0xD3C5A3));
     m_def_colors.push_back(wxColour(0xAF7933));
-    m_def_colors.push_back(wxColour(0x898989));
-    m_def_colors.push_back(wxColour(0xBCBCBC));
-    m_def_colors.push_back(wxColour(0x161616));
+    m_def_colors.push_back(wxColour(0x738E9F));
+    m_def_colors.push_back(wxColour(0xB1BEC7));
+    m_def_colors.push_back(wxColour(0x0D181F));
 
 
     SetBackgroundColour(wxColour(*wxWHITE));
@@ -1349,18 +1349,18 @@ ColorPickerPopup::ColorPickerPopup(wxWindow* parent)
     wxBoxSizer* m_sizer_ams = new wxBoxSizer(wxHORIZONTAL);
     auto m_title_ams = new wxStaticText(m_def_color_box, wxID_ANY, _L("CFS"), wxDefaultPosition, wxDefaultSize, 0);
     m_title_ams->SetFont(::Label::Body_14);
-    m_title_ams->SetBackgroundColour(wxColour(238, 238, 238));
+    m_title_ams->SetBackgroundColour(wxColour(235, 239, 241));
     m_sizer_ams->Add(m_title_ams, 0, wxALL, 5);
     auto ams_line = new wxPanel(m_def_color_box, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    ams_line->SetBackgroundColour(wxColour(0xCECECE));
+    ams_line->SetBackgroundColour(wxColour(0xC6D0D6));
     ams_line->SetMinSize(wxSize(-1, 1));
     ams_line->SetMaxSize(wxSize(-1, 1));
     m_sizer_ams->Add(ams_line, 1, wxALIGN_CENTER, 0);
 
 
     m_def_color_box->SetCornerRadius(FromDIP(10));
-    m_def_color_box->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal)));
-    m_def_color_box->SetBorderColor(StateColor(std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal)));
+    m_def_color_box->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Normal)));
+    m_def_color_box->SetBorderColor(StateColor(std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Normal)));
 
     //ams
     m_ams_fg_sizer = new wxFlexGridSizer(0, 8, 0, 0);
@@ -1378,7 +1378,7 @@ ColorPickerPopup::ColorPickerPopup(wxWindow* parent)
         auto cp = new ColorPicker(m_def_color_box, wxID_ANY, wxDefaultPosition, wxDefaultSize);
         cp->set_color(col);
         cp->set_selected(false);
-        cp->SetBackgroundColour(StateColor::darkModeColorFor(wxColour(238,238,238)));
+        cp->SetBackgroundColour(StateColor::darkModeColorFor(wxColour(235,239,241)));
         m_color_pickers.push_back(cp);
         fg_sizer->Add(cp, 0, wxALL, FromDIP(3));
         cp->Bind(wxEVT_LEFT_DOWN, [this, cp](auto& e) {
@@ -1394,21 +1394,21 @@ ColorPickerPopup::ColorPickerPopup(wxWindow* parent)
     wxBoxSizer* m_sizer_other = new wxBoxSizer(wxHORIZONTAL);
     auto m_title_other = new wxStaticText(m_def_color_box, wxID_ANY, _L("Other Color"), wxDefaultPosition, wxDefaultSize, 0);
     m_title_other->SetFont(::Label::Body_14);
-    m_title_other->SetBackgroundColour(wxColour(238, 238, 238));
+    m_title_other->SetBackgroundColour(wxColour(235, 239, 241));
     m_sizer_other->Add(m_title_other, 0, wxALL, 5);
     auto other_line = new wxPanel(m_def_color_box, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
     other_line->SetMinSize(wxSize(-1, 1));
     other_line->SetMaxSize(wxSize(-1, 1));
-    other_line->SetBackgroundColour(wxColour(0xCECECE));
+    other_line->SetBackgroundColour(wxColour(0xC6D0D6));
     m_sizer_other->Add(other_line, 1, wxALIGN_CENTER, 0);
 
     //custom color
     wxBoxSizer* m_sizer_custom = new wxBoxSizer(wxHORIZONTAL);
     auto m_title_custom = new wxStaticText(m_def_color_box, wxID_ANY, _L("Custom Color"), wxDefaultPosition, wxDefaultSize, 0);
     m_title_custom->SetFont(::Label::Body_14);
-    m_title_custom->SetBackgroundColour(wxColour(238, 238, 238));
+    m_title_custom->SetBackgroundColour(wxColour(235, 239, 241));
     auto custom_line = new wxPanel(m_def_color_box, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    custom_line->SetBackgroundColour(wxColour(0xCECECE));
+    custom_line->SetBackgroundColour(wxColour(0xC6D0D6));
     custom_line->SetMinSize(wxSize(-1, 1));
     custom_line->SetMaxSize(wxSize(-1, 1));
     m_sizer_custom->Add(m_title_custom, 0, wxALL, 5);
@@ -1418,7 +1418,7 @@ ColorPickerPopup::ColorPickerPopup(wxWindow* parent)
     m_custom_cp->SetSize(FromDIP(60), FromDIP(25));
     m_custom_cp->SetMinSize(wxSize(FromDIP(60), FromDIP(25)));
     m_custom_cp->SetMaxSize(wxSize(FromDIP(60), FromDIP(25)));
-    m_custom_cp->SetBorderColor(StateColor(std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal)));
+    m_custom_cp->SetBorderColor(StateColor(std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Normal)));
     m_custom_cp->Bind(wxEVT_LEFT_DOWN, &ColorPickerPopup::on_custom_clr_picker, this);
     m_custom_cp->Bind(wxEVT_ENTER_WINDOW, [this](auto& e) {
         SetCursor(wxCURSOR_HAND);
@@ -1534,7 +1534,7 @@ void ColorPickerPopup::set_ams_colours(std::vector<wxColour> ams)
         auto cp = new ColorPicker(m_def_color_box, wxID_ANY, wxDefaultPosition, wxDefaultSize);
         cp->set_color(col);
         cp->set_selected(false);
-        cp->SetBackgroundColour(StateColor::darkModeColorFor(wxColour(238,238,238)));
+        cp->SetBackgroundColour(StateColor::darkModeColorFor(wxColour(235,239,241)));
         m_color_pickers.push_back(cp);
         m_ams_color_pickers.push_back(cp);
         m_ams_fg_sizer->Add(cp, 0, wxALL, FromDIP(3));

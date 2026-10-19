@@ -49,7 +49,7 @@ ImageGrid::ImageGrid(wxWindow * parent)
     m_cell_size.Set(396, 228);
 
     SetBackgroundStyle(wxBG_STYLE_PAINT);
-    SetBackgroundColour(0xEEEEEE);
+    SetBackgroundColour(0xEBEFF1);
     SetFont(Label::Head_20);
 
     m_timer.Bind(wxEVT_TIMER, [this](auto & e) { Refresh(); });
@@ -225,9 +225,9 @@ void ImageGrid::UpdateLayout()
         title_mask_size.x = m_border_size.x;
     }
     if (!m_title_mask.IsOk() || m_title_mask.GetSize() != title_mask_size)
-        m_title_mask = createAlphaBitmap(title_mask_size, 0x6f6f6f, 255, 0);
+        m_title_mask = createAlphaBitmap(title_mask_size, 0x587486, 255, 0);
     if (!m_border_mask.IsOk() || m_border_mask.GetSize() != m_border_size)
-        m_border_mask = createShadowBorder(m_border_size, StateColor::darkModeColorFor(0xEEEEEE), em_unit(this), 3);
+        m_border_mask = createShadowBorder(m_border_size, StateColor::darkModeColorFor(0xEBEFF1), em_unit(this), 3);
     UpdateFocusRange();
     Refresh();
 }
@@ -523,7 +523,7 @@ void ImageGrid::render(wxDC& dc)
             auto   st = dc.GetTextExtent(m_status_msg);
             auto   rect = wxRect{0, 0, max(st.x, si.x), si.y + 26 + st.y}.CenterIn(wxRect({0, 0}, size));
             dc.DrawBitmap(m_status_icon.bmp(), rect.x + (rect.width - si.x) / 2, rect.y);
-            dc.SetTextForeground(wxColor(0x909090));
+            dc.SetTextForeground(wxColor(0x7D94A3));
             dc.DrawText(m_status_msg, rect.x + (rect.width - st.x) / 2, rect.GetBottom() - st.y);
         }
         return;
@@ -578,7 +578,7 @@ void ImageGrid::render(wxDC& dc)
         auto date1 = wxDateTime((time_t) file1.time).Format(_L(TIME_FORMATS[m_file_sys->GetGroupMode()]));
         auto date2 = wxDateTime((time_t) file2.time).Format(_L(TIME_FORMATS[m_file_sys->GetGroupMode()]));
         dc.SetFont(Label::Head_16);
-        dc.SetTextForeground(StateColor::darkModeColorFor("#262E30"));
+        dc.SetTextForeground(StateColor::darkModeColorFor("#1B2F3B"));
         dc.DrawText(date1 + " - " + date2, wxPoint{off.x, 2});
     }
     // Draw bottom background
@@ -675,8 +675,8 @@ void Slic3r::GUI::ImageGrid::renderContent2(wxDC &dc, wxPoint const &pt, int ind
     m_content_rect.SetHeight(m_content_rect.GetHeight() - h);
     auto br = dc.GetBrush();
     auto pn = dc.GetPen();
-    dc.SetBrush(StateColor::darkModeColorFor(0xEEEEEE));
-    dc.SetPen(StateColor::darkModeColorFor(0xEEEEEE));
+    dc.SetBrush(StateColor::darkModeColorFor(0xEBEFF1));
+    dc.SetPen(StateColor::darkModeColorFor(0xEBEFF1));
     dc.DrawRectangle(pt, m_content_rect.GetSize()); // Fix translucent model thumbnail
     renderContent1(dc, pt, index, hit);
     m_content_rect.SetHeight(m_content_rect.GetHeight() + h);
@@ -696,7 +696,7 @@ void Slic3r::GUI::ImageGrid::renderContent2(wxDC &dc, wxPoint const &pt, int ind
     rect.Offset(0, h / 2);
     rect.SetWidth(rect.GetWidth() / 2 - em);
     dc.SetFont(Label::Body_13);
-    dc.SetTextForeground(StateColor::darkModeColorFor("#6B6B6B"));
+    dc.SetTextForeground(StateColor::darkModeColorFor("#547082"));
     renderIconText(dc, m_model_time_icon, file.Metadata("Time", "0m"), rect);
     rect.Offset(m_content_rect.GetWidth() / 2, 0);
     renderIconText(dc, m_model_weight_icon, file.Metadata("Weight", "0g"), rect);
@@ -725,7 +725,7 @@ void Slic3r::GUI::ImageGrid::renderButtons(wxDC &dc, wxArrayString const &texts,
         //rect.Deflate(10, 5);
         // Draw button splitter
         auto pen = dc.GetPen();
-        dc.SetPen(wxPen("#616161"));
+        dc.SetPen(wxPen("#4A6678"));
         if (i > 0) dc.DrawLine(rect.GetLeftTop(), rect.GetLeftBottom());
         dc.SetPen(pen);
         // Draw button text

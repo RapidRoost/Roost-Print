@@ -8,13 +8,13 @@
  d="M118.998,8.000 C121.628,7.693 123.162,8.044 131.999,13.000 C141.118,18.114 170.662,33.245 172.999,35.000 C175.334,36.754 175.817,37.986 175.999,46.000 C176.181,54.013 175.999,61.000 175.999,61.000 L118.998,79.000 L115.999,62.000 C115.999,62.000 116.370,8.307 118.998,8.000 Z"/>
 <path fill-rule="evenodd"  fill="rgb(81, 106, 91)"
  d="M63.999,44.000 C63.999,44.000 63.852,37.339 63.999,37.000 C64.144,36.661 116.531,8.000 116.999,8.000 C117.110,7.999 118.229,7.999 119.256,8.000 C120.164,8.000 120.999,8.000 120.999,8.000 L120.999,11.000 L120.999,74.000 L63.999,44.000 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(127, 127, 127)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(102, 133, 152)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M173.009,113.420 C175.148,112.271 176.162,110.277 175.968,108.395 C176.176,106.401 175.148,104.517 173.009,103.369 L126.921,78.698 C124.880,77.549 122.435,77.024 119.992,77.024 C117.547,77.024 115.090,77.549 113.048,78.698 L66.960,103.272 C64.821,104.421 63.905,106.415 64.002,108.297 C63.905,110.290 64.821,112.271 66.960,113.420 L113.048,138.006 C115.090,139.156 117.534,139.682 119.992,139.682 C122.435,139.682 124.880,139.156 126.921,138.006 L173.009,113.420 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(127, 127, 127)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(102, 133, 152)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M64.997,43.999 L64.997,107.999 "/>
-<path fill-rule="evenodd"  stroke="rgb(127, 127, 127)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(102, 133, 152)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M175.997,43.999 L175.997,107.999 "/>
-<path fill-rule="evenodd"  stroke="rgb(127, 127, 127)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(102, 133, 152)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M120.997,71.998 L120.997,139.998 "/>
 <path fill-rule="evenodd"  fill="rgb(33, 149, 222)"
  d="M119.998,69.999 C119.998,69.999 122.060,69.694 123.998,68.999 C125.936,68.305 173.218,42.372 173.998,41.999 C174.779,41.627 175.998,40.000 175.998,40.000 L175.998,110.000 C175.998,110.000 175.598,111.233 172.999,113.000 C170.399,114.767 125.104,139.436 123.998,140.000 C122.893,140.563 119.998,140.000 119.998,140.000 L119.998,69.999 Z"/>
@@ -80,7 +80,7 @@
  d="M120.004,78.506 C117.561,78.506 115.117,77.978 113.076,76.826 L66.987,52.166 C64.849,51.013 63.835,49.014 64.029,47.126 "/>
 <path fill-rule="evenodd"  stroke="rgb(24, 122, 184)" stroke-width="1px" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M120.004,74.494 C117.561,74.494 115.117,73.966 113.076,72.813 L66.987,48.154 C64.849,47.001 63.835,45.002 64.029,43.114 "/>
-<path fill-rule="evenodd"  stroke="rgb(127, 127, 127)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="rgb(64, 64, 66)"
+<path fill-rule="evenodd"  stroke="rgb(102, 133, 152)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="rgb(44, 70, 86)"
  d="M221.999,15.000 C235.806,15.000 246.999,26.192 246.999,40.000 C246.999,53.807 235.806,65.000 221.999,65.000 C208.192,65.000 196.999,53.807 196.999,40.000 C196.999,26.192 208.192,15.000 221.999,15.000 Z"/>
 <path fill-rule="evenodd"  stroke="rgb(30, 144, 216)" stroke-width="8px" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M235.334,51.553 L204.881,35.237 "/>

@@ -784,7 +784,7 @@ bool ImGuiWrapper::bbl_slider_float_style(const std::string &label, float *v, fl
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
     ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.81f, 0.81f, 0.81f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.784f, 0.820f, 0.839f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, COL_CREALITY);
 
     bool ret = bbl_slider_float(label, v, v_min,v_max, format, power, clamp,tooltip);
@@ -846,7 +846,7 @@ bool ImGuiWrapper::bbl_slider_int_style(
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
     ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 0.00f, 0.00f));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.81f, 0.81f, 0.81f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.784f, 0.820f, 0.839f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, COL_CREALITY);
 
     bool ret = bbl_slider_int(label, v, v_min, v_max, format, clamp, tooltip);
@@ -2579,7 +2579,7 @@ std::vector<unsigned char> ImGuiWrapper::load_svg(const std::string& bitmap_name
 {
     std::vector<unsigned char> empty_vector;
 
-    NSVGimage* image = BitmapCache::nsvgParseFromFileWithReplace(Slic3r::var(bitmap_name + ".svg").c_str(), "px", 96.0f, { { "\"#808080\"", "\"#FFFFFF\"" } });
+    NSVGimage* image = BitmapCache::nsvgParseFromFileWithReplace(Slic3r::var(bitmap_name + ".svg").c_str(), "px", 96.0f, { { "\"#688698\"", "\"#FFFFFF\"" } });
     if (image == nullptr)
         return empty_vector;
 
@@ -2644,9 +2644,9 @@ void ImGuiWrapper::push_toolbar_style(const float scale)
         ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));             // 11
         ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, ImVec4(43 / 255.0f, 64 / 255.0f, 54 / 255.0f, 1.00f));         // 12
         ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                                // 13
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.42f, 0.42f, 0.42f, 1.00f));                            // 14
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(0.93f, 0.93f, 0.93f, 1.00f));                     // 15
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, ImVec4(0.93f, 0.93f, 0.93f, 1.00f));                      // 16
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.329f, 0.439f, 0.510f, 1.00f));                            // 14
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(0.918f, 0.933f, 0.941f, 1.00f));                     // 15
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, ImVec4(0.918f, 0.933f, 0.941f, 1.00f));                      // 16
     }
     else {
         
@@ -2663,9 +2663,9 @@ void ImGuiWrapper::push_toolbar_style(const float scale)
         ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));        // 11
         ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, COL_GREEN_LIGHT);                                     // 12
         ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));//13
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.42f, 0.42f, 0.42f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(0.93f, 0.93f, 0.93f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, ImVec4(0.93f, 0.93f, 0.93f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.329f, 0.439f, 0.510f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(0.918f, 0.933f, 0.941f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, ImVec4(0.918f, 0.933f, 0.941f, 1.00f));
     }
 }
 
@@ -2942,13 +2942,25 @@ void ImGuiWrapper::init_font(bool compress)
     // Orca: temp fix for Korean font
     auto font_name_regular = "HarmonyOS_Sans_SC_Regular.ttf";
     auto font_name_bold = "HarmonyOS_Sans_SC_Bold.ttf";
+    // Roost Print: Rapid Roost's text font (Manrope), with HarmonyOS merged in behind it for any
+    // symbol Manrope doesn't have. Chinese/Japanese, Korean and Thai keep their own fonts.
+    bool roost_font = !m_font_cjk;
+    if (roost_font) {
+        font_name_regular = "Manrope-Regular.ttf";
+        font_name_bold    = "Manrope-Bold.ttf";
+    }
     if(m_glyph_ranges == ImGui::GetIO().Fonts->GetGlyphRangesKorean()) {
         font_name_regular = "NanumGothic-Regular.ttf";
         font_name_bold = "NanumGothic-Bold.ttf";
+        roost_font = false;
     } else if (m_glyph_ranges == ImGui::GetIO().Fonts->GetGlyphRangesThai()) {
         font_name_regular = "NotoSansThai-Regular.ttf";
         font_name_bold = "NotoSansThai-Bold.ttf";
+        roost_font = false;
     }
+    ImFontConfig roost_merge = ImFontConfig();
+    roost_merge.OversampleH = roost_merge.OversampleV = 1;
+    roost_merge.MergeMode = true;
     default_font = io.Fonts->AddFontFromFileTTF((Slic3r::resources_dir() + "/fonts/" + font_name_regular).c_str(), m_font_size, &cfg, ranges.Data);
     if (default_font == nullptr) {
         BOOST_LOG_TRIVIAL(warning) << "ImGui: failed to load font file: " << font_name_regular << ", fallback AddFontDefault()";
@@ -2959,6 +2971,8 @@ void ImGuiWrapper::init_font(bool compress)
             boost::log::core::get()->flush();
             throw Slic3r::RuntimeError("ImGui: Could not load deafult font");
         }
+    } else if (roost_font) {
+        io.Fonts->AddFontFromFileTTF((Slic3r::resources_dir() + "/fonts/HarmonyOS_Sans_SC_Regular.ttf").c_str(), m_font_size, &roost_merge, ranges.Data);
     }
 
     bold_font        = io.Fonts->AddFontFromFileTTF((Slic3r::resources_dir() + "/fonts/" + font_name_bold).c_str(), m_font_size, &cfg, ranges.Data);
@@ -2971,6 +2985,8 @@ void ImGuiWrapper::init_font(bool compress)
             boost::log::core::get()->flush();
             throw Slic3r::RuntimeError("ImGui: Could not load deafult font");
         }
+    } else if (roost_font) {
+        io.Fonts->AddFontFromFileTTF((Slic3r::resources_dir() + "/fonts/HarmonyOS_Sans_SC_Bold.ttf").c_str(), m_font_size, &roost_merge, ranges.Data);
     }
 
     ImFontConfig cfg_24 = ImFontConfig();

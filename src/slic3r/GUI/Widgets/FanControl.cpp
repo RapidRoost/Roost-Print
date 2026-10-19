@@ -285,7 +285,7 @@ void FanOperate::doRender(wxDC& dc)
 
     //txt
     dc.SetFont(::Label::Body_12);
-    dc.SetTextForeground(StateColor::darkModeColorFor(wxColour(0x898989)));
+    dc.SetTextForeground(StateColor::darkModeColorFor(wxColour(0x738E9F)));
     wxString text = wxString::Format("%d%%", 10);
     wxSize text_size = dc.GetTextExtent(text);
     dc.DrawText(text, wxPoint(left_fir + (left_fir- text_size.x) / 2, (size.y- text_size.y) / 2));
@@ -502,11 +502,11 @@ FanControlPopup::FanControlPopup(wxWindow* parent)
 
     m_line_top = new wxWindow(this, wxID_ANY);
     m_line_top->SetSize(wxSize(-1, 1));
-    m_line_top->SetBackgroundColour(0xF1F1F1);
+    m_line_top->SetBackgroundColour(0xEFF1F3);
 
     m_line_bottom = new wxWindow(this, wxID_ANY);
     m_line_bottom->SetSize(wxSize(-1, 1));
-    m_line_bottom->SetBackgroundColour(0xF1F1F1);
+    m_line_bottom->SetBackgroundColour(0xEFF1F3);
 
 
     m_sizer_main->Add(m_part_fan, 0, wxALL, FromDIP(14));

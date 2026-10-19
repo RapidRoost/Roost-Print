@@ -447,7 +447,7 @@ void GLCanvas3D::LayersEditing::render_variable_layer_height_dialog(const GLCanv
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
     ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.81f, 0.81f, 0.81f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.784f, 0.820f, 0.839f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImGuiWrapper::COL_CREALITY);
     if (ImGui::BBLSliderScalar("##radius_slider", ImGuiDataType_S32, &radius, &v_min, &v_max)) {
         radius                 = std::clamp(radius, v_min, v_max);
@@ -526,7 +526,7 @@ void GLCanvas3D::LayersEditing::render_variable_layer_height_dialog(const GLCanv
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
     ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.81f, 0.81f, 0.81f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.784f, 0.820f, 0.839f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImGuiWrapper::COL_CREALITY);
     if (ImGui::BBLSliderScalar("##radius_slider", ImGuiDataType_S32, &radius, &v_min, &v_max)) {
         radius                 = std::clamp(radius, 1, 10);
@@ -1103,7 +1103,7 @@ void GLCanvas3D::Labels::render(const std::vector<const ModelInstance*>& sorted_
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, owner.selected ? 3.0f : 1.5f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-        ImGui::PushStyleColor(ImGuiCol_Border, owner.selected ? ImVec4(0.757f, 0.404f, 0.216f, 1.0f) : ImVec4(0.75f, 0.75f, 0.75f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Border, owner.selected ? ImVec4(0.757f, 0.404f, 0.216f, 1.0f) : ImVec4(0.710f, 0.757f, 0.788f, 1.0f));
         imgui.set_next_window_pos(x, y, ImGuiCond_Always, 0.5f, 0.5f);
         imgui.begin(owner.title, ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration |
                                      ImGuiWindowFlags_NoMove);
@@ -7294,7 +7294,7 @@ bool GLCanvas3D::_render_object_clone_options(float left, float right, float bot
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
     ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.81f, 0.81f, 0.81f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.784f, 0.820f, 0.839f, 1.0f));
     const ImVec4 COL_CREALITY = ImVec4{0.118f, 0.565f, 0.847f, 1.0f};
     ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, COL_CREALITY);
 
@@ -10932,7 +10932,7 @@ void GLCanvas3D::_render_slice_control() const
 
             // Popup menu width equals main+dropdown width; white menu background; no padding
             {
-                ImVec4 dark_bg  = ImVec4(0x59 / 255.f, 0x59 / 255.f, 0x5D / 255.f, 1.0f); // #59595D
+                ImVec4 dark_bg  = ImVec4(0x59 / 255.f, 0x59 / 255.f, 0x5D / 255.f, 1.0f); // #446072
                 ImVec4 light_bg = config.getColor(DispConfig::e_ct_white);
                 ImGui::PushStyleColor(ImGuiCol_PopupBg, wxGetApp().dark_mode() ? dark_bg : light_bg);
             }
@@ -11153,7 +11153,7 @@ void GLCanvas3D::_render_slice_control() const
                 if (ImGui::IsItemClicked())
                     ImGui::OpenPopup("^##id1");
                 {
-                    ImVec4 dark_bg2  = ImVec4(0x59 / 255.f, 0x59 / 255.f, 0x5D / 255.f, 1.0f); // #59595D
+                    ImVec4 dark_bg2  = ImVec4(0x59 / 255.f, 0x59 / 255.f, 0x5D / 255.f, 1.0f); // #446072
                     ImVec4 light_bg2 = config.getColor(DispConfig::e_ct_white);
                     ImGui::PushStyleColor(ImGuiCol_PopupBg, wxGetApp().dark_mode() ? dark_bg2 : light_bg2);
                 }
@@ -11507,7 +11507,7 @@ void GLCanvas3D::_render_overlays()
     m_labels.render(sorted_instances);
 
     _render_3d_navigator();
-    _render_ai_chat_toggle();
+    // Roost Print: the AI assistant bot is removed.
 }
 
 void GLCanvas3D::_render_style_editor()
@@ -11985,8 +11985,8 @@ void GLCanvas3D::_render_imgui_select_plate_toolbar()
 
     ImVec4 window_bg     = ImVec4(0, 0, 0, 0);
     ImVec4 button_active = ImGuiWrapper::COL_CREALITY; // ORCA: Use orca color for selected sliced plate border
-    ImVec4 button_hover  = ImVec4(0.5f, 0.5f, 0.5, 1.0f);
-    ImVec4 scroll_col    = ImVec4(0.77f, 0.77f, 0.77f, 1.0f);
+    ImVec4 button_hover  = ImVec4(0.408f, 0.525f, 0.596f, 1.0f);
+    ImVec4 scroll_col    = ImVec4(0.733f, 0.776f, 0.804f, 1.0f);
     // ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 0.f, 0.f, 1.0f));
     // use white text as the background switch to black
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -12338,9 +12338,9 @@ void GLCanvas3D::_render_return_toolbar() const
 #endif
 
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 18.0f);
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.149f, 0.180f, 0.188f, 0.3f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.149f, 0.180f, 0.188f, 0.15f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.149f, 0.180f, 0.188f, 0.5f));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.106f, 0.184f, 0.231f, 0.3f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.106f, 0.184f, 0.231f, 0.15f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.106f, 0.184f, 0.231f, 0.5f));
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
@@ -14555,7 +14555,7 @@ bool GLCanvas3D::_render_global_objects_switch_button()
     // switch button has diffrent text color
     ImVec4 text_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     if (enable_object == true) {
-        text_color = m_is_dark ? ImVec4(201.0f / 255.0f, 201.0f / 255.0f, 201.0f / 255.0f, 1.0f) : ImVec4(0.2, 0.2, 0.2, 1.0);
+        text_color = m_is_dark ? ImVec4(201.0f / 255.0f, 201.0f / 255.0f, 201.0f / 255.0f, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
     }
     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 
@@ -14574,7 +14574,7 @@ bool GLCanvas3D::_render_global_objects_switch_button()
 
     text_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     if (enable_object == false) {
-        text_color = m_is_dark ? ImVec4(201.0f / 255.0f, 201.0f / 255.0f, 201.0f / 255.0f, 1.0f) : ImVec4(0.2, 0.2, 0.2, 1.0);
+        text_color = m_is_dark ? ImVec4(201.0f / 255.0f, 201.0f / 255.0f, 201.0f / 255.0f, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
     }
     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 

@@ -3,8 +3,8 @@
 #include "GUI_App.hpp"
 #include "libslic3r/Utils.hpp"
 #include "libslic3r/common_header/common_header.h"
-static const wxColour STATIC_BOX_LINE_COL = wxColour(238, 238, 238);
-static const wxColour STATIC_TEXT_CAPTION_COL = wxColour(100, 100, 100);
+static const wxColour STATIC_BOX_LINE_COL = wxColour(235, 239, 241);
+static const wxColour STATIC_TEXT_CAPTION_COL = wxColour(77, 105, 123);
 
 namespace Slic3r { namespace GUI {
 
@@ -210,7 +210,7 @@ wxBoxSizer* PrintOptionsDialog::create_settings_group(wxWindow* parent)
     wxBoxSizer* line_sizer = new wxBoxSizer(wxHORIZONTAL);
 
     auto m_line = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line->SetBackgroundColour(wxColour(154, 171, 182));
 
     sizer->Add(m_line, 0, wxEXPAND, 0);
 
@@ -454,7 +454,7 @@ PrinterPartsDialog::PrinterPartsDialog(wxWindow* parent)
     
 
     auto m_line = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line->SetBackgroundColour(wxColour(154, 171, 182));
     
     //nozzle type
     wxBoxSizer* line_sizer_nozzle_type = new wxBoxSizer(wxHORIZONTAL);

@@ -12,9 +12,9 @@
 #include "../wxExtensions.hpp"
 #include "slic3r/GUI//Widgets/SideTools.hpp"
 
-#define SIDE_TOOLS_GREY900 wxColour(38, 46, 48)
-#define SIDE_TOOLS_GREY600 wxColour(144, 144, 144)
-#define SIDE_TOOLS_GREY400 wxColour(206, 206, 206)
+#define SIDE_TOOLS_GREY900 wxColour(27, 47, 59)
+#define SIDE_TOOLS_GREY600 wxColour(125, 148, 163)
+#define SIDE_TOOLS_GREY400 wxColour(198, 208, 214)
 #define SIDE_TOOLS_BRAND wxColour(30, 144, 216)
 #define SIDE_TOOLS_LIGHT_GREEN wxColour(220, 240, 252)
 

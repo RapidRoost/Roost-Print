@@ -13,6 +13,9 @@ Run from the repo root:  python tools/roost/recolor.py   (safe to run again afte
 """
 import colorsys, os, re, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from css_names import CSS_NAMES  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BRAND = (0x1E, 0x90, 0xD8)
 BLUE_HUE = colorsys.rgb_to_hls(*(c / 255 for c in BRAND))[0]
@@ -98,7 +101,33 @@ def fix(text, ext):
         return f'{m.group(1)}{a}{m.group(3)}{b}{m.group(5)}{c}'
     if ext in ('.cpp', '.hpp', '.h'):
         text = FLOATS.sub(fl, text)
+    text, fixed = restore_names(text)
+    n[0] = max(0, n[0] - fixed)
     return text, n[0]
+
+# A colour-name table ({gray:"#808080"}, {"green", "#008000"}) says what a name means, e.g. for
+# a filament's colour; those keep their real values.
+_NAMES = '|'.join(sorted(CSS_NAMES, key=len, reverse=True))
+NAMED = re.compile(r'(?<![A-Za-z0-9_$-])(["\']?)(' + _NAMES + r')\1(\s*[:,]\s*)(["\'])#([0-9A-Fa-f]{6})\4', re.I)
+
+RECOLOURS = [shift]  # the colour changes in use (tint.py adds its own)
+
+def restore_names(text):
+    count = [0]
+    def put_back(m):
+        real = CSS_NAMES[m.group(2).lower()]
+        cur = ('#' + m.group(5)).lower()
+        if cur == real:
+            return m.group(0)
+        # Only undo our own recolouring of the name's real value; a table with its own idea of
+        # a name ("green": "#00ff00") stays as written.
+        rgb = tuple(int(real[i:i + 2], 16) for i in (1, 3, 5))
+        ours = {'#%02x%02x%02x' % f(rgb) for f in RECOLOURS}
+        if cur not in ours:
+            return m.group(0)
+        count[0] += 1
+        return f'{m.group(1)}{m.group(2)}{m.group(1)}{m.group(3)}{m.group(4)}{real}{m.group(4)}'
+    return NAMED.sub(put_back, text), count[0]
 
 def main():
     total, files = 0, 0

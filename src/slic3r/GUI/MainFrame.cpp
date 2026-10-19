@@ -99,6 +99,7 @@
 #include "slic3r/GUI/AnalyticsDataUploadManager.hpp"
 #include "slic3r/GUI/print_manage/data/DataCenter.hpp"
 #include "slic3r/GUI/simple/MCPChatPanel.hpp"
+#include "slic3r/GUI/print_manage/App/SendToPrinter.hpp"
 #include "slic3r/GUI/simple/bridge/SlicerBridge.hpp"
 
 namespace Slic3r {
@@ -106,15 +107,8 @@ namespace GUI {
 
 static void ensure_web_model_view_ready(WebModelLibraryView* model_view)
 {
-    if (!model_view)
-        return;
-
-    // Programmatic tab switches do not always emit the notebook selection event.
-    if (!model_view->IsInitialized()) {
-        model_view->open_default_page();
-    }
-
-    model_view->Show();
+    // Roost Print: the online model library and AI creation pages are removed; never load them.
+    (void)model_view;
 }
 
 wxDEFINE_EVENT(EVT_SELECT_TAB, wxCommandEvent);
@@ -276,7 +270,7 @@ MainFrame::MainFrame()
     m_topbar         = new BBLTopbar(this);
 //#else
 //     auto panel_topbar = new wxPanel(this, wxID_ANY);
-//     panel_topbar->SetBackgroundColour(wxColour(38, 46, 48));
+//     panel_topbar->SetBackgroundColour(wxColour(27, 47, 59));
 //     auto sizer_tobar = new wxBoxSizer(wxVERTICAL);
 //     panel_topbar->SetSizer(sizer_tobar);
 //     panel_topbar->Layout();
@@ -1170,17 +1164,9 @@ void MainFrame::update_layout()
                     m_printer_mgr_view->on_switch_to_device_page();
                 }
             } else if (evt.GetId() == tpOnlineModel) {
-                AnalyticsEventPayload payload;
-                payload.type = AnalyticsDataEventType::ANALYTICS_ONLINE_MODELS;
-                AnalyticsDataUploadManager::getInstance().triggerUploadTasksWithPayload(payload);
-                if (m_webmodellibrary_view) {
-                    //click online  models
-                    AnalyticsDataUploadManager::uploadSlice822ClickEvent("online_models");
-                    // 切换到在线模型时不刷新 UA；仅在登录状态变更时由 GUI_App 触发更新
-
-                    // 首次进入在线模型时加载默认页面；以视图实例状态为准，避免语言切换重建 GUI 后不加载的问题
-                    ensure_web_model_view_ready(m_webmodellibrary_view);
-                }
+                // Roost Print: Online Models is removed.
+                select_tab(tp3DEditor);
+                return;
             } else if (evt.GetId() == tpAICreation) {
                 AnalyticsEventPayload payload;
                 payload.type = AnalyticsDataEventType::ANALYTICS_TAB_MAKENOW;
@@ -1247,6 +1233,20 @@ void MainFrame::shutdown()
     // remember an embedded parent owned by Plater, which must not be accessed
     // once wxWidgets starts destroying the main frame's children.
     DestroyAIChatPanelsForGUIRecreate();
+
+    // Roost Print: send windows are separate top-level windows now; close them while the
+    // plater they read from still exists (deleting runs their clean-up right away).
+    {
+        std::vector<CxSentToPrinterDialog*> send_windows;
+        for (wxWindow* w : wxTopLevelWindows)
+            if (auto* dlg = dynamic_cast<CxSentToPrinterDialog*>(w))
+                if (dlg->is_modeless() && !dlg->IsBeingDeleted())
+                    send_windows.push_back(dlg);
+        for (auto* dlg : send_windows) {
+            dlg->set_modeless(nullptr);
+            delete dlg;
+        }
+    }
 
     // BBS: backup
     Slic3r::set_backup_callback(nullptr);
@@ -1579,11 +1579,8 @@ void MainFrame::init_tabpanel() {
     m_printer_mgr_view->Hide();
 
     // Append the page so existing notebook indices stay stable. The topbar uses its window ID.
-    m_ai_creation_view = new WebModelLibraryView(m_tabpanel);
-    m_ai_creation_view->SetId(tpAICreation);
-    m_ai_creation_view->SetStartPage(wxString::FromUTF8(get_ai_creation_webaddress()));
-    m_tabpanel->AddPage(m_ai_creation_view, _L("AI Creation"), "tab_ai_creation_active", "tab_ai_creation", false);
-    m_ai_creation_view->Hide();
+    // Roost Print: no AI Creation page.
+    m_ai_creation_view = nullptr;
     // Roost Print: PrintCam's page, in its own tab (appended, like AI Creation, so indices stay put).
     m_printcam_view = new RoostPrintCamPanel(m_tabpanel);
     m_printcam_view->SetId(tpPrintCam);
@@ -2971,7 +2968,7 @@ static wxMenu* generate_help_menu(MainFrame* mainframe)
                                            : "https://wiki.creality.com/en/software/6-0/privacy";
         wxLaunchDefaultBrowser(url, wxBROWSER_NEW_WINDOW);
     });
-#if !defined(CUSTOMIZED) || defined(CUSTOM_FEEDBOOK_ENABLED)
+#if 0 // Roost Print: no customer support link
     append_menu_item(helpMenu, wxID_ANY, _L("User Feedback"), _L("User Feedback"), [](wxCommandEvent&) {
         AnalyticsEventPayload payload;
         payload.type = AnalyticsDataEventType::ANALYTICS_GOTO_SUPPORT;
@@ -4212,7 +4209,7 @@ public:
         //  mid panel
         wxPanel* panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
         panel->SetMinSize(wxSize(FromDIP(537), FromDIP(176)));
-        panel->SetBackgroundColour(wxColour("#36363A"));
+        panel->SetBackgroundColour(wxColour("#243C4C"));
         m_main_sizer->Add(panel, 1, wxEXPAND | wxALL, 12);
 
         wxBoxSizer* panel_sizer = new wxBoxSizer(wxVERTICAL);
@@ -4251,7 +4248,7 @@ public:
         pBtnOverride->SetSize(wxSize(FromDIP(128), FromDIP(32)));
         pBtnOverride->SetMinSize(wxSize(FromDIP(128), FromDIP(32)));
         pBtnOverride->SetForegroundColour(wxColour("#FFFFFF"));
-        pBtnOverride->SetBackgroundColour(wxColour("#6E6E72"));
+        pBtnOverride->SetBackgroundColour(wxColour("#597587"));
         pBtnOverride->Bind(wxEVT_LEFT_DOWN, [this](wxMouseEvent& e) {
             m_nClickedButtonValue = 1;
             EndModal(wxID_OK);
@@ -4294,7 +4291,7 @@ public:
         //  mid panel
         //wxPanel* panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
         //panel->SetMinSize(wxSize(FromDIP(537), FromDIP(176)));
-        //panel->SetBackgroundColour(wxColour("#36363A"));
+        //panel->SetBackgroundColour(wxColour("#243C4C"));
         //m_main_sizer->Add(panel, 1, wxEXPAND | wxALL, 12);
 
         //wxBoxSizer* panel_sizer = new wxBoxSizer(wxVERTICAL);
@@ -4305,7 +4302,7 @@ public:
                                      wxTAB_TRAVERSAL | wxBORDER_SIMPLE | wxBG_STYLE_COLOUR);
 
         panel->SetMinSize(wxSize(FromDIP(558), FromDIP(28)));
-        panel->SetBackgroundColour(wxColour("#5B5B5E"));
+        panel->SetBackgroundColour(wxColour("#466273"));
         wxBoxSizer* panelBoxSizer = new wxBoxSizer(wxHORIZONTAL);
         wxStaticText* sttFile       = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
         m_sttFile                   = sttFile;
@@ -4318,12 +4315,12 @@ public:
 
         panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | wxBORDER_SIMPLE | wxBG_STYLE_COLOUR);
         panel->SetMinSize(wxSize(FromDIP(558), FromDIP(232)));
-        panel->SetBackgroundColour(wxColour("#5B5B5E"));
+        panel->SetBackgroundColour(wxColour("#466273"));
         panelBoxSizer  = new wxBoxSizer(wxHORIZONTAL);
         wxScrolledWindow* scrolledWindow = new wxScrolledWindow(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL|wxBORDER_SIMPLE);
         m_scrolledWindow                 = scrolledWindow;
         scrolledWindow->SetMinSize(wxSize(FromDIP(558), FromDIP(232)));
-        scrolledWindow->SetBackgroundColour(wxColour("#4B4B4D"));
+        scrolledWindow->SetBackgroundColour(wxColour("#365162"));
         scrolledWindow->SetScrollRate(5, 5);
         wxBoxSizer* sizer_body = new wxBoxSizer(wxVERTICAL);
         m_scrolledWindowSizer  = sizer_body;
@@ -4353,7 +4350,7 @@ public:
         pBtnOverride->SetSize(wxSize(FromDIP(128), FromDIP(32)));
         pBtnOverride->SetMinSize(wxSize(FromDIP(128), FromDIP(32)));
         pBtnOverride->SetForegroundColour(wxColour("#FFFFFF"));
-        pBtnOverride->SetBackgroundColour(wxColour("#6E6E72"));
+        pBtnOverride->SetBackgroundColour(wxColour("#597587"));
         pBtnOverride->Bind(wxEVT_LEFT_DOWN, [this](wxMouseEvent& e) {
             m_nClickedButtonValue = 1;
             EndModal(wxID_OK);
@@ -4444,7 +4441,7 @@ private:
                                      wxTAB_TRAVERSAL | wxBG_STYLE_COLOUR);
 
         panel->SetMinSize(wxSize(FromDIP(536), FromDIP(26)));
-        panel->SetBackgroundColour(wxColour("#4B4B4D"));
+        panel->SetBackgroundColour(wxColour("#365162"));
         wxBoxSizer*   panelBoxSizer = new wxBoxSizer(wxHORIZONTAL);
         wxStaticText* sttTitle      = new wxStaticText(panel, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
         sttTitle->SetMinSize(wxSize(FromDIP(100), FromDIP(14)));
@@ -4465,7 +4462,7 @@ private:
         wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | wxBG_STYLE_COLOUR);
 
         panel->SetMinSize(wxSize(FromDIP(536), FromDIP(16)));
-        panel->SetBackgroundColour(wxColour("#4B4B4D"));
+        panel->SetBackgroundColour(wxColour("#365162"));
         wxBoxSizer*   panelBoxSizer = new wxBoxSizer(wxHORIZONTAL);
         wxStaticText* sttTitle      = new wxStaticText(panel, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
         sttTitle->SetMinSize(wxSize(FromDIP(100), FromDIP(14)));
@@ -4826,6 +4823,9 @@ void MainFrame::jump_to_multipage()
 //BBS GUI refactor: remove unused layout new/dlg
 void MainFrame::select_tab(size_t tab/* = size_t(-1)*/)
 {
+    // Roost Print: Online Models and AI Creation are removed; anything asking for them gets Prepare.
+    if (tab == tpOnlineModel || tab == tpAICreation)
+        tab = tp3DEditor;
     //bool tabpanel_was_hidden = false;
 
     // Controls on page are created on active page of active tab now.

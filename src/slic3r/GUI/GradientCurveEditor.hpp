@@ -34,8 +34,8 @@ public:
     using PointList = GradientCurve;
 
     GradientCurveEditor(wxWindow* parent,
-                        const wxColour& color_low  = wxColour(217, 217, 217),
-                        const wxColour& color_high = wxColour(217, 217, 217));
+                        const wxColour& color_low  = wxColour(211, 218, 223),
+                        const wxColour& color_high = wxColour(211, 218, 223));
 
     // Replace the entire point list. The widget enforces x in [0,1], y in [0,1],
     // sorts by x, and clamps the first / last x to 0 / 1. Tangent overrides are

@@ -16,12 +16,20 @@ wxFont Label::sysFont(int size, bool bold)
     size = size * 4 / 5;
 #endif
 
-    wxString face = "HarmonyOS Sans SC";
-
+    // Roost Print: Rapid Roost's fonts, as on rapidroost.net: Manrope for text, Orbitron for the
+    // big headings. Chinese, Japanese and Korean keep fonts that have those characters.
+    wxString face = "Manrope";
+    const int sys_lang = wxLocale::GetSystemLanguage();
+    const wxLanguageInfo* lang_info = wxLocale::GetLanguageInfo(sys_lang);
+    const wxString lang_name = lang_info ? lang_info->CanonicalName : wxString();
+    if (lang_name.StartsWith("zh") || lang_name.StartsWith("ja"))
+        face = "HarmonyOS Sans SC";
     // Check if the current locale is Korean
-    if (wxLocale::GetSystemLanguage() == wxLANGUAGE_KOREAN) {
+    if (sys_lang == wxLANGUAGE_KOREAN || lang_name.StartsWith("ko")) {
         face = "NanumGothic";
     }
+    if (face == "Manrope" && bold && size >= 24)
+        face = "Orbitron";
 
     wxFont font{size, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, bold ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL, false, face};
     font.SetFaceName(face);
@@ -62,6 +70,9 @@ void Label::initSysFont()
 {
 #if defined(__linux__) || defined(_WIN32)
     const std::string &resource_path = Slic3r::resources_dir();
+    // Roost Print: Rapid Roost's fonts.
+    for (const char* roost_font : {"Manrope-Regular.ttf", "Manrope-Bold.ttf", "Orbitron-Bold.ttf"})
+        wxFont::AddPrivateFont(wxString::FromUTF8(resource_path + "/fonts/" + roost_font));
     wxString font_path = wxString::FromUTF8(resource_path + "/fonts/HarmonyOS_Sans_SC_Bold.ttf");
     bool result = wxFont::AddPrivateFont(font_path);
     // BOOST_LOG_TRIVIAL(info) << boost::format("add font of HarmonyOS_Sans_SC_Bold returns %1%")%result;
@@ -308,7 +319,7 @@ Label::Label(wxWindow *parent, wxFont const &font, wxString const &text, long st
     SetFont(font);
     SetForegroundColour(*wxBLACK);
     SetBackgroundColour(StaticBox::GetParentBackgroundColor(parent));
-    SetForegroundColour("#262E30");
+    SetForegroundColour("#1B2F3B");
     if (style & LB_PROPAGATE_MOUSE_EVENT) {
         for (auto evt : { wxEVT_LEFT_UP, wxEVT_LEFT_DOWN })
             Bind(evt, [this] (auto & e) { GetParent()->GetEventHandler()->ProcessEventLocally(e); });

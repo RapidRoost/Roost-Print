@@ -84,7 +84,7 @@ SavePresetDialog::Item::Item(Preset::Type type, const std::string &suffix, wxBox
     std::string tipText = m_parent->m_IsSave ? L("Save %s") : L("Save %s as");
     wxStaticText *label_top = new wxStaticText(m_parent, wxID_ANY, from_u8((boost::format(_utf8(tipText)) % into_u8(tab->title())).str()));
     label_top->SetFont(::Label::Body_13);
-    label_top->SetForegroundColour(wxColour(38,46,48));
+    label_top->SetForegroundColour(wxColour(27,47,59));
 
 
     //    m_valid_bmp = new wxStaticBitmap(m_parent, wxID_ANY, create_scaled_bitmap("blank_16", m_parent));
@@ -130,7 +130,7 @@ SavePresetDialog::Item::Item(Preset::Type type, const std::string &suffix, wxBox
     }
 
     m_input_ctrl = new ::TextInput(parent, from_u8(preset_name), wxEmptyString, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    StateColor input_bg(std::pair<wxColour, int>(wxColour("#F0F0F1"), StateColor::Disabled), std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
+    StateColor input_bg(std::pair<wxColour, int>(wxColour("#EEF1F3"), StateColor::Disabled), std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
     m_input_ctrl->SetBackgroundColor(input_bg);
     m_input_ctrl->Bind(wxEVT_TEXT, [this](wxCommandEvent &) { update(); });
     m_input_ctrl->SetMinSize(m_parent->input_size());
@@ -168,7 +168,7 @@ SavePresetDialog::Item::Item(Preset::Type type, const std::string &suffix, wxBox
     auto m_left_text = new wxStaticText(parent, wxID_ANY, _L("User Preset"), wxDefaultPosition, wxDefaultSize, 0);
     m_left_text->Wrap(-1);
     m_left_text->SetFont(::Label::Body_13);
-    m_left_text->SetForegroundColour(wxColour(107,107,107));
+    m_left_text->SetForegroundColour(wxColour(84,112,130));
     m_sizer_left->Add(m_left_text, 0, wxALIGN_CENTER, 0);
 
     radio_sizer->Add(m_sizer_left, 1, wxALIGN_CENTER, 5);
@@ -185,7 +185,7 @@ SavePresetDialog::Item::Item(Preset::Type type, const std::string &suffix, wxBox
     m_sizer_right->Add(0, 0, 0, wxLEFT, m_parent->FromDIP(10));
 
     auto m_right_text = new wxStaticText(parent, wxID_ANY, _L("Preset Inside Project"), wxDefaultPosition, wxDefaultSize, 0);
-    m_right_text->SetForegroundColour(wxColour(107,107,107));
+    m_right_text->SetForegroundColour(wxColour(84,112,130));
     m_right_text->SetFont(::Label::Body_13);
     m_right_text->Wrap(-1);
     m_sizer_right->Add(m_right_text, 0, wxALIGN_CENTER, 0);
@@ -315,14 +315,14 @@ void SavePresetDialog::Item::update()
             if (m_parent->m_confirm) {
                 m_parent->m_confirm->Enable();
                 m_parent->m_confirm->SetTextColor(wxColour("#FFFFFE"));
-                m_parent->m_confirm->SetBackgroundColorNormal(wxColour(0x6E6E73));
+                m_parent->m_confirm->SetBackgroundColorNormal(wxColour(0x597688));
             }
         }
         else {
             if (m_parent->m_confirm) {
                 m_parent->m_confirm->Disable();
-                m_parent->m_confirm->SetTextColor(wxColour(0x999999));
-                m_parent->m_confirm->SetBackgroundColorNormal(wxColour(0x565658));
+                m_parent->m_confirm->SetTextColor(wxColour(0x889DAA));
+                m_parent->m_confirm->SetBackgroundColorNormal(wxColour(0x405C6E));
             }
         }
     }
@@ -421,13 +421,13 @@ void SavePresetDialog::build(std::vector<Preset::Type> types, std::string suffix
 
     m_confirm = new Button(this, _L("OK"));
     StateColor btn_bg_grey(
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(0x6E6E73), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(0x597688), StateColor::Normal)
     );
     m_confirm->SetBackgroundColor(btn_bg_grey);
     m_confirm->SetBorderWidth(0);
-    m_confirm->SetBorderColor(wxColour(38, 46, 48));
+    m_confirm->SetBorderColor(wxColour(27, 47, 59));
     m_confirm->SetTextColor(wxColour("#FFFFFE"));
     m_confirm->SetMinSize(button_size());
     m_confirm->SetCornerRadius(FromDIP(SAVE_PRESET_DIALOG_CORNER_RADIUS));
@@ -452,7 +452,7 @@ void SavePresetDialog::build(std::vector<Preset::Type> types, std::string suffix
     btns->Add(block_right, 0, wxRIGHT, FromDIP(40));
 
     auto m_line = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line->SetBackgroundColour(wxColour(154, 171, 182));
 
     m_Sizer_main->Add( m_line, 0, wxEXPAND, 0 );
     m_Sizer_main->Add(m_presets_sizer, 0, wxEXPAND | wxALL, FromDIP(BORDER_W));

@@ -27,10 +27,10 @@ EVT_PAINT(FanSwitchButton::paintEvent)
 END_EVENT_TABLE()
 
 static const wxColour DEFAULT_HOVER_COL = wxColour(30, 144, 216);
-static const wxColour DEFAULT_PRESS_COL = wxColour(238, 238, 238);
+static const wxColour DEFAULT_PRESS_COL = wxColour(235, 239, 241);
 
 ImageSwitchButton::ImageSwitchButton(wxWindow *parent, ScalableBitmap &img_on, ScalableBitmap &img_off, long style)
-    : text_color(std::make_pair(0x6B6B6B, (int) StateColor::Disabled), std::make_pair(*wxBLACK, (int) StateColor::Normal))
+    : text_color(std::make_pair(0x547082, (int) StateColor::Disabled), std::make_pair(*wxBLACK, (int) StateColor::Normal))
 {
     radius = 0;
     m_padding = 0;
@@ -190,7 +190,7 @@ void ImageSwitchButton::sendButtonEvent()
 }
 
 FanSwitchButton::FanSwitchButton(wxWindow* parent, ScalableBitmap& img_on, ScalableBitmap& img_off, long style)
-    : text_color(std::make_pair(0x6B6B6B, (int)StateColor::Disabled), std::make_pair(*wxBLACK, (int)StateColor::Normal))
+    : text_color(std::make_pair(0x547082, (int)StateColor::Disabled), std::make_pair(*wxBLACK, (int)StateColor::Normal))
 {
     radius = 0;
     m_padding = 0;

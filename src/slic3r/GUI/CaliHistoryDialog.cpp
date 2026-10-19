@@ -88,7 +88,7 @@ HistoryWindow::HistoryWindow(wxWindow* parent, const std::vector<PACalibResult>&
     scroll_sizer->AddSpacer(FromDIP(15));
 
     wxPanel* comboBox_panel = new wxPanel(scroll_window);
-    comboBox_panel->SetBackgroundColour(wxColour(238, 238, 238));
+    comboBox_panel->SetBackgroundColour(wxColour(235, 239, 241));
     auto comboBox_sizer = new wxBoxSizer(wxVERTICAL);
     comboBox_panel->SetSizer(comboBox_sizer);
     comboBox_sizer->AddSpacer(10);

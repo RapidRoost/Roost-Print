@@ -340,7 +340,7 @@ class ParamsPanel : public wxPanel
         std::map<wxString, wxString> m_preset_name_by_display;
         //wxTreeItemId                                                   m_curItem;
 
-        wxColor m_normal_color = wxColor(110, 110, 115);
+        wxColor m_normal_color = wxColor(89, 118, 136);
         wxColor m_hover_color = wxColor(30, 144, 216);
 
         bool            m_IsNeed          = true;

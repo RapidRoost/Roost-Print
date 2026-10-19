@@ -1209,7 +1209,7 @@ void PartPlate::render_label(GLCanvas3D& canvas) const {
 	ImGuiWrapper& imgui = *wxGetApp().imgui();
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.5f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.75f, 0.75f, 0.75f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.710f, 0.757f, 0.788f, 1.0f));
 	imgui.set_next_window_pos(x, y, ImGuiCond_Always, 0.5f, 0.5f);
 	imgui.begin(label, ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 	ImGui::BringWindowToDisplayFront(ImGui::GetCurrentWindow());

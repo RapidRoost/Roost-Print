@@ -1379,7 +1379,7 @@ bool IMSlider::render(int canvas_width, int canvas_height)
             ImGui::PushStyleColor(ImGuiCol_FrameBg,ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
             ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
             ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-            ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.81f, 0.81f, 0.81f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.784f, 0.820f, 0.839f, 1.0f));
             ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImGuiWrapper::COL_CREALITY);
             
             // slider

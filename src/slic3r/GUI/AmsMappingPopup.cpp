@@ -440,7 +440,7 @@ void AmsMapingPopup::update_ams_data_multi_machines()
         TrayData td;
         td.id = i;
         td.type = EMPTY;
-        td.colour = wxColour(166, 169, 170);
+        td.colour = wxColour(154, 171, 182);
         td.name = "";
         td.filament_type = "";
         td.ctype = 0;
@@ -783,7 +783,7 @@ void MappingItem::doRender(wxDC &dc)
     }
 
 
-    wxColour side_colour = wxColour(0xE4E4E4);
+    wxColour side_colour = wxColour(0xE0E5E8);
 
     dc.SetPen(side_colour);
     dc.SetBrush(wxBrush(side_colour));
@@ -839,7 +839,7 @@ AmsMapingTipPopup::AmsMapingTipPopup(wxWindow *parent)
     m_sizer_body->Add(m_panel_enable_ams, 0, 0, 0);
 
     m_split_lines = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(1, FromDIP(150)), wxTAB_TRAVERSAL);
-    m_split_lines->SetBackgroundColour(wxColour(238, 238, 238));
+    m_split_lines->SetBackgroundColour(wxColour(235, 239, 241));
 
     m_sizer_body->Add(m_split_lines, 0, wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT, FromDIP(10));
 
@@ -1048,7 +1048,7 @@ AmsTutorialPopup::AmsTutorialPopup(wxWindow* parent)
     sizer_tip_top->Add(arrows_top, 0, wxALIGN_CENTER, 0);
 
     tip_top = new wxStaticText(this, wxID_ANY, _L("Filament used in this print job"), wxDefaultPosition, wxDefaultSize, 0);
-    tip_top->SetForegroundColour(wxColour("#686868"));
+    tip_top->SetForegroundColour(wxColour("#516D7F"));
     
     sizer_tip_top->Add(tip_top, 0, wxALL, 0);
 
@@ -1062,7 +1062,7 @@ AmsTutorialPopup::AmsTutorialPopup(wxWindow* parent)
 
     arrows_bottom = new wxStaticBitmap(this, wxID_ANY, create_scaled_bitmap("ams_arrow", this, 8), wxDefaultPosition, wxSize(FromDIP(24), FromDIP(8)), 0);
     tip_bottom = new wxStaticText(this, wxID_ANY, _L("CFS slot used for this filament"), wxDefaultPosition, wxDefaultSize, 0);
-    tip_bottom->SetForegroundColour(wxColour("#686868"));
+    tip_bottom->SetForegroundColour(wxColour("#516D7F"));
 
 
     sizer_tip_bottom->Add(arrows_bottom, 0, wxALIGN_CENTER, 0);
@@ -1083,7 +1083,7 @@ AmsTutorialPopup::AmsTutorialPopup(wxWindow* parent)
     sizer_middle->Add(img_middle, 0, wxALIGN_CENTER, 0);
 
     tip_middle = new wxStaticText(this, wxID_ANY, _L("Click to select CFS slot manually"), wxDefaultPosition, wxDefaultSize, 0);
-    tip_middle->SetForegroundColour(wxColour("#686868"));
+    tip_middle->SetForegroundColour(wxColour("#516D7F"));
     sizer_middle->Add(0, 0, 0,wxLEFT, 15);
     sizer_middle->Add(tip_middle, 0, wxALIGN_CENTER, 0);
 
@@ -1138,7 +1138,7 @@ AmsIntroducePopup::AmsIntroducePopup(wxWindow* parent)
     m_staticText_bottom =  new Label(this, _L("Print using materials mounted on the back of the case"));
     m_staticText_bottom->Wrap(-1);
     m_staticText_bottom->SetFont(::Label::Body_13);
-    m_staticText_bottom->SetForegroundColour(wxColour(0x6B6B6B));
+    m_staticText_bottom->SetForegroundColour(wxColour(0x547082));
     bSizer4->Add(m_staticText_bottom, 0, wxALL, 5);
 
     wxBoxSizer* bSizer5;
@@ -1279,7 +1279,7 @@ void AmsReplaceMaterialDialog::create()
 
     m_main_sizer = new wxBoxSizer(wxVERTICAL);
     auto m_top_line = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_top_line->SetBackgroundColour(wxColour(166, 169, 170));
+    m_top_line->SetBackgroundColour(wxColour(154, 171, 182));
     m_main_sizer->Add(m_top_line, 0, wxEXPAND, 0);
 
 
@@ -1288,7 +1288,7 @@ void AmsReplaceMaterialDialog::create()
     label_title->SetForegroundColour(0x1E90D8);
     label_txt = new Label(this, _L("When the current material run out, the printer will continue to print in the following order."));
     label_txt->SetFont(Label::Body_13);
-    label_txt->SetForegroundColour(StateColor::darkModeColorFor(wxColour("#323A3C")));
+    label_txt->SetForegroundColour(StateColor::darkModeColorFor(wxColour("#243B4A")));
     label_txt->SetMinSize(wxSize(FromDIP(380), -1));
     label_txt->SetMaxSize(wxSize(FromDIP(380), -1));
     label_txt->Wrap(FromDIP(380));
@@ -1314,10 +1314,10 @@ void AmsReplaceMaterialDialog::create()
         std::pair<wxColour, int>(AMS_CONTROL_WHITE_COLOUR, StateColor::Normal));
 
     StateColor btn_bd_white(std::pair<wxColour, int>(wxColour(255, 255, 254), StateColor::Disabled),
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
 
     StateColor btn_text_white(std::pair<wxColour, int>(wxColour(255, 255, 254), StateColor::Disabled),
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
 
 
     StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal));
@@ -1597,7 +1597,7 @@ void AmsRMGroup::doRender(wxDC& dc)
 
         dc.SetPen(*wxTRANSPARENT_PEN);
 
-        if (tray_color == *wxWHITE) dc.SetPen(wxPen(wxColour(0xEEEEEE), 2));
+        if (tray_color == *wxWHITE) dc.SetPen(wxPen(wxColour(0xEBEFF1), 2));
         dc.SetBrush(wxBrush(tray_color));
 
         int x = size.x / 2;
@@ -1618,7 +1618,7 @@ void AmsRMGroup::doRender(wxDC& dc)
 
         //draw selected
         if (!m_selected_index.empty() && m_selected_index == tray_name) {
-            dc.SetPen(wxPen(0xCECECE, 2));
+            dc.SetPen(wxPen(0xC6D0D6, 2));
             dc.SetBrush(*wxTRANSPARENT_BRUSH);
             dc.DrawEllipticArc(x - radius, y - radius, radius * 2, radius * 2, startAngle, endAngle);
             dc.DrawEllipticArc(x - selected_radius, y - selected_radius,selected_radius * 2, selected_radius * 2,  startAngle, endAngle);
@@ -1647,14 +1647,14 @@ void AmsRMGroup::doRender(wxDC& dc)
         //draw tray
         dc.SetFont(::Label::Body_12);
         auto text_size = dc.GetTextExtent(tray_name);
-        dc.SetTextForeground(tray_color.GetLuminance() < 0.6 ? *wxWHITE : wxColour(0x262E30));
-        if (tray_color.Alpha() == 0) {dc.SetTextForeground(wxColour(0x262E30));}
+        dc.SetTextForeground(tray_color.GetLuminance() < 0.6 ? *wxWHITE : wxColour(0x1B2F3B));
+        if (tray_color.Alpha() == 0) {dc.SetTextForeground(wxColour(0x1B2F3B));}
 
         dc.DrawText(tray_name, x_center - text_size.x / 2, size.y - y_center - text_size.y / 2);
 
         //draw split line
         dc.SetPen(wxPen(*wxWHITE, 2));
-        if (tray_color.Alpha() == 0) {dc.SetPen(wxPen(wxColour(0xCECECE), 2));}
+        if (tray_color.Alpha() == 0) {dc.SetPen(wxPen(wxColour(0xC6D0D6), 2));}
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
         auto pos_sp_start = CalculateEndpoint(wxPoint(x, y), (360 - startAngle),  size.x / 2 - FromDIP(3));
         dc.DrawLine(wxPoint(x, y), pos_sp_start);
@@ -1752,7 +1752,7 @@ void AmsHumidityLevelList::doRender(wxDC& dc)
 
 
     //dry / wet
-    dc.SetTextForeground(wxColour(0x989898));
+    dc.SetTextForeground(wxColour(0x879CA9));
     dc.SetFont(::Label::Head_20);
 
     auto font_top = GetSize().y - dc.GetTextExtent(_L("DRY")).GetHeight();

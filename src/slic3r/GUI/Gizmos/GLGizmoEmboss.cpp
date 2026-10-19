@@ -2030,8 +2030,8 @@ void GLGizmoEmboss::draw_style_rename_button()
     }
 
     ImVec4 bg_color = m_is_dark_mode ? 
-        ImVec4(0.08f, 0.08f, 0.08f, 0.95f) : // 深色模式
-        ImVec4(0.92f, 0.92f, 0.92f, 0.95f);  // 浅色模式
+        ImVec4(0.047f, 0.086f, 0.110f, 0.95f) : // 深色模式
+        ImVec4(0.910f, 0.925f, 0.933f, 0.95f);  // 浅色模式
     ImGui::PushStyleColor(ImGuiCol_PopupBg, bg_color);
 
     if (ImGui::BeginPopupModal(popup_id, NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -2127,7 +2127,7 @@ void GLGizmoEmboss::draw_style_add_button()
         }
     }
 
-    ImVec4 bg_color = m_is_dark_mode ? ImVec4(0.43f, 0.43f, 0.447f, 1.f) : ImVec4(1.f, 1.f, 1.f, 1.f);
+    ImVec4 bg_color = m_is_dark_mode ? ImVec4(0.349f, 0.459f, 0.529f, 1.f) : ImVec4(1.f, 1.f, 1.f, 1.f);
     ImGui::PushStyleColor(ImGuiCol_PopupBg, bg_color);
 
     if (ImGui::BeginPopupModal(popup_id, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {

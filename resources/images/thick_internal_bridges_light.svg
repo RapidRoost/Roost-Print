@@ -4,17 +4,17 @@
  width="300.5px" height="147.5px">
 <path fill-rule="evenodd"  fill="none"
  d="M-0.003,-0.001 L299.998,-0.001 L299.998,146.999 L-0.003,146.999 L-0.003,-0.001 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(111, 111, 111)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(88, 116, 134)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M53.999,24.000 L245.999,24.000 L245.999,96.000 L53.999,96.000 L53.999,24.000 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(111, 111, 111)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(88, 116, 134)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M33.999,52.000 L266.000,52.000 L262.999,124.000 L36.999,124.000 L33.999,52.000 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(111, 111, 111)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(88, 116, 134)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M54.999,25.000 L34.999,52.000 "/>
-<path fill-rule="evenodd"  stroke="rgb(111, 111, 111)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(88, 116, 134)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M245.999,24.000 L266.999,52.000 "/>
-<path fill-rule="evenodd"  stroke="rgb(111, 111, 111)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(88, 116, 134)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M54.999,97.000 L38.999,123.000 "/>
-<path fill-rule="evenodd"  stroke="rgb(111, 111, 111)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(88, 116, 134)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M246.999,96.000 L261.999,123.000 "/>
 <path fill-rule="evenodd"  fill="rgb(30, 144, 216)"
  d="M52.998,102.999 L101.360,102.999 C104.122,102.999 106.360,105.238 106.360,107.999 L106.360,107.999 C106.360,110.761 104.122,112.999 101.360,112.999 L52.998,112.999 C50.237,112.999 47.998,110.761 47.998,107.999 L47.998,107.999 C47.998,105.238 50.237,102.999 52.998,102.999 Z"/>
@@ -60,10 +60,10 @@
  d="M249.016,62.999 L170.930,62.999 C168.178,62.999 165.947,65.238 165.947,67.999 L165.947,68.000 C165.947,70.761 168.178,72.999 170.930,72.999 L249.016,72.999 C251.769,72.999 254.000,70.761 254.000,68.000 L254.000,67.999 C254.000,65.238 251.769,62.999 249.016,62.999 Z"/>
 <path fill-rule="evenodd"  fill="rgb(19, 93, 139)"
  d="M249.232,68.999 L170.722,68.999 C166.818,68.999 166.742,65.243 166.742,65.243 C166.742,65.243 165.952,66.980 165.952,67.999 C165.952,70.760 168.089,72.999 170.722,72.999 L249.232,72.999 C251.865,72.999 254.001,70.760 254.001,67.999 C254.001,66.917 253.116,65.097 253.116,65.097 C253.116,65.097 252.964,68.999 249.232,68.999 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(51, 51, 51)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(32, 55, 70)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M133.999,86.000 L133.999,46.000 "/>
-<path fill-rule="evenodd"  stroke="rgb(51, 51, 51)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(32, 55, 70)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M163.999,86.000 L163.999,46.000 "/>
-<path fill-rule="evenodd"  fill="rgb(51, 51, 51)"
+<path fill-rule="evenodd"  fill="rgb(32, 55, 70)"
  d="M164.200,40.996 C163.758,40.996 163.400,40.611 163.400,40.139 L163.400,29.853 C163.400,29.379 163.758,28.996 164.200,28.996 C164.642,28.996 165.000,29.379 165.000,29.853 L165.000,40.139 C165.000,40.611 164.642,40.996 164.200,40.996 ZM159.966,38.458 C159.651,38.773 159.159,38.764 158.855,38.437 C158.550,38.111 158.541,37.584 158.835,37.247 L160.135,35.853 L138.866,35.853 L140.166,37.247 C140.469,37.584 140.464,38.119 140.156,38.449 C139.848,38.779 139.349,38.783 139.034,38.458 L136.369,35.603 C136.294,35.524 136.235,35.428 136.194,35.321 C136.171,35.259 136.168,35.193 136.158,35.128 C136.151,35.083 136.133,35.043 136.133,34.995 C136.133,34.947 136.152,34.906 136.159,34.860 C136.168,34.796 136.171,34.731 136.195,34.670 C136.236,34.564 136.295,34.467 136.371,34.387 L139.034,31.532 C139.350,31.219 139.841,31.228 140.145,31.554 C140.450,31.880 140.459,32.406 140.165,32.744 L138.865,34.138 L160.135,34.138 L158.833,32.744 C158.531,32.408 158.535,31.873 158.844,31.543 C159.153,31.213 159.652,31.207 159.966,31.532 L162.632,34.390 C162.944,34.724 162.944,35.267 162.632,35.602 L159.966,38.458 ZM134.799,40.996 C134.358,40.996 134.000,40.611 134.000,40.139 L134.000,29.853 C134.000,29.379 134.358,28.996 134.799,28.996 C135.242,28.996 135.600,29.379 135.600,29.853 L135.600,40.139 C135.600,40.611 135.242,40.996 134.799,40.996 Z"/>
 </svg>

@@ -273,7 +273,7 @@ SendMultiMachinePage::SendMultiMachinePage(Plater* plater)
     wxBoxSizer* main_sizer = new wxBoxSizer(wxVERTICAL);
 
     auto line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    line_top->SetBackgroundColour(wxColour(154, 171, 182));
     main_sizer->Add(line_top, 0, wxEXPAND, 0);
     main_sizer->AddSpacer(FromDIP(10));
 
@@ -817,7 +817,7 @@ wxBoxSizer* SendMultiMachinePage::create_item_input(wxString str_before, wxStrin
     input_title->Wrap(-1);
 
     auto input = new ::TextInput(parent, wxEmptyString, wxEmptyString, wxEmptyString, wxDefaultPosition, DESIGN_INPUT_SIZE, wxTE_PROCESS_ENTER);
-    StateColor input_bg(std::pair<wxColour, int>(wxColour("#F0F0F1"), StateColor::Disabled), std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
+    StateColor input_bg(std::pair<wxColour, int>(wxColour("#EEF1F3"), StateColor::Disabled), std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
     input->SetBackgroundColor(input_bg);
     input->GetTextCtrl()->SetValue(app_config->get(param));
     wxTextValidator validator(wxFILTER_DIGITS);
@@ -1410,7 +1410,7 @@ void SendMultiMachinePage::sync_ams_list()
         if (extruder >= materials.size() || extruder < 0 || extruder >= display_materials.size()) continue;
 
         MaterialItem* item = new MaterialItem(m_main_page, colour_rgb, _L(display_materials[extruder]));
-        item->set_ams_info(wxColour("#CECECE"), "A1", 0, std::vector<wxColour>());
+        item->set_ams_info(wxColour("#C6D0D6"), "A1", 0, std::vector<wxColour>());
         m_ams_list_sizer->Add(item, 0, wxALL, FromDIP(4));
 
         item->Bind(wxEVT_LEFT_UP, [this, item, materials, extruder](wxMouseEvent& e) {});

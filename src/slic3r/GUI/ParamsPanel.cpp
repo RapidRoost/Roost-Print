@@ -90,8 +90,8 @@ static wxString params_panel_preset_display_name(const Preset& preset, bool is_f
 
         // const wxColour grey_color(54, 54, 56);
         bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
-        // wxColour bg_color = is_dark ? wxColour("#363638") : wxColour("#FFFFFF");
-        wxColour bg_color = is_dark ? wxColour(75,75,77) : wxColour("#FFFFFF");
+        // wxColour bg_color = is_dark ? wxColour("#243B4A") : wxColour("#FFFFFF");
+        wxColour bg_color = is_dark ? wxColour(54,81,98) : wxColour("#FFFFFF");
 
         // Initialize the static text
         m_text = new wxStaticText(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
@@ -118,7 +118,7 @@ static wxString params_panel_preset_display_name(const Preset& preset, bool is_f
         m_defaultBmp = cache.load_png("image_tooltip_default");
         if(m_defaultBmp) {
             m_backgroundImage = new wxStaticBitmap(this, wxID_ANY, *m_defaultBmp);
-            m_backgroundImage->SetBackgroundColour(is_dark ? wxColour(54,54,56) : wxColour("#FFFFFF"));
+            m_backgroundImage->SetBackgroundColour(is_dark ? wxColour(36,59,74) : wxColour("#FFFFFF"));
             this->GetSizer()->Add(m_backgroundImage, 1, wxEXPAND | wxALL, 5);
         }
 
@@ -159,11 +159,11 @@ static wxString params_panel_preset_display_name(const Preset& preset, bool is_f
         wxRect rect = GetClientRect();
 
         bool is_dark = wxGetApp().dark_mode();
-        wxColour fill_bg_color = is_dark ? wxColour(54,54,56) : wxColour("#FFFFFF");
+        wxColour fill_bg_color = is_dark ? wxColour(36,59,74) : wxColour("#FFFFFF");
 
         wxGraphicsContext* gc = wxGraphicsContext::Create(dc);
         if (gc) {
-            gc->SetPen(wxPen(is_dark ? fill_bg_color : wxColour(214, 214, 220), 1));
+            gc->SetPen(wxPen(is_dark ? fill_bg_color : wxColour(211, 218, 223), 1));
             // gc->SetBrush(*wxTRANSPARENT_BRUSH);
             gc->SetBrush(fill_bg_color);
 
@@ -233,7 +233,7 @@ static wxString params_panel_preset_display_name(const Preset& preset, bool is_f
 
     void ImageTooltipPanel::on_change_color_mode(bool is_dark)
     {
-        wxColour text_btn_bg_color = is_dark ? wxColour(54,54,56) : wxColour("#FFFFFF");
+        wxColour text_btn_bg_color = is_dark ? wxColour(36,59,74) : wxColour("#FFFFFF");
 
         if(m_hideButton) {
             wxBitmap button_bitmap = create_scaled_bitmap(is_dark ? "button_hide_img_tooltip" : "button_hide_img_light", this, 10);
@@ -245,9 +245,9 @@ static wxString params_panel_preset_display_name(const Preset& preset, bool is_f
             m_text->SetBackgroundColour(text_btn_bg_color);
 
         if(m_backgroundImage)
-            m_backgroundImage->SetBackgroundColour(is_dark ? wxColour(54,54,56) : wxColour("#FFFFFF"));
+            m_backgroundImage->SetBackgroundColour(is_dark ? wxColour(36,59,74) : wxColour("#FFFFFF"));
 
-        wxColour bg_color = is_dark ? wxColour(75,75,77) : wxColour("#FFFFFF");
+        wxColour bg_color = is_dark ? wxColour(54,81,98) : wxColour("#FFFFFF");
         SetBackgroundColour(bg_color);
     }
 
@@ -262,7 +262,7 @@ TipsDialog::TipsDialog(wxWindow *parent, const wxString &title, const wxString &
     wxBoxSizer *m_sizer_main = new wxBoxSizer(wxVERTICAL);
 
     m_top_line = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
-    m_top_line->SetBackgroundColour(wxColour(166, 169, 170));
+    m_top_line->SetBackgroundColour(wxColour(154, 171, 182));
 
     m_sizer_main->Add(m_top_line, 0, wxEXPAND, 0);
 
@@ -271,7 +271,7 @@ TipsDialog::TipsDialog(wxWindow *parent, const wxString &title, const wxString &
     m_msg = new wxStaticText(this, wxID_ANY, description, wxDefaultPosition, wxDefaultSize, 0);
     m_msg->Wrap(-1);
     m_msg->SetFont(::Label::Body_13);
-    m_msg->SetForegroundColour(wxColour(107, 107, 107));
+    m_msg->SetForegroundColour(wxColour(84, 112, 130));
     m_msg->SetBackgroundColour(wxColour(255, 255, 255));
 
     m_sizer_main->Add(m_msg, 1, wxEXPAND | wxLEFT | wxRIGHT, FromDIP(40));
@@ -290,17 +290,17 @@ TipsDialog::TipsDialog(wxWindow *parent, const wxString &title, const wxString &
 
     m_confirm = new Button(this, _L("OK"));
     StateColor btn_bg_grey(
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal)
     );
 
     StateColor btn_text_white(
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal)
     );
 
     StateColor btn_bd_grey(
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal)
     );
 
     m_confirm->SetBackgroundColor(btn_bg_grey);
@@ -337,7 +337,7 @@ wxBoxSizer *TipsDialog::create_item_checkbox(wxString title, wxWindow *parent, w
     m_sizer_checkbox->Add(0, 0, 0, wxEXPAND | wxLEFT, 8);
 
     auto checkbox_title = new wxStaticText(parent, wxID_ANY, title, wxDefaultPosition, wxSize(-1, -1), 0);
-    checkbox_title->SetForegroundColour(wxColour(144, 144, 144));
+    checkbox_title->SetForegroundColour(wxColour(125, 148, 163));
     checkbox_title->SetFont(::Label::Body_13);
     checkbox_title->Wrap(-1);
     m_sizer_checkbox->Add(checkbox_title, 0, wxALIGN_CENTER | wxALL, 3);
@@ -390,7 +390,7 @@ void CustomTreeCtrl::OnPaint(wxPaintEvent& event)
     //        // 绘制悬停状态
     //        if (item == hoverItem) {
     //            dc.SetPen(*wxTRANSPARENT_PEN);
-    //            dc.SetBrush(wxBrush(wxColour(200, 200, 200))); // 设置悬停背景色
+    //            dc.SetBrush(wxBrush(wxColour(191, 202, 209))); // 设置悬停背景色
     //            dc.DrawRectangle(rect);
     //        }
 
@@ -515,9 +515,9 @@ ParamsPanel::ParamsPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, c
         m_mode_view  = new SwitchButton(m_top_panel, wxID_ABOUT);
         m_mode_view->SetMaxSize({em_unit(this) * 12, -1});
         //m_mode_view->SetLabels(_L("    "), _L("    "));
-        StateColor stateColor = StateColor(std::make_pair(is_dark ? 0x4B4B4D : 0xFFFFFF, (int) StateColor::Disabled),
+        StateColor stateColor = StateColor(std::make_pair(is_dark ? 0x365162 : 0xFFFFFF, (int) StateColor::Disabled),
                                      std::make_pair(0x1877B4, (int) StateColor::Hovered),
-                                     std::make_pair(is_dark ? 0x4B4B4D : 0xFFFFFF, (int) StateColor::Normal));
+                                     std::make_pair(is_dark ? 0x365162 : 0xFFFFFF, (int) StateColor::Normal));
         //m_mode_view_box = new HoverBorderBox(m_top_panel, m_mode_view, wxDefaultPosition, wxSize(FromDIP(24),FromDIP(24)), wxTE_PROCESS_ENTER);
         m_mode_view->SetToolTip(_L("Advance parameters"));
 
@@ -583,7 +583,7 @@ ParamsPanel::ParamsPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, c
     m_color_border_box = new StaticBox(this, wxID_ANY, wxDefaultPosition);
     m_color_border_box->SetBackgroundColour(*wxWHITE);
     m_color_border_box->SetBorderWidth(1);
-    m_color_border_box->SetBorderColor(0x7A7A7F);
+    m_color_border_box->SetBorderColor(0x648295);
     m_color_border_box->SetCornerFlags(0xC);
     m_tmp_sizer = new wxBoxSizer(wxVERTICAL);
     m_tmp_sizer->SetMinSize(wxSize(0, FromDIP(150)));
@@ -883,7 +883,7 @@ void ParamsPanel::create_layout_printerAndFilament()
         //wxPanel* tabCtrPanel = new wxPanel(this);
         StaticBox* tabCtrPanel = new StaticBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
         tabCtrPanel->SetBorderWidth(1);
-        tabCtrPanel->SetBorderColor(0x7A7A7F);
+        tabCtrPanel->SetBorderColor(0x648295);
         tabCtrPanel->SetMinSize(wxSize(116, -1));
         wxBoxSizer* tabCtr_sizer = new wxBoxSizer(wxVERTICAL);
         tabCtrPanel->SetSizer(tabCtr_sizer);
@@ -914,7 +914,7 @@ void ParamsPanel::create_layout_printerAndFilament()
         bool is_dark = wxGetApp().dark_mode();
         int em = em_unit(this);
         StateColor bg_color = StateColor(std::pair{wxColour(24, 119, 180), (int) StateColor::Hovered},
-                                         std::pair{is_dark ? wxColour(142, 142, 159) : wxColour(214, 214, 220), (int) StateColor::Normal});
+                                         std::pair{is_dark ? wxColour(142, 142, 159) : wxColour(211, 218, 223), (int) StateColor::Normal});
 
         StateColor bg_checkedColor = StateColor(std::pair{wxColour(24, 119, 180), (int) StateColor::Hovered},
                                                 std::pair{wxColour(24, 119, 180), (int) StateColor::Normal});
@@ -982,7 +982,7 @@ void ParamsPanel::create_layout_printerAndFilament()
         m_bottomBtnsPanel = new wxPanel(this);
         wxBoxSizer* buttons_sizer_bt = new wxBoxSizer(wxHORIZONTAL);
         m_bottomBtnsPanel->SetSizer(buttons_sizer_bt);
-        m_bottomBtnsPanel->SetBackgroundColour(is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF"));
+        m_bottomBtnsPanel->SetBackgroundColour(is_dark ? wxColour("#365162") : wxColour("#FFFFFF"));
 
         //m_btn_save = new Button(this, _L("Save"));
         m_btn_save = new wxButton(m_bottomBtnsPanel, wxID_ANY, _L("Save"), wxDefaultPosition, wxDefaultSize,
@@ -1133,8 +1133,8 @@ void ParamsPanel::create_layout_printerAndFilament()
         CustomRoundCornerButton* rcb1 = new CustomRoundCornerButton(rp, wxID_ANY, _L("User"), wxDefaultPosition, wxSize(100, 30),
             wxLeft | wxBORDER_NONE);
 
-        rcb->SetBorderColor(wxColour("#6E6E72"));
-        rcb1->SetBorderColor(wxColour("#6E6E72"));
+        rcb->SetBorderColor(wxColour("#597587"));
+        rcb1->SetBorderColor(wxColour("#597587"));
 
         rcb->onClicked = [rcb1]() {
             rcb1->SetIsChecked(false); };
@@ -2321,7 +2321,7 @@ void ParamsPanel::updateItemState()
     
     bool       is_dark  = wxGetApp().dark_mode();
     StateColor bg_color = StateColor(std::pair{wxColour(142, 142, 159), (int) StateColor::Hovered},
-                                     std::pair{is_dark ? wxColour(142, 142, 159) : wxColour(214, 214, 220), (int) StateColor::Normal});
+                                     std::pair{is_dark ? wxColour(142, 142, 159) : wxColour(211, 218, 223), (int) StateColor::Normal});
 
     StateColor bg_checkedColor = StateColor(std::pair{wxColour(24, 119, 180), (int) StateColor::Hovered},
                                             std::pair{wxColour(24, 119, 180), (int) StateColor::Normal});
@@ -3013,7 +3013,7 @@ void ParamsPanel::layoutPrinterAndFilament()
     int em = em_unit(this);
     StateColor text_color = StateColor(std::pair{ is_dark ? wxColour(254, 254, 254) : wxColour(0,0,0), (int)StateColor::Normal });
     StateColor bg_color = StateColor(std::pair{ wxColour(30, 144, 216), (int)StateColor::Hovered },
-        std::pair{ is_dark ? wxColour(110, 110, 115) : wxColour(214, 214, 220), (int)StateColor::Normal });
+        std::pair{ is_dark ? wxColour(89, 118, 136) : wxColour(211, 218, 223), (int)StateColor::Normal });
 
 
     //main_sizer->Add(sizer, 1, wxEXPAND | wxALL, FromDIP(10));
@@ -3037,13 +3037,13 @@ void ParamsPanel::layoutPrinterAndFilament()
     //m_tabbar_printer = new TabbarCtrlPrinter(this, m_h_tabbar_printer, m_v_tabbar_printer, wxGetApp().preset_bundle);
     //m_tabbar_filament = new TabbarCtrlFilament(this, m_h_tabbar_printer, m_v_tabbar_printer, wxGetApp().preset_bundle);
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
         std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
     {
         m_button_save = new Button(this, _L("Save"));
         m_button_save->SetBackgroundColor(btn_bg_white);
-        m_button_save->SetBorderColor(wxColour(38, 46, 48));
+        m_button_save->SetBorderColor(wxColour(27, 47, 59));
         //m_button_save->SetTextColor(wxColour(0xFFFFFE));
         m_button_save->SetFont(Label::Body_12);
         m_button_save->SetSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -3053,7 +3053,7 @@ void ParamsPanel::layoutPrinterAndFilament()
     {
         //m_button_save_as = new Button(this, _L("Save as"));
         //m_button_save_as->SetBackgroundColor(btn_bg_white);
-        //m_button_save_as->SetBorderColor(wxColour(38, 46, 48));
+        //m_button_save_as->SetBorderColor(wxColour(27, 47, 59));
         ////m_button_save_as->SetTextColor(wxColour(0xFFFFFE));
         //m_button_save_as->SetFont(Label::Body_12);
         //m_button_save_as->SetSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -3063,7 +3063,7 @@ void ParamsPanel::layoutPrinterAndFilament()
     {
         m_button_delete = new Button(this, _L("Delete"));
         m_button_delete->SetBackgroundColor(btn_bg_white);
-        m_button_delete->SetBorderColor(wxColour(38, 46, 48));
+        m_button_delete->SetBorderColor(wxColour(27, 47, 59));
         //m_button_delete->SetTextColor(wxColour(0xFFFFFE));
         m_button_delete->SetFont(Label::Body_12);
         m_button_delete->SetSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -3073,7 +3073,7 @@ void ParamsPanel::layoutPrinterAndFilament()
     {
         m_button_reset = new Button(this, _L("Reset"));
         m_button_reset->SetBackgroundColor(btn_bg_white);
-        m_button_reset->SetBorderColor(wxColour(38, 46, 48));
+        m_button_reset->SetBorderColor(wxColour(27, 47, 59));
         //m_button_reset->SetTextColor(wxColour(0xFFFFFE));
         m_button_reset->SetFont(Label::Body_12);
         m_button_reset->SetSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -3140,13 +3140,13 @@ void ParamsPanel::layoutOther()
     m_tabbar_printer  = nullptr;//new TabbarCtrlPrinter(this, m_h_tabbar_printer, m_v_tabbar_printer, wxGetApp().preset_bundle);
     m_tabbar_filament = nullptr;//new TabbarCtrlFilament(this, m_h_tabbar_printer, m_v_tabbar_printer, wxGetApp().preset_bundle);
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
         std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
     {
         m_button_save = new Button(this, _L("Save"));
         m_button_save->SetBackgroundColor(btn_bg_white);
-        m_button_save->SetBorderColor(wxColour(38, 46, 48));
+        m_button_save->SetBorderColor(wxColour(27, 47, 59));
         //m_button_save->SetTextColor(wxColour(0xFFFFFE));
         m_button_save->SetFont(Label::Body_12);
         m_button_save->SetSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -3156,7 +3156,7 @@ void ParamsPanel::layoutOther()
     {
         //m_button_save_as = new Button(this, _L("Save as"));
         //m_button_save_as->SetBackgroundColor(btn_bg_white);
-        //m_button_save_as->SetBorderColor(wxColour(38, 46, 48));
+        //m_button_save_as->SetBorderColor(wxColour(27, 47, 59));
         ////m_button_save_as->SetTextColor(wxColour(0xFFFFFE));
         //m_button_save_as->SetFont(Label::Body_12);
         //m_button_save_as->SetSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -3166,7 +3166,7 @@ void ParamsPanel::layoutOther()
     {
         m_button_delete = new Button(this, _L("Delete"));
         m_button_delete->SetBackgroundColor(btn_bg_white);
-        m_button_delete->SetBorderColor(wxColour(38, 46, 48));
+        m_button_delete->SetBorderColor(wxColour(27, 47, 59));
         //m_button_delete->SetTextColor(wxColour(0xFFFFFE));
         m_button_delete->SetFont(Label::Body_12);
         m_button_delete->SetSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -3176,7 +3176,7 @@ void ParamsPanel::layoutOther()
     {
         m_button_reset = new Button(this, _L("Reset"));
         m_button_reset->SetBackgroundColor(btn_bg_white);
-        m_button_reset->SetBorderColor(wxColour(38, 46, 48));
+        m_button_reset->SetBorderColor(wxColour(27, 47, 59));
         //m_button_reset->SetTextColor(wxColour(0xFFFFFE));
         m_button_reset->SetFont(Label::Body_12);
         m_button_reset->SetSize(wxSize(FromDIP(58), FromDIP(24)));

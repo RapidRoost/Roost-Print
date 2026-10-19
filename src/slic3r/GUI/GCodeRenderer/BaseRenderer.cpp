@@ -771,7 +771,7 @@ void BaseRenderer::GCodeWindow::renderGcode(uint64_t curr_line_id, int canvas_wi
     static const ImVec4 SELECTION_RECT_COLOR = ImGuiWrapper::COL_ORANGE_DARK;
     static const ImVec4 COMMAND_COLOR = { 0.8f, 0.8f, 0.0f, 1.0f };
     const ImVec4 PARAMETERS_COLOR = m_is_dark ? ImVec4{ 1.0f, 1.0f, 1.0f, 1.0f } : ImVec4{ 0.0f, 0.0f, 0.0f, 1.0f };
-    const ImVec4 COMMENT_COLOR = m_is_dark ? ImVec4{ 0.7f, 0.7f, 0.7f, 1.0f } : ImVec4{ 0.0f, 0.0f, 0.0f, 0.7f };
+    const ImVec4 COMMENT_COLOR = m_is_dark ? ImVec4{ 0.651f, 0.710f, 0.745f, 1.0f } : ImVec4{ 0.0f, 0.0f, 0.0f, 0.7f };
 
     ImGuiWrapper& imgui = *wxGetApp().imgui();
     for (uint64_t id = start_id; id <= end_id; ++id) {
@@ -1192,7 +1192,7 @@ public:
         ImVec4 inactive_border= is_dark ? ImVec4(0.30f, 0.33f, 0.36f, 1.0f) : ImVec4(0.82f, 0.86f, 0.90f, 1.0f);
         ImVec4 active_bg      = ImGuiWrapper::COL_CREALITY;
         ImVec4 active_text    = ImVec4(1, 1, 1, 1);
-        ImVec4 inactive_text  = is_dark ? ImVec4(0.78f, 0.80f, 0.82f, 1.0f) : ImVec4(0.36f, 0.36f, 0.40f, 1.0f);
+        ImVec4 inactive_text  = is_dark ? ImVec4(0.769f, 0.808f, 0.831f, 1.0f) : ImVec4(0.290f, 0.400f, 0.471f, 1.0f);
 
         // pill border
         draw_list->AddRectFilled(pill_pos, ImVec2(pill_pos.x + pill_w, pill_pos.y + pill_h),
@@ -3924,9 +3924,9 @@ void BaseRenderer::render_all_plates_stats(const std::vector<const GCodeProcesso
     ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(1.0f, 1.0f, 1.0f, 0.6f));
     ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.016f, 0.412f, 0.663f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.016f, 0.412f, 0.663f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.42f, 0.42f, 0.42f, 1.00f));
-    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(0.93f, 0.93f, 0.93f, 1.00f));
-    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, ImVec4(0.93f, 0.93f, 0.93f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.329f, 0.439f, 0.510f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(0.918f, 0.933f, 0.941f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, ImVec4(0.918f, 0.933f, 0.941f, 1.00f));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(340.f * m_scale * imgui.scaled(1.0f / 15.0f), 0));
 
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), 0, ImVec2(0.5f, 0.5f));

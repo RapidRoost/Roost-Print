@@ -1,9 +1,9 @@
 <svg width="112" height="92" viewBox="0 0 112 92" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="filamentShade" x1="35.25" y1="29" x2="58.75" y2="29" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#383838"/>
+      <stop stop-color="#243C4C"/>
       <stop offset="0.52" stop-color="#FFFFFF"/>
-      <stop offset="1" stop-color="#2C2C2C"/>
+      <stop offset="1" stop-color="#1B303D"/>
     </linearGradient>
     <clipPath id="clip">
       <rect x="35.25" y="29" width="23.5" height="30" rx="8"/>

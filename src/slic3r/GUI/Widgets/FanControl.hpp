@@ -23,8 +23,8 @@ Description:Fan
 **************************************************/
 #define SIZE_OF_FAN_OPERATE wxSize(100, 28)
 
-#define DRAW_TEXT_COLOUR wxColour(0x898989)
-#define DRAW_OPERATE_LINE_COLOUR wxColour(0xDEDEDE)
+#define DRAW_TEXT_COLOUR wxColour(0x738E9F)
+#define DRAW_OPERATE_LINE_COLOUR wxColour(0xD9DFE3)
 
 struct RotateOffSet
 {

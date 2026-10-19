@@ -196,9 +196,9 @@ protected:
 #define SELECT_MACHINE_POPUP_SIZE wxSize(FromDIP(216), FromDIP(364))
 #define SELECT_MACHINE_LIST_SIZE wxSize(FromDIP(212), FromDIP(360))  
 #define SELECT_MACHINE_ITEM_SIZE wxSize(FromDIP(182), FromDIP(35))
-#define SELECT_MACHINE_GREY900 wxColour(38, 46, 48)
-#define SELECT_MACHINE_GREY600 wxColour(144,144,144)
-#define SELECT_MACHINE_GREY400 wxColour(206, 206, 206)
+#define SELECT_MACHINE_GREY900 wxColour(27, 47, 59)
+#define SELECT_MACHINE_GREY600 wxColour(125,148,163)
+#define SELECT_MACHINE_GREY400 wxColour(198, 208, 214)
 #define SELECT_MACHINE_BRAND wxColour(30, 144, 216)
 #define SELECT_MACHINE_REMIND wxColour(255,111,0)
 #define SELECT_MACHINE_LIGHT_GREEN wxColour(220, 240, 252)
@@ -356,7 +356,7 @@ private:
     wxString                            m_current_project_name;
     PrintDialogStatus                   m_print_status { PrintStatusInit };
     wxColour                            m_colour_def_color{wxColour(255, 255, 255)};
-    wxColour                            m_colour_bold_color{wxColour(38, 46, 48)};
+    wxColour                            m_colour_bold_color{wxColour(27, 47, 59)};
     StateColor                          m_btn_bg_enable;
     
     std::shared_ptr<int>                m_token = std::make_shared<int>(0);

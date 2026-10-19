@@ -262,7 +262,7 @@ wxWindow* CameraPopup::create_item_radiobox(wxString title, wxWindow* parent, wx
     resolution_texts.push_back(text);
     text->SetPosition(wxPoint(padding_left + radiobox->GetSize().GetWidth() + 10, (item->GetSize().GetHeight() - text->GetSize().GetHeight()) / 2));
     text->SetFont(Label::Body_13);
-    text->SetForegroundColour(0x6B6B6B);
+    text->SetForegroundColour(0x547082);
     text->Bind(wxEVT_LEFT_DOWN, [this, btn_idx](wxMouseEvent &e) {
         if (m_obj && allow_alter_resolution) {
             select_curr_radiobox(btn_idx);

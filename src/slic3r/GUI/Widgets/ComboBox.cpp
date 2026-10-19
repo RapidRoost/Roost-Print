@@ -54,14 +54,14 @@ ComboBox::ComboBox(wxWindow *parent,
     if (style & wxCB_READONLY) {
         GetTextCtrl()->Hide();
         TextInput::SetFont(Label::Body_13);
-        TextInput::SetBorderColor(StateColor(std::make_pair(0xDBDBDB, (int) StateColor::Disabled),
+        TextInput::SetBorderColor(StateColor(std::make_pair(0xD5DCE1, (int) StateColor::Disabled),
             std::make_pair(0x1877B4, (int) StateColor::Hovered),
-            std::make_pair(0xDBDBDB, (int) StateColor::Normal)));
-        TextInput::SetBackgroundColor(StateColor(std::make_pair(0xF0F0F1, (int) StateColor::Disabled),
+            std::make_pair(0xD5DCE1, (int) StateColor::Normal)));
+        TextInput::SetBackgroundColor(StateColor(std::make_pair(0xEEF1F3, (int) StateColor::Disabled),
                        std::make_pair(*wxWHITE, (int) StateColor::Focused), // ORCA updated background color for focused item
             std::make_pair(*wxWHITE, (int) StateColor::Normal)));
         TextInput::SetLabelColor(StateColor(
-            std::make_pair(wxColour("#ACACAC"), (int) StateColor::Disabled), // ORCA: Use same color for disabled text on combo boxes
+            std::make_pair(wxColour("#9FAFB9"), (int) StateColor::Disabled), // ORCA: Use same color for disabled text on combo boxes
             std::make_pair(0x000000, (int) StateColor::Normal)));
     }
     if (auto scroll = GetScrollParent(this))

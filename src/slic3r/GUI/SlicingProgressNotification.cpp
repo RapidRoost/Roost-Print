@@ -288,7 +288,7 @@ void NotificationManager::SlicingProgressNotification::render(
 			// Separator Line
 			ImVec2 separator_min = ImVec2(ImGui::GetCursorScreenPos().x + progress_child_window_padding.x, ImGui::GetCursorScreenPos().y);
 			ImVec2 separator_max = ImVec2(ImGui::GetCursorScreenPos().x + progress_child_window_padding.x + progress_panel_width, ImGui::GetCursorScreenPos().y);
-			ImGui::GetCurrentWindow()->DrawList->AddLine(separator_min, separator_max, ImColor(238, 238, 238, (int)(255 * m_current_fade_opacity)));
+			ImGui::GetCurrentWindow()->DrawList->AddLine(separator_min, separator_max, ImColor(235, 239, 241, (int)(255 * m_current_fade_opacity)));
 
 #endif
 
@@ -409,7 +409,7 @@ void Slic3r::GUI::NotificationManager::SlicingProgressNotification::render_text(
 	}
 	if(m_sp_state == SlicingProgressState::SP_PROGRESS)	{
 		//one line text
-		ImVec4 iv = m_is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.13f, 0.13f, 0.13f, 1.0f);
+		ImVec4 iv = m_is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.078f, 0.141f, 0.180f, 1.0f);
 		push_style_color(ImGuiCol_Text, iv, m_state == EState::FadingOut, m_current_fade_opacity);
 		ImGui::SetCursorScreenPos(pos);
 		imgui.text(m_text1.substr(0, m_endlines[0]).c_str());
@@ -425,9 +425,9 @@ void Slic3r::GUI::NotificationManager::SlicingProgressNotification::render_bar(c
 	ImGuiWrapper& imgui = *wxGetApp().imgui();
 
 	//ImColor progress_color = ImColor(30, 144, 216, (int)(255 * m_current_fade_opacity));
-	//ImColor bg_color = ImColor(217, 217, 217, (int)(255 * m_current_fade_opacity));
+	//ImColor bg_color = ImColor(211, 218, 223, (int)(255 * m_current_fade_opacity));
 	ImColor progress_color = ImColor(30, 144, 216, (int)(255 * m_current_fade_opacity));
-    ImColor bg_color       = ImColor(74, 74, 77, (int) (255 * m_current_fade_opacity));
+    ImColor bg_color       = ImColor(53, 81, 98, (int) (255 * m_current_fade_opacity));
 
 	ImVec2 lineStart = pos;
 	ImVec2 lineEnd = lineStart + size;
@@ -444,7 +444,7 @@ void Slic3r::GUI::NotificationManager::SlicingProgressNotification::render_bar(c
 	stream << std::fixed << std::setprecision(2) << (int)(m_percentage * 100) << "%";
 	text = stream.str();
 
-	ImVec4 iv = m_is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.13f, 0.13f, 0.13f, 1.0f);
+	ImVec4 iv = m_is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.078f, 0.141f, 0.180f, 1.0f);
 	push_style_color(ImGuiCol_Text, iv, m_state == EState::FadingOut, m_current_fade_opacity);
 	ImGui::SetCursorScreenPos(text_pos);
 	imgui.text(text.c_str());

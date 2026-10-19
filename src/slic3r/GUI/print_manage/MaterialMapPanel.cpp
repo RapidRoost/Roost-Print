@@ -68,7 +68,7 @@ PrinterColorPopPanel::PrinterColorPopPanel(wxWindow* parent, int index, PrinterC
     SetSizer(m_sizer);
 
     // Set background color
-    SetBackgroundColour(wxColour(54, 54, 56)); // Light grey background color
+    SetBackgroundColour(wxColour(36, 59, 74)); // Light grey background color
 
     // Calculate the size of the popup window to fit 4 PrinterColorItems
     int itemWidth = 60;
@@ -142,7 +142,7 @@ PrinterColorItem::PrinterColorItem(wxWindow* parent, const wxSize& size, const w
     // invalid match; NOT FOUND match filament in device
     if(m_filament_type == "")
     {
-        m_bk_color = wxColour(128,128,128);
+        m_bk_color = wxColour(104,134,152);
         m_match_index_info = "/";
     }
     else {
@@ -354,7 +354,7 @@ void MaterialMapPanel::SetMaterialMapInfo(const std::vector<ColorMatchInfo>& mat
 
         // Right arrow
         ScalableButton* rightArrow = new ScalableButton(this, wxID_ANY, "map_right_arrow", wxEmptyString, wxDefaultSize, wxDefaultPosition,wxBU_EXACTFIT | wxNO_BORDER, true, 10);
-        rightArrow->SetBackgroundColour(wxColour(75, 75, 77));
+        rightArrow->SetBackgroundColour(wxColour(54, 81, 98));
         itemSizer->Add(rightArrow, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
 
         PrinterColorItem* printerColorItem = new PrinterColorItem(this, wxSize(60, 45), mapInfo.matchColor, mapInfo.materialId, mapInfo.matchFilamentType, mapInfo.extruderId, this->related_printer_ip);

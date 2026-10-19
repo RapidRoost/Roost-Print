@@ -123,7 +123,7 @@ KBShortcutsDialog::KBShortcutsDialog()
     wxBoxSizer *m_sizer_top = new wxBoxSizer(wxVERTICAL);
 
     auto m_top_line = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_top_line->SetBackgroundColour(wxColour(166, 169, 170));
+    m_top_line->SetBackgroundColour(wxColour(154, 171, 182));
 
     m_sizer_top->Add(m_top_line, 0, wxEXPAND, 0);
     m_sizer_body = new wxBoxSizer(wxHORIZONTAL);
@@ -429,7 +429,7 @@ wxWindow *KBShortcutsDialog::create_button(int id, wxString text)
 
     auto stext = new wxStaticText(tab_button, wxID_ANY, text, wxDefaultPosition, wxDefaultSize, 0);
     stext->SetFont(::Label::Body_13);
-    stext->SetForegroundColour(wxColour(38, 46, 48));
+    stext->SetForegroundColour(wxColour(27, 47, 59));
     stext->Wrap(-1);
     sizer->Add(stext, 1, wxALIGN_CENTER, 0);
 

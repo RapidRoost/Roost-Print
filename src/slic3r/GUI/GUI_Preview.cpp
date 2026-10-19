@@ -734,7 +734,7 @@ void Preview::load_print_as_fff(bool keep_z_range, bool only_gcode)
                 color_print_values = wxGetApp().plater()->model().get_curr_plate_custom_gcodes().gcodes;
             else
                 color_print_values = m_canvas->get_custom_gcode_per_print_z();
-            colors.push_back("#808080"); // gray color for pause print or custom G-code
+            colors.push_back("#688698"); // gray color for pause print or custom G-code
         }
     }
     else if (gcode_preview_data_valid || gcode_view_type == EViewType::Tool) {

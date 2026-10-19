@@ -25,7 +25,7 @@ GuidePanel::GuidePanel(wxWindow* parent) : wxPanel(parent)
 
     m_MainPanel  = new wxPanel(this);
     bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
-    m_MainPanel->SetBackgroundColour(is_dark ? wxColor("#373739") : wxColor("#ffffff"));
+    m_MainPanel->SetBackgroundColour(is_dark ? wxColor("#243C4C") : wxColor("#ffffff"));
     m_MainPanel->SetSizer(verSizer);
     horSizer->Add(m_MainPanel, 1, wxEXPAND | wxALL, 0);
 
@@ -33,8 +33,8 @@ GuidePanel::GuidePanel(wxWindow* parent) : wxPanel(parent)
     wxBitmap   imgTip = createScaledBitmap("userGuide_step1", m_MainPanel, 17, wxDefaultSize);
     StaticBox* imgBox = new StaticBox(m_MainPanel);
     imgBox->SetCornerRadius(6);
-    imgBox->SetBorderColor(is_dark ? wxColor("#505052") : wxColor("#ffffff"));
-    imgBox->SetBackgroundColor(is_dark ? wxColor("#373739") : wxColor("#e1e4e9"));
+    imgBox->SetBorderColor(is_dark ? wxColor("#3A5668") : wxColor("#ffffff"));
+    imgBox->SetBackgroundColor(is_dark ? wxColor("#243C4C") : wxColor("#e1e4e9"));
     imgBox->SetBorderWidth(is_dark ? 2 : 0);
     imgBox->SetSize(imgSize);
     imgBox->SetMinSize(imgSize);
@@ -48,7 +48,7 @@ GuidePanel::GuidePanel(wxWindow* parent) : wxPanel(parent)
     imgSizer->AddStretchSpacer();
     verSizer->Add(imgBox, 0, wxALL | wxALIGN_CENTRE_HORIZONTAL, FromDIP(12));
 
-    const wxColour font_bg = wxGetApp().dark_mode() ? wxColour("#4B4B4D") : wxColour("#FFFFFF");
+    const wxColour font_bg = wxGetApp().dark_mode() ? wxColour("#365162") : wxColour("#FFFFFF");
     const wxColour font_fg = wxGetApp().dark_mode() ? wxColour("#FFFFFF") : wxColour("#000000");
 
     std::string frontText = m_TipsFront.ToStdString();
@@ -94,17 +94,17 @@ GuidePanel::GuidePanel(wxWindow* parent) : wxPanel(parent)
     btns->AddStretchSpacer();
 
     StateColor report_bg(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled),
-                         std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
+                         std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
                          std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Hovered),
                          std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled),
                          std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
 
-    StateColor report_bd(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled),
+    StateColor report_bd(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled),
                          std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Hovered),
                          std::pair<wxColour, int>(wxColour(166, 172, 180), StateColor::Enabled));
 
-    StateColor report_text(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled),
-                           std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+    StateColor report_text(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled),
+                           std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
 
     m_SkipBtn = new Button(m_MainPanel, _L("Skip"));
     m_SkipBtn->SetBackgroundColor(report_bg);

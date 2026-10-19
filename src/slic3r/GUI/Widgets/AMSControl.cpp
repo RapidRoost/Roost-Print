@@ -618,7 +618,7 @@ Description:AMSLib
 **************************************************/
 AMSLib::AMSLib(wxWindow *parent, Caninfo info)
 {
-    m_border_color   = (wxColour(130, 130, 128));
+    m_border_color   = (wxColour(105, 134, 153));
     m_road_def_color = AMS_CONTROL_GRAY500;
     wxWindow::SetBackgroundColour(AMS_CONTROL_DEF_BLOCK_BK_COLOUR);
     create(parent);
@@ -1260,7 +1260,7 @@ void AMSLib::render_generic_lib(wxDC &dc)
 #endif
             }
             if (tmp_lib_colour.Red() > 238 && tmp_lib_colour.Green() > 238 && tmp_lib_colour.Blue() > 238) {
-                dc.SetPen(wxPen(wxColour(130, 129, 128), 1, wxSOLID));
+                dc.SetPen(wxPen(wxColour(105, 134, 153), 1, wxSOLID));
                 dc.SetBrush(wxBrush(*wxTRANSPARENT_BRUSH));
                 dc.DrawLine(FromDIP(4), FromDIP(4) + top, size.x - FromDIP(4), FromDIP(4) + top);
             }
@@ -1268,7 +1268,7 @@ void AMSLib::render_generic_lib(wxDC &dc)
         else {
             dc.SetBrush(wxBrush(*wxTRANSPARENT_BRUSH));
             if (tmp_lib_colour.Red() > 238 && tmp_lib_colour.Green() > 238 && tmp_lib_colour.Blue() > 238) {
-                dc.SetPen(wxPen(wxColour(130, 129, 128), 2, wxSOLID));
+                dc.SetPen(wxPen(wxColour(105, 134, 153), 2, wxSOLID));
             }
             else {
                 dc.SetPen(wxPen(tmp_lib_colour, 2, wxSOLID));
@@ -1285,7 +1285,7 @@ void AMSLib::render_generic_lib(wxDC &dc)
     }
 
     //border
-    dc.SetPen(wxPen(wxColour(130, 130, 128), 1, wxSOLID));
+    dc.SetPen(wxPen(wxColour(105, 134, 153), 1, wxSOLID));
     dc.SetBrush(wxBrush(*wxTRANSPARENT_BRUSH));
 #ifdef __APPLE__
     dc.DrawRoundedRectangle(FromDIP(4), FromDIP(4), size.x - FromDIP(7), size.y - FromDIP(7), m_radius);
@@ -2542,13 +2542,13 @@ AMSControl::AMSControl(wxWindow *parent, wxWindowID id, const wxPoint &pos, cons
                             std::pair<wxColour, int>(AMS_CONTROL_BRAND_COLOUR, StateColor::Enabled));
 
     StateColor btn_bd_white(std::pair<wxColour, int>(wxColour(255,255,254), StateColor::Disabled), 
-                            std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+                            std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
 
     StateColor btn_text_green(std::pair<wxColour, int>(wxColour(255,255,254), StateColor::Disabled), 
                               std::pair<wxColour, int>(wxColour(255,255,254), StateColor::Enabled));
 
     StateColor btn_text_white(std::pair<wxColour, int>(wxColour(255, 255, 254), StateColor::Disabled),
-                              std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+                              std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
 
     m_button_area = new wxWindow(m_amswin, wxID_ANY);
     m_button_area->SetBackgroundColour(m_amswin->GetBackgroundColour());

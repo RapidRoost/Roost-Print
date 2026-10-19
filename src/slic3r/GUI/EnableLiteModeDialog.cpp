@@ -48,7 +48,7 @@ EnableLiteModeDialog::EnableLiteModeDialog(wxWindow* parent, wxWindowID id, cons
     SetBackgroundColour(*wxWHITE);
     m_sizer_main = new wxBoxSizer(wxVERTICAL);
     auto        m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(FromDIP(540), 1));
-    m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
     m_sizer_main->Add(m_line_top, 0, wxEXPAND, 0);
     m_sizer_main->Add(0, 0, 0, wxTOP, FromDIP(5));
 
@@ -92,8 +92,8 @@ EnableLiteModeDialog::EnableLiteModeDialog(wxWindow* parent, wxWindowID id, cons
     StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal));
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(220, 220, 220), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal));
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(wxColour(215, 221, 225), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Normal));
 
     m_button_ok = new Button(this, _L("Enable"));
     m_button_ok->SetBackgroundColor(wxColour("#1E90D8"));

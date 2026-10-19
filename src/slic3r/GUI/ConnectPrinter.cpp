@@ -41,7 +41,7 @@ ConnectPrinterDialog::ConnectPrinterDialog(wxWindow *parent, wxWindowID id, cons
     m_textCtrl_code->GetTextCtrl()->SetSize(wxSize(-1, FromDIP(22)));
     m_textCtrl_code->GetTextCtrl()->SetMinSize(wxSize(-1, FromDIP(22)));
     m_textCtrl_code->SetBackgroundColour(*wxWHITE);
-    m_textCtrl_code->GetTextCtrl()->SetForegroundColour(wxColour(107, 107, 107));
+    m_textCtrl_code->GetTextCtrl()->SetForegroundColour(wxColour(84, 112, 130));
     sizer_connect->Add(m_textCtrl_code, 0, wxALL | wxALIGN_CENTER_VERTICAL, 0);
 
     sizer_connect->Add(FromDIP(20), 0);

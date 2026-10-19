@@ -46,7 +46,7 @@ static wxColour dark_or(const wxColour& light, const wxColour& dark)
 
 static wxColour texture_import_gray9000()
 {
-    return wxColour(38, 46, 48);
+    return wxColour(27, 47, 59);
 }
 
 static wxColour texture_import_text_colour()
@@ -56,7 +56,7 @@ static wxColour texture_import_text_colour()
 
 static wxColour texture_import_separator_colour()
 {
-    return StateColor::darkModeColorFor(wxColour("#CECECE"));
+    return StateColor::darkModeColorFor(wxColour("#C6D0D6"));
 }
 
 static wxFont texture_import_section_title_font(wxWindow* win)
@@ -115,7 +115,7 @@ static bool needs_filament_swatch_border(const wxColour& colour)
 
 static wxColour filament_swatch_border_colour()
 {
-    return is_dark() ? wxColour(207, 207, 207) : wxColour(130, 130, 128);
+    return is_dark() ? wxColour(200, 209, 214) : wxColour(105, 134, 153);
 }
 
 static void draw_filament_swatch_border(wxDC& dc, const wxColour& colour,
@@ -259,9 +259,9 @@ void GreenSlider::OnPaint(wxPaintEvent&)
     int pen_w = FromDIP(2);
 
     wxColour greenClr = IsEnabled() ? wxColour(30, 144, 216)
-                                    : dark_or(wxColour(180, 180, 180), wxColour(90, 90, 96));
-    wxColour grayClr  = IsEnabled() ? dark_or(wxColour(200, 200, 200), wxColour(90, 90, 96))
-                                    : dark_or(wxColour(220, 220, 220), wxColour(70, 70, 76));
+                                    : dark_or(wxColour(168, 183, 192), wxColour(70, 98, 116));
+    wxColour grayClr  = IsEnabled() ? dark_or(wxColour(191, 202, 209), wxColour(70, 98, 116))
+                                    : dark_or(wxColour(215, 221, 225), wxColour(51, 78, 95));
 
     int tx = xFromValue();
 
@@ -344,7 +344,7 @@ static wxString filament_name_to_wx_string(const std::string& name)
 static std::string texture_normalize_color_hex(std::string hex)
 {
     if (hex.empty())
-        return "#808080";
+        return "#688698";
     if (hex.front() != '#')
         hex = "#" + hex;
     return decompose_normalize_color_hex(std::move(hex));
@@ -754,7 +754,7 @@ private:
             ? wxColour((unsigned char)(m_colors_rgba[idx][0] * 255.f),
                        (unsigned char)(m_colors_rgba[idx][1] * 255.f),
                        (unsigned char)(m_colors_rgba[idx][2] * 255.f))
-            : wxColour(128, 128, 128);
+            : wxColour(104, 134, 152);
 
         wxString name_str = (idx < m_names.size()) ? filament_name_to_wx_string(m_names[idx])
                                                     : wxString::Format("Filament %d", display_number((int)idx));
@@ -837,7 +837,7 @@ private:
         wxColour row_bg    = dark_or(*wxWHITE, wxColour(0x2D, 0x2D, 0x31));
         wxColour hover_bg  = dark_or(wxColour(245, 245, 245), wxColour(0x3C, 0x3C, 0x42));
         wxColour name_fg   = texture_import_text_colour();
-        wxColour plus_fg   = dark_or(wxColour(38, 46, 48), wxColour(0xE6, 0xE6, 0xE8));
+        wxColour plus_fg   = dark_or(wxColour(27, 47, 59), wxColour(0xE6, 0xE6, 0xE8));
         const int idx = entry.dialog_index;
 
         wxPanel* row = new wxPanel(m_content, wxID_ANY, wxDefaultPosition, wxSize(-1, row_h));
@@ -874,7 +874,7 @@ private:
 
                 const unsigned int comp_id = entry.mixed_components[ci];
                 const int comp_dialog_idx = comp_id >= 1 ? (int)comp_id - 1 : -1;
-                wxColour comp_clr("#D9D9D9");
+                wxColour comp_clr("#D3DADF");
                 if (comp_dialog_idx >= 0 && comp_dialog_idx < (int)m_colors_rgba.size()) {
                     const auto& c = m_colors_rgba[comp_dialog_idx];
                     comp_clr = wxColour((unsigned char)(c[0] * 255.f),
@@ -1821,7 +1821,7 @@ void TextureImportDialog::build_ui()
     wxBoxSizer* root_sizer = new wxBoxSizer(wxVERTICAL);
 
     auto line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1));
-    line_top->SetBackgroundColour(dark_or(wxColour(166, 169, 170), wxColour(80, 80, 86)));
+    line_top->SetBackgroundColour(dark_or(wxColour(154, 171, 182), wxColour(60, 88, 106)));
     root_sizer->Add(line_top, 0, wxEXPAND);
 
     wxBoxSizer* main_sizer = new wxBoxSizer(wxVERTICAL);
@@ -1870,8 +1870,8 @@ void TextureImportDialog::build_ui()
 
 void TextureImportDialog::build_preview_panel(wxWindow* parent, wxSizer* sizer)
 {
-    wxColour preview_bg = dark_or(wxColour(238, 238, 238), wxColour(0x31, 0x31, 0x31));
-    wxColour preview_bd = dark_or(wxColour(206, 206, 206), wxColour(0x54, 0x54, 0x5B));
+    wxColour preview_bg = dark_or(wxColour(235, 239, 241), wxColour(0x31, 0x31, 0x31));
+    wxColour preview_bd = dark_or(wxColour(198, 208, 214), wxColour(0x54, 0x54, 0x5B));
 
     wxPanel* preview_container = new wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
     preview_container->SetBackgroundColour(preview_bg);
@@ -2038,12 +2038,12 @@ void TextureImportDialog::build_params_panel(wxWindow* parent, wxSizer* sizer)
             std::pair<wxColour, int>(wxColour(30, 93, 133), StateColor::Pressed | StateColor::Checked),
             std::pair<wxColour, int>(wxColour(65, 147, 199), StateColor::Hovered | StateColor::Checked),
             std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Checked),
-            std::pair<wxColour, int>(dark_or(wxColour(206, 206, 206), wxColour(0x54, 0x54, 0x5B)), StateColor::Pressed),
-            std::pair<wxColour, int>(dark_or(wxColour(238, 238, 238), wxColour(0x4C, 0x4C, 0x55)), StateColor::Hovered),
+            std::pair<wxColour, int>(dark_or(wxColour(198, 208, 214), wxColour(0x54, 0x54, 0x5B)), StateColor::Pressed),
+            std::pair<wxColour, int>(dark_or(wxColour(235, 239, 241), wxColour(0x4C, 0x4C, 0x55)), StateColor::Hovered),
             std::pair<wxColour, int>(dark_or(wxColour(255, 255, 255), wxColour(0x2D, 0x2D, 0x31)), StateColor::Normal));
         StateColor preset_bd(
             std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Checked),
-            std::pair<wxColour, int>(dark_or(wxColour(206, 206, 206), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
+            std::pair<wxColour, int>(dark_or(wxColour(198, 208, 214), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
         StateColor preset_text(
             std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Checked),
             std::pair<wxColour, int>(dark_or(wxColour(50, 58, 61), wxColour(0xEF, 0xEF, 0xF0)), StateColor::Normal));
@@ -2110,8 +2110,8 @@ void TextureImportDialog::build_params_panel(wxWindow* parent, wxSizer* sizer)
 
     {
         StateColor btn_bg_white(
-            std::pair<wxColour, int>(dark_or(wxColour(206, 206, 206), wxColour(0x54, 0x54, 0x5B)), StateColor::Pressed),
-            std::pair<wxColour, int>(dark_or(wxColour(238, 238, 238), wxColour(0x4C, 0x4C, 0x55)), StateColor::Hovered),
+            std::pair<wxColour, int>(dark_or(wxColour(198, 208, 214), wxColour(0x54, 0x54, 0x5B)), StateColor::Pressed),
+            std::pair<wxColour, int>(dark_or(wxColour(235, 239, 241), wxColour(0x4C, 0x4C, 0x55)), StateColor::Hovered),
             std::pair<wxColour, int>(dark_or(wxColour(255, 255, 255), wxColour(0x2D, 0x2D, 0x31)), StateColor::Normal));
         StateColor btn_bd_green(
             std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal));
@@ -2201,7 +2201,7 @@ void TextureImportDialog::build_mapping_panel(wxWindow* parent, wxSizer* sizer)
     wxBoxSizer* content_sizer = new wxBoxSizer(wxVERTICAL);
     sizer = content_sizer;
 
-    wxColour secondary_fg = dark_or(wxColour(107, 107, 107), wxColour(0x81, 0x81, 0x83));
+    wxColour secondary_fg = dark_or(wxColour(84, 112, 130), wxColour(0x81, 0x81, 0x83));
 
     wxBoxSizer* header_sizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -2247,7 +2247,7 @@ void TextureImportDialog::build_mapping_panel(wxWindow* parent, wxSizer* sizer)
             std::pair<wxColour, int>(dark_or(wxColour(248, 248, 248), wxColour(0x35, 0x35, 0x3A)), StateColor::Hovered),
             std::pair<wxColour, int>(dark_or(*wxWHITE, wxColour(0x2D, 0x2D, 0x31)), StateColor::Normal));
         StateColor btn_bd(
-            std::pair<wxColour, int>(dark_or(wxColour(206, 206, 206), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
+            std::pair<wxColour, int>(dark_or(wxColour(198, 208, 214), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
         StateColor btn_text(
             std::pair<wxColour, int>(texture_import_text_colour(), StateColor::Normal));
         m_combo_auto_mix->SetBackgroundColor(btn_bg);
@@ -2262,7 +2262,7 @@ void TextureImportDialog::build_mapping_panel(wxWindow* parent, wxSizer* sizer)
         drop.SetMaxVisibleItems(2);
         drop.SetBackgroundColour(dark_or(*wxWHITE, wxColour(0x2D, 0x2D, 0x31)));
         drop.SetBorderColor(StateColor(
-            std::pair<wxColour, int>(dark_or(wxColour(206, 206, 206), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal)));
+            std::pair<wxColour, int>(dark_or(wxColour(198, 208, 214), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal)));
         drop.SetTextColor(StateColor(std::pair<wxColour, int>(texture_import_text_colour(), StateColor::Normal)));
         drop.SetSelectorBorderColor(StateColor(
             std::pair<wxColour, int>(wxColour(0x15, 0xBF, 0x59), StateColor::Hovered),
@@ -2330,13 +2330,13 @@ void TextureImportDialog::build_bottom_buttons(wxBoxSizer* sizer)
     m_btn_skip->SetMinSize(wxSize(FromDIP(136), FromDIP(40)));
     {
         StateColor skip_bg(
-            std::pair<wxColour, int>(dark_or(wxColour(206, 206, 206), wxColour(0x54, 0x54, 0x5B)), StateColor::Pressed),
-            std::pair<wxColour, int>(dark_or(wxColour(238, 238, 238), wxColour(0x4C, 0x4C, 0x55)), StateColor::Hovered),
+            std::pair<wxColour, int>(dark_or(wxColour(198, 208, 214), wxColour(0x54, 0x54, 0x5B)), StateColor::Pressed),
+            std::pair<wxColour, int>(dark_or(wxColour(235, 239, 241), wxColour(0x4C, 0x4C, 0x55)), StateColor::Hovered),
             std::pair<wxColour, int>(dark_or(wxColour(255, 255, 255), wxColour(0x2D, 0x2D, 0x31)), StateColor::Normal));
         StateColor skip_bd(
-            std::pair<wxColour, int>(dark_or(wxColour(206, 206, 206), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
+            std::pair<wxColour, int>(dark_or(wxColour(198, 208, 214), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
         StateColor skip_text(
-            std::pair<wxColour, int>(dark_or(wxColour(107, 107, 107), wxColour(0xB3, 0xB3, 0xB5)), StateColor::Normal));
+            std::pair<wxColour, int>(dark_or(wxColour(84, 112, 130), wxColour(0xB3, 0xB3, 0xB5)), StateColor::Normal));
         m_btn_skip->SetBackgroundColor(skip_bg);
         m_btn_skip->SetBorderColor(skip_bd);
         m_btn_skip->SetTextColor(skip_text);
@@ -2412,11 +2412,11 @@ void TextureImportDialog::update_ui_for_state()
     if (ready && valid && is_params_dirty()) {
         m_btn_ok->Enable(true);
         StateColor gray_bg(
-            std::pair<wxColour, int>(dark_or(wxColour(206, 206, 206), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
+            std::pair<wxColour, int>(dark_or(wxColour(198, 208, 214), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
         StateColor gray_bd(
-            std::pair<wxColour, int>(dark_or(wxColour(206, 206, 206), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
+            std::pair<wxColour, int>(dark_or(wxColour(198, 208, 214), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
         StateColor gray_text(
-            std::pair<wxColour, int>(dark_or(wxColour(107, 107, 107), wxColour(0xB3, 0xB3, 0xB5)), StateColor::Normal));
+            std::pair<wxColour, int>(dark_or(wxColour(84, 112, 130), wxColour(0xB3, 0xB3, 0xB5)), StateColor::Normal));
         m_btn_ok->SetBackgroundColor(gray_bg);
         m_btn_ok->SetBorderColor(gray_bd);
         m_btn_ok->SetTextColor(gray_text);
@@ -2611,7 +2611,7 @@ void TextureImportDialog::on_computation_complete(wxCommandEvent&)
     for (size_t i = 0; i < m_filament_entries.size(); ++i) {
         m_filament_entries[i].dialog_index = (int)i;
         m_filament_entries[i].color_hex = i < m_filament_color_strs.size() ?
-            texture_normalize_color_hex(m_filament_color_strs[i]) : "#808080";
+            texture_normalize_color_hex(m_filament_color_strs[i]) : "#688698";
         m_filament_entries[i].name = i < m_filament_names.size() ?
             m_filament_names[i] : "Filament " + std::to_string(i + 1);
     }
@@ -2728,8 +2728,8 @@ void TextureImportDialog::on_mesh_repair_decision_required(wxCommandEvent&)
     StateColor primary_text(
         std::pair<wxColour, int>(wxColour("#FFFFFE"), StateColor::Normal));
     StateColor secondary_bg(
-        std::pair<wxColour, int>(wxColour("#CECECE"), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour("#EEEEEE"), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour("#C6D0D6"), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour("#EBEFF1"), StateColor::Hovered),
         std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
     StateColor secondary_bd(
         std::pair<wxColour, int>(texture_import_gray9000(), StateColor::Normal));
@@ -3752,7 +3752,7 @@ void TextureImportDialog::rebuild_mapping_rows()
                             (unsigned char)(c[1] * 255.f),
                             (unsigned char)(c[2] * 255.f));
         }
-        return wxColour(128, 128, 128);
+        return wxColour(104, 134, 152);
     };
 
     const auto display_numbers = compute_display_numbers();
@@ -3767,14 +3767,14 @@ void TextureImportDialog::rebuild_mapping_rows()
         return wxString::Format("Filament %d", display_number(idx));
     };
 
-    const wxColour dash_clr   = dark_or(wxColour(179, 179, 179), wxColour(100, 100, 106));
+    const wxColour dash_clr   = dark_or(wxColour(167, 182, 191), wxColour(80, 108, 126));
     const wxColour hex_fg     = texture_import_text_colour();
-    const wxColour card_bg    = dark_or(wxColour(235, 235, 235), wxColour(0x3C, 0x3C, 0x42));
-    const wxColour card_bd    = dark_or(wxColour(224, 224, 224), wxColour(0x46, 0x46, 0x4C));
+    const wxColour card_bg    = dark_or(wxColour(232, 236, 238), wxColour(0x3C, 0x3C, 0x42));
+    const wxColour card_bd    = dark_or(wxColour(219, 225, 229), wxColour(0x46, 0x46, 0x4C));
     const wxColour name_fg    = texture_import_text_colour();
-    const wxColour chev_clr   = dark_or(wxColour(107, 107, 107), wxColour(0xB3, 0xB3, 0xB5));
-    // dark_or(light, dark): #EFF0F6 in light mode, #2B2B2B in dark mode.
-    const wxColour src_bg     = dark_or(wxColour("#EFF0F6"), wxColour("#2B2B2B"));
+    const wxColour chev_clr   = dark_or(wxColour(84, 112, 130), wxColour(0xB3, 0xB3, 0xB5));
+    // dark_or(light, dark): #EFF0F6 in light mode, #1B2F3B in dark mode.
+    const wxColour src_bg     = dark_or(wxColour("#EFF0F6"), wxColour("#1B2F3B"));
 
     m_mapping_rows.resize(m_current_matches.size());
     for (size_t ci = 0; ci < m_current_matches.size(); ++ci) {
@@ -3933,7 +3933,7 @@ void TextureImportDialog::rebuild_mapping_rows()
 
                     const unsigned int comp_id = entry.mixed_components[mi];
                     const int comp_idx = comp_id >= 1 ? (int)comp_id - 1 : -1;
-                    wxColour comp_clr("#D9D9D9");
+                    wxColour comp_clr("#D3DADF");
                     if (comp_idx >= 0 && comp_idx < (int)m_filament_colors_rgba.size()) {
                         const auto& c = m_filament_colors_rgba[comp_idx];
                         comp_clr = wxColour((unsigned char)(c[0] * 255.f),
@@ -4209,7 +4209,7 @@ void TextureImportDialog::highlight_view_button(int view_index)
     StateColor inactive_bd(
         std::pair<wxColour, int>(dark_or(wxColour(255, 255, 255), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
     StateColor inactive_text(
-        std::pair<wxColour, int>(dark_or(wxColour(104, 104, 104), wxColour(0xD0, 0xD0, 0xD2)), StateColor::Normal));
+        std::pair<wxColour, int>(dark_or(wxColour(81, 109, 127), wxColour(0xD0, 0xD0, 0xD2)), StateColor::Normal));
 
     for (int i = 0; i < 2; ++i) {
         if (!btns[i]) continue;
@@ -4310,11 +4310,11 @@ void TextureImportDialog::update_confirm_button_state()
 
     if (dirty) {
         StateColor gray_bg(
-            std::pair<wxColour, int>(dark_or(wxColour(206, 206, 206), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
+            std::pair<wxColour, int>(dark_or(wxColour(198, 208, 214), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
         StateColor gray_bd(
-            std::pair<wxColour, int>(dark_or(wxColour(206, 206, 206), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
+            std::pair<wxColour, int>(dark_or(wxColour(198, 208, 214), wxColour(0x54, 0x54, 0x5B)), StateColor::Normal));
         StateColor gray_text(
-            std::pair<wxColour, int>(dark_or(wxColour(107, 107, 107), wxColour(0xB3, 0xB3, 0xB5)), StateColor::Normal));
+            std::pair<wxColour, int>(dark_or(wxColour(84, 112, 130), wxColour(0xB3, 0xB3, 0xB5)), StateColor::Normal));
         m_btn_ok->SetBackgroundColor(gray_bg);
         m_btn_ok->SetBorderColor(gray_bd);
         m_btn_ok->SetTextColor(gray_text);

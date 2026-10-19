@@ -326,20 +326,20 @@ wxBitmap* BitmapCache::load_svg(const std::string &bitmap_name, unsigned target_
     replaces["\"#0x1E90D8\""] = "\"#1E90D8\"";
     replaces["\"#00FF00\""] = "\"#5599c4\"";
     if (dark_mode) {
-        replaces["\"#262E30\""] = "\"#EFEFF0\"";
-        replaces["\"#323A3D\""] = "\"#B3B3B5\"";
-        replaces["\"#808080\""] = "\"#818183\"";
-        //replaces["\"#ACACAC\""] = "\"#54545A\"";
-        replaces["\"#CECECE\""] = "\"#54545B\"";
-        replaces["\"#6B6B6B\""] = "\"#818182\"";
-        replaces["\"#909090\""] = "\"#FFFFFF\"";
+        replaces["\"#1B2F3B\""] = "\"#EDF0F2\"";
+        replaces["\"#323A3D\""] = "\"#A8B7C0\"";
+        replaces["\"#688698\""] = "\"#6A879A\"";
+        //replaces["\"#9FAFB9\""] = "\"#405C6E\"";
+        replaces["\"#C6D0D6\""] = "\"#415D6E\"";
+        replaces["\"#547082\""] = "\"#6A8799\"";
+        replaces["\"#7D94A3\""] = "\"#FFFFFF\"";
         replaces["\"#00FF00\""] = "\"#FF0000\"";
         replaces["\"#1E90D8\""] = "\"#033f64\"";
-        replaces["#DBDBDB"] = "#4A4A51"; // ORCA border color
-        replaces["#F0F0F1"] = "#404040"; // ORCA disabled background color
-        replaces["#262E30"] = "#EFEFF0"; // ORCA
+        replaces["#D5DCE1"] = "#375364"; // ORCA border color
+        replaces["#EEF1F3"] = "#2B4555"; // ORCA disabled background color
+        replaces["#1B2F3B"] = "#EDF0F2"; // ORCA
     } else {
-        replaces["#EDEDED"] = "#7C8282"; // ORCA replace icon line color for light theme
+        replaces["#EAEEF0"] = "#668598"; // ORCA replace icon line color for light theme
     }
 
     if (strstr(bitmap_name.c_str(), "toggle_on") != NULL && dark_mode) // ORCA only replace color of toggle button
@@ -403,7 +403,7 @@ wxBitmap* BitmapCache::load_svg2(const std::string& bitmap_name, unsigned target
 
     std::map<std::string, std::string> replaces;
     if (array_new_color.size() == 2) {
-        replaces["#D9D9D9"] = array_new_color[0];
+        replaces["#D3DADF"] = array_new_color[0];
         replaces["fill-opacity=\"1.0"] = array_new_color[1];
     }
     

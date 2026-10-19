@@ -4,17 +4,17 @@
  width="300.5px" height="147.5px">
 <path fill-rule="evenodd"  fill="none"
  d="M-0.002,-0.001 L299.998,-0.001 L299.998,146.999 L-0.002,146.999 L-0.002,-0.001 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(111, 111, 111)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(88, 116, 134)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M53.999,24.000 L245.999,24.000 L245.999,96.000 L53.999,96.000 L53.999,24.000 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(111, 111, 111)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(88, 116, 134)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M33.999,52.000 L265.999,52.000 L263.000,124.000 L36.999,124.000 L33.999,52.000 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(111, 111, 111)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(88, 116, 134)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M54.999,25.000 L34.999,52.000 "/>
-<path fill-rule="evenodd"  stroke="rgb(111, 111, 111)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(88, 116, 134)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M245.999,24.000 L266.999,52.000 "/>
-<path fill-rule="evenodd"  stroke="rgb(111, 111, 111)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(88, 116, 134)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M54.999,97.000 L39.000,123.000 "/>
-<path fill-rule="evenodd"  stroke="rgb(111, 111, 111)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(88, 116, 134)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M246.999,96.000 L262.000,123.000 "/>
 <path fill-rule="evenodd"  fill="rgb(30, 144, 216)"
  d="M50.998,103.000 L142.361,103.000 C145.122,103.000 147.361,105.238 147.361,107.999 L147.361,108.000 C147.361,110.761 145.122,112.999 142.361,112.999 L50.998,112.999 C48.237,112.999 45.998,110.761 45.998,108.000 L45.998,107.999 C45.998,105.238 48.237,103.000 50.998,103.000 Z"/>

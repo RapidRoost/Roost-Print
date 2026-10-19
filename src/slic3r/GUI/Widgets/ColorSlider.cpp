@@ -173,9 +173,9 @@ void ColorSlider::UpdatePaletteFromEnv()
 {
     const bool dark = IsDarkAppearance();
     if (dark) {
-        mTrackBg   = wxColour(43, 43, 43);
+        mTrackBg   = wxColour(27, 47, 59);
         mThumbFill = wxColour(30, 144, 216);
-        mThumbRing = wxColour(219, 219, 219);
+        mThumbRing = wxColour(213, 220, 225);
     } else {
         mTrackBg   = wxColour(225, 228, 233);
         mThumbFill = wxColour(25, 125, 188);

@@ -1147,7 +1147,7 @@ public:
             wxMemoryDC memDC;
             memDC.SelectObject(bitmap);
             memDC.SetFont(m_action_font);
-            memDC.SetTextForeground(StateColor::darkModeColorFor(wxColour(144, 144, 144)));
+            memDC.SetTextForeground(StateColor::darkModeColorFor(wxColour(125, 148, 163)));
             int width = bitmap.GetWidth();
             //int text_height = memDC.GetTextExtent(text).GetHeight();
             //int text_width = memDC.GetTextExtent(text).GetWidth();
@@ -2133,13 +2133,7 @@ void GUI_App::switch_to_tab(const std::string& tabName)
     if (tabName == "tpHome") {
         mainframe->select_tab(MainFrame::tpHome);
     }
-    else if (tabName == "tpOnlineModel") {
-        mainframe->select_tab(MainFrame::tpOnlineModel);
-        wxCommandEvent e = wxCommandEvent(wxCUSTOMEVT_NOTEBOOK_SEL_CHANGED);
-        e.SetId(MainFrame::TabPosition::tpOnlineModel); // printer details page
-        wxPostEvent(wxGetApp().mainframe->topbar(), e);
-        //mainframe->m_topbar->SetSelection(size_t(MainFrame::tpOnlineModel));
-    }
+    // Roost Print: no Online Models tab to switch to.
 }
 
 void GUI_App::post_init()
@@ -5005,6 +4999,7 @@ bool GUI_App::on_init_inner(bool isdump_launcher)
             init_user_profile();
             init_params->preset_substitutions = preset_bundle->load_presets(*app_config, ForwardCompatibilitySubstitutionRule::EnableSystemSilent);
             roost_install_fleet();
+            roost_apply_polymaker();
         }catch(ConfigurationError &ex)
         {
             int ret = wxMessageBox(_L("Detected corruption in the Creality Print configuration file, attempted to rebuild, \nplease manually restart the software."), _L("Error"), wxOK | wxICON_ERROR);
@@ -5613,19 +5608,19 @@ void GUI_App::init_label_colours()
 {
     bool is_dark_mode = dark_mode();
     m_color_label_modified = is_dark_mode ? wxColour("#EBC406") : wxColour("#EBC406");
-    m_color_label_sys      = is_dark_mode ? wxColour("#B2B3B5") : wxColour("#363636");
+    m_color_label_sys      = is_dark_mode ? wxColour("#A8B6BF") : wxColour("#233A49");
 
 #if defined(_WIN32) || defined(__linux__) || defined(__APPLE__)
     m_color_label_default           = is_dark_mode ? wxColour(250, 250, 250) : m_color_label_sys; // wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
-    m_color_highlight_label_default = is_dark_mode ? wxColour(230, 230, 230): wxSystemSettings::GetColour(/*wxSYS_COLOUR_HIGHLIGHTTEXT*/wxSYS_COLOUR_WINDOWTEXT);
-    m_color_highlight_default       = is_dark_mode ? wxColour(78, 78, 78)   : wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT);
+    m_color_highlight_label_default = is_dark_mode ? wxColour(226, 231, 234): wxSystemSettings::GetColour(/*wxSYS_COLOUR_HIGHLIGHTTEXT*/wxSYS_COLOUR_WINDOWTEXT);
+    m_color_highlight_default       = is_dark_mode ? wxColour(56, 83, 100)   : wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT);
     m_color_hovered_btn_label       = is_dark_mode ? wxColour(255, 255, 254) : wxColour(0,0,0);
     m_color_default_btn_label       = is_dark_mode ? wxColour(255, 255, 254): wxColour(0,0,0);
-    m_color_selected_btn_bg         = is_dark_mode ? wxColour(84, 84, 91)   : wxColour(206, 206, 206);
+    m_color_selected_btn_bg         = is_dark_mode ? wxColour(65, 93, 110)   : wxColour(198, 208, 214);
 #else
     m_color_label_default = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
 #endif
-    m_color_window_default          = is_dark_mode ? wxColour(43, 43, 43)   : wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+    m_color_window_default          = is_dark_mode ? wxColour(27, 47, 59)   : wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
     StateColor::SetDarkMode(is_dark_mode);
 }
 
@@ -8226,7 +8221,8 @@ std::string GUI_App::handle_web_request(std::string cmd)
             } else if (command_str.compare("set_begin_guide_version_mode") == 0) {
                 std:: string version_mode;
                 version_mode = root.get<std::string>("version_mode");
-                wxGetApp().app_config->set("easy_print_mode", version_mode == "ai" ? "1" : "0");
+                (void)version_mode;
+                wxGetApp().app_config->set("easy_print_mode", "0"); // Roost Print: no AI mode
                 wxGetApp().app_config->save();
                 wxGetApp().Update_easy_mode_flag();
                 mainframe->topbar()->Refresh();
@@ -13960,6 +13956,72 @@ void GUI_App::roost_install_fleet()
     }
 }
 
+// Roost Print: the shop runs on Polymaker filament. Once (and again whenever the list changes),
+// show the Polymaker profiles for the shop's printers and hide Creality's (still installed; tick
+// them back on in the filament list any time). Your own filament profiles are left as they are.
+void GUI_App::roost_apply_polymaker()
+{
+    if (!preset_bundle || !app_config)
+        return;
+    try {
+        namespace fs = boost::filesystem;
+        const fs::path list_file = fs::path(resources_dir()) / "profiles" / "Creality" / "roost_polymaker.json";
+        if (!fs::exists(list_file))
+            return;
+        boost::nowide::ifstream ifs(list_file.string());
+        nlohmann::json j;
+        ifs >> j;
+        std::vector<std::string> names;
+        for (const auto& n : j.value("filaments", nlohmann::json::array()))
+            if (n.is_string())
+                names.push_back(n.get<std::string>());
+        if (names.empty())
+            return;
+        // Only redo it when the Polymaker list itself changed, so later choices are kept.
+        const std::string stamp = std::to_string(names.size()) + ":" + names.front() + ":" + names.back();
+        if (app_config->get("roost", "polymaker_list") == stamp)
+            return;
+
+        std::map<std::string, std::string> section;
+        if (app_config->has_section(AppConfig::SECTION_FILAMENTS))
+            for (const auto& [name, value] : app_config->get_section(AppConfig::SECTION_FILAMENTS)) {
+                const Preset* p = preset_bundle->filaments.find_preset(name, false, true);
+                if (p == nullptr || !p->is_system)
+                    section[name] = value; // the user's own profiles stay on
+            }
+        int found = 0;
+        for (const auto& name : names)
+            if (preset_bundle->filaments.find_preset(name, false) != nullptr) {
+                section[name] = "true";
+                ++found;
+            }
+        if (found == 0) {
+            BOOST_LOG_TRIVIAL(warning) << "Roost Print: no Polymaker profiles found";
+            return;
+        }
+        app_config->set_section(AppConfig::SECTION_FILAMENTS, section);
+        preset_bundle->load_installed_filaments(*app_config);
+        // Start on PolyLite PLA if the current filament is now hidden.
+        const Preset& cur = preset_bundle->filaments.get_selected_preset();
+        if (!cur.is_visible || cur.is_default) {
+            const std::string pick = "PolyLite PLA @" + preset_bundle->printers.get_selected_preset_name();
+            if (preset_bundle->filaments.find_preset(pick, false) != nullptr) {
+                preset_bundle->filaments.select_preset_by_name(pick, true);
+                if (!preset_bundle->filament_presets.empty())
+                    preset_bundle->filament_presets.front() = pick;
+                else
+                    preset_bundle->filament_presets = {pick};
+            }
+        }
+        preset_bundle->export_selections(*app_config);
+        app_config->set("roost", "polymaker_list", stamp);
+        app_config->save();
+        BOOST_LOG_TRIVIAL(warning) << "Roost Print: " << found << " Polymaker filament profiles turned on";
+    } catch (const std::exception& ex) {
+        BOOST_LOG_TRIVIAL(error) << "Roost Print: setting up Polymaker filaments failed: " << ex.what();
+    }
+}
+
 bool GUI_App::config_wizard_startup()
 {
 #if defined(CREALITYPRINT_APP_STORE)
@@ -14649,7 +14711,8 @@ void GUI_App::OpenEshopRecommendedGoods(const std::string& materialColor, const 
 
 bool GUI_App::easy_mode()
 {
-    return wxGetApp().app_config->get("easy_print_mode") == "1" ? true : false;
+    // Roost Print: always the full (Pro) slicer; the AI mode is removed.
+    return false;
 }
 
 void GUI_App::Update_easy_mode_flag()

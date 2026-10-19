@@ -981,7 +981,7 @@ SelectMachineDialog::SelectMachineDialog(Plater *plater)
 
     m_sizer_main->SetMinSize(wxSize(0, -1));
     m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
 
     m_scrollable_view   = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
     m_sizer_scrollable_view = new wxBoxSizer(wxVERTICAL);
@@ -1172,8 +1172,8 @@ SelectMachineDialog::SelectMachineDialog(Plater *plater)
     m_statictext_ams_msg->Hide();
 
     m_line_materia = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line_materia->SetForegroundColour(wxColour(238, 238, 238));
-    m_line_materia->SetBackgroundColour(wxColour(238, 238, 238));
+    m_line_materia->SetForegroundColour(wxColour(235, 239, 241));
+    m_line_materia->SetBackgroundColour(wxColour(235, 239, 241));
 
     wxBoxSizer *m_sizer_printer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -1228,7 +1228,7 @@ SelectMachineDialog::SelectMachineDialog(Plater *plater)
 
     // line schedule
     m_line_schedule = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1));
-    m_line_schedule->SetBackgroundColour(wxColour(238, 238, 238));
+    m_line_schedule->SetBackgroundColour(wxColour(235, 239, 241));
 
     m_simplebook   = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, SELECT_MACHINE_DIALOG_SIMBOOK_SIZE, 0);
 
@@ -1315,9 +1315,9 @@ SelectMachineDialog::SelectMachineDialog(Plater *plater)
     auto st_title_error_code = new wxStaticText(m_sw_print_failed_info, wxID_ANY, _L("Error code"));
     auto st_title_error_code_doc = new wxStaticText(m_sw_print_failed_info, wxID_ANY,": ");
     m_st_txt_error_code = new Label(m_sw_print_failed_info, wxEmptyString);
-    st_title_error_code->SetForegroundColour(0x909090);
-    st_title_error_code_doc->SetForegroundColour(0x909090);
-    m_st_txt_error_code->SetForegroundColour(0x909090);
+    st_title_error_code->SetForegroundColour(0x7D94A3);
+    st_title_error_code_doc->SetForegroundColour(0x7D94A3);
+    m_st_txt_error_code->SetForegroundColour(0x7D94A3);
     st_title_error_code->SetFont(::Label::Body_13);
     st_title_error_code_doc->SetFont(::Label::Body_13);
     m_st_txt_error_code->SetFont(::Label::Body_13);
@@ -1333,9 +1333,9 @@ SelectMachineDialog::SelectMachineDialog(Plater *plater)
     auto st_title_error_desc = new wxStaticText(m_sw_print_failed_info, wxID_ANY, wxT("Error desc"));
     auto st_title_error_desc_doc = new wxStaticText(m_sw_print_failed_info, wxID_ANY,": ");
     m_st_txt_error_desc = new Label(m_sw_print_failed_info, wxEmptyString);
-    st_title_error_desc->SetForegroundColour(0x909090);
-    st_title_error_desc_doc->SetForegroundColour(0x909090);
-    m_st_txt_error_desc->SetForegroundColour(0x909090);
+    st_title_error_desc->SetForegroundColour(0x7D94A3);
+    st_title_error_desc_doc->SetForegroundColour(0x7D94A3);
+    m_st_txt_error_desc->SetForegroundColour(0x7D94A3);
     st_title_error_desc->SetFont(::Label::Body_13);
     st_title_error_desc_doc->SetFont(::Label::Body_13);
     m_st_txt_error_desc->SetFont(::Label::Body_13);
@@ -1350,9 +1350,9 @@ SelectMachineDialog::SelectMachineDialog(Plater *plater)
     auto st_title_extra_info = new wxStaticText(m_sw_print_failed_info, wxID_ANY, wxT("Extra info"));
     auto st_title_extra_info_doc = new wxStaticText(m_sw_print_failed_info, wxID_ANY, ": ");
     m_st_txt_extra_info = new Label(m_sw_print_failed_info, wxEmptyString);
-    st_title_extra_info->SetForegroundColour(0x909090);
-    st_title_extra_info_doc->SetForegroundColour(0x909090);
-    m_st_txt_extra_info->SetForegroundColour(0x909090);
+    st_title_extra_info->SetForegroundColour(0x7D94A3);
+    st_title_extra_info_doc->SetForegroundColour(0x7D94A3);
+    m_st_txt_extra_info->SetForegroundColour(0x7D94A3);
     st_title_extra_info->SetFont(::Label::Body_13);
     st_title_extra_info_doc->SetFont(::Label::Body_13);
     m_st_txt_extra_info->SetFont(::Label::Body_13);
@@ -1574,7 +1574,7 @@ wxWindow *SelectMachineDialog::create_ams_checkbox(wxString title, wxWindow *par
 
     auto text = new wxStaticText(checkbox, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, 0);
     text->SetFont(::Label::Body_13);
-    text->SetForegroundColour(StateColor::darkModeColorFor(wxColour("#323A3C")));
+    text->SetForegroundColour(StateColor::darkModeColorFor(wxColour("#243B4A")));
     text->Wrap(-1);
     sizer_checkbox->Add(text, 0, wxALIGN_CENTER, 0);
 
@@ -1633,7 +1633,7 @@ wxWindow *SelectMachineDialog::create_item_checkbox(wxString title, wxWindow *pa
 
     auto text = new wxStaticText(checkbox, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END);
     text->SetFont(::Label::Body_12);
-    text->SetForegroundColour(StateColor::darkModeColorFor(wxColour("#323A3C")));
+    text->SetForegroundColour(StateColor::darkModeColorFor(wxColour("#243B4A")));
     text->Wrap(-1);
     text->SetMinSize(wxSize(FromDIP(140), -1));
     text->SetMaxSize(wxSize(FromDIP(140), -1));
@@ -4697,7 +4697,7 @@ EditDevNameDialog::EditDevNameDialog(Plater *plater /*= nullptr*/)
     SetBackgroundColour(*wxWHITE);
     wxBoxSizer *m_sizer_main = new wxBoxSizer(wxVERTICAL);
     auto        m_line_top   = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
     m_sizer_main->Add(m_line_top, 0, wxEXPAND, 0);
     m_sizer_main->Add(0, 0, 0, wxTOP, FromDIP(38));
     m_textCtr = new ::TextInput(this, wxEmptyString, wxEmptyString, wxEmptyString, wxDefaultPosition, wxSize(FromDIP(260), FromDIP(40)), wxTE_PROCESS_ENTER);
@@ -4930,7 +4930,7 @@ void EditDevNameDialog::on_edit_name(wxCommandEvent &e)
      auto size = GetSize();
      dc.DrawBitmap(m_bitmap.bmp(), wxPoint(FromDIP(20), (size.y - m_bitmap.GetBmpSize().y) / 2));
      dc.SetFont(::Label::Head_13);
-     dc.SetTextForeground(wxColour(38, 46, 48));
+     dc.SetTextForeground(wxColour(27, 47, 59));
      wxString txt = _L("Bind with Pin Code");
      auto txt_size = dc.GetTextExtent(txt);
      dc.DrawText(txt, wxPoint(FromDIP(40), (size.y - txt_size.y) / 2));

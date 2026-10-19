@@ -34,9 +34,9 @@
 #include "wxExtensions.hpp"
 #include "Auxiliary.hpp"
 
-#define AUFILE_GREY700 wxColour(107, 107, 107)
-#define AUFILE_GREY500 wxColour(158, 158, 158)
-#define AUFILE_GREY300 wxColour(238, 238, 238)
+#define AUFILE_GREY700 wxColour(84, 112, 130)
+#define AUFILE_GREY500 wxColour(142, 162, 174)
+#define AUFILE_GREY300 wxColour(235, 239, 241)
 #define AUFILE_GREY200 wxColour(248, 248, 248)
 #define AUFILE_BRAND wxColour(30, 144, 216)
 #define AUFILE_BRAND_TRANSPARENT wxColour(215, 232, 222)

@@ -14,6 +14,8 @@
 #include <wx/osx/webview_webkit.h>
 #endif
 #include <wx/uri.h>
+#include <wx/base64.h>
+#include <wx/ffile.h>
 #if defined(__WIN32__) || defined(__WXMAC__)
 #include "wx/private/jsscriptwrapper.h"
 #endif
@@ -480,6 +482,53 @@ static void initialize_webview_userdata_dir()
 }
 #endif
 
+// Roost Print: Rapid Roost's fonts (Manrope for text, Orbitron for headings) on the app's own
+// pages. The web views run in their own process and can't see fonts the app registered, and
+// pages loaded from disk can't load font files from disk either, so the fonts go in as data.
+static const wxString& roost_web_theme_script()
+{
+    static wxString script;
+    if (!script.empty())
+        return script;
+    auto font_data = [](const char* file) -> wxString {
+        wxFFile f(wxString::FromUTF8(Slic3r::resources_dir() + "/fonts/" + file), "rb");
+        if (!f.IsOpened())
+            return wxString();
+        wxMemoryBuffer buf;
+        const wxFileOffset len = f.Length();
+        if (len <= 0)
+            return wxString();
+        f.Read(buf.GetWriteBuf(len), len);
+        buf.UngetWriteBuf(len);
+        return "data:font/ttf;base64," + wxBase64Encode(buf);
+    };
+    const wxString regular = font_data("Manrope-Regular.ttf");
+    const wxString bold    = font_data("Manrope-Bold.ttf");
+    const wxString display = font_data("Orbitron-Bold.ttf");
+    if (regular.empty())
+        return script = " "; // fonts missing: inject nothing (a space so this isn't rebuilt)
+    wxString css;
+    css << "@font-face{font-family:'Manrope';font-weight:100 500;src:url(" << regular << ") format('truetype');}";
+    if (!bold.empty())
+        css << "@font-face{font-family:'Manrope';font-weight:600 900;src:url(" << bold << ") format('truetype');}";
+    if (!display.empty())
+        css << "@font-face{font-family:'Orbitron';font-weight:100 900;src:url(" << display << ") format('truetype');}";
+    // Everything but icon fonts.
+    css << "html,body,body *:not(i):not([class*='icon']):not([class*='Icon']):not(code):not(pre)"
+           "{font-family:'Manrope',system-ui,'Segoe UI',sans-serif !important;}"
+           "body h1:not(#roost-x),body h2:not(#roost-x){font-family:'Orbitron','Manrope',sans-serif !important;letter-spacing:.02em;}"
+           "::selection{background:#1e90d8;color:#fff;}";
+    css.Replace("\\", "\\\\");
+    css.Replace("'", "\\'");
+    script = "(function(){try{if(location.protocol!=='file:')return;"
+             "var s=document.createElement('style');s.id='roost-theme';s.textContent=" +
+             wxString("'") + css + "';"
+             "var add=function(){if(document.getElementById('roost-theme'))return true;"
+             "var p=document.head||document.documentElement;if(!p)return false;p.appendChild(s);return true;};"
+             "if(!add())document.addEventListener('DOMContentLoaded',add);}catch(e){}})();";
+    return script;
+}
+
 wxWebView* WebView::CreateWebView(wxWindow * parent, wxString const & url)
 {
     if (g_webview_shutting_down) {
@@ -645,6 +694,9 @@ wxWebView* WebView::CreateWebView(wxWindow * parent, wxString const & url)
         });
 #endif
         webView->EnableContextMenu(true);
+        // Roost Print: our fonts on every page the app shows from its own files.
+        if (roost_web_theme_script().size() > 1)
+            webView->AddUserScript(roost_web_theme_script(), wxWEBVIEW_INJECT_AT_DOCUMENT_START);
     } else {
         BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << ": failed. Use fake web view.";
         webView = new FakeWebView;

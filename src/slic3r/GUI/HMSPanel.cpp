@@ -56,7 +56,7 @@ HMSNotifyItem::HMSNotifyItem(wxWindow *parent, HMSItem& item)
     m_panel_sizer->Add(m_panel_sizer_inner, 1, wxEXPAND | wxALL, FromDIP(20));
 
     m_staticline = new wxPanel(m_panel_hms, wxID_DELETE, wxDefaultPosition, wxSize(-1, FromDIP(1)));
-    m_staticline->SetBackgroundColour(wxColour(238, 238, 238));
+    m_staticline->SetBackgroundColour(wxColour(235, 239, 241));
 
     m_panel_sizer->Add(m_staticline, 0, wxLEFT | wxRIGHT | wxEXPAND, FromDIP(20));
 
@@ -161,7 +161,7 @@ wxBitmap & HMSNotifyItem::get_notify_bitmap()
 HMSPanel::HMSPanel(wxWindow *parent, wxWindowID id, const wxPoint &pos, const wxSize &size, long style)
     :wxPanel(parent, id, pos, size, style)
 {
-    this->SetBackgroundColour(wxColour(238, 238, 238));
+    this->SetBackgroundColour(wxColour(235, 239, 241));
 
     auto m_main_sizer = new wxBoxSizer(wxVERTICAL);
 

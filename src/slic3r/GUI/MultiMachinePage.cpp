@@ -316,7 +316,7 @@ MultiMachinePickPage::MultiMachinePickPage(Plater* plater /*= nullptr*/)
     wxBoxSizer* main_sizer = new wxBoxSizer(wxVERTICAL);
 
     auto line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    line_top->SetBackgroundColour(wxColour(154, 171, 182));
     
     m_label = new Label(this, _L("Select connected printers (0/6)"));
 

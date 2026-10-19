@@ -35,7 +35,7 @@ ModelDetailDialog::ModelDetailDialog(wxWindow*       parent,
                wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
 {
     SetSize(wxSize(1100, 780));
-    SetBackgroundColour(wxColour(54, 54, 56));
+    SetBackgroundColour(wxColour(36, 59, 74));
 
     // Reuse WebModelLibraryView so UA, cookies, CXSWGroupInterface script
     // message handler and F12 dev-tools are all set up identically.

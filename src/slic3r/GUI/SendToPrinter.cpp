@@ -202,7 +202,7 @@ SendToPrinterDialog::SendToPrinterDialog(Plater *plater)
 
     m_sizer_main->SetMinSize(wxSize(0, -1));
     m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
 
     m_scrollable_region       = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
     m_sizer_scrollable_region = new wxBoxSizer(wxVERTICAL); 
@@ -237,8 +237,8 @@ SendToPrinterDialog::SendToPrinterDialog(Plater *plater)
     m_sizer_basic->Add(m_sizer_basic_time, 0, wxALIGN_CENTER, 0);
 
     m_line_materia = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line_materia->SetForegroundColour(wxColour(238, 238, 238));
-    m_line_materia->SetBackgroundColour(wxColour(238, 238, 238));
+    m_line_materia->SetForegroundColour(wxColour(235, 239, 241));
+    m_line_materia->SetBackgroundColour(wxColour(235, 239, 241));
 
     wxBoxSizer *m_sizer_printer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -275,7 +275,7 @@ SendToPrinterDialog::SendToPrinterDialog(Plater *plater)
 
     // line schedule
     m_line_schedule = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1));
-    m_line_schedule->SetBackgroundColour(wxColour(238, 238, 238));
+    m_line_schedule->SetBackgroundColour(wxColour(235, 239, 241));
     m_simplebook   = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, SELECT_MACHINE_DIALOG_SIMBOOK_SIZE, 0);
 
     // perpare mode
@@ -352,9 +352,9 @@ SendToPrinterDialog::SendToPrinterDialog(Plater *plater)
     auto st_title_error_code = new wxStaticText(m_sw_print_failed_info, wxID_ANY, _L("Error code"));
     auto st_title_error_code_doc = new wxStaticText(m_sw_print_failed_info, wxID_ANY, ": ");
     m_st_txt_error_code = new Label(m_sw_print_failed_info, wxEmptyString);
-    st_title_error_code->SetForegroundColour(0x909090);
-    st_title_error_code_doc->SetForegroundColour(0x909090);
-    m_st_txt_error_code->SetForegroundColour(0x909090);
+    st_title_error_code->SetForegroundColour(0x7D94A3);
+    st_title_error_code_doc->SetForegroundColour(0x7D94A3);
+    m_st_txt_error_code->SetForegroundColour(0x7D94A3);
     st_title_error_code->SetFont(::Label::Body_13);
     st_title_error_code_doc->SetFont(::Label::Body_13);
     m_st_txt_error_code->SetFont(::Label::Body_13);
@@ -370,9 +370,9 @@ SendToPrinterDialog::SendToPrinterDialog(Plater *plater)
     auto st_title_error_desc = new wxStaticText(m_sw_print_failed_info, wxID_ANY, wxT("Error desc"));
     auto st_title_error_desc_doc = new wxStaticText(m_sw_print_failed_info, wxID_ANY, ": ");
     m_st_txt_error_desc = new Label(m_sw_print_failed_info, wxEmptyString);
-    st_title_error_desc->SetForegroundColour(0x909090);
-    st_title_error_desc_doc->SetForegroundColour(0x909090);
-    m_st_txt_error_desc->SetForegroundColour(0x909090);
+    st_title_error_desc->SetForegroundColour(0x7D94A3);
+    st_title_error_desc_doc->SetForegroundColour(0x7D94A3);
+    m_st_txt_error_desc->SetForegroundColour(0x7D94A3);
     st_title_error_desc->SetFont(::Label::Body_13);
     st_title_error_desc_doc->SetFont(::Label::Body_13);
     m_st_txt_error_desc->SetFont(::Label::Body_13);
@@ -387,9 +387,9 @@ SendToPrinterDialog::SendToPrinterDialog(Plater *plater)
     auto st_title_extra_info = new wxStaticText(m_sw_print_failed_info, wxID_ANY, wxT("Extra info"));
     auto st_title_extra_info_doc = new wxStaticText(m_sw_print_failed_info, wxID_ANY, ": ");
     m_st_txt_extra_info = new Label(m_sw_print_failed_info, wxEmptyString);
-    st_title_extra_info->SetForegroundColour(0x909090);
-    st_title_extra_info_doc->SetForegroundColour(0x909090);
-    m_st_txt_extra_info->SetForegroundColour(0x909090);
+    st_title_extra_info->SetForegroundColour(0x7D94A3);
+    st_title_extra_info_doc->SetForegroundColour(0x7D94A3);
+    m_st_txt_extra_info->SetForegroundColour(0x7D94A3);
     st_title_extra_info->SetFont(::Label::Body_13);
     st_title_extra_info_doc->SetFont(::Label::Body_13);
     m_st_txt_extra_info->SetFont(::Label::Body_13);

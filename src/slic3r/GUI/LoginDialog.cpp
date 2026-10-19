@@ -106,7 +106,7 @@ wxEND_EVENT_TABLE()
         void LoginDialog::InitializeUI()
         {
             auto dark = Slic3r::GUI::wxGetApp().dark_mode();
-            this->SetBackgroundColour(dark ? wxColour("#1c1e22") :wxColour("#f4f7fb") );
+            this->SetBackgroundColour(dark ? wxColour("#13222b") :wxColour("#f4f7fb") );
             // 创建主面板
             m_panel = new wxPanel(this, wxID_ANY);
 

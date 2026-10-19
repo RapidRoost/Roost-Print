@@ -21,11 +21,11 @@ StepCtrlBase::StepCtrlBase(wxWindow *      parent,
                    long            style)
     : StaticBox(parent, id, pos, size, style)
     , font_tip(Label::Body_13)
-    , clr_bar(0xACACAC)
-    , clr_step(0xACACAC)
+    , clr_bar(0x9FAFB9)
+    , clr_step(0x9FAFB9)
     , clr_text(std::make_pair(0x1E90D8, (int) StateColor::Checked), 
-            std::make_pair(0x6B6B6B, (int) StateColor::Normal))
-    , clr_tip(0x828280)
+            std::make_pair(0x547082, (int) StateColor::Normal))
+    , clr_tip(0x698699)
 {
     SetFont(Label::Body_13);
     border_color     = StateColor(*wxLIGHT_GREY);
@@ -253,14 +253,14 @@ StepIndicator::StepIndicator(wxWindow *parent, wxWindowID id, const wxPoint &pos
 {
     SetFont(Label::Body_12);
     font_tip = Label::Body_10;
-    clr_bar = 0xE1E1E1;
+    clr_bar = 0xDCE2E6;
     clr_step = StateColor(
-            std::make_pair(0xACACAC, (int) StateColor::Disabled), 
+            std::make_pair(0x9FAFB9, (int) StateColor::Disabled), 
             std::make_pair(wxColour("#1877B4"), 0));
     clr_text = StateColor(
-            std::make_pair(0xACACAC, (int) StateColor::Disabled), 
+            std::make_pair(0x9FAFB9, (int) StateColor::Disabled), 
             std::make_pair(0x323A3D, (int) StateColor::Checked), 
-            std::make_pair(0x6B6B6B, 0));
+            std::make_pair(0x547082, 0));
     clr_tip = *wxWHITE;
     StaticBox::border_width = 0;
     radius    = bmp_ok.GetBmpHeight() / 2;

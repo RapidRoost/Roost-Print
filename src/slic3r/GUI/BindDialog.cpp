@@ -70,7 +70,7 @@ PingCodeBindDialog::PingCodeBindDialog(Plater* plater /*= nullptr*/)
     SetBackgroundColour(*wxWHITE);
     wxBoxSizer* m_sizer_main = new wxBoxSizer(wxVERTICAL);
     auto m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
     
 
     m_simplebook = new wxSimplebook(this);
@@ -99,7 +99,7 @@ PingCodeBindDialog::PingCodeBindDialog(Plater* plater /*= nullptr*/)
     m_status_text->SetFont(Label::Body_14);
     m_status_text->SetMaxSize(wxSize(FromDIP(440), -1));
     m_status_text->Wrap(FromDIP(440));
-    m_status_text->SetForegroundColour(wxColour(38, 46, 48));
+    m_status_text->SetForegroundColour(wxColour(27, 47, 59));
 
     m_link_show_ping_code_wiki = new wxStaticText(request_bind_panel, wxID_ANY, _L("Can't find Pin Code?"));
     m_link_show_ping_code_wiki->SetFont(Label::Body_14);
@@ -139,7 +139,7 @@ PingCodeBindDialog::PingCodeBindDialog(Plater* plater /*= nullptr*/)
     m_sizer_button->Add(0, 0, 1, wxEXPAND, 5);
     m_button_bind = new Button(request_bind_panel, _L("Confirm"));
 
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Disabled),
+    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Disabled),
         std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal));
@@ -151,7 +151,7 @@ PingCodeBindDialog::PingCodeBindDialog(Plater* plater /*= nullptr*/)
     m_button_bind->SetCornerRadius(FromDIP(12));
     m_button_bind->Enable(false);
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Hovered),
         std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
     m_button_cancel = new Button(request_bind_panel, _L("Cancel"));
@@ -365,7 +365,7 @@ PingCodeBindDialog::~PingCodeBindDialog() {
      SetBackgroundColour(*wxWHITE);
      wxBoxSizer *m_sizer_main = new wxBoxSizer(wxVERTICAL);
      auto m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-     m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+     m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
      m_sizer_main->Add(m_line_top, 0, wxEXPAND, 0);
      m_sizer_main->Add(0, 0, 0, wxTOP, FromDIP(38));
 
@@ -425,13 +425,13 @@ PingCodeBindDialog::~PingCodeBindDialog() {
 
      auto m_sizer_status_text = new wxBoxSizer(wxHORIZONTAL);
      m_status_text = new wxStaticText(this, wxID_ANY, _L("Would you like to log in this printer with current account?"));
-     m_status_text->SetForegroundColour(wxColour(107, 107, 107));
+     m_status_text->SetForegroundColour(wxColour(84, 112, 130));
      m_status_text->SetFont(::Label::Body_13);
      m_status_text->Wrap(-1);
 
 
      m_link_show_error = new wxStaticText(this, wxID_ANY, _L("Check the reason"));
-     m_link_show_error->SetForegroundColour(wxColour(0x6b6b6b));
+     m_link_show_error->SetForegroundColour(wxColour(0x547082));
      m_link_show_error->SetFont(::Label::Head_13);
 
      m_bitmap_show_error_close = create_scaled_bitmap("link_more_error_close",nullptr, 7);
@@ -477,7 +477,7 @@ PingCodeBindDialog::~PingCodeBindDialog() {
      auto m_checkbox_privacy = new CheckBox(m_panel_agreement, wxID_ANY);
      auto m_st_privacy_title = new Label(m_panel_agreement, _L("Read and accept"));
      m_st_privacy_title->SetFont(Label::Body_13);
-     m_st_privacy_title->SetForegroundColour(wxColour(38, 46, 48));
+     m_st_privacy_title->SetForegroundColour(wxColour(27, 47, 59));
 
      auto m_link_Terms_title = new Label(m_panel_agreement, _L("Terms and Conditions"));
      m_link_Terms_title->SetFont(Label::Head_13);
@@ -496,7 +496,7 @@ PingCodeBindDialog::~PingCodeBindDialog() {
 
      auto m_st_and_title = new Label(m_panel_agreement, _L("and"));
      m_st_and_title->SetFont(Label::Body_13);
-     m_st_and_title->SetForegroundColour(wxColour(38, 46, 48));
+     m_st_and_title->SetForegroundColour(wxColour(27, 47, 59));
 
      auto m_link_privacy_title = new Label(m_panel_agreement, _L("Privacy Policy"));
      m_link_privacy_title->SetFont(Label::Head_13);
@@ -536,7 +536,7 @@ PingCodeBindDialog::~PingCodeBindDialog() {
      auto m_checkbox_notice = new CheckBox(m_panel_agreement, wxID_ANY);
      auto m_st_notice_title = new Label(m_panel_agreement, notice_title);
      m_st_notice_title->SetFont(Label::Body_13);
-     m_st_notice_title->SetForegroundColour(wxColour(38, 46, 48));
+     m_st_notice_title->SetForegroundColour(wxColour(27, 47, 59));
 
      auto m_link_notice_title = new Label(m_panel_agreement, notice_link_title);
      m_link_notice_title->SetFont(Label::Head_13);
@@ -611,9 +611,9 @@ PingCodeBindDialog::~PingCodeBindDialog() {
      auto st_title_error_code = new wxStaticText(m_sw_bind_failed_info, wxID_ANY, _L("Error code"));
      auto st_title_error_code_doc = new wxStaticText(m_sw_bind_failed_info, wxID_ANY, ": ");
      m_st_txt_error_code = new Label(m_sw_bind_failed_info, wxEmptyString);
-     st_title_error_code->SetForegroundColour(0x909090);
-     st_title_error_code_doc->SetForegroundColour(0x909090);
-     m_st_txt_error_code->SetForegroundColour(0x909090);
+     st_title_error_code->SetForegroundColour(0x7D94A3);
+     st_title_error_code_doc->SetForegroundColour(0x7D94A3);
+     m_st_txt_error_code->SetForegroundColour(0x7D94A3);
      st_title_error_code->SetFont(::Label::Body_13);
      st_title_error_code_doc->SetFont(::Label::Body_13);
      m_st_txt_error_code->SetFont(::Label::Body_13);
@@ -629,9 +629,9 @@ PingCodeBindDialog::~PingCodeBindDialog() {
      auto st_title_error_desc = new wxStaticText(m_sw_bind_failed_info, wxID_ANY, wxT("Error desc"));
      auto st_title_error_desc_doc = new wxStaticText(m_sw_bind_failed_info, wxID_ANY, ": ");
      m_st_txt_error_desc = new Label(m_sw_bind_failed_info, wxEmptyString);
-     st_title_error_desc->SetForegroundColour(0x909090);
-     st_title_error_desc_doc->SetForegroundColour(0x909090);
-     m_st_txt_error_desc->SetForegroundColour(0x909090);
+     st_title_error_desc->SetForegroundColour(0x7D94A3);
+     st_title_error_desc_doc->SetForegroundColour(0x7D94A3);
+     m_st_txt_error_desc->SetForegroundColour(0x7D94A3);
      st_title_error_desc->SetFont(::Label::Body_13);
      st_title_error_desc_doc->SetFont(::Label::Body_13);
      m_st_txt_error_desc->SetFont(::Label::Body_13);
@@ -646,9 +646,9 @@ PingCodeBindDialog::~PingCodeBindDialog() {
      auto st_title_extra_info = new wxStaticText(m_sw_bind_failed_info, wxID_ANY, wxT("Extra info"));
      auto st_title_extra_info_doc = new wxStaticText(m_sw_bind_failed_info, wxID_ANY, ": ");
      m_st_txt_extra_info = new Label(m_sw_bind_failed_info, wxEmptyString);
-     st_title_extra_info->SetForegroundColour(0x909090);
-     st_title_extra_info_doc->SetForegroundColour(0x909090);
-     m_st_txt_extra_info->SetForegroundColour(0x909090);
+     st_title_extra_info->SetForegroundColour(0x7D94A3);
+     st_title_extra_info_doc->SetForegroundColour(0x7D94A3);
+     m_st_txt_extra_info->SetForegroundColour(0x7D94A3);
      st_title_extra_info->SetFont(::Label::Body_13);
      st_title_extra_info_doc->SetFont(::Label::Body_13);
      m_st_txt_extra_info->SetFont(::Label::Body_13);
@@ -680,7 +680,7 @@ PingCodeBindDialog::~PingCodeBindDialog() {
      m_sizer_button->Add(0, 0, 1, wxEXPAND, 5);
      m_button_bind = new Button(button_panel, _L("Confirm"));
 
-     StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Disabled),
+     StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Disabled),
          std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed),
          std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
          std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal));
@@ -693,7 +693,7 @@ PingCodeBindDialog::~PingCodeBindDialog() {
      m_button_bind->Enable(false);
 
 
-     StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Hovered),
+     StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
      m_button_cancel = new Button(button_panel, _L("Cancel"));
@@ -964,7 +964,7 @@ UnBindMachineDialog::UnBindMachineDialog(Plater *plater /*= nullptr*/)
      SetBackgroundColour(*wxWHITE);
      wxBoxSizer *m_sizer_main = new wxBoxSizer(wxVERTICAL);
      auto m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-     m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+     m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
      m_sizer_main->Add(m_line_top, 0, wxEXPAND, 0);
      m_sizer_main->Add(0, 0, 0, wxTOP, FromDIP(38));
 
@@ -1022,7 +1022,7 @@ UnBindMachineDialog::UnBindMachineDialog(Plater *plater /*= nullptr*/)
      m_sizer_main->Add(0, 0, 0, wxEXPAND | wxTOP, FromDIP(20));
 
      m_status_text = new wxStaticText(this, wxID_ANY, _L("Would you like to log out the printer?"), wxDefaultPosition, wxSize(BIND_DIALOG_BUTTON_PANEL_SIZE.x, -1), wxST_ELLIPSIZE_END);
-     m_status_text->SetForegroundColour(wxColour(107, 107, 107));
+     m_status_text->SetForegroundColour(wxColour(84, 112, 130));
      m_status_text->SetFont(::Label::Body_13);
 
 
@@ -1041,7 +1041,7 @@ UnBindMachineDialog::UnBindMachineDialog(Plater *plater /*= nullptr*/)
      m_button_unbind->SetCornerRadius(FromDIP(12));
 
 
-     StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Hovered),
+     StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
      m_button_cancel = new Button(this, _L("Cancel"));

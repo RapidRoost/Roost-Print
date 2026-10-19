@@ -13,8 +13,10 @@ set(SOLUTION_NAME "${PROCESS_NAME}")
 
 
 
+# Roost Print: no online printer/filament packages from Creality's cloud. They would replace the
+# bundled profiles (and the Polymaker set) behind our back; profiles come with each app update.
 if(NOT DEFINED UPDATE_ONLINE_MACHINES)
-    set(UPDATE_ONLINE_MACHINES "1")
+    set(UPDATE_ONLINE_MACHINES "0")
 endif()
 
 if(NOT DEFINED BBL_RELEASE_TO_PUBLIC)

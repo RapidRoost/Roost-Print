@@ -196,8 +196,8 @@ void MultiMachineItem::doRender(wxDC& dc)
                 DrawTextWithEllipsis(dc, progress_info + "%  |  " + left_time, FromDIP(DEVICE_LEFT_PRO_INFO), left, FromDIP(10));
                 
 
-                dc.SetPen(wxPen(wxColour(233,233,233)));
-                dc.SetBrush(wxBrush(wxColour(233,233,233)));
+                dc.SetPen(wxPen(wxColour(230,234,236)));
+                dc.SetBrush(wxBrush(wxColour(230,234,236)));
                 dc.DrawRoundedRectangle(left, FromDIP(30), FromDIP(DEVICE_LEFT_PRO_INFO), FromDIP(10), 2);
 
                 dc.SetPen(wxPen(wxColour(30, 144, 216)));
@@ -217,7 +217,7 @@ void MultiMachineItem::doRender(wxDC& dc)
         left += FromDIP(DEVICE_LEFT_PRO_INFO);
 
         //button
-        dc.SetPen(wxPen(wxColour(38, 46, 48)));
+        dc.SetPen(wxPen(wxColour(27, 47, 59)));
         dc.SetBrush(wxBrush(wxColour(*wxWHITE)));
         dc.DrawRoundedRectangle(left, (size.y - FromDIP(38)) / 2, FromDIP(90), FromDIP(38), 6);
         dc.SetFont(Label::Body_14);
@@ -270,7 +270,7 @@ MultiMachineManagerPage::MultiMachineManagerPage(wxWindow* parent)
 #ifdef __WINDOWS__
     SetDoubleBuffered(true);
 #endif //__WINDOWS__
-    SetBackgroundColour(wxColour(0xEEEEEE));
+    SetBackgroundColour(wxColour(0xEBEFF1));
     m_main_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
     m_main_panel->SetBackgroundColour(*wxWHITE);
     m_main_sizer = new wxBoxSizer(wxVERTICAL);
@@ -288,11 +288,11 @@ MultiMachineManagerPage::MultiMachineManagerPage(wxWindow* parent)
     );
 
 
-    StateColor clean_bg(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled), std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered), std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled),
+    StateColor clean_bg(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled), std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered), std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
-    StateColor clean_bd(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
-    StateColor clean_text(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+    StateColor clean_bd(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
+    StateColor clean_text(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
 
     auto sizer_button_printer = new wxBoxSizer(wxHORIZONTAL);
     sizer_button_printer->SetMinSize(wxSize(FromDIP(DEVICE_ITEM_MAX_WIDTH), -1));
@@ -479,7 +479,7 @@ MultiMachineManagerPage::MultiMachineManagerPage(wxWindow* parent)
     });
    
     m_page_num_input = new ::TextInput(m_flipping_panel, wxEmptyString, wxEmptyString, wxEmptyString, wxDefaultPosition, wxSize(FromDIP(50), -1), wxTE_PROCESS_ENTER);
-    StateColor input_bg(std::pair<wxColour, int>(wxColour("#F0F0F1"), StateColor::Disabled), std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
+    StateColor input_bg(std::pair<wxColour, int>(wxColour("#EEF1F3"), StateColor::Disabled), std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
     m_page_num_input->SetBackgroundColor(input_bg);
     m_page_num_input->GetTextCtrl()->SetValue("1");
     wxTextValidator validator(wxFILTER_DIGITS);

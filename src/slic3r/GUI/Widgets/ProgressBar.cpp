@@ -192,7 +192,7 @@ void ProgressBar::doRender(wxDC &dc)
 
         dc.SetFont(::Label::Head_12);
         auto textSize = dc.GetMultiLineTextExtent(m_disable_text);
-        dc.SetTextForeground(wxColour(144, 144, 144));
+        dc.SetTextForeground(wxColour(125, 148, 163));
         auto pt = wxPoint();
         pt.x    = (size.x - textSize.x) / 2;
         pt.y    = (size.y - textSize.y) / 2;
@@ -212,7 +212,7 @@ void ProgressBar::doRender(wxDC &dc)
 
         dc.SetFont(GetFont());
         auto textSize = dc.GetMultiLineTextExtent(wxString("000%"));
-        dc.SetTextForeground(wxColour(144, 144, 144));
+        dc.SetTextForeground(wxColour(125, 148, 163));
         auto pt = wxPoint();
         pt.x    = (size.x - textSize.x) / 2;
         pt.y    = (size.y - textSize.y) / 2;

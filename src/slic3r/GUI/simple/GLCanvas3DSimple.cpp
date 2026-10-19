@@ -263,8 +263,8 @@ static void render_easy_mode_left_bed_type_selector(const ImVec4& rect, float sc
     const float combo_w = std::max(120.0f * scale, rect.z - 108.0f * scale);
     const float combo_h = 28.0f * scale;
     const ImVec4 frame_bg = dark ? ImVec4(0.18f, 0.20f, 0.24f, 0.96f) : ImVec4(1.0f, 1.0f, 1.0f, 0.96f);
-    const ImVec4 border_col = dark ? ImVec4(0.38f, 0.40f, 0.45f, 0.78f) : ImVec4(0.75f, 0.75f, 0.78f, 0.78f);
-    const ImVec4 text_col = dark ? ImVec4(0.90f, 0.92f, 0.95f, 1.0f) : ImVec4(0.10f, 0.10f, 0.12f, 1.0f);
+    const ImVec4 border_col = dark ? ImVec4(0.38f, 0.40f, 0.45f, 0.78f) : ImVec4(0.729f, 0.773f, 0.800f, 0.78f);
+    const ImVec4 text_col = dark ? ImVec4(0.90f, 0.92f, 0.95f, 1.0f) : ImVec4(0.067f, 0.122f, 0.157f, 1.0f);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
                              ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
@@ -635,15 +635,15 @@ void GLCanvas3D::_render_device_list_dropdown_panel_simple() const
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 4.0f * scale);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
     const bool dark = wxGetApp().dark_mode();
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, dark ? ImVec4(0.157f,0.157f,0.172f,1.0f) : ImVec4(1.0f,1.0f,1.0f,1.0f));
-    ImGui::PushStyleColor(ImGuiCol_Border,   dark ? ImVec4(0.431f,0.431f,0.447f,0.78f) : ImVec4(0.753f,0.753f,0.784f,0.78f));
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, dark ? ImVec4(0.102f,0.180f,0.227f,1.0f) : ImVec4(1.0f,1.0f,1.0f,1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Border,   dark ? ImVec4(0.349f,0.459f,0.529f,0.78f) : ImVec4(0.733f,0.776f,0.804f,0.78f));
     // Thin, subtle scrollbar like the mockup: narrow, pill-shaped grab, light track
     ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 10.0f * scale);
     ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarRounding, 4.0f * scale);
     ImGui::PushStyleColor(ImGuiCol_ScrollbarBg,          ImVec4(0.0f,0.0f,0.0f,0.0f));
-    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab,        dark ? ImVec4(0.42f,0.42f,0.46f,1.0f) : ImVec4(0.71f,0.73f,0.78f,1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, dark ? ImVec4(0.50f,0.50f,0.54f,1.0f) : ImVec4(0.62f,0.64f,0.68f,1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,  dark ? ImVec4(0.58f,0.58f,0.62f,1.0f) : ImVec4(0.54f,0.56f,0.60f,1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab,        dark ? ImVec4(0.349f,0.459f,0.529f,1.0f) : ImVec4(0.71f,0.73f,0.78f,1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, dark ? ImVec4(0.431f,0.541f,0.612f,1.0f) : ImVec4(0.62f,0.64f,0.68f,1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,  dark ? ImVec4(0.533f,0.616f,0.667f,1.0f) : ImVec4(0.54f,0.56f,0.60f,1.0f));
     if (ImGui::Begin("##preset_dropdown_panel_simple", nullptr, flags)) {
         const ImVec2 win_pos  = ImGui::GetWindowPos();
         const ImVec2 win_size = ImGui::GetWindowSize();
@@ -1008,7 +1008,7 @@ void GLCanvas3D::_render_cur_device_card_simple(const ImVec4& rect, const char* 
             const float shadow_px = 6.0f * scale;
 
             ImU32 fill_col = ImGui::GetColorU32(dark
-                ? ImVec4(0.12f, 0.12f, 0.14f, 0.85f)
+                ? ImVec4(0.082f, 0.141f, 0.180f, 0.85f)
                 : ImVec4(1.00f, 1.00f, 1.00f, 0.92f));
 
             ImU32 base_border_col = dark

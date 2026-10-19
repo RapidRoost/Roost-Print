@@ -1,10 +1,10 @@
 :root {
     --primary-text-color: #fff;
-    --primary-bg-color: #4B4B4D;
+    --primary-bg-color: #365162;
 }
 .white-theme {
     --primary-bg-color: #fff;
-    --primary-text-color: #333;
+    --primary-text-color: #203746;
 }
 
 body {
@@ -63,9 +63,9 @@ button {
 .search-printer-empty {
     width: 800px;
     height: 500px;
-    background: #4B4B4D;
+    background: #365162;
     border-radius: 5px;
-    border: 1px dashed #7A7A7F;
+    border: 1px dashed #648295;
     display: none;
     flex-direction: column;
     align-items: center;
@@ -77,7 +77,7 @@ button {
     font-family: Source Han Sans CN;
     font-weight: bold;
     font-size: 12px;
-    color: #B7B7B7;
+    color: #ACBAC2;
 }
 /* 卡片样式 */
 .card-list-item {
@@ -86,8 +86,8 @@ button {
     padding: 12px 10px 11px 9px;
     box-sizing: border-box;
     border-radius: 5px;
-    border: 1px solid #6E6E72;
-    /* background: #5D5D61; */
+    border: 1px solid #597587;
+    /* background: #486476; */
 }
 .card-item-title {
     display: flex;
@@ -103,7 +103,7 @@ button {
     line-height: 12px;
     font-weight: bold;
     font-size: 12px;
-    /* color: #ADADAD; */
+    /* color: #A0B0BA; */
 }
 .card-list-img {
     /* padding-top: 15px; */
@@ -130,7 +130,7 @@ button {
 .card-list-add-nozzle button {
     width: 75px;
     height: 28px;
-    background: #74747B;
+    background: #5F7D90;
     border-radius: 5px;
     cursor: pointer;
 }
@@ -171,12 +171,12 @@ button {
 }
 .card-list-item-checked-printer-wrapper {
     position: absolute;
-    border: 1px solid #262626;
+    border: 1px solid #172935;
     left: 0;
     top: 30px;
     width: 237px;
     height: 108px;
-    background: #4B4B4D;
+    background: #365162;
     box-shadow: 0px 10px 20px 0px rgba(0,0,0,0.2);
     border-radius: 5px;
     /* display: none; */
@@ -282,12 +282,12 @@ button {
 .tree-node-item {
     padding: 8px 0px 7px 14px;
     border-radius: 5px;
-    color: #CBCBCC;
+    color: #C4CDD3;
 }
 .tree-node-item-white {
     padding: 8px 0px 7px 14px;
     border-radius: 5px;
-    color: #666;
+    color: #506B7C;
 }
 .search-tip {
     width: 318px;
@@ -333,7 +333,7 @@ button {
     position: absolute;
     width: 300px;
     height: 150px;
-    background-color: #181818;
+    background-color: #0F1A21;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -402,7 +402,7 @@ button {
     width: 100%;
     height: 24px;
     padding: 6px 30px;
-	border: 1px solid #7A7A7F;
+	border: 1px solid #648295;
 	border-radius: 5px;
     box-sizing: border-box;
     outline: none;
@@ -416,7 +416,7 @@ button {
 	color: #fff;
   }
   #searchPrinterAll::placeholder {
-    color: #CBCBCC;
+    color: #C4CDD3;
     padding-left: 0px;
 }
 .printer-search-remove {
@@ -437,7 +437,7 @@ button {
     height: 100vh;
     padding: 15px 22px 5px 16px;
     box-sizing: border-box;
-    background: #4B4B4D;
+    background: #365162;
     font-size: 12px;
 }
 /* 切换专家与用户显示按钮*/
@@ -447,7 +447,7 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #4B4B4D;
+    background: #365162;
 }
 /* 白色背景色 */
 .toggle-user-type-white {
@@ -463,7 +463,7 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid #6E6E72;
+    border: 1px solid #597587;
     border-radius: 15.5px;
     padding: 2px 1px;
 }
@@ -472,15 +472,15 @@ button {
     width: 100px;
     border: none;
     font-size: 16px;
-    color: #CBCBCC;
+    color: #C4CDD3;
     border-radius: 15.5px;
 }
 /* 黑色主题色 */
 .toggle-button {
     display: inline-block;
-    color: #f0f0f0;
+    color: #eef1f2;
     outline: none;
-    background: #6E6E73;
+    background: #597688;
     border-radius: 5px;
     padding: 6px 15px;
     margin: 10px 5px 0 10px;
@@ -491,7 +491,7 @@ button {
 /* 白色主题色 */
 .toggle-button-white {
     display: inline-block;
-    color: #333333 !important;
+    color: #203746 !important;
     outline: none;
     background: #fff;
     border-radius: 5px;
@@ -532,11 +532,11 @@ button {
     height: 24px;
 }
 #brand {
-    background: #4B4B4D;
+    background: #365162;
     border-radius: 5px;
     font-weight: 500;
     font-size: 12px;
-    border: 1px solid #6E6E72;
+    border: 1px solid #597587;
 }
 #brand:focus {
     outline: none;
@@ -545,11 +545,11 @@ button {
     outline: none;
 }
 #machine {
-    background: #4B4B4D;
+    background: #365162;
     border-radius: 5px;
     font-size: 12px;
     font-weight: 500;
-    border: 1px solid #6E6E72;
+    border: 1px solid #597587;
 }
 .machine-search {
     position: relative;
@@ -563,13 +563,13 @@ button {
     font-size: 12px;
     font-weight: 500;
     padding: 1px 20px;
-    background: #4B4B4D;
+    background: #365162;
     border-radius: 5px;
     color: var(--primary-text-color);
-    border: 1px solid #6E6E72;
+    border: 1px solid #597587;
 }
 #site-search::placeholder {
-    color: #CBCBCC;
+    color: #C4CDD3;
 }
 #site-search:focus {
     outline: none;
@@ -596,7 +596,7 @@ button {
     width: 120px;
     height: 24px;
     line-height: 24px;
-    background: #6E6E73;
+    background: #597688;
     border-radius: 12px;
     font-size: 12px;
     cursor: pointer;
@@ -613,16 +613,16 @@ button {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    background: #4B4B4D;
+    background: #365162;
 }
 .card-area {
     width: 250px;
     height: 286px;
-    background: #5D5D61;
+    background: #486476;
     padding: 8px 8px 12px 8px;
     box-sizing: border-box;
     border-radius: 5px;
-    border: 1px solid #6E6E72;
+    border: 1px solid #597587;
 }
 .card-header {
     display: flex;
@@ -632,7 +632,7 @@ button {
 .card-header span {
     font-size: 14px;
     font-weight: bold;
-    color:#ADADAD;
+    color:#A0B0BA;
 }
 .img-area img {
     display: block;
@@ -649,7 +649,7 @@ button {
     align-items: center;
 }
 .params-name {
-    color: #ADADAD;
+    color: #A0B0BA;
     font-size: 10px;
     display: inline-block;
     line-height: 21px;
@@ -685,7 +685,7 @@ input[type=checkbox]::after {
     position: absolute;
     top: 0;
     /* background-color: #fff; */
-    background: #4B4B4D;
+    background: #365162;
     color: #fff;
     width: 14px;
     height: 14px;
@@ -696,7 +696,7 @@ input[type=checkbox]::after {
     content: ' ';
     border-radius: 3px;
     box-sizing: border-box;
-    border: 1px solid #ddd;
+    border: 1px solid #D8DEE2;
 }
 
 input[type=checkbox]:checked::after {
@@ -724,17 +724,17 @@ div::-webkit-scrollbar{
     /**/
   }
   div::-webkit-scrollbar-track{
-    background: #4B4B4D;
+    background: #365162;
     border-radius:2px;
   }
   div::-webkit-scrollbar-thumb{
     width: 6px;
     height: 100px;
-    background: #7E7E84;
+    background: #698699;
     border-radius: 3px;
   }
   div::-webkit-scrollbar-thumb:hover{
-    background: #999;
+    background: #889DAA;
   }
   div::-webkit-scrollbar-corner{
     background: #204754;

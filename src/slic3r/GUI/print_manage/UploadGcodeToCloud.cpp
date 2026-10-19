@@ -330,7 +330,7 @@ UploadGcodeToCloudDialog::UploadGcodeToCloudDialog(Plater* plater)
     m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, FromDIP(60)), wxTAB_TRAVERSAL);
     m_sizer_main->Add(m_line_top, 0, wxEXPAND, 0);
     wxBoxSizer* topSizer = new wxBoxSizer(wxHORIZONTAL);
-    m_line_top->SetBackgroundColour(wxColour("#4B4B4D"));
+    m_line_top->SetBackgroundColour(wxColour("#365162"));
     m_line_top->SetSizer(topSizer);
     // rename normal
     m_rename_switch_panel = new wxSimplebook(m_line_top);
@@ -423,12 +423,12 @@ UploadGcodeToCloudDialog::UploadGcodeToCloudDialog(Plater* plater)
 
     wxFont font(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 
-    btn_bg_enable = StateColor(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-                               std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
+    btn_bg_enable = StateColor(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+                               std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
                                std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal),
-                               std::pair<wxColour, int>(wxColour(200, 200, 200), StateColor::Disabled));
+                               std::pair<wxColour, int>(wxColour(191, 202, 209), StateColor::Disabled));
 
-    btn_bd_enable = StateColor(std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal));
+    btn_bd_enable = StateColor(std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal));
 
     // progress bar
     wxBoxSizer* m_sizer_progress_with_text = new wxBoxSizer(wxHORIZONTAL);
@@ -623,9 +623,9 @@ void UploadGcodeToCloudDialog::get_current_plate_color()
       scrolledWindow->SetScrollRate(10, 10);*/
 
     m_panel_image = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(FromDIP(700), FromDIP(400)));
-    // m_panel_image->SetBackgroundColour(wxColor(75, 75, 77));
+    // m_panel_image->SetBackgroundColour(wxColor(54, 81, 98));
    if (gcode_upload_dark_mode()) {
-        m_panel_image->SetBackgroundColour(wxColour(75, 75, 73));
+        m_panel_image->SetBackgroundColour(wxColour(52, 79, 96));
     } else {
         m_panel_image->SetBackgroundColour(wxColour(255, 255, 255));
     }
@@ -634,9 +634,9 @@ void UploadGcodeToCloudDialog::get_current_plate_color()
 
     wxWrapSizer* wrapSizer = new wxWrapSizer(wxHORIZONTAL);
 
-    wxColor cardColor  = wxColor(45, 45, 49);
+    wxColor cardColor  = wxColor(29, 51, 65);
     const wxColour previewBgColor   = gcode_upload_dark_mode() ? cardColor : m_panel_image->GetBackgroundColour();
-    const wxColour previewTextColor = gcode_upload_dark_mode() ? wxColour("#FFFFFF") : wxColour(38, 38, 38);
+    const wxColour previewTextColor = gcode_upload_dark_mode() ? wxColour("#FFFFFF") : wxColour(23, 41, 53);
     if (!m_plater)
         return;
 
@@ -1597,8 +1597,8 @@ void UploadGcodeToCloudDialog::update_printer_icons()
 void UploadGcodeToCloudDialog::apply_dialog_theme()
 {
     const bool     is_dark    = gcode_upload_dark_mode();
-    const wxColour top_bg     = is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF");
-    const wxColour text_color = is_dark ? wxColour("#FFFFFF") : wxColour(38, 38, 38);
+    const wxColour top_bg     = is_dark ? wxColour("#365162") : wxColour("#FFFFFF");
+    const wxColour text_color = is_dark ? wxColour("#FFFFFF") : wxColour(23, 41, 53);
 
     if (m_line_top)
         m_line_top->SetBackgroundColour(top_bg);

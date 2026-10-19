@@ -95,13 +95,13 @@ private:
 
         if (m_hovered) {
             dc.SetBrush(wxBrush(StateColor::darkModeColorFor(wxColour("#F8F8F8"))));
-            dc.SetPen(wxPen(StateColor::darkModeColorFor(wxColour("#CECECE")), 1));
+            dc.SetPen(wxPen(StateColor::darkModeColorFor(wxColour("#C6D0D6")), 1));
             dc.DrawRoundedRectangle(0, 0, sz.GetWidth(), sz.GetHeight(), FromDIP(3));
         }
 
         dc.SetFont(GetFont());
         dc.SetTextForeground(m_hovered ? wxColour("#1E90D8")
-                                       : StateColor::darkModeColorFor(wxColour("#262E30")));
+                                       : StateColor::darkModeColorFor(wxColour("#1B2F3B")));
         wxSize ts = dc.GetTextExtent(m_text);
         int x = (sz.GetWidth()  - ts.GetWidth())  / 2;
         int y = (sz.GetHeight() - ts.GetHeight()) / 2;
@@ -277,7 +277,7 @@ wxColour MixedFilamentDialog::comp_colour(size_t i) const
     unsigned int c = comp(i);
     if (c >= 1 && c <= m_physical_colors.size())
         return wxColour(m_physical_colors[c - 1]);
-    return wxColour("#D9D9D9");
+    return wxColour("#D3DADF");
 }
 
 static wxBitmap make_alpha_bitmap(int w, int h,
@@ -330,7 +330,7 @@ wxBitmap MixedFilamentDialog::make_swatch_bitmap(size_t idx)
     int bmp_w = pad_left + swatch_sz + pad_right;
     int bmp_h = swatch_sz;
 
-    wxColour col("#D9D9D9");
+    wxColour col("#D3DADF");
     if (idx < m_physical_colors.size())
         col = wxColour(m_physical_colors[idx]);
 
@@ -340,12 +340,12 @@ wxBitmap MixedFilamentDialog::make_swatch_bitmap(size_t idx)
         dc.DrawRoundedRectangle(pad_left, 0, swatch_sz, swatch_sz, px(2));
 
         if (!wxGetApp().dark_mode() && col.Red() > 224 && col.Green() > 224 && col.Blue() > 224) {
-            dc.SetPen(wxPen(wxColour(130, 130, 128), 1));
+            dc.SetPen(wxPen(wxColour(105, 134, 153), 1));
             dc.SetBrush(*wxTRANSPARENT_BRUSH);
             dc.DrawRoundedRectangle(pad_left, 0, swatch_sz, swatch_sz, px(2));
         }
         if (wxGetApp().dark_mode() && col.Red() < 45 && col.Green() < 45 && col.Blue() < 45) {
-            dc.SetPen(wxPen(wxColour(207, 207, 207), 1));
+            dc.SetPen(wxPen(wxColour(200, 209, 214), 1));
             dc.SetBrush(*wxTRANSPARENT_BRUSH);
             dc.DrawRoundedRectangle(pad_left, 0, swatch_sz, swatch_sz, px(2));
         }
@@ -516,7 +516,7 @@ void MixedFilamentDialog::start_ratio_editor(size_t idx, wxWindow* anchor, const
 
     if (!m_ratio_editor_panel) {
         wxColour bg = StateColor::darkModeColorFor(wxColour("#F8F8F8"));
-        wxColour fg = StateColor::darkModeColorFor(wxColour("#262E30"));
+        wxColour fg = StateColor::darkModeColorFor(wxColour("#1B2F3B"));
 
         m_ratio_editor_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition,
                                            wxDefaultSize, wxBORDER_SIMPLE);
@@ -659,12 +659,12 @@ void MixedFilamentDialog::commit_ratio_editor_from_background(wxMouseEvent& e)
 
 void MixedFilamentDialog::build_ui()
 {
-    const wxColour mc_text     = StateColor::darkModeColorFor(wxColour("#262E30"));
+    const wxColour mc_text     = StateColor::darkModeColorFor(wxColour("#1B2F3B"));
 
     // Dialog background: match system title bar color
-    const wxColour dlg_bg = wxGetApp().dark_mode() ? wxColour(42, 42, 46) : wxColour(230, 230, 230);
+    const wxColour dlg_bg = wxGetApp().dark_mode() ? wxColour(27, 48, 61) : wxColour(226, 231, 234);
     // Panel background: lighter gray
-    const wxColour panel_bg = wxGetApp().dark_mode() ? wxColour(58, 58, 62) : wxColour(255, 255, 255);
+    const wxColour panel_bg = wxGetApp().dark_mode() ? wxColour(40, 65, 80) : wxColour(255, 255, 255);
 
     SetBackgroundColour(dlg_bg);
     SetSize(FromDIP(480), FromDIP(620));
@@ -864,7 +864,7 @@ wxBoxSizer* MixedFilamentDialog::create_preview_panel(wxWindow* parent)
     sizer->Add(m_preview_canvas, 0, wxALIGN_CENTER_HORIZONTAL);
 
     auto* label = new wxStaticText(parent, wxID_ANY, _L("Effect Preview"), wxDefaultPosition, wxSize(FromDIP(100), -1), wxALIGN_CENTER_HORIZONTAL);
-    label->SetForegroundColour(wxColour("#909090"));
+    label->SetForegroundColour(wxColour("#7D94A3"));
     label->SetFont(::Label::Body_13);
     sizer->Add(label, 0, wxEXPAND | wxTOP, FromDIP(5));
 
@@ -882,8 +882,8 @@ wxBoxSizer* MixedFilamentDialog::create_material_selection(wxWindow* parent)
         wxBufferedPaintDC dc(m_summary_panel);
         wxSize sz = m_summary_panel->GetClientSize();
 
-        wxColour sum_bg   = wxGetApp().dark_mode() ? wxColour(42, 42, 46) : wxColour(230, 230, 230);
-        wxColour sum_text = StateColor::darkModeColorFor(wxColour("#262E30"));
+        wxColour sum_bg   = wxGetApp().dark_mode() ? wxColour(27, 48, 61) : wxColour(226, 231, 234);
+        wxColour sum_text = StateColor::darkModeColorFor(wxColour("#1B2F3B"));
         dc.SetBrush(wxBrush(sum_bg));
         dc.SetPen(*wxTRANSPARENT_PEN);
         dc.DrawRectangle(0, 0, sz.GetWidth(), sz.GetHeight());
@@ -926,7 +926,7 @@ wxBoxSizer* MixedFilamentDialog::create_material_selection(wxWindow* parent)
     sizer->Add(m_summary_panel, 0, wxEXPAND);
 
     auto* sel_label = new wxStaticText(parent, wxID_ANY, _L("Select Mixed Materials"));
-    sel_label->SetForegroundColour(wxColour("#909090"));
+    sel_label->SetForegroundColour(wxColour("#7D94A3"));
     sel_label->SetFont(::Label::Body_12);
     sizer->Add(sel_label, 0, wxTOP, FromDIP(6));
 
@@ -959,8 +959,8 @@ wxBoxSizer* MixedFilamentDialog::create_material_selection(wxWindow* parent)
 
     m_btn_add_material = new Button(parent, _L("+ Add Material"));
     m_btn_add_material->SetBackgroundColor(parent->GetBackgroundColour());
-    m_btn_add_material->SetBorderColor(StateColor::darkModeColorFor(wxColour("#CECECE")));
-    m_btn_add_material->SetTextColor(StateColor::darkModeColorFor(wxColour("#262E30")));
+    m_btn_add_material->SetBorderColor(StateColor::darkModeColorFor(wxColour("#C6D0D6")));
+    m_btn_add_material->SetTextColor(StateColor::darkModeColorFor(wxColour("#1B2F3B")));
     m_btn_add_material->SetCornerRadius(FromDIP(2));
     m_btn_add_material->SetMinSize(wxSize(-1, FromDIP(24)));
     m_btn_add_material->SetCursor(wxCursor(wxCURSOR_HAND));
@@ -969,8 +969,8 @@ wxBoxSizer* MixedFilamentDialog::create_material_selection(wxWindow* parent)
 
     m_btn_remove_material = new Button(parent, _L("- Delete Material"));
     m_btn_remove_material->SetBackgroundColor(parent->GetBackgroundColour());
-    m_btn_remove_material->SetBorderColor(StateColor::darkModeColorFor(wxColour("#CECECE")));
-    m_btn_remove_material->SetTextColor(StateColor::darkModeColorFor(wxColour("#262E30")));
+    m_btn_remove_material->SetBorderColor(StateColor::darkModeColorFor(wxColour("#C6D0D6")));
+    m_btn_remove_material->SetTextColor(StateColor::darkModeColorFor(wxColour("#1B2F3B")));
     m_btn_remove_material->SetCornerRadius(FromDIP(2));
     m_btn_remove_material->SetMinSize(wxSize(-1, FromDIP(24)));
     m_btn_remove_material->SetCursor(wxCursor(wxCURSOR_HAND));
@@ -988,7 +988,7 @@ wxBoxSizer* MixedFilamentDialog::create_ratio_slider(wxWindow* parent)
     auto* sizer = new wxBoxSizer(wxVERTICAL);
 
     auto* ratio_label = new wxStaticText(parent, wxID_ANY, _L("Ratio"));
-    ratio_label->SetForegroundColour(wxColour("#909090"));
+    ratio_label->SetForegroundColour(wxColour("#7D94A3"));
     ratio_label->SetFont(::Label::Body_12);
     sizer->Add(ratio_label, 0, wxBOTTOM, FromDIP(4));
 
@@ -1010,7 +1010,7 @@ wxBoxSizer* MixedFilamentDialog::create_ratio_slider(wxWindow* parent)
         }
 
         int div_x = (int)(ratio(1) / 100.0 * sz.GetWidth());
-        dc.SetPen(wxPen(StateColor::darkModeColorFor(wxColour(80, 80, 80)), FromDIP(4)));
+        dc.SetPen(wxPen(StateColor::darkModeColorFor(wxColour(57, 85, 103)), FromDIP(4)));
         dc.DrawLine(div_x, 0, div_x, sz.GetHeight());
         dc.SetPen(wxPen(*wxWHITE, FromDIP(2)));
         dc.DrawLine(div_x, 0, div_x, sz.GetHeight());
@@ -1115,7 +1115,7 @@ wxBoxSizer* MixedFilamentDialog::create_triangle_picker(wxWindow* parent)
 
     // Ratio label (left-aligned, separate from triangle)
     auto* ratio_label_tri = new wxStaticText(parent, wxID_ANY, _L("Ratio"));
-    ratio_label_tri->SetForegroundColour(wxColour("#909090"));
+    ratio_label_tri->SetForegroundColour(wxColour("#7D94A3"));
     ratio_label_tri->SetFont(::Label::Body_12);
     sizer->Add(ratio_label_tri, 0, wxBOTTOM, FromDIP(4));
 
@@ -1196,7 +1196,7 @@ wxBoxSizer* MixedFilamentDialog::create_triangle_picker(wxWindow* parent)
                 }
             }
 
-            mdc.SetPen(wxPen(StateColor::darkModeColorFor(wxColour("#CECECE")), 1));
+            mdc.SetPen(wxPen(StateColor::darkModeColorFor(wxColour("#C6D0D6")), 1));
             mdc.SetBrush(*wxTRANSPARENT_BRUSH);
             wxPoint pts[3] = {{(int)v0.x, (int)v0.y}, {(int)v1.x, (int)v1.y}, {(int)v2.x, (int)v2.y}};
             mdc.DrawPolygon(3, pts);
@@ -1213,7 +1213,7 @@ wxBoxSizer* MixedFilamentDialog::create_triangle_picker(wxWindow* parent)
         double hy = m_tri_wx * v0.y + m_tri_wy * v1.y + m_tri_wz * v2.y;
         int handle_r = FromDIP(5);
         dc.SetBrush(*wxWHITE_BRUSH);
-        dc.SetPen(wxPen(wxColour("#262E30"), FromDIP(2)));
+        dc.SetPen(wxPen(wxColour("#1B2F3B"), FromDIP(2)));
         dc.DrawCircle((int)hx, (int)hy, handle_r);
 
         if (m_result.ratios.size() >= 3) {
@@ -1422,7 +1422,7 @@ wxBoxSizer* MixedFilamentDialog::create_recommendation_grid(wxWindow* parent)
     auto* outer = new wxBoxSizer(wxVERTICAL);
 
     auto* rec_label = new wxStaticText(parent, wxID_ANY, _L("Mixing Recommendations"));
-    rec_label->SetForegroundColour(StateColor::darkModeColorFor(wxColour("#262E30")));
+    rec_label->SetForegroundColour(StateColor::darkModeColorFor(wxColour("#1B2F3B")));
     rec_label->SetFont(::Label::Head_14);
     outer->Add(rec_label, 0, wxBOTTOM, FromDIP(8));
 
@@ -1554,10 +1554,10 @@ wxBoxSizer* MixedFilamentDialog::create_button_panel(wxWindow* parent)
 
     m_btn_cancel = new Button(parent, _L("Cancel"));
     m_btn_cancel->SetBackgroundColor(StateColor::darkModeColorFor(*wxWHITE));
-    m_btn_cancel->SetBorderColor(StateColor::darkModeColorFor(wxColour("#CECECE")));
+    m_btn_cancel->SetBorderColor(StateColor::darkModeColorFor(wxColour("#C6D0D6")));
     m_btn_cancel->SetBorderWidth(1);
     m_btn_cancel->SetCornerRadius(FromDIP(4));
-    m_btn_cancel->SetTextColor(StateColor::darkModeColorFor(wxColour("#262E30")));
+    m_btn_cancel->SetTextColor(StateColor::darkModeColorFor(wxColour("#1B2F3B")));
     m_btn_cancel->SetMinSize(wxSize(FromDIP(72), FromDIP(28)));
     m_btn_cancel->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { commit_ratio_editor(false); EndModal(wxID_CANCEL); });
 
@@ -2088,12 +2088,12 @@ void MixedFilamentDialog::update_ok_button_state()
     bool can_confirm = !has_type_mismatch && !has_unselected;
     m_btn_ok->Enable(can_confirm);
     if (has_unselected) {
-        m_btn_ok->SetBackgroundColor(wxColour("#CECECE"));
-        m_btn_ok->SetBorderColor(wxColour("#CECECE"));
+        m_btn_ok->SetBackgroundColor(wxColour("#C6D0D6"));
+        m_btn_ok->SetBorderColor(wxColour("#C6D0D6"));
         m_btn_ok->SetToolTip(_L("Please select a filament for all components"));
     } else if (has_type_mismatch) {
-        m_btn_ok->SetBackgroundColor(wxColour("#CECECE"));
-        m_btn_ok->SetBorderColor(wxColour("#CECECE"));
+        m_btn_ok->SetBackgroundColor(wxColour("#C6D0D6"));
+        m_btn_ok->SetBorderColor(wxColour("#C6D0D6"));
         m_btn_ok->SetToolTip(_L("Cannot mix different filament types"));
     } else {
         m_btn_ok->SetBackgroundColor(wxColour("#1E90D8"));
@@ -2124,7 +2124,7 @@ void MixedFilamentDialog::update_gradient_direction_items()
         int bmp_w = swatch_sz + gap + arrow_w + gap + swatch_sz;
         int bmp_h = swatch_sz;
 
-        wxColour dir_text = StateColor::darkModeColorFor(wxColour("#262E30"));
+        wxColour dir_text = StateColor::darkModeColorFor(wxColour("#1B2F3B"));
 
         return make_alpha_bitmap(bmp_w, bmp_h, [&](wxDC& dc) {
             wxFont number_font = ::Label::Body_13;
@@ -2132,7 +2132,7 @@ void MixedFilamentDialog::update_gradient_direction_items()
             dc.SetFont(number_font);
 
             auto draw_swatch = [&](int x, size_t idx) {
-                wxColour col("#D9D9D9");
+                wxColour col("#D3DADF");
                 if (idx < m_physical_colors.size())
                     col = wxColour(m_physical_colors[idx]);
                 dc.SetBrush(wxBrush(col));
@@ -2206,12 +2206,12 @@ void MixedFilamentDialog::update_component_count_ui()
         bool can_add = (num_components() < (size_t)MAX_COMPONENTS && m_physical_colors.size() > num_components());
         m_btn_add_material->Enable(can_add);
         if (can_add) {
-            m_btn_add_material->SetTextColor(wxColour("#262E30"));
-            m_btn_add_material->SetBorderColor(wxColour("#EEEEEE"));
+            m_btn_add_material->SetTextColor(wxColour("#1B2F3B"));
+            m_btn_add_material->SetBorderColor(wxColour("#EBEFF1"));
             m_btn_add_material->SetToolTip(wxEmptyString);
         } else {
-            m_btn_add_material->SetTextColor(wxColour("#CECECE"));
-            m_btn_add_material->SetBorderColor(wxColour("#EEEEEE"));
+            m_btn_add_material->SetTextColor(wxColour("#C6D0D6"));
+            m_btn_add_material->SetBorderColor(wxColour("#EBEFF1"));
             m_btn_add_material->SetToolTip(is_three ? _L("Maximum 3 materials for mixing") : _L("Maximum number of components reached"));
         }
     }

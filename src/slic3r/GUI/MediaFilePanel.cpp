@@ -29,7 +29,7 @@ MediaFilePanel::MediaFilePanel(wxWindow * parent)
     , m_bmp_empty(this, "media_empty", 0)
     , m_machine("<null>")
 {
-    SetBackgroundColour(0xEEEEEE);
+    SetBackgroundColour(0xEBEFF1);
     Hide();
 
     wxBoxSizer * sizer = new wxBoxSizer(wxVERTICAL);
@@ -39,7 +39,7 @@ MediaFilePanel::MediaFilePanel(wxWindow * parent)
 
     // Time group
     auto time_panel = new wxWindow(this, wxID_ANY);
-    time_panel->SetBackgroundColour(0xEEEEEE);
+    time_panel->SetBackgroundColour(0xEBEFF1);
     m_time_panel = new ::StaticBox(time_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
     m_time_panel->SetCornerRadius(0);
     m_button_year  = new ::Button(m_time_panel, _L("Year"), "", wxBORDER_NONE);
@@ -54,7 +54,7 @@ MediaFilePanel::MediaFilePanel(wxWindow * parent)
         b->SetTextColor(StateColor(
             std::make_pair(0x3B4446, (int) StateColor::Checked),
             std::make_pair(*wxLIGHT_GREY, (int) StateColor::Hovered),
-            std::make_pair(0xABACAC, (int) StateColor::Normal)
+            std::make_pair(0x9EAEB9, (int) StateColor::Normal)
         ));
     }
 
@@ -70,7 +70,7 @@ MediaFilePanel::MediaFilePanel(wxWindow * parent)
 
     // File type
     StateColor background(
-        std::make_pair(0xEEEEEE, (int) StateColor::Checked),
+        std::make_pair(0xEBEFF1, (int) StateColor::Checked),
         std::make_pair(*wxLIGHT_GREY, (int) StateColor::Hovered), 
         std::make_pair(*wxWHITE, (int) StateColor::Normal));
     m_type_panel = new ::StaticBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);

@@ -28,7 +28,7 @@ RecenterDialog::RecenterDialog(wxWindow* parent, wxWindowID id, const wxString& 
     auto* button_sizer = new wxBoxSizer(wxHORIZONTAL);
 
     wxPanel* m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
 
     m_button_confirm = new Button(this, _L("Go Home"));
     m_button_confirm->SetFont(Label::Body_14);
@@ -44,11 +44,11 @@ RecenterDialog::RecenterDialog(wxWindow* parent, wxWindowID id, const wxString& 
     m_button_close->SetFont(Label::Body_14);
     m_button_close->SetMinSize(wxSize(-1, FromDIP(24)));
     m_button_close->SetCornerRadius(FromDIP(12));
-    StateColor close_btn_bg(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Hovered),
+    StateColor close_btn_bg(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Hovered),
         std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
     m_button_close->SetBackgroundColor(close_btn_bg);
-    m_button_close->SetBorderColor(wxColour(38, 46, 48));
-    m_button_close->SetTextColor(wxColour(38, 46, 48));
+    m_button_close->SetBorderColor(wxColour(27, 47, 59));
+    m_button_close->SetTextColor(wxColour(27, 47, 59));
 
     button_sizer->AddStretchSpacer();
     button_sizer->Add(m_button_confirm);

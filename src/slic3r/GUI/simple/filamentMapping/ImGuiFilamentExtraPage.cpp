@@ -52,7 +52,7 @@ void ImGuiFilamentPanel::render_palette_view()
     ImVec2 color_min = row_start;
     ImVec2 color_max = ImVec2(row_start.x + block_size.x, row_start.y + block_size.y);
     dl->AddRectFilled(color_min, color_max, ImGui::GetColorU32(color), 4.f);
-    dl->AddRect(color_min, color_max, ImGui::GetColorU32(ImVec4(0.85f, 0.85f, 0.85f, 1.0f)), 4.f, 0, 1.2f);
+    dl->AddRect(color_min, color_max, ImGui::GetColorU32(ImVec4(0.827f, 0.855f, 0.875f, 1.0f)), 4.f, 0, 1.2f);
     ImVec2 color_txt_sz = ImGui::CalcTextSize(color_label.c_str());
     dl->AddText(ImVec2(color_min.x + (block_size.x - color_txt_sz.x) * 0.5f,
                        color_min.y + (block_size.y - color_txt_sz.y) * 0.5f),
@@ -65,7 +65,7 @@ void ImGuiFilamentPanel::render_palette_view()
     ImVec4 sel_bg(0.94f, 0.94f, 0.94f, 1.0f);
     ImVec4 sel_txt(0.6f, 0.6f, 0.6f, 1.0f);
     dl->AddRectFilled(sel_min, sel_max, ImGui::GetColorU32(sel_bg), 4.f);
-    dl->AddRect(sel_min, sel_max, ImGui::GetColorU32(ImVec4(0.85f, 0.85f, 0.85f, 1.0f)), 4.f, 0, 1.0f);
+    dl->AddRect(sel_min, sel_max, ImGui::GetColorU32(ImVec4(0.827f, 0.855f, 0.875f, 1.0f)), 4.f, 0, 1.0f);
     const char* sel_label = "Select a material";
     ImVec2 sel_txt_sz = ImGui::CalcTextSize(sel_label);
     dl->AddText(ImVec2(sel_min.x + (block_size.x - sel_txt_sz.x) * 0.5f,

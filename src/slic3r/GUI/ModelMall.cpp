@@ -26,7 +26,7 @@ namespace GUI {
         wxBoxSizer* m_sizer_main = new wxBoxSizer(wxVERTICAL);
 
         auto m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-        m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+        m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
         m_sizer_main->Add(m_line_top, 0, wxEXPAND, 0);
 
         m_web_control_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, MODEL_MALL_PAGE_CONTROL_SIZE, wxTAB_TRAVERSAL);

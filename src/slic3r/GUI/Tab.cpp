@@ -401,7 +401,7 @@ static const char* preset_search_icon_name()
 
 static wxColour preset_top_panel_colour()
 {
-    return wxGetApp().dark_mode() ? wxColour("#4B4B4D") : wxColour("#FFFFFF");
+    return wxGetApp().dark_mode() ? wxColour("#365162") : wxColour("#FFFFFF");
 }
 
 void Tab::Highlighter::set_timer_owner(wxEvtHandler* owner, int timerid/* = wxID_ANY*/)
@@ -649,17 +649,17 @@ void Tab::create_preset_tab()
     //search input
     m_search_item = new StaticBox(m_top_panel);
     StateColor box_colour(std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
-    StateColor box_border_colour(std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal));
+    StateColor box_border_colour(std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Normal));
 
     m_search_item->SetBackgroundColor(box_colour);
     m_search_item->SetBorderColor(box_border_colour);
     m_search_item->SetCornerRadius(5);
 
 
-    //StateColor::darkModeColorFor(wxColour(238, 238, 238)), wxDefaultPosition, wxSize(m_top_panel->GetSize().GetWidth(), 3 * wxGetApp().em_unit()), 8);
+    //StateColor::darkModeColorFor(wxColour(235, 239, 241)), wxDefaultPosition, wxSize(m_top_panel->GetSize().GetWidth(), 3 * wxGetApp().em_unit()), 8);
     auto search_sizer = new wxBoxSizer(wxHORIZONTAL);
     m_search_input = new TextInput(m_search_item, wxEmptyString, wxEmptyString, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 | wxBORDER_NONE);
-    m_search_input->SetBackgroundColour(wxColour(238, 238, 238));
+    m_search_input->SetBackgroundColour(wxColour(235, 239, 241));
     m_search_input->SetForegroundColour(wxColour(43, 52, 54));
     m_search_input->SetFont(wxGetApp().bold_font());
 
@@ -773,7 +773,7 @@ void Tab::create_preset_tab()
 
     m_top_sizer->SetMinSize(-1, 3 * m_em_unit);
     m_top_panel->SetSizer(m_top_sizer);
-    //m_top_panel->SetBackgroundColour(wxColour(122, 122, 122));
+    //m_top_panel->SetBackgroundColour(wxColour(98, 127, 146));
     if (m_presets_choice)
         m_main_sizer->Add(m_top_panel, 0, wxEXPAND | wxUP | wxDOWN, m_em_unit);
     else
@@ -1191,7 +1191,7 @@ void Tab::update_label_colours()
                 (m_type < Preset::TYPE_COUNT ? &m_default_text_clr : &m_modified_label_clr);
 
             m_tabctrl->SetItemTextColour(cur_item, clr == &m_modified_label_clr ? *clr : StateColor(
-                        std::make_pair(wxColor("#CBCBCC"), (int)StateColor::NotChecked),
+                        std::make_pair(wxColor("#C4CDD3"), (int)StateColor::NotChecked),
                         std::make_pair(wxColor("#000000"), (int) StateColor::Normal)));
             break;
         }
@@ -1736,7 +1736,7 @@ void Tab::update_changed_tree_ui()
 
             if (page->set_item_colour(clr))
                 m_tabctrl->SetItemTextColour(cur_item, clr == &m_modified_label_clr ? *clr : StateColor(
-                        std::make_pair(wxColor("#CBCBCC"), (int)StateColor::NotChecked),
+                        std::make_pair(wxColor("#C4CDD3"), (int)StateColor::NotChecked),
                         std::make_pair(wxColor("#000000"), (int)StateColor::Normal)));
 
             page->m_is_nonsys_values = !sys_page;
@@ -3971,16 +3971,16 @@ wxSizer* TabPrint::create_limit_mess_enable_widget(const std::string& title, wxW
     btn->SetMaxSize(wxSize(FromDIP(122), FromDIP(24)));
     btn->SetSize(wxSize(FromDIP(122), FromDIP(24)));
     btn->SetCornerRadius(FromDIP(4));
-    btn->SetBorderColor(wxColour("#DBDBDB"));
-    btn->SetBackgroundColour(is_dark ? 0x4B4B4D : 0xFFFFFF);
-    btn->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour(is_dark ? 0x4B4B4D : 0xFFFFFF), StateColor::Pressed),
-                                       std::pair<wxColour, int>(wxColour(is_dark ? 0x4B4B4D : 0xFFFFFF), StateColor::Hovered),
-                                       std::pair<wxColour, int>(wxColour(is_dark ? 0x4B4B4D : 0xFFFFFF), StateColor::Normal)));
+    btn->SetBorderColor(wxColour("#D5DCE1"));
+    btn->SetBackgroundColour(is_dark ? 0x365162 : 0xFFFFFF);
+    btn->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour(is_dark ? 0x365162 : 0xFFFFFF), StateColor::Pressed),
+                                       std::pair<wxColour, int>(wxColour(is_dark ? 0x365162 : 0xFFFFFF), StateColor::Hovered),
+                                       std::pair<wxColour, int>(wxColour(is_dark ? 0x365162 : 0xFFFFFF), StateColor::Normal)));
     btn->Bind(wxEVT_ENTER_WINDOW, [=](wxMouseEvent& e) {
         btn->SetBorderColor(wxColour("#1E90D8"));
     });
     btn->Bind(wxEVT_LEAVE_WINDOW, [=](wxMouseEvent& e) {
-        btn->SetBorderColor(wxColour("#DBDBDB"));
+        btn->SetBorderColor(wxColour("#D5DCE1"));
     });
     auto sizer = new wxBoxSizer(wxHORIZONTAL);
     sizer->Add(text, 0, wxLEFT, FromDIP(50));
@@ -4046,18 +4046,18 @@ wxSizer* TabPrint::create_flush_into_skeleton_widget(wxWindow* parent)
     btn->SetMaxSize(wxSize(FromDIP(122), FromDIP(24)));
     btn->SetSize(wxSize(FromDIP(122), FromDIP(24)));
     btn->SetCornerRadius(FromDIP(4));
-    btn->SetBorderColor(wxColour("#DBDBDB"));
-    btn->SetBackgroundColour(is_dark ? 0x4B4B4D : 0xFFFFFF);
-    btn->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour(is_dark ? 0x4B4B4D : 0xFFFFFF), StateColor::Pressed),
-                                       std::pair<wxColour, int>(wxColour(is_dark ? 0x4B4B4D : 0xFFFFFF), StateColor::Hovered),
-                                       std::pair<wxColour, int>(wxColour(is_dark ? 0x4B4B4D : 0xFFFFFF), StateColor::Normal)));
+    btn->SetBorderColor(wxColour("#D5DCE1"));
+    btn->SetBackgroundColour(is_dark ? 0x365162 : 0xFFFFFF);
+    btn->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour(is_dark ? 0x365162 : 0xFFFFFF), StateColor::Pressed),
+                                       std::pair<wxColour, int>(wxColour(is_dark ? 0x365162 : 0xFFFFFF), StateColor::Hovered),
+                                       std::pair<wxColour, int>(wxColour(is_dark ? 0x365162 : 0xFFFFFF), StateColor::Normal)));
     m_flush_into_skeleton_btn = btn;
     update_flush_into_skeleton_button_state();
     btn->Bind(wxEVT_ENTER_WINDOW, [=](wxMouseEvent& e) {
         btn->SetBorderColor(wxColour("#1E90D8"));
     });
     btn->Bind(wxEVT_LEAVE_WINDOW, [=](wxMouseEvent& e) {
-        btn->SetBorderColor(wxColour("#DBDBDB"));
+        btn->SetBorderColor(wxColour("#D5DCE1"));
     });
 
     auto sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -6275,17 +6275,17 @@ void TabFilament::create_preset_tab()
     //search input
     m_search_item = new StaticBox(m_top_panel);
     StateColor box_colour(std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
-    StateColor box_border_colour(std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal));
+    StateColor box_border_colour(std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Normal));
 
     m_search_item->SetBackgroundColor(box_colour);
     m_search_item->SetBorderColor(box_border_colour);
     m_search_item->SetCornerRadius(5);
 
 
-    //StateColor::darkModeColorFor(wxColour(238, 238, 238)), wxDefaultPosition, wxSize(m_top_panel->GetSize().GetWidth(), 3 * wxGetApp().em_unit()), 8);
+    //StateColor::darkModeColorFor(wxColour(235, 239, 241)), wxDefaultPosition, wxSize(m_top_panel->GetSize().GetWidth(), 3 * wxGetApp().em_unit()), 8);
     auto search_sizer = new wxBoxSizer(wxHORIZONTAL);
     m_search_input = new TextInput(m_search_item, wxEmptyString, wxEmptyString, wxEmptyString, wxDefaultPosition, wxSize(FromDIP(200), FromDIP(30)), 0 | wxBORDER_NONE);
-    m_search_input->SetBackgroundColour(wxColour(238, 238, 238));
+    m_search_input->SetBackgroundColour(wxColour(235, 239, 241));
     m_search_input->SetForegroundColour(wxColour(43, 52, 54));
     m_search_input->SetFont(wxGetApp().bold_font());
 
@@ -6371,13 +6371,13 @@ void TabFilament::create_preset_tab()
 
     bool is_dark = wxGetApp().dark_mode();
     m_boxPanel = new wxPanel(m_top_panel);
-    m_boxPanel->SetBackgroundColour(is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF"));
+    m_boxPanel->SetBackgroundColour(is_dark ? wxColour("#365162") : wxColour("#FFFFFF"));
     wxBoxSizer* bSizer = new wxBoxSizer(wxHORIZONTAL);
     m_boxPanel->SetSizer(bSizer);
 
     wxStaticText* vendorLabel = new wxStaticText(m_boxPanel, wxID_ANY, _L("Vendor"), wxDefaultPosition, wxDefaultSize, 0);
     //m_top_sizer->Add(vendorLabel, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 1);
-    vendorLabel->SetBackgroundColour(is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF"));
+    vendorLabel->SetBackgroundColour(is_dark ? wxColour("#365162") : wxColour("#FFFFFF"));
     bSizer->Add(vendorLabel, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 10);
 
     if (!m_wcb_choiceVendor)
@@ -6394,7 +6394,7 @@ void TabFilament::create_preset_tab()
     wxStaticText* typeLabel = new wxStaticText(m_boxPanel, wxID_ANY, _L("Type"), wxDefaultPosition, wxDefaultSize, 0);
     //m_top_sizer->Add(typeLabel, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 1);
     bSizer->Add(typeLabel, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 10);
-    typeLabel->SetBackgroundColour(is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF"));
+    typeLabel->SetBackgroundColour(is_dark ? wxColour("#365162") : wxColour("#FFFFFF"));
     if (!m_wcb_choicePrintType)
         m_wcb_choicePrintType = new TabPresetComboBox(m_boxPanel, Preset::TYPE_INVALID);
     m_wcb_choicePrintType->Bind(wxEVT_COMBOBOX, [this](wxCommandEvent& e) {
@@ -8122,7 +8122,7 @@ void Tab::rebuild_page_tree()
             continue;
         auto itemId = m_tabctrl->AppendItem(translate_category(p->title(), m_type), p->iconID());
         m_tabctrl->SetItemTextColour(itemId, p->get_item_colour() == m_modified_label_clr ? p->get_item_colour() : StateColor(
-                        std::make_pair(wxColor("#CBCBCC"), (int)StateColor::NotChecked),
+                        std::make_pair(wxColor("#C4CDD3"), (int)StateColor::NotChecked),
                         std::make_pair(wxColor("#000000"), (int)StateColor::Normal)));
         if (translate_category(p->title(), m_type) == selected)
             item = itemId;
@@ -9564,17 +9564,17 @@ void TabPrinter::create_preset_tab()
     //search input
     m_search_item = new StaticBox(m_top_panel);
     StateColor box_colour(std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
-    StateColor box_border_colour(std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal));
+    StateColor box_border_colour(std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Normal));
 
     m_search_item->SetBackgroundColor(box_colour);
     m_search_item->SetBorderColor(box_border_colour);
     m_search_item->SetCornerRadius(5);
 
 
-    //StateColor::darkModeColorFor(wxColour(238, 238, 238)), wxDefaultPosition, wxSize(m_top_panel->GetSize().GetWidth(), 3 * wxGetApp().em_unit()), 8);
+    //StateColor::darkModeColorFor(wxColour(235, 239, 241)), wxDefaultPosition, wxSize(m_top_panel->GetSize().GetWidth(), 3 * wxGetApp().em_unit()), 8);
     auto search_sizer = new wxBoxSizer(wxHORIZONTAL);
     m_search_input = new TextInput(m_search_item, wxEmptyString, wxEmptyString, wxEmptyString, wxDefaultPosition, wxSize(FromDIP(200), FromDIP(30)), 0 | wxBORDER_NONE);
-    m_search_input->SetBackgroundColour(wxColour(238, 238, 238));
+    m_search_input->SetBackgroundColour(wxColour(235, 239, 241));
     m_search_input->SetForegroundColour(wxColour(43, 52, 54));
     m_search_input->SetFont(wxGetApp().bold_font());
 
@@ -9660,13 +9660,13 @@ void TabPrinter::create_preset_tab()
 
     bool is_dark = wxGetApp().dark_mode();
     m_boxPanel = new wxPanel(m_top_panel);
-    m_boxPanel->SetBackgroundColour(is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF"));
+    m_boxPanel->SetBackgroundColour(is_dark ? wxColour("#365162") : wxColour("#FFFFFF"));
     wxBoxSizer* bSizer = new wxBoxSizer(wxHORIZONTAL);
     m_boxPanel->SetSizer(bSizer);
 
     wxStaticText* vendorLabel = new wxStaticText(m_boxPanel, wxID_ANY, _L("Vendor"), wxDefaultPosition, wxDefaultSize, 0);
     //m_top_sizer->Add(vendorLabel, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 1);
-    vendorLabel->SetBackgroundColour(is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF"));
+    vendorLabel->SetBackgroundColour(is_dark ? wxColour("#365162") : wxColour("#FFFFFF"));
     bSizer->Add(vendorLabel, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 10);
 
     if (!m_wcb_choiceVendor)
@@ -9682,7 +9682,7 @@ void TabPrinter::create_preset_tab()
 
     wxStaticText* typeLabel = new wxStaticText(m_boxPanel, wxID_ANY, _L("Printer"), wxDefaultPosition, wxDefaultSize, 0);
     //m_top_sizer->Add(typeLabel, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 1);
-    typeLabel->SetBackgroundColour(is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF"));
+    typeLabel->SetBackgroundColour(is_dark ? wxColour("#365162") : wxColour("#FFFFFF"));
     bSizer->Add(typeLabel, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 10);
     if (!m_wcb_choicePrintType)
         m_wcb_choicePrintType = new TabPresetComboBox(m_boxPanel, Preset::TYPE_INVALID);
@@ -11488,13 +11488,13 @@ HTabbarPrinter::HTabbarPrinter(ParamsPanel* parent, Preset::Type preset_type, Pr
     // search box
     m_search_box = new StaticBox(this);
     StateColor box_colour(std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
-    StateColor box_border_colour(std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal));
+    StateColor box_border_colour(std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Normal));
     m_search_box->SetBackgroundColor(box_colour);
     m_search_box->SetBorderColor(box_border_colour);
     m_search_box->SetCornerRadius(5);
     // search input
     m_search_text_input = new TextInput(m_search_box, wxEmptyString, wxEmptyString, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 | wxBORDER_NONE);
-    m_search_text_input->SetBackgroundColour(wxColour(238, 238, 238));
+    m_search_text_input->SetBackgroundColour(wxColour(235, 239, 241));
     m_search_text_input->SetForegroundColour(wxColour(43, 52, 54));
     m_search_text_input->SetFont(wxGetApp().bold_font());
 

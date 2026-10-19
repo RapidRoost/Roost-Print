@@ -11,44 +11,44 @@ static std::map<wxColour, wxColour> gDarkColors{
     {"#1F8EEA", "#2778D2"}, // rgb(31, 142, 234)   ???
     {"#FF6F00", "#D15B00"}, // rgb(255, 111, 0)    Secondary color
     {"#D01B1B", "#BB2A3A"}, // rgb(208, 27, 27)    ???
-    {"#262E30", "#EFEFF0"}, // rgb(38, 46, 48)     Button text color | Input Text Color
-    {"#2C2C2E", "#B3B3B4"}, // rgb(44, 44, 46)     ???
-    {"#6B6B6B", "#818183"}, // rgb(107, 107, 107)  Disabled Text
-    {"#ACACAC", "#65656A"}, // rgb(172, 172, 172)  Disabled Text on boxes | Dimmed Elements
-    {"#EEEEEE", "#6C6C70"}, // rgb(238, 238, 238)  Separator Line | Title Line Color
-    {"#E8E8E8", "#3E3E45"}, // rgb(232, 232, 232)  ???
-    {"#323A3D", "#E5E5E4"}, // rgb(50, 58, 61)     Softer text color
-    {"#F7F8FA", "#4B4B4C"}, // rgb(255, 255, 255)  Window background
-    {"#FFFFFF", "#4B4B4D"}, // rgb(255, 255, 255)  Window background
-    {"#F8F8F8", "#36363C"}, // rgb(248, 248, 248)  Sidebar > Titlebar > Gradient Top | BBL monitor page titlebar bg
-    {"#F1F1F1", "#36363B"}, // rgb(241, 241, 241)  Sidebar > Titlebar > Gradient Bottom
-    {"#3B4446", "#2D2D30"}, // rgb(59, 68, 78)     Top Bar / Main tab bar bg color
-    {"#CECECE", "#54545B"}, // rgb(206, 206, 206)  Sidebar wxPanel bg | 
-    {"#D6EDFC", "#3B3B40"}, // rgb(214, 237, 252)  Not Used anymore // Was used for BBS combo boxes etc
+    {"#1B2F3B", "#EDF0F2"}, // rgb(27, 47, 59)     Button text color | Input Text Color
+    {"#1C313E", "#A8B6BF"}, // rgb(28, 49, 62)     ???
+    {"#547082", "#6A879A"}, // rgb(84, 112, 130)  Disabled Text
+    {"#9FAFB9", "#516D7E"}, // rgb(159, 175, 185)  Disabled Text on boxes | Dimmed Elements
+    {"#EBEFF1", "#577385"}, // rgb(235, 239, 241)  Separator Line | Title Line Color
+    {"#E4E9EC", "#2C4657"}, // rgb(228, 233, 236)  ???
+    {"#323A3D", "#E0E5E9"}, // rgb(50, 58, 61)     Softer text color
+    {"#F7F8FA", "#355162"}, // rgb(255, 255, 255)  Window background
+    {"#FFFFFF", "#365162"}, // rgb(255, 255, 255)  Window background
+    {"#F8F8F8", "#253D4D"}, // rgb(248, 248, 248)  Sidebar > Titlebar > Gradient Top | BBL monitor page titlebar bg
+    {"#EFF1F3", "#253D4C"}, // rgb(239, 241, 243)  Sidebar > Titlebar > Gradient Bottom
+    {"#3B4446", "#1D3240"}, // rgb(59, 68, 78)     Top Bar / Main tab bar bg color
+    {"#C6D0D6", "#415D6E"}, // rgb(198, 208, 214)  Sidebar wxPanel bg | 
+    {"#D6EDFC", "#294252"}, // rgb(214, 237, 252)  Not Used anymore // Was used for BBS combo boxes etc
     {"#000000", "#FFFFFE"}, // rgb(0, 0, 0)        Mostly Text color wxBlack
-    {"#F4F4F4", "#36363D"}, // rgb(244, 244, 244)  ???
-    {"#DBDBDB", "#6C6C70"}, // rgb(219, 219, 219)  Input/Combo Box Border Color
-    {"#EDFAF2", "#283232"}, // rgb(229, 240, 238)  Not Used anymore // Was used for BBS Combo / Dropdown focused background color
-    {"#323A3C", "#E5E5E6"}, // rgb(50, 58, 60)     Text color used on search list | 
-    {"#6B6B6A", "#B3B3B5"}, // rgb(107, 107, 106)  Button Dimmed text | Input box side text 
-    {"#303A3C", "#E5E5E5"}, // rgb(48, 58, 60)     Object Table > Column header text color | StaticBox Border Color
-    {"#FEFFFF", "#242428"}, // rgb(254, 255, 255)  Side Tabbar bg | 
-    {"#A6A9AA", "#3B3B3D"}, // rgb(166, 169, 170)  Seperator color
-    {"#E8EAEE", "#3B3B3D"}, // rgb(166, 169, 170)  Seperator color 2
-    {"#363636", "#B2B3B5"}, // rgb(54, 54, 54)     Sidebar > Parameter Label/Title color | Sidebar tab text | Create Filament window text
-    {"#F0F0F1", "#333337"}, // rgb(240, 240, 241)  Disabled element background // ORCA Used better background color for dark mode
-    {"#9E9E9E", "#53545A"}, // rgb(158, 158, 158)  ???
+    {"#F4F4F4", "#263E4D"}, // rgb(244, 244, 244)  ???
+    {"#D5DCE1", "#577385"}, // rgb(213, 220, 225)  Input/Combo Box Border Color
+    {"#EDFAF2", "#1C313E"}, // rgb(229, 240, 238)  Not Used anymore // Was used for BBS Combo / Dropdown focused background color
+    {"#243B4A", "#E2E6E9"}, // rgb(36, 59, 74)     Text color used on search list | 
+    {"#547081", "#A8B7C0"}, // rgb(84, 112, 129)  Button Dimmed text | Input box side text 
+    {"#303A3C", "#E1E6E9"}, // rgb(48, 58, 60)     Object Table > Column header text color | StaticBox Border Color
+    {"#FEFFFF", "#172935"}, // rgb(254, 255, 255)  Side Tabbar bg | 
+    {"#9AABB6", "#284150"}, // rgb(154, 171, 182)  Seperator color
+    {"#E8EAEE", "#284150"}, // rgb(154, 171, 182)  Seperator color 2
+    {"#233A49", "#A8B6BF"}, // rgb(35, 58, 73)     Sidebar > Parameter Label/Title color | Sidebar tab text | Create Filament window text
+    {"#EEF1F3", "#223948"}, // rgb(238, 241, 243)  Disabled element background // ORCA Used better background color for dark mode
+    {"#8EA2AE", "#405C6D"}, // rgb(142, 162, 174)  ???
     {"#D7E8DE", "#1F2B27"}, // rgb(215, 232, 222)  Not Used anymore // Leftover from BBS
-    {"#2B3436", "#808080"}, // rgb(43, 52, 54)     Not Used anymore // Leftover from BBS. Was used as main fill color of icons
-    {"#ABABAB", "#ABABAB"},
-    {"#D9D9D9", "#2D2D32"}, // rgb(217, 217, 217)  Sidebar > Toggle button track color
-    //{"#F0F0F0", "#4C4C54"},
+    {"#2B3436", "#688698"}, // rgb(43, 52, 54)     Not Used anymore // Leftover from BBS. Was used as main fill color of icons
+    {"#9EAEB8", "#9EAEB8"},
+    {"#D3DADF", "#1E3441"}, // rgb(211, 218, 223)  Sidebar > Toggle button track color
+    //{"#EEF1F2", "#395567"},
     // ORCA
     {"#C0D4E0", "#223C3C"}, // rgb(192, 212, 224)  Dropdown checked item background color > ORCA color with %25 opacity
-    {"#E5F0EE", "#283232"}, // rgb(229, 240, 238)  Combo / Dropdown focused background color > ORCA color with %10 opacity
-    {"#6E6E73", "#6E6E73"}, //rgb(110, 110, 115) prompt tip yse/no button grey
-    {"#96969B", "#96969B"}, //rgb(150, 150, 155)
-    // rgb(110, 110, 115)  #736E6E
+    {"#E5F0EE", "#1C313E"}, // rgb(229, 240, 238)  Combo / Dropdown focused background color > ORCA color with %10 opacity
+    {"#597688", "#597688"}, //rgb(89, 118, 136) prompt tip yse/no button grey
+    {"#879CAA", "#879CAA"}, //rgb(135, 156, 170)
+    // rgb(89, 118, 136)  #597688
     {"#010203", "#FEFEFE"},
 };
 

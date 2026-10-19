@@ -337,9 +337,9 @@ SideTools::SideTools(wxWindow *parent, wxWindowID id, const wxPoint &pos, const 
     auto st_title_error_code = new wxStaticText(m_side_error_panel, wxID_ANY, _L("code"), wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END);
     auto st_title_error_code_doc = new wxStaticText(m_side_error_panel, wxID_ANY, ": ");
     m_st_txt_error_code = new Label(m_side_error_panel, wxEmptyString, LB_AUTO_WRAP);
-    st_title_error_code->SetForegroundColour(0x909090);
-    st_title_error_code_doc->SetForegroundColour(0x909090);
-    m_st_txt_error_code->SetForegroundColour(0x909090);
+    st_title_error_code->SetForegroundColour(0x7D94A3);
+    st_title_error_code_doc->SetForegroundColour(0x7D94A3);
+    m_st_txt_error_code->SetForegroundColour(0x7D94A3);
     st_title_error_code->SetFont(::Label::Body_12);
     st_title_error_code_doc->SetFont(::Label::Body_12);
     m_st_txt_error_code->SetFont(::Label::Body_12);
@@ -355,9 +355,9 @@ SideTools::SideTools(wxWindow *parent, wxWindowID id, const wxPoint &pos, const 
     auto st_title_error_desc = new wxStaticText(m_side_error_panel, wxID_ANY, wxT("desc"), wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END);
     auto st_title_error_desc_doc = new wxStaticText(m_side_error_panel, wxID_ANY, ": ");
     m_st_txt_error_desc = new Label(m_side_error_panel, wxEmptyString, LB_AUTO_WRAP);
-    st_title_error_desc->SetForegroundColour(0x909090);
-    st_title_error_desc_doc->SetForegroundColour(0x909090);
-    m_st_txt_error_desc->SetForegroundColour(0x909090);
+    st_title_error_desc->SetForegroundColour(0x7D94A3);
+    st_title_error_desc_doc->SetForegroundColour(0x7D94A3);
+    m_st_txt_error_desc->SetForegroundColour(0x7D94A3);
     st_title_error_desc->SetFont(::Label::Body_12);
     st_title_error_desc_doc->SetFont(::Label::Body_12);
     m_st_txt_error_desc->SetFont(::Label::Body_12);
@@ -372,9 +372,9 @@ SideTools::SideTools(wxWindow *parent, wxWindowID id, const wxPoint &pos, const 
     auto st_title_extra_info = new wxStaticText(m_side_error_panel, wxID_ANY, wxT("info"), wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END);
     auto st_title_extra_info_doc = new wxStaticText(m_side_error_panel, wxID_ANY, ": ");
     m_st_txt_extra_info = new Label(m_side_error_panel, wxEmptyString, LB_AUTO_WRAP);
-    st_title_extra_info->SetForegroundColour(0x909090);
-    st_title_extra_info_doc->SetForegroundColour(0x909090);
-    m_st_txt_extra_info->SetForegroundColour(0x909090);
+    st_title_extra_info->SetForegroundColour(0x7D94A3);
+    st_title_extra_info_doc->SetForegroundColour(0x7D94A3);
+    m_st_txt_extra_info->SetForegroundColour(0x7D94A3);
     st_title_extra_info->SetFont(::Label::Body_12);
     st_title_extra_info_doc->SetFont(::Label::Body_12);
     m_st_txt_extra_info->SetFont(::Label::Body_12);

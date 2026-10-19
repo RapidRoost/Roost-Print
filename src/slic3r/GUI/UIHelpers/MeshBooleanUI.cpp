@@ -696,9 +696,9 @@ bool MeshBooleanUI::draw_tab_button(const char* icon_name, const char* text, boo
     ImU32 bg_color = selected
         ? ImGui::GetColorU32(ImVec4(0, 174.0f/255.0f, 66.0f/255.0f, 1.0f))
         : (ImGui::IsItemHovered()
-            ? ImGui::GetColorU32(m_is_dark_mode ? ImVec4(0.3f,0.3f,0.3f,1.0f) : ImVec4(0.9f,0.9f,0.9f,1.0f))
-            : ImGui::GetColorU32(m_is_dark_mode ? ImVec4(0.2f,0.2f,0.2f,1.0f) : ImVec4(1.0f,1.0f,1.0f,1.0f)));
-    ImU32 border_color = ImGui::GetColorU32(m_is_dark_mode ? ImVec4(0.5f,0.5f,0.5f,1.0f) : ImVec4(0.7f,0.7f,0.7f,1.0f));
+            ? ImGui::GetColorU32(m_is_dark_mode ? ImVec4(0.212f,0.318f,0.384f,1.0f) : ImVec4(0.886f,0.906f,0.918f,1.0f))
+            : ImGui::GetColorU32(m_is_dark_mode ? ImVec4(0.125f,0.216f,0.275f,1.0f) : ImVec4(1.0f,1.0f,1.0f,1.0f)));
+    ImU32 border_color = ImGui::GetColorU32(m_is_dark_mode ? ImVec4(0.408f,0.525f,0.596f,1.0f) : ImVec4(0.651f,0.710f,0.745f,1.0f));
     float rounding = MeshBooleanConfig::ROUNDING_BUTTON;
 
     if (border_type == 0) {
@@ -1299,7 +1299,7 @@ void MeshBooleanUI::draw_progress_bar()
     // Draw percentage text on the same line
     ImGui::SameLine(0, text_padding);
     ImGui::AlignTextToFramePadding();
-    ImGui::TextColored(ImVec4(0.42f, 0.42f, 0.42f, 1.00f), progress_text.c_str());
+    ImGui::TextColored(ImVec4(0.329f, 0.439f, 0.510f, 1.00f), progress_text.c_str());
 
     ImGui::EndGroup();
 
@@ -1308,7 +1308,7 @@ void MeshBooleanUI::draw_progress_bar()
 
     // Determine status text and color based on progress
     std::string status_text;
-    ImVec4 text_color = ImVec4(0.42f, 0.42f, 0.42f, 1.0f);
+    ImVec4 text_color = ImVec4(0.329f, 0.439f, 0.510f, 1.0f);
 
     if (progress < 10.0f) {
         status_text = _u8L("Preparing data...");

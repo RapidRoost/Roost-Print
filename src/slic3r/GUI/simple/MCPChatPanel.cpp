@@ -2999,6 +2999,9 @@ void MCPChatWindow::OnParentIconize(wxIconizeEvent& evt)
 
 void MCPChatWindow::Toggle(wxWindow* parent)
 {
+    // Roost Print: the AI assistant is removed; its window never opens.
+    (void)parent;
+    return;
     // if (activate_embedded_chat_panel_if_available())
     //     return;
 
@@ -3012,6 +3015,9 @@ void MCPChatWindow::Toggle(wxWindow* parent)
 
 void MCPChatWindow::Show(wxWindow* parent)
 {
+    // Roost Print: the AI assistant is removed; its window never opens.
+    (void)parent;
+    return;
     // if (activate_embedded_chat_panel_if_available())
     //     return;
 

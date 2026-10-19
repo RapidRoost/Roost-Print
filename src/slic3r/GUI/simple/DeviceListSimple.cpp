@@ -1310,7 +1310,7 @@ void render_device_list_popup(GLCanvas3D& canvas, float /*x*/, float /*y*/, floa
     const bool  dark  = wxGetApp().dark_mode();
 
     // Title
-    ImGui::PushStyleColor(ImGuiCol_Text, dark ? ImVec4(1,1,1,1) : ImVec4(0.1686f,0.1686f,0.1765f,1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Text, dark ? ImVec4(1,1,1,1) : ImVec4(0.106f,0.188f,0.239f,1.0f));
     const float base_font_px = ImGui::GetFontSize();
     const float title_px     = 16.0f * scale;
     const float prev_scale   = 1.0f;
@@ -1381,7 +1381,7 @@ void render_device_list_popup(GLCanvas3D& canvas, float /*x*/, float /*y*/, floa
         const std::string link   = _u8L(" add printer");
 
         // Adaptive text color per theme (compute locally)
-        ImGui::PushStyleColor(ImGuiCol_Text, dark ? ImVec4(1,1,1,1) : ImVec4(0.1686f,0.1686f,0.1765f,1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Text, dark ? ImVec4(1,1,1,1) : ImVec4(0.106f,0.188f,0.239f,1.0f));
 
         // Single-line: "<line1>  <line11><link>" at 16px font size
         const float base_px   = ImGui::GetFontSize();
@@ -1439,7 +1439,7 @@ void render_device_list_popup(GLCanvas3D& canvas, float /*x*/, float /*y*/, floa
 
     const ImU32 br_grey  = dark ? IM_COL32(110,110,114,200) : IM_COL32(192,192,200,200);
     const ImU32 br_green = IM_COL32(41,190,85,255);
-    const ImU32 text_col = ImGui::GetColorU32(dark ? ImVec4(1,1,1,1) : ImVec4(0.1686f,0.1686f,0.1765f,1));
+    const ImU32 text_col = ImGui::GetColorU32(dark ? ImVec4(1,1,1,1) : ImVec4(0.106f,0.188f,0.239f,1));
     const ImU32 status_free = IM_COL32(21,192,89,255);
     const ImU32 status_busy = IM_COL32(56,125,255,255);
     const ImU32 status_off  = IM_COL32(255,125,0,255);

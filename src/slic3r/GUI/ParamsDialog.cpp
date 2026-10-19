@@ -363,14 +363,14 @@ CusDialog::CusDialog(wxWindow* parent, wxWindowID id,
     auto* topsizer = new wxBoxSizer(wxVERTICAL);
 
     m_ContentPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBK_LEFT | wxTAB_TRAVERSAL);
-    m_ContentPanel->SetBackgroundColour(wxColor("#4b4b4d"));
+    m_ContentPanel->SetBackgroundColour(wxColor("#365162"));
     m_TitlePanel = new CusTitlePanel(this,"");
     m_TitlePanel->SetMinSize(wxSize(-1, m_TitleHeight));
-    m_TitlePanel->setBgColor(wxColor("#4B4B4D"));
+    m_TitlePanel->setBgColor(wxColor("#365162"));
 
     wxPanel* line = new wxPanel(this);
     line->SetSize(-1, 1);
-    line->SetBackgroundColour("#616165");
+    line->SetBackgroundColour("#4C687A");
     line->Show(false);
     topsizer->Add(m_TitlePanel, 0, wxALL | wxEXPAND, 0);
     topsizer->Add(line, 0, wxALL | wxEXPAND, 0);

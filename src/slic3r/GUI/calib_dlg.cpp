@@ -21,7 +21,7 @@ wxBoxSizer* create_item_checkbox(wxString title, wxWindow* parent, bool* value, 
     m_sizer_checkbox->Add(0, 0, 0, wxEXPAND | wxLEFT, 8);
 
     auto checkbox_title = new wxStaticText(parent, wxID_ANY, title, wxDefaultPosition, wxSize(-1, -1), 0);
-    checkbox_title->SetForegroundColour(wxColour(144, 144, 144));
+    checkbox_title->SetForegroundColour(wxColour(125, 148, 163));
     checkbox_title->SetFont(::Label::Body_13);
     checkbox_title->Wrap(-1);
     m_sizer_checkbox->Add(checkbox_title, 0, wxALIGN_CENTER | wxALL, 3);
@@ -51,8 +51,8 @@ PA_Calibration_Dlg::PA_Calibration_Dlg(wxWindow* parent, wxWindowID id, Plater* 
     bool        is_dark      = wxGetApp().dark_mode();
 
     // 定义颜色：白色文字 + 深灰色背景
-    wxColour textColor = is_dark ?  wxColour(0, 0, 0) : wxColour(51, 51, 51); // 白色
-    wxColour bgColor(75, 75, 77); // 深灰色（#404040）
+    wxColour textColor = is_dark ?  wxColour(0, 0, 0) : wxColour(32, 55, 70); // 白色
+    wxColour bgColor(75, 75, 77); // 深灰色（#2B4555）
      // ---------------------- 左侧：挤出机类型 ----------------------
     extruderBox                     = new wxStaticBox(this, wxID_ANY, _L("Extruder type"));
     wxStaticBoxSizer* extruderSizer = new wxStaticBoxSizer(extruderBox, wxHORIZONTAL);
@@ -114,9 +114,9 @@ PA_Calibration_Dlg::PA_Calibration_Dlg(wxWindow* parent, wxWindowID id, Plater* 
     // start PA
     auto start_PA_sizer = new wxBoxSizer(wxHORIZONTAL);
     auto start_pa_text = new wxStaticText(this, wxID_ANY, start_pa_str, wxDefaultPosition, st_size, wxALIGN_LEFT);
-    //start_pa_text->SetOwnForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(51, 51, 51));
-    start_pa_text->SetBackgroundColour(is_dark ? wxColour(75, 75, 77) : wxColour(255, 255, 255));
-    start_pa_text->SetForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(51, 51, 51));
+    //start_pa_text->SetOwnForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(32, 55, 70));
+    start_pa_text->SetBackgroundColour(is_dark ? wxColour(54, 81, 98) : wxColour(255, 255, 255));
+    start_pa_text->SetForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(32, 55, 70));
     m_tiStartPA = new TextInput(this, "", "", "", wxDefaultPosition, ti_size, wxTE_CENTRE | wxTE_PROCESS_ENTER|wxALIGN_RIGHT);
     m_tiStartPA->GetTextCtrl()->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
@@ -127,9 +127,9 @@ PA_Calibration_Dlg::PA_Calibration_Dlg(wxWindow* parent, wxWindowID id, Plater* 
     // end PA
     auto end_PA_sizer = new wxBoxSizer(wxHORIZONTAL);
     auto end_pa_text = new wxStaticText(this, wxID_ANY, end_pa_str, wxDefaultPosition, st_size, wxALIGN_LEFT);
-    //end_pa_text->SetOwnForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(51, 51, 51));
-    end_pa_text->SetBackgroundColour(is_dark ? wxColour(75, 75, 77) : wxColour(255, 255, 255));
-    end_pa_text->SetForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(51, 51, 51));
+    //end_pa_text->SetOwnForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(32, 55, 70));
+    end_pa_text->SetBackgroundColour(is_dark ? wxColour(54, 81, 98) : wxColour(255, 255, 255));
+    end_pa_text->SetForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(32, 55, 70));
     m_tiEndPA = new TextInput(this, "", "", "", wxDefaultPosition, ti_size, wxTE_CENTRE | wxTE_PROCESS_ENTER);
     m_tiStartPA->GetTextCtrl()->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
     end_PA_sizer->Add(end_pa_text, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
@@ -139,9 +139,9 @@ PA_Calibration_Dlg::PA_Calibration_Dlg(wxWindow* parent, wxWindowID id, Plater* 
     // PA step
     auto PA_step_sizer = new wxBoxSizer(wxHORIZONTAL);
     auto PA_step_text = new wxStaticText(this, wxID_ANY, PA_step_str, wxDefaultPosition, st_size, wxALIGN_LEFT);
-    //PA_step_text->SetOwnForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(51, 51, 51));
-    PA_step_text->SetBackgroundColour(is_dark ? wxColour(75, 75, 77) : wxColour(255, 255, 255));
-    PA_step_text->SetForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(51, 51, 51));
+    //PA_step_text->SetOwnForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(32, 55, 70));
+    PA_step_text->SetBackgroundColour(is_dark ? wxColour(54, 81, 98) : wxColour(255, 255, 255));
+    PA_step_text->SetForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(32, 55, 70));
     m_tiPAStep = new TextInput(this, "", "", "", wxDefaultPosition, ti_size, wxTE_CENTRE | wxTE_PROCESS_ENTER);
     m_tiStartPA->GetTextCtrl()->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
     PA_step_sizer->Add(PA_step_text, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
@@ -151,9 +151,9 @@ PA_Calibration_Dlg::PA_Calibration_Dlg(wxWindow* parent, wxWindowID id, Plater* 
     // creality add bed temp
     auto bed_temp_sizer = new wxBoxSizer(wxHORIZONTAL);
     auto bed_temp_text  = new wxStaticText(this, wxID_ANY, bed_temp_str, wxDefaultPosition, st_size, wxALIGN_LEFT);
-    //bed_temp_text->SetOwnForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(51, 51, 51));
-    bed_temp_text->SetBackgroundColour(is_dark ? wxColour(75, 75, 77) : wxColour(255, 255, 255));
-    bed_temp_text->SetForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(51, 51, 51));
+    //bed_temp_text->SetOwnForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(32, 55, 70));
+    bed_temp_text->SetBackgroundColour(is_dark ? wxColour(54, 81, 98) : wxColour(255, 255, 255));
+    bed_temp_text->SetForegroundColour(is_dark ? wxColour(0, 0, 0) : wxColour(32, 55, 70));
     m_tiBedTemp = new TextInput(this, wxString::FromDouble(50), _L("℃"), "", wxDefaultPosition, ti_size, wxTE_CENTRE);
     m_tiStartPA->GetTextCtrl()->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
     bed_temp_sizer->Add(bed_temp_text, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
@@ -169,15 +169,15 @@ PA_Calibration_Dlg::PA_Calibration_Dlg(wxWindow* parent, wxWindowID id, Plater* 
 	v_sizer->Add(FromDIP(10), FromDIP(10), 0, wxEXPAND, 5);
     m_btnStart = new Button(this, _L("OK"));
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(214, 214, 220));
-	m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(211, 218, 223));
+	m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
 	m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(30)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(30)));
 	m_btnStart->SetCornerRadius(FromDIP(12));
@@ -437,7 +437,7 @@ Temp_Calibration_Dlg::Temp_Calibration_Dlg(wxWindow* parent, wxWindowID id, Plat
     // start temp
     auto start_temp_sizer = new wxBoxSizer(wxHORIZONTAL);
     auto start_temp_text = new wxStaticText(this, wxID_ANY, start_temp_str, wxDefaultPosition, st_size, wxALIGN_LEFT);
-    //start_temp_text->SetForegroundColour(wxColour("#606060"));
+    //start_temp_text->SetForegroundColour(wxColour("#496577"));
     m_tiStart = new TextInput(this, std::to_string(230), _L("\u2103"), "", wxDefaultPosition, ti_size, wxTE_CENTRE);
     m_tiStart->GetTextCtrl()->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
@@ -468,7 +468,7 @@ Temp_Calibration_Dlg::Temp_Calibration_Dlg(wxWindow* parent, wxWindowID id, Plat
     // creality add bed temp
     auto bed_temp_sizer = new wxBoxSizer(wxHORIZONTAL);
     auto bed_temp_text  = new wxStaticText(this, wxID_ANY, bed_temp_str, wxDefaultPosition, st_size, wxALIGN_LEFT);
-    //bed_temp_text->SetForegroundColour(wxColour("#999999"));
+    //bed_temp_text->SetForegroundColour(wxColour("#889DAA"));
     m_tiBedTemp         = new TextInput(this, wxString::FromDouble(50), _L("℃"), "", wxDefaultPosition, ti_size, wxTE_CENTRE);
     m_tiStart->GetTextCtrl()->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
     bed_temp_sizer->Add(bed_temp_text, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
@@ -480,15 +480,15 @@ Temp_Calibration_Dlg::Temp_Calibration_Dlg(wxWindow* parent, wxWindowID id, Plat
     m_btnStart = new Button(this, _L("OK"));
     bool is_dark = wxGetApp().dark_mode();
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-                           std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-                           std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+                           std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+                           std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246,246,249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0,0,0) : wxColour(214, 214, 220));
-    m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0,0,0) : wxColour(211, 218, 223));
+    m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
     m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetCornerRadius(FromDIP(12));
@@ -691,15 +691,15 @@ MaxVolumetricSpeed_Test_Dlg::MaxVolumetricSpeed_Test_Dlg(wxWindow* parent, wxWin
     m_btnStart = new Button(this, _L("OK"));
     bool is_dark = wxGetApp().dark_mode();
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(214, 214, 220));
-    m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(211, 218, 223));
+    m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
     m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetCornerRadius(FromDIP(12));
@@ -868,15 +868,15 @@ VFA_Test_Dlg::VFA_Test_Dlg(wxWindow* parent, wxWindowID id, Plater* plater)
     m_btnStart = new Button(this, _L("OK"));
     bool is_dark = wxGetApp().dark_mode();
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(214, 214, 220));
-    m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(211, 218, 223));
+    m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
     m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetCornerRadius(FromDIP(12));
@@ -1041,15 +1041,15 @@ Retraction_Test_Dlg::Retraction_Test_Dlg(wxWindow* parent, wxWindowID id, Plater
     m_btnStart = new Button(this, _L("OK"));
     bool is_dark = wxGetApp().dark_mode();
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(214, 214, 220));
-    m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(211, 218, 223));
+    m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
     m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetCornerRadius(FromDIP(12));
@@ -1220,15 +1220,15 @@ Retraction_Speed_Dlg::Retraction_Speed_Dlg(wxWindow* parent, wxWindowID id, Plat
     m_btnStart = new Button(this, _L("OK"));
     bool is_dark = wxGetApp().dark_mode();
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(214, 214, 220));
-    m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(211, 218, 223));
+    m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
     m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetCornerRadius(FromDIP(12));
@@ -1411,15 +1411,15 @@ Limit_Speed_Dlg::Limit_Speed_Dlg(wxWindow* parent, wxWindowID id, Plater* plater
     m_btnStart = new Button(this, _L("OK"));
     bool is_dark = wxGetApp().dark_mode();
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(214, 214, 220));
-    m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(211, 218, 223));
+    m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
     m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetCornerRadius(FromDIP(12));
@@ -1600,15 +1600,15 @@ Speed_Tower_Dlg::Speed_Tower_Dlg(wxWindow* parent, wxWindowID id, Plater* plater
     m_btnStart = new Button(this, _L("OK"));
     bool is_dark = wxGetApp().dark_mode();
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(214, 214, 220));
-    m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(211, 218, 223));
+    m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
     m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetCornerRadius(FromDIP(12));
@@ -1789,15 +1789,15 @@ Jitter_Speed_Dlg::Jitter_Speed_Dlg(wxWindow* parent, wxWindowID id, Plater* plat
     m_btnStart = new Button(this, _L("OK"));
     bool is_dark = wxGetApp().dark_mode();
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(214, 214, 220));
-    m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(211, 218, 223));
+    m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
     m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetCornerRadius(FromDIP(12));
@@ -1979,15 +1979,15 @@ Fan_Speed_Dlg::Fan_Speed_Dlg(wxWindow* parent, wxWindowID id, Plater* plater)
     m_btnStart = new Button(this, _L("OK"));
     bool is_dark = wxGetApp().dark_mode();
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(214, 214, 220));
-    m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(211, 218, 223));
+    m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
     m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetCornerRadius(FromDIP(12));
@@ -2172,15 +2172,15 @@ Limit_Acceleration_Dlg::Limit_Acceleration_Dlg(wxWindow* parent, wxWindowID id, 
     m_btnStart = new Button(this, _L("OK"));
     bool is_dark = wxGetApp().dark_mode();
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(214, 214, 220));
-    m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(211, 218, 223));
+    m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
     m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetCornerRadius(FromDIP(12));
@@ -2363,15 +2363,15 @@ Acceleration_Tower_Dlg::Acceleration_Tower_Dlg(wxWindow* parent, wxWindowID id, 
     m_btnStart = new Button(this, _L("OK"));
     bool is_dark = wxGetApp().dark_mode();
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(214, 214, 220));
-    m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(211, 218, 223));
+    m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
     m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetCornerRadius(FromDIP(12));
@@ -2561,15 +2561,15 @@ Dec_Acceleration_Dlg::Dec_Acceleration_Dlg(wxWindow* parent, wxWindowID id, Plat
     m_btnStart = new Button(this, _L("OK"));
     bool is_dark = wxGetApp().dark_mode();
     StateColor btn_bg_gray(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Normal));
 
     StateColor btn_bg_light_mode(std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(246, 246, 249), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_btnStart->SetBackgroundColor(is_dark ? btn_bg_gray : btn_bg_light_mode);
-    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(214, 214, 220));
-    m_btnStart->SetTextColor(is_dark ? wxColour(38, 46, 48) : wxColour(51, 51, 51));
+    m_btnStart->SetBorderColor(is_dark ? wxColour(0, 0, 0) : wxColour(211, 218, 223));
+    m_btnStart->SetTextColor(is_dark ? wxColour(27, 47, 59) : wxColour(32, 55, 70));
     m_btnStart->SetSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetMinSize(wxSize(FromDIP(100), FromDIP(28)));
     m_btnStart->SetCornerRadius(FromDIP(12));
@@ -2697,15 +2697,15 @@ High_Flowrate_Dlg::High_Flowrate_Dlg(wxWindow* parent, wxWindowID id, Plater* pl
     }
 
     StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled),
-                         std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-                         std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+                         std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+                         std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
                          std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled),
                          std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
 
-    StateColor report_bd(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled),
-                         std::pair<wxColour, int>(wxColour("#d6d6dc"), StateColor::Enabled));
-    StateColor report_text(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled),
-                           std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+    StateColor report_bd(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled),
+                         std::pair<wxColour, int>(wxColour("#d3dadf"), StateColor::Enabled));
+    StateColor report_text(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled),
+                           std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
 
     wxString info_str      = _L("Choose the one with the best coarse tuning");
     auto     info_str_size = wxWindow::GetTextExtent(info_str);
@@ -2820,7 +2820,7 @@ XY_Offset_Calibration_Dlg::XY_Offset_Calibration_Dlg(wxWindow* parent, wxWindowI
 
     const wxSize label_size(FromDIP(140), -1);
     const wxSize combo_size(FromDIP(120), -1);
-    const wxColour label_color = StateColor::darkModeColorFor(wxColour("#323A3C"));
+    const wxColour label_color = StateColor::darkModeColorFor(wxColour("#243B4A"));
 
     auto add_row = [this, &v_sizer, label_size, combo_size, label_color](
         const wxString& label,

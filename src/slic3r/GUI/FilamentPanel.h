@@ -187,7 +187,7 @@ const wxColour MENU_COLORS[8] = {
     wxColour(255, 0, 0),     // 05
     wxColour(0, 0, 255),     // 06
     wxColour(173, 216, 230), // 07
-    wxColour(128, 128, 128)  // 08
+    wxColour(104, 134, 152)  // 08
 };
 
 /*

@@ -25,11 +25,11 @@ void HoverBorderBox::Create(wxWindow* parent, wxWindow* insideChild, const wxPoi
     StaticBox::Create(parent, wxID_ANY, pos, size, style);
     SetCornerRadius(6);
 
-    StaticBox::SetBorderColor(StateColor(std::make_pair(is_dark ? 0x4B4B4D : 0xFFFFFF, (int) StateColor::Disabled),
+    StaticBox::SetBorderColor(StateColor(std::make_pair(is_dark ? 0x365162 : 0xFFFFFF, (int) StateColor::Disabled),
                                          std::make_pair(0x1877B4, (int) StateColor::Hovered),
-                                         std::make_pair(is_dark ? 0x4B4B4D : 0xFFFFFF, (int) StateColor::Normal)));
+                                         std::make_pair(is_dark ? 0x365162 : 0xFFFFFF, (int) StateColor::Normal)));
     StaticBox::SetBackgroundColor(
-        StateColor(std::make_pair(0xF0F0F1, (int) StateColor::Disabled),
+        StateColor(std::make_pair(0xEEF1F3, (int) StateColor::Disabled),
                    std::make_pair(wxColour("#787565"), (int) StateColor::Focused), // ORCA updated background color for focused item
                    std::make_pair(*wxWHITE, (int) StateColor::Normal)));
 
@@ -56,9 +56,9 @@ void HoverBorderBox::SetToolTip_( const wxString &tip )
 
 void HoverBorderBox::on_change_color_mode(bool is_dark)
 {
-    StaticBox::SetBorderColor(StateColor(std::make_pair(is_dark ? 0x4B4B4D : 0xFFFFFF, (int) StateColor::Disabled),
+    StaticBox::SetBorderColor(StateColor(std::make_pair(is_dark ? 0x365162 : 0xFFFFFF, (int) StateColor::Disabled),
                                          std::make_pair(0x1877B4, (int) StateColor::Hovered),
-                                         std::make_pair(is_dark ? 0x4B4B4D : 0xFFFFFF, (int) StateColor::Normal)));
+                                         std::make_pair(is_dark ? 0x365162 : 0xFFFFFF, (int) StateColor::Normal)));
 
     state_handler.update_binds();
 

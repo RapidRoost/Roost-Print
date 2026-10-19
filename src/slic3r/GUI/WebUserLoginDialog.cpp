@@ -97,7 +97,7 @@ ZUserLogin::ZUserLogin() : wxDialog((wxWindow *) (wxGetApp().mainframe), wxID_AN
 
         wxBoxSizer* m_sizer_main = new wxBoxSizer(wxVERTICAL);
         auto m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1));
-        m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+        m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
         m_sizer_main->Add(m_line_top, 0, wxEXPAND, 0);
 
         auto* m_message = new wxStaticText(this, wxID_ANY, _L("Bambu Network plug-in not detected."), wxDefaultPosition, wxDefaultSize, 0);

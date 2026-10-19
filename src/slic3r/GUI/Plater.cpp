@@ -1612,9 +1612,9 @@ Sidebar::Sidebar(Plater* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, 
     p->scrolled->SetSizer(scrolled_sizer);
 
     wxColour title_bg        = wxColour(248, 248, 248);
-    wxColour inactive_text   = wxColour(86, 86, 86);
+    wxColour inactive_text   = wxColour(63, 91, 109);
     wxColour active_text     = wxColour(0, 0, 0);
-    wxColour static_line_col = wxColour(166, 169, 170);
+    wxColour static_line_col = wxColour(154, 171, 182);
 
 #ifdef __WINDOWS__
     p->scrolled->SetDoubleBuffered(true);
@@ -1627,7 +1627,7 @@ Sidebar::Sidebar(Plater* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, 
         // p->m_panel_printer_title = new StaticBox(p->scrolled, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | wxBORDER_NONE);
         if (nullptr != p->m_panel_printer_title) {
             p->m_panel_printer_title->SetBackgroundColor(title_bg);
-            p->m_panel_printer_title->SetBackgroundColor2(0xF1F1F1);
+            p->m_panel_printer_title->SetBackgroundColor2(0xEFF1F3);
 
             p->m_printer_icon          = new ScalableButton(p->m_panel_printer_title, wxID_ANY, "printer");
             p->m_text_printer_settings = new Label(p->m_panel_printer_title, _L("Printer"), LB_PROPAGATE_MOUSE_EVENT);
@@ -1659,7 +1659,7 @@ Sidebar::Sidebar(Plater* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, 
             // 1.2 Add spliters around title bar
             // add spliter 1
             // auto spliter_1 = new ::StaticLine(p->scrolled);
-            // spliter_1->SetBackgroundColour("#A6A9AA");
+            // spliter_1->SetBackgroundColour("#9AABB6");
             // scrolled_sizer->Add(spliter_1, 0, wxEXPAND);
 
             // add printer title
@@ -1674,7 +1674,7 @@ Sidebar::Sidebar(Plater* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, 
 
             // add spliter 2
             auto spliter_2 = new ::StaticLine(p->scrolled);
-            spliter_2->SetLineColour("#CECECE");
+            spliter_2->SetLineColour("#C6D0D6");
             scrolled_sizer->Add(spliter_2, 0, wxEXPAND);
         }
 
@@ -1844,11 +1844,11 @@ Sidebar::Sidebar(Plater* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, 
         p->m_panel_filament_title->SetSizer(bSizer39);
         p->m_panel_filament_title->Layout();
         auto spliter_1 = new ::StaticLine(p->scrolled);
-        spliter_1->SetLineColour("#A6A9AA");
+        spliter_1->SetLineColour("#9AABB6");
         scrolled_sizer->Add(spliter_1, 0, wxEXPAND);
         scrolled_sizer->Add(p->m_panel_filament_title, 0, wxEXPAND | wxALL, 0);
         auto spliter_2 = new ::StaticLine(p->scrolled);
-        spliter_2->SetLineColour("#CECECE");
+        spliter_2->SetLineColour("#C6D0D6");
         scrolled_sizer->Add(spliter_2, 0, wxEXPAND);
 
         bSizer39->AddStretchSpacer(1);
@@ -2162,7 +2162,7 @@ Sidebar::Sidebar(Plater* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, 
         // Create title bar (StaticBox for collapsible header)
         p->m_panel_mixed_filaments_title = new StaticBox(p->scrolled, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | wxBORDER_NONE);
         const wxColour title_bg = StateColor::darkModeColorFor(wxColour(0xF7, 0xF8, 0xFA));
-        const wxColour title_fg = StateColor::darkModeColorFor(wxColour("#262E30"));
+        const wxColour title_fg = StateColor::darkModeColorFor(wxColour("#1B2F3B"));
         p->m_panel_mixed_filaments_title->SetBackgroundColour(title_bg);
         p->m_panel_mixed_filaments_title->SetBackgroundColor(title_bg);
         p->m_panel_mixed_filaments_title->SetBackgroundColor2(title_bg);
@@ -2289,7 +2289,7 @@ Sidebar::Sidebar(Plater* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, 
 
         // Add splitter line before title
         auto spliter_mixed_1 = new ::StaticLine(p->scrolled);
-        spliter_mixed_1->SetLineColour("#A6A9AA");
+        spliter_mixed_1->SetLineColour("#9AABB6");
         scrolled_sizer->Add(spliter_mixed_1, 0, wxEXPAND);
 
         // Add title bar to scrolled sizer
@@ -2297,7 +2297,7 @@ Sidebar::Sidebar(Plater* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, 
 
         // Add splitter line after title (slightly darker)
         auto spliter_mixed_2 = new ::StaticLine(p->scrolled);
-        spliter_mixed_2->SetLineColour("#A6A9AA");
+        spliter_mixed_2->SetLineColour("#9AABB6");
         scrolled_sizer->Add(spliter_mixed_2, 0, wxEXPAND);
 
         // Create content panel (collapsible)
@@ -2363,9 +2363,9 @@ Sidebar::Sidebar(Plater* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, 
 
         // the border style of the search control
         //   p->pSearchBk = new StaticBox(p->scrolled);
-        // p->pSearchBk->SetBorderColor(StateColor(std::make_pair(0xDBDBDB, (int)StateColor::Disabled), std::make_pair(0x1877B4,
-        // (int)StateColor::Hovered), 	std::make_pair(0xDBDBDB, (int)StateColor::Normal)));
-        //   //p->pSearchBk->SetBackgroundColor(StateColor(std::make_pair(0xF0F0F1, (int)StateColor::Disabled), std::make_pair(*wxWHITE,
+        // p->pSearchBk->SetBorderColor(StateColor(std::make_pair(0xD5DCE1, (int)StateColor::Disabled), std::make_pair(0x1877B4,
+        // (int)StateColor::Hovered), 	std::make_pair(0xD5DCE1, (int)StateColor::Normal)));
+        //   //p->pSearchBk->SetBackgroundColor(StateColor(std::make_pair(0xEEF1F3, (int)StateColor::Disabled), std::make_pair(*wxWHITE,
         //   (int)StateColor::Normal))); p->pSearchBk->SetCornerRadius(0); p->pSearchBk->SetBorderWidth(1);
         //   //p->sizer_params->Add(p->pSearchBk, 0, wxBOTTOM |wxRIGHT| wxEXPAND, 1);
 
@@ -2413,11 +2413,11 @@ Sidebar::Sidebar(Plater* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, 
         if (params_panel) {
             params_panel->get_top_panel()->Reparent(p->scrolled);
             auto spliter_1 = new ::StaticLine(p->scrolled);
-            spliter_1->SetLineColour("#A6A9AA");
+            spliter_1->SetLineColour("#9AABB6");
             scrolled_sizer->Add(spliter_1, 0, wxEXPAND);
             scrolled_sizer->Add(params_panel->get_top_panel(), 0, wxEXPAND);
             auto spliter_2 = new ::StaticLine(p->scrolled);
-            spliter_2->SetLineColour("#CECECE");
+            spliter_2->SetLineColour("#C6D0D6");
             scrolled_sizer->Add(spliter_2, 0, wxEXPAND);
         }
 
@@ -2988,7 +2988,7 @@ void Sidebar::sys_color_changed()
     if (p->m_panel_mixed_filaments_title) {
         const bool is_dark_mf = wxGetApp().dark_mode();
         const wxColour title_bg = StateColor::darkModeColorFor(wxColour(0xF7, 0xF8, 0xFA));
-        const wxColour title_fg = StateColor::darkModeColorFor(wxColour("#262E30"));
+        const wxColour title_fg = StateColor::darkModeColorFor(wxColour("#1B2F3B"));
         p->m_panel_mixed_filaments_title->SetBackgroundColour(title_bg);
         p->m_panel_mixed_filaments_title->SetBackgroundColor(title_bg);
         p->m_panel_mixed_filaments_title->SetBackgroundColor2(title_bg);
@@ -3294,9 +3294,9 @@ void Sidebar::show_mixed_filament_merge_menu(wxWindow *anchor, uint64_t source_s
         const int size = anchor->FromDIP(14);
         wxBitmap bitmap(size, size);
         wxMemoryDC dc(bitmap);
-        dc.SetBackground(wxBrush(color.IsOk() ? color : wxColour("#CCCCCC")));
+        dc.SetBackground(wxBrush(color.IsOk() ? color : wxColour("#C4CED4")));
         dc.Clear();
-        dc.SetPen(wxPen(wxColour("#808080")));
+        dc.SetPen(wxPen(wxColour("#688698")));
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
         dc.DrawRectangle(0, 0, size, size);
         dc.SelectObject(wxNullBitmap);
@@ -3310,7 +3310,7 @@ void Sidebar::show_mixed_filament_merge_menu(wxWindow *anchor, uint64_t source_s
     const auto items = filament_panel ? filament_panel->get_filament_items() : std::vector<FilamentItem *>{};
     const auto *filament_colour = preset_bundle->project_config.option<ConfigOptionStrings>("filament_colour");
     for (size_t i = 0; i < filament_presets.size(); ++i) {
-        wxColour color("#CCCCCC");
+        wxColour color("#C4CED4");
         if (filament_colour && i < filament_colour->values.size() && !filament_colour->values[i].empty())
             color = wxColour(filament_colour->values[i]);
         const wxString label = i < items.size() && items[i] ? items[i]->name()
@@ -3334,7 +3334,7 @@ void Sidebar::show_mixed_filament_merge_menu(wxWindow *anchor, uint64_t source_s
         else
             label = wxString::Format(_L("Mixed %u (F%u + F%u)"), (unsigned int)(i + 1),
                                      mf.component_a, mf.component_b);
-        add_target(slot, label, wxColour(mf.display_color.empty() ? "#CCCCCC" : mf.display_color), 1, (int)i);
+        add_target(slot, label, wxColour(mf.display_color.empty() ? "#C4CED4" : mf.display_color), 1, (int)i);
     }
 
     if (menu.GetMenuItemCount() == 0) return;
@@ -4509,7 +4509,7 @@ private:
             }
 
             if (m_multi_weights.size() == m_multi_colors.size()) {
-                dc.SetTextForeground(is_dark ? wxColour(236, 236, 236) : wxColour(20, 20, 20));
+                dc.SetTextForeground(is_dark ? wxColour(233, 237, 239) : wxColour(12, 22, 28));
                 dc.SetFont(Label::Body_10);
                 const int pad = FromDIP(2);
                 if (m_multi_colors.size() >= 4) {
@@ -4547,12 +4547,12 @@ private:
                 dc.GradientFillLinear(rect, m_left, m_right, wxEAST);
             }
         }
-        dc.SetPen(wxPen(is_dark ? wxColour(100, 100, 106) : wxColour(170, 170, 170), 1));
+        dc.SetPen(wxPen(is_dark ? wxColour(80, 108, 126) : wxColour(157, 173, 183), 1));
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
         dc.DrawRectangle(rect);
 
         if (m_multi_mode) {
-            dc.SetTextForeground(is_dark ? wxColour(236, 236, 236) : wxColour(30, 30, 30));
+            dc.SetTextForeground(is_dark ? wxColour(233, 237, 239) : wxColour(18, 33, 42));
             dc.SetFont(Label::Body_10);
             const wxString hint = _L("Click to edit");
             wxSize text_sz = dc.GetTextExtent(hint);
@@ -4564,7 +4564,7 @@ private:
         marker_x = std::clamp(marker_x, rect.GetLeft(), rect.GetRight());
         dc.SetPen(wxPen(wxColour(255, 255, 255), 3));
         dc.DrawLine(marker_x, rect.GetTop(), marker_x, rect.GetBottom());
-        dc.SetPen(wxPen(wxColour(33, 33, 33), 1));
+        dc.SetPen(wxPen(wxColour(20, 36, 46), 1));
         dc.DrawLine(marker_x, rect.GetTop(), marker_x, rect.GetBottom());
     }
 
@@ -4916,7 +4916,7 @@ private:
         }
         dc.DrawBitmap(wxBitmap(img), rect.GetLeft(), rect.GetTop(), false);
 
-        dc.SetPen(wxPen(wxColour(160, 160, 160), 1));
+        dc.SetPen(wxPen(wxColour(145, 163, 175), 1));
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
         dc.DrawRectangle(rect);
 
@@ -4924,7 +4924,7 @@ private:
         for (size_t i = 0; i < anchors.size() && i < m_colors.size(); ++i) {
             const int ax = rect.GetLeft() + int(std::lround(anchors[i].x * double(std::max(1, w - 1))));
             const int ay = rect.GetTop() + int(std::lround(anchors[i].y * double(std::max(1, h - 1))));
-            dc.SetPen(wxPen(wxColour(30, 30, 30), 1));
+            dc.SetPen(wxPen(wxColour(18, 33, 42), 1));
             dc.SetBrush(wxBrush(m_colors[i]));
             dc.DrawCircle(wxPoint(ax, ay), FromDIP(4));
         }
@@ -4934,7 +4934,7 @@ private:
         dc.SetPen(wxPen(wxColour(255, 255, 255), 3));
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
         dc.DrawCircle(wxPoint(cx, cy), FromDIP(7));
-        dc.SetPen(wxPen(wxColour(30, 30, 30), 1));
+        dc.SetPen(wxPen(wxColour(18, 33, 42), 1));
         dc.DrawCircle(wxPoint(cx, cy), FromDIP(7));
     }
 
@@ -5078,7 +5078,7 @@ private:
                     dc.DrawText(text, x + ox, y + oy);
                 }
             }
-            dc.SetTextForeground(wxColour(22, 22, 22));
+            dc.SetTextForeground(wxColour(13, 24, 31));
             dc.DrawText(text, x, y);
         };
 
@@ -5094,7 +5094,7 @@ private:
             draw_outlined_text(m_right_overlay, rect.GetRight() - pad - int(right_w), text_y);
 
         const bool is_dark = wxGetApp().dark_mode();
-        dc.SetPen(wxPen(is_dark ? wxColour(110, 110, 110) : wxColour(170, 170, 170), 1));
+        dc.SetPen(wxPen(is_dark ? wxColour(87, 115, 133) : wxColour(157, 173, 183), 1));
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
         dc.DrawRectangle(rect);
     }
@@ -5564,7 +5564,7 @@ MixedFilamentConfigPanel::MixedFilamentConfigPanel(wxWindow *parent,
     if (parent)
         SetBackgroundColour(parent->GetBackgroundColour());
     else
-        SetBackgroundColour(wxGetApp().dark_mode() ? wxColour(52, 52, 56) : wxColour(255, 255, 255));
+        SetBackgroundColour(wxGetApp().dark_mode() ? wxColour(35, 58, 73) : wxColour(255, 255, 255));
     build_ui();
 }
 
@@ -5573,7 +5573,7 @@ void MixedFilamentConfigPanel::build_ui()
     const int gap = FromDIP(6);
     const bool is_dark = wxGetApp().dark_mode();
     const wxColour panel_bg = GetBackgroundColour().IsOk() ? GetBackgroundColour() :
-        (is_dark ? wxColour(52, 52, 56) : wxColour(255, 255, 255));
+        (is_dark ? wxColour(35, 58, 73) : wxColour(255, 255, 255));
     SetBackgroundColour(panel_bg);
     auto *root = new wxBoxSizer(wxVERTICAL);
 
@@ -5599,8 +5599,8 @@ void MixedFilamentConfigPanel::build_ui()
     auto create_component_picker = [this, gap](wxPanel *&container_out, wxPanel *&swatch_out, wxStaticText *&label_out, const wxString &tooltip) {
         const int inner_gap = std::max(FromDIP(1), gap / 4);
         const bool local_is_dark = wxGetApp().dark_mode();
-        const wxColour local_picker_bg = local_is_dark ? wxColour(64, 64, 70) : wxColour(255, 255, 255);
-        const wxColour local_picker_text = local_is_dark ? wxColour(230, 230, 230) : wxColour(32, 32, 32);
+        const wxColour local_picker_bg = local_is_dark ? wxColour(46, 72, 88) : wxColour(255, 255, 255);
+        const wxColour local_picker_text = local_is_dark ? wxColour(226, 231, 234) : wxColour(20, 35, 44);
         container_out = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SIMPLE);
         container_out->SetBackgroundColour(local_picker_bg);
         const wxSize picker_size(FromDIP(38), FromDIP(22));
@@ -5649,7 +5649,7 @@ void MixedFilamentConfigPanel::build_ui()
     if (pattern_row_mode) {
         auto *pattern_row = new wxBoxSizer(wxHORIZONTAL);
         auto *pattern_label = new wxStaticText(this, wxID_ANY, _L("Pattern"));
-        pattern_label->SetForegroundColour(is_dark ? wxColour(236, 236, 236) : wxColour(20, 20, 20));
+        pattern_label->SetForegroundColour(is_dark ? wxColour(233, 237, 239) : wxColour(12, 22, 28));
         pattern_row->Add(pattern_label, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, gap);
         m_pattern_ctrl = new wxTextCtrl(this, wxID_ANY, from_u8(normalized_pattern), wxDefaultPosition,
                                         wxSize(FromDIP(200), -1), wxTE_PROCESS_ENTER);
@@ -5671,7 +5671,7 @@ void MixedFilamentConfigPanel::build_ui()
             m_pattern_quick_buttons.emplace_back(btn);
         }
         auto *filaments_label = new wxStaticText(this, wxID_ANY, _L("Filaments"));
-        filaments_label->SetForegroundColour(is_dark ? wxColour(236, 236, 236) : wxColour(20, 20, 20));
+        filaments_label->SetForegroundColour(is_dark ? wxColour(233, 237, 239) : wxColour(12, 22, 28));
         picker_row->Add(filaments_label, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, std::max(FromDIP(3), gap / 2));
         picker_row->Add(quick_buttons, 0, wxALIGN_CENTER_VERTICAL);
     } else {
@@ -5880,7 +5880,7 @@ void MixedFilamentConfigPanel::build_ui()
         wxMemoryDC dc(bmp);
         dc.SetBackground(wxBrush(wxColour(255, 255, 255)));
         dc.Clear();
-        dc.SetPen(wxPen(wxColour(120, 120, 120)));
+        dc.SetPen(wxPen(wxColour(96, 125, 144)));
         dc.SetBrush(wxBrush(color));
         dc.DrawRectangle(0, 0, chip_size, chip_size);
         dc.SelectObject(wxNullBitmap);
@@ -10390,7 +10390,7 @@ bool Plater::priv::run_textured_mesh_import_dialog(Slic3r::Model&           load
             entry.kind                 = TextureFilamentKind::ExistingPhysical;
             entry.dialog_index         = (int) filament_entries.size();
             entry.project_config_index = i;
-            entry.color_hex            = (colours_opt && i < colours_opt->values.size()) ? colours_opt->values[i] : "#808080";
+            entry.color_hex            = (colours_opt && i < colours_opt->values.size()) ? colours_opt->values[i] : "#688698";
             entry.type                 = (type_opt && i < type_opt->values.size()) ? type_opt->values[i] : "";
 
             std::string name;
@@ -10458,7 +10458,7 @@ bool Plater::priv::run_textured_mesh_import_dialog(Slic3r::Model&           load
             entry.kind                 = TextureFilamentKind::ExistingMixed;
             entry.dialog_index         = (int) filament_entries.size();
             entry.project_config_index = slot_index;
-            entry.color_hex            = mf.display_color.empty() ? "#808080" : mf.display_color;
+            entry.color_hex            = mf.display_color.empty() ? "#688698" : mf.display_color;
             entry.mixed_components     = std::move(components);
             entry.mixed_ratios         = std::move(ratios);
             entry.name                 = "Mixed " + std::to_string(slot_index + 1);
@@ -10543,7 +10543,7 @@ void Plater::priv::apply_textured_mesh_import_result(Slic3r::Model&             
         auto*                    colours_opt    = project_config.option<ConfigOptionStrings>("filament_colour");
         const size_t             total          = wxGetApp().preset_bundle->filament_presets.size();
         for (size_t i = 0; i < total; ++i)
-            colors.push_back(colours_opt && i < colours_opt->values.size() ? colours_opt->values[i] : "#808080");
+            colors.push_back(colours_opt && i < colours_opt->values.size() ? colours_opt->values[i] : "#688698");
         return colors;
     };
 
@@ -14434,12 +14434,14 @@ void Plater::priv::on_action_send_to_multi_machine(SimpleEvent&)
 
     wxGetApp().mainframe->get_printer_mgr_view()->request_close_detail_page();
 
-    CxSentToPrinterDialog dlg(this->q,CxSentToPrinterDialog::SendType::Multi);
-    Test::Visitor().call_cmd("allow_dialog", "");
-    dlg.ShowModal();
-    Test::Visitor().call_cmd("ban_dialog", "");
-    if (wxGetApp().preset_bundle->machine_is_belt())
-        restore_belt_transformation();
+    // Roost Print: an ordinary window, so the slicer stays usable while it works.
+    auto* dlg = new CxSentToPrinterDialog(this->q, CxSentToPrinterDialog::SendType::Multi);
+    dlg->set_modeless([this]() {
+        if (wxGetApp().preset_bundle && wxGetApp().preset_bundle->machine_is_belt())
+            restore_belt_transformation();
+    });
+    dlg->Show();
+    dlg->Raise();
 }
 
 void Plater::priv::on_action_print_plate_from_sdcard(SimpleEvent&)
@@ -14645,17 +14647,17 @@ bool Plater::priv::on_action_send_to_local_net_printer(bool isall, bool skip_saf
     // need to close the detail-page Video show, because not allowed two video stream("send page" and "detail page") at the same time
     wxGetApp().mainframe->get_printer_mgr_view()->request_close_detail_page();
 
-    CxSentToPrinterDialog dlg(this->q,CxSentToPrinterDialog::SendType::Single,sidebar->get_filament_map_string().ToStdString());
-
-    Test::Visitor().call_cmd("allow_dialog", "");
-    dlg.ShowModal();
-    const bool canceled = dlg.send_was_canceled();
-
-    if (wxGetApp().preset_bundle->machine_is_belt())
-        restore_belt_transformation();
-    Test::Visitor().call_cmd("ban_dialog", "");
-
-    return !canceled;
+    // Roost Print: an ordinary window instead of a modal one. The slicer stays usable while it
+    // uploads, it can be minimised, and you can open another for the next plate meanwhile.
+    auto* dlg = new CxSentToPrinterDialog(this->q, CxSentToPrinterDialog::SendType::Single,
+                                          sidebar->get_filament_map_string().ToStdString());
+    dlg->set_modeless([this]() {
+        if (wxGetApp().preset_bundle && wxGetApp().preset_bundle->machine_is_belt())
+            restore_belt_transformation();
+    });
+    dlg->Show();
+    dlg->Raise();
+    return true;
 }
 
 void Plater::priv::on_action_upload_3mf(bool isall)
@@ -14949,11 +14951,11 @@ void Plater::priv::apply_color_mode()
     wxColour orca_color = wxColour(59, 68,
                                    70); // wxColour(ColorRGBA::ORCA().r_uchar(), ColorRGBA::ORCA().g_uchar(), ColorRGBA::ORCA().b_uchar());
     orca_color          = is_dark ? StateColor::darkModeColorFor(orca_color) : StateColor::lightModeColorFor(orca_color);
-    wxColour sash_color = is_dark ? wxColour(38, 46, 48) : wxColour(206, 206, 206);
+    wxColour sash_color = is_dark ? wxColour(27, 47, 59) : wxColour(198, 208, 214);
     m_aui_mgr.GetArtProvider()->SetColour(wxAUI_DOCKART_INACTIVE_CAPTION_COLOUR, sash_color);
     m_aui_mgr.GetArtProvider()->SetColour(wxAUI_DOCKART_INACTIVE_CAPTION_TEXT_COLOUR, *wxWHITE);
     m_aui_mgr.GetArtProvider()->SetColour(wxAUI_DOCKART_SASH_COLOUR, sash_color);
-    m_aui_mgr.GetArtProvider()->SetColour(wxAUI_DOCKART_BORDER_COLOUR, is_dark ? *wxBLACK : wxColour(165, 165, 165));
+    m_aui_mgr.GetArtProvider()->SetColour(wxAUI_DOCKART_BORDER_COLOUR, is_dark ? *wxBLACK : wxColour(151, 168, 179));
 }
 
 static void get_position(wxWindowBase* child, wxWindowBase* until_parent, int& x, int& y)
@@ -19588,7 +19590,7 @@ ProjectDropDialog::ProjectDropDialog(const std::string& filename)
     wxBoxSizer* m_sizer_main = new wxBoxSizer(wxVERTICAL);
 
     m_top_line = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
-    m_top_line->SetBackgroundColour(wxColour(166, 169, 170));
+    m_top_line->SetBackgroundColour(wxColour(154, 171, 182));
 
     m_sizer_main->Add(m_top_line, 0, wxEXPAND, 0);
 
@@ -19600,7 +19602,7 @@ ProjectDropDialog::ProjectDropDialog(const std::string& filename)
     m_fname_title = new wxStaticText(this, wxID_ANY, _L("Please select an action"), wxDefaultPosition, wxDefaultSize, 0);
     m_fname_title->Wrap(-1);
     m_fname_title->SetFont(::Label::Body_13);
-    m_fname_title->SetForegroundColour(wxColour(107, 107, 107));
+    m_fname_title->SetForegroundColour(wxColour(84, 112, 130));
     m_fname_title->SetBackgroundColour(wxColour(255, 255, 255));
 
     m_sizer_fline->Add(m_fname_title, 0, wxALL, 0);
@@ -19609,7 +19611,7 @@ ProjectDropDialog::ProjectDropDialog(const std::string& filename)
     m_fname_f = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
     m_fname_f->SetFont(::Label::Head_13);
     m_fname_f->Wrap(-1);
-    m_fname_f->SetForegroundColour(wxColour(38, 46, 48));
+    m_fname_f->SetForegroundColour(wxColour(27, 47, 59));
 
     m_sizer_fline->Add(m_fname_f, 1, wxALL, 0);
 
@@ -19618,7 +19620,7 @@ ProjectDropDialog::ProjectDropDialog(const std::string& filename)
     m_fname_s = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
     m_fname_s->SetFont(::Label::Head_13);
     m_fname_s->Wrap(-1);
-    m_fname_s->SetForegroundColour(wxColour(38, 46, 48));
+    m_fname_s->SetForegroundColour(wxColour(27, 47, 59));
 
     m_sizer_name->Add(m_fname_s, 1, wxALL, 0);
 
@@ -19683,7 +19685,7 @@ ProjectDropDialog::ProjectDropDialog(const std::string& filename)
     m_sizer_right->Add(m_confirm, 0, wxALL, 5);
 
     m_cancel = new Button(this, _L("Cancel"));
-    m_cancel->SetTextColor(wxColour(107, 107, 107));
+    m_cancel->SetTextColor(wxColour(84, 112, 130));
     m_cancel->SetSize(PROJECT_DROP_DIALOG_BUTTON_SIZE);
     m_cancel->SetMinSize(PROJECT_DROP_DIALOG_BUTTON_SIZE);
     m_cancel->SetCornerRadius(FromDIP(12));
@@ -19734,7 +19736,7 @@ wxBoxSizer* ProjectDropDialog ::create_item_radiobox(wxString title, wxWindow* p
     sizer->Add(0, 0, 0, wxEXPAND | wxLEFT, 5);
     auto text = new wxStaticText(parent, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, 0);
     text->Wrap(-1);
-    text->SetForegroundColour(wxColour(107, 107, 107));
+    text->SetForegroundColour(wxColour(84, 112, 130));
     text->SetBackgroundColour(wxColour(248, 248, 248));
     sizer->Add(text, 0, wxALL, 5);
 
@@ -19763,7 +19765,7 @@ wxBoxSizer* ProjectDropDialog::create_item_checkbox(wxString title, wxWindow* pa
     m_sizer_checkbox->Add(0, 0, 0, wxEXPAND | wxLEFT, 8);
 
     auto checkbox_title = new wxStaticText(parent, wxID_ANY, title, wxDefaultPosition, wxSize(-1, -1), 0);
-    checkbox_title->SetForegroundColour(wxColour(144, 144, 144));
+    checkbox_title->SetForegroundColour(wxColour(125, 148, 163));
     checkbox_title->SetFont(::Label::Body_13);
     checkbox_title->Wrap(-1);
     m_sizer_checkbox->Add(checkbox_title, 0, wxALIGN_CENTER | wxALL, 3);
@@ -26138,8 +26140,8 @@ void Sidebar::update_mixed_filament_panel(bool sync_manager)
     rows_sizer->AddSpacer(FromDIP(5)); // top padding
 
     const wxColour row_bg = content_bg;
-    const wxColour splitter_color = is_dark ? wxColour(80, 80, 80) : wxColour(220, 220, 220);
-    const wxColour dot_color = is_dark ? wxColour(100, 100, 100) : wxColour(180, 180, 180);
+    const wxColour splitter_color = is_dark ? wxColour(57, 85, 103) : wxColour(215, 221, 225);
+    const wxColour dot_color = is_dark ? wxColour(77, 105, 123) : wxColour(168, 183, 192);
 
     // Build UI indices
     //p->m_mixed_filament_ui_order = mgr.get_ui_order();
@@ -26219,7 +26221,7 @@ void Sidebar::update_mixed_filament_panel(bool sync_manager)
         comp_box->SetMinSize(wxSize(-1, FromDIP(34)));
         comp_box->SetMaxSize(wxSize(-1, FromDIP(34)));
         const wxColour border_color = has_warning ? wxColour("#E84C4C")
-            : (is_dark ? wxColour(90, 90, 95) : wxColour(200, 200, 200));
+            : (is_dark ? wxColour(70, 98, 115) : wxColour(191, 202, 209));
         {
             auto *comp_box_sizer = new wxBoxSizer(wxHORIZONTAL);
             comp_box_sizer->AddSpacer(FromDIP(5)); // left padding inside bordered container
@@ -26235,9 +26237,9 @@ void Sidebar::update_mixed_filament_panel(bool sync_manager)
                     dc.Clear();
                     wxSize bs = badge->GetSize();
                     if (comp_id == 0) {
-                        const wxColour missing_bg = is_dark ? wxColour("#2D2E31") : wxColour("#FFFFFF");
-                        const wxColour missing_border = is_dark ? wxColour("#505052") : wxColour("#D0D4DE");
-                        const wxColour dash_color = is_dark ? wxColour("#B8BABD") : wxColour("#7A7D82");
+                        const wxColour missing_bg = is_dark ? wxColour("#1D3341") : wxColour("#FFFFFF");
+                        const wxColour missing_border = is_dark ? wxColour("#3A5668") : wxColour("#D0D4DE");
+                        const wxColour dash_color = is_dark ? wxColour("#B0BDC5") : wxColour("#668496");
                         dc.SetBrush(wxBrush(missing_bg));
                         dc.SetPen(*wxTRANSPARENT_PEN);
                         dc.DrawRoundedRectangle(0, 0, bs.x, bs.y, badge->FromDIP(3));
@@ -26295,7 +26297,7 @@ void Sidebar::update_mixed_filament_panel(bool sync_manager)
             while (comp_weights.size() < comp_ids.size())
                 comp_weights.push_back(comp_ids.empty() ? 0 : 100 / (int)comp_ids.size());
 
-            const wxColour text_fg = is_dark ? wxColour(220, 220, 220) : wxColour(60, 60, 60);
+            const wxColour text_fg = is_dark ? wxColour(215, 221, 225) : wxColour(40, 65, 80);
 
             for (size_t ci = 0; ci < comp_ids.size(); ++ci) {
                 if (ci > 0) {

@@ -225,7 +225,7 @@ Upload3mfToCloudDialog::Upload3mfToCloudDialog(Plater* plater)
     SetSize(initialSize);
     m_scrolledWindow = new wxScrolledWindow(this, wxID_ANY);
     if (wxGetApp().dark_mode()) {
-        m_scrolledWindow->SetBackgroundColour(wxColour(75, 75, 73));
+        m_scrolledWindow->SetBackgroundColour(wxColour(52, 79, 96));
     } else {
         m_scrolledWindow->SetBackgroundColour(wxColour(255, 255, 255));
     }
@@ -271,14 +271,14 @@ Upload3mfToCloudDialog::Upload3mfToCloudDialog(Plater* plater)
     m_sizer_main->SetMinSize(wxSize(0, -1));
 
     m_line_top = new wxPanel(m_scrolledWindow, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
 
     // m_scrollable_region       = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
     m_sizer_scrollable_region = new wxBoxSizer(wxVERTICAL);
 
     m_line_materia = new wxPanel(m_scrolledWindow, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line_materia->SetForegroundColour(wxColour(238, 238, 238));
-    m_line_materia->SetBackgroundColour(wxColour(238, 238, 238));
+    m_line_materia->SetForegroundColour(wxColour(235, 239, 241));
+    m_line_materia->SetBackgroundColour(wxColour(235, 239, 241));
 
     // wxBoxSizer* m_sizer_plate = new wxBoxSizer(wxVERTICAL);
 
@@ -353,16 +353,16 @@ Upload3mfToCloudDialog::Upload3mfToCloudDialog(Plater* plater)
 
     m_sizer_plate_sliced_count->Add(m_stext_plate_sliced_count, 0, wxALL, FromDIP(5));
 
-    btn_bg_enable = StateColor(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-                               std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
+    btn_bg_enable = StateColor(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+                               std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
                                std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal),
-                               std::pair<wxColour, int>(wxColour(200, 200, 200), StateColor::Disabled));
+                               std::pair<wxColour, int>(wxColour(191, 202, 209), StateColor::Disabled));
 
-    btn_bd_enable = StateColor(std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal));
+    btn_bd_enable = StateColor(std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal));
 
     // line schedule
     m_line_schedule = new wxPanel(m_scrolledWindow, wxID_ANY, wxDefaultPosition, wxSize(-1, 1));
-    m_line_schedule->SetBackgroundColour(wxColour(238, 238, 238));
+    m_line_schedule->SetBackgroundColour(wxColour(235, 239, 241));
 
     wxBoxSizer* m_sizer_send_btns = new wxBoxSizer(wxHORIZONTAL);
 
@@ -716,7 +716,7 @@ void Upload3mfToCloudDialog::get_current_plate_color()
 
     wxWrapSizer* wrapSizer = new wxWrapSizer(wxHORIZONTAL);
 
-    wxColor cardColor  = wxGetApp().dark_mode() ? wxColor(45, 45, 49) : wxColor(240, 243, 249);
+    wxColor cardColor  = wxGetApp().dark_mode() ? wxColor(29, 51, 65) : wxColor(240, 243, 249);
     int     plateCount = 0;
     for (auto plate : plate_list) {
         plateCount++;

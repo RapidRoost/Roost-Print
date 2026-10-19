@@ -65,7 +65,7 @@ static std::string def_text_color()
     wxColour def_colour = wxGetApp().get_label_clr_default();//wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
     return encode_color(ColorRGB(def_colour.Red(), def_colour.Green(), def_colour.Blue()));
 }
-static std::string grey     = "#808080";
+static std::string grey     = "#688698";
 static std::string orange   = "#ed6b21";
 
 static void color_string(wxString& str, const std::string& color)
@@ -779,11 +779,11 @@ static std::string none{"none"};
 #define UNSAVE_CHANGE_DIALOG_ITEM_HEIGHT FromDIP(24)
 #define UNSAVE_CHANGE_DIALOG_BUTTON_SIZE wxSize(FromDIP(70), FromDIP(24))
 
-#define THUMB_COLOR wxColor(196, 196, 196)
-#define GREY900 wxColour(38, 46, 48)
-#define GREY700 wxColour(107,107,107)
-#define GREY400 wxColour(206,206,206)
-#define GREY300 wxColour(238,238,238)
+#define THUMB_COLOR wxColor(187, 198, 205)
+#define GREY900 wxColour(27, 47, 59)
+#define GREY700 wxColour(84,112,130)
+#define GREY400 wxColour(198,208,214)
+#define GREY300 wxColour(235,239,241)
 #define GREY200 wxColour(248,248,248)
 
 static size_t printer_extruder_count(const Preset& preset)
@@ -875,7 +875,7 @@ void UnsavedChangesDialog::build(Preset::Type type, PresetCollection *dependent_
     wxBoxSizer *m_sizer_main = new wxBoxSizer(wxVERTICAL);
 
     m_top_line = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_top_line->SetBackgroundColour(wxColour(166, 169, 170));
+    m_top_line->SetBackgroundColour(wxColour(154, 171, 182));
 
     m_sizer_main->Add(m_top_line, 0, wxEXPAND, 0);
 
@@ -894,7 +894,7 @@ void UnsavedChangesDialog::build(Preset::Type type, PresetCollection *dependent_
     wxBoxSizer *m_sizer_tab = new wxBoxSizer(wxVERTICAL);
 
     m_table_top = new wxPanel(m_panel_tab, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
-    m_table_top->SetBackgroundColour(wxColour(107, 107, 107));
+    m_table_top->SetBackgroundColour(wxColour(84, 112, 130));
 
     wxBoxSizer *m_sizer_top = new wxBoxSizer(wxHORIZONTAL);
 
@@ -915,7 +915,7 @@ void UnsavedChangesDialog::build(Preset::Type type, PresetCollection *dependent_
 
 
     title_block_middle = new wxPanel(m_table_top, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
-    title_block_middle->SetBackgroundColour(wxColour(172, 172, 172));
+    title_block_middle->SetBackgroundColour(wxColour(159, 175, 185));
 
     m_sizer_top->Add(title_block_middle, 0, wxBOTTOM | wxEXPAND | wxTOP, 2);
     auto m_panel_oldv = new wxPanel( m_table_top, wxID_ANY, wxDefaultPosition, wxSize(UNSAVE_CHANGE_DIALOG_VALUE_WIDTH,-1), wxTAB_TRAVERSAL );
@@ -933,7 +933,7 @@ void UnsavedChangesDialog::build(Preset::Type type, PresetCollection *dependent_
     m_sizer_top->Add(m_panel_oldv, 0, wxALIGN_CENTER, 0);
 
     title_block_right = new wxPanel(m_table_top, wxID_ANY, wxDefaultPosition, wxSize(1, -1), wxTAB_TRAVERSAL);
-    title_block_right->SetBackgroundColour(wxColour(172, 172, 172));
+    title_block_right->SetBackgroundColour(wxColour(159, 175, 185));
 
     m_sizer_top->Add(title_block_right, 0, wxBOTTOM | wxEXPAND | wxTOP, 2);
 
@@ -998,10 +998,10 @@ void UnsavedChangesDialog::build(Preset::Type type, PresetCollection *dependent_
      // Add Buttons
     wxFont      btn_font = this->GetFont().Scaled(1.4f);
 
-    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Disabled),
+    StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Disabled),
         std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed),
         std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Hovered),
-        std::pair<wxColour, int>(wxColour(110, 110, 115), StateColor::Normal));
+        std::pair<wxColour, int>(wxColour(89, 118, 136), StateColor::Normal));
 
     auto add_btn = [this, m_sizer_button, btn_font, dependent_presets, btn_bg_green](Button **btn, int &btn_id, const std::string &icon_name, Action close_act, const wxString &label,
                                                                               bool focus, bool process_enable = true) {
@@ -1065,7 +1065,7 @@ void UnsavedChangesDialog::build(Preset::Type type, PresetCollection *dependent_
       buttons->Add(cancel_btn, 1, wxLEFT | wxRIGHT, 5);
       cancel_btn->SetFont(btn_font);*/
     /* m_cancel_btn = new Button(this, _L("Cancel"));
-     m_cancel_btn->SetTextColor(wxColour(107, 107, 107));
+     m_cancel_btn->SetTextColor(wxColour(84, 112, 130));
      m_cancel_btn->Bind(wxEVT_LEFT_DOWN, [this](wxEvent &) { this->EndModal(wxID_CANCEL); });
      m_cancel_btn->SetMinSize(UNSAVE_CHANGE_DIALOG_BUTTON_SIZE);
      m_cancel_btn->SetCornerRadius(12);
@@ -1528,8 +1528,8 @@ void UnsavedChangesDialog::update_list()
         m_listsizer->Add(panel_category, 0, wxEXPAND, 0);
 
         /*auto item_line = new wxStaticLine(list, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
-        item_line->SetForegroundColour(wxColour(206, 206, 206));
-        item_line->SetBackgroundColour(wxColour(206, 206, 206));
+        item_line->SetForegroundColour(wxColour(198, 208, 214));
+        item_line->SetBackgroundColour(wxColour(198, 208, 214));
         sizer_list->Add(item_line, 0, wxALL, 0); */
 
         // isset group
@@ -1628,8 +1628,8 @@ void UnsavedChangesDialog::update_list()
 
                 ////if (g == class_g_list[gname].size() - 1) {
                 //    auto item_line = new wxStaticLine(list, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
-                //    item_line->SetForegroundColour(wxColour(206, 206, 206));
-                //    item_line->SetBackgroundColour(wxColour(206, 206, 206));
+                //    item_line->SetForegroundColour(wxColour(198, 208, 214));
+                //    item_line->SetBackgroundColour(wxColour(198, 208, 214));
                 //    sizer_list->Add(item_line, 0, wxALL, 0);
                 ////}
             }
@@ -2145,7 +2145,7 @@ void DiffPresetDialog::create_buttons()
 
     // Cancel
     m_cancel_btn = new Button(this, L("Cancel"));
-    m_cancel_btn->SetTextColor(wxColour(107, 107, 107));
+    m_cancel_btn->SetTextColor(wxColour(84, 112, 130));
     m_cancel_btn->SetMinSize(wxSize(-1, -1));
     m_cancel_btn->SetCornerRadius(FromDIP(12));
 

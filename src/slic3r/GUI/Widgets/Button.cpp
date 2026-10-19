@@ -28,7 +28,7 @@ Button::Button()
     : paddingSize(5, 5)
 {
     background_color = StateColor(
-        std::make_pair(0xF0F0F1, (int) StateColor::Disabled),
+        std::make_pair(0xEEF1F3, (int) StateColor::Disabled),
         std::make_pair(0x5599C4, (int) StateColor::Hovered | StateColor::Checked),
         std::make_pair(0x1E90D8, (int) StateColor::Checked),
         std::make_pair(*wxLIGHT_GREY, (int) StateColor::Hovered), 
@@ -387,7 +387,7 @@ WXLRESULT Button::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam)
     : wxButton(parent, id, label, pos, size, style, validator, name)
 {
     Bind(wxEVT_PAINT, &RoundedButton::OnPaint, this);
-    wxColour default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#010101") : wxColour(214, 214, 220);
+    wxColour default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#070C12") : wxColour(211, 218, 223);
     wxButton::SetBackgroundColour(default_btn_bg);
     // SetBackgroundColour(GetParent()->GetBackgroundColour());
 }
@@ -421,7 +421,7 @@ void RoundedButton::Render(wxDC& dc)
         wxRect rect = GetClientRect();
 
         // 清除默认背景
-        wxColour default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#010101") : wxColour(214, 214, 220);
+        wxColour default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#070C12") : wxColour(211, 218, 223);
         wxButton::SetBackgroundColour(default_btn_bg);
 
         // 绘制圆角背景
@@ -470,7 +470,7 @@ RoundedPanel::RoundedPanel(wxWindow* parent, wxWindowID id,
     m_bottomRightRadius(0),
     m_bottomLeftRadius(0),
     m_borderWidth(2),
-    m_borderColor(wxColour("#6e6e72")) {
+    m_borderColor(wxColour("#597587")) {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     Bind(wxEVT_PAINT, &RoundedPanel::OnPaint, this);
 }
@@ -554,7 +554,7 @@ CustomRoundCornerButton::CustomRoundCornerButton(wxWindow* parent, wxWindowID id
     : wxPanel(parent),
     m_label(label),
     m_radiusTopLeft(10), m_radiusTopRight(10), m_radiusBottomLeft(0), m_radiusBottomRight(0),
-    m_normalColor(wxColor("#4b4b4d")), m_hoverColor("#1e90d8"), m_pressedColor("#1e90d8"), m_borderColor("#6e6e72"),
+    m_normalColor(wxColor("#365162")), m_hoverColor("#1e90d8"), m_pressedColor("#1e90d8"), m_borderColor("#597587"),
     m_isHovered(false), m_isPressed(false), m_isChecked(false){
     Bind(wxEVT_PAINT, &CustomRoundCornerButton::OnPaint, this);
     Bind(wxEVT_ENTER_WINDOW, &CustomRoundCornerButton::OnMouseEnter, this);

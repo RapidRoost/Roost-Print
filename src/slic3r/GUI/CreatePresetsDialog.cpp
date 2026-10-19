@@ -35,11 +35,11 @@
 #define ORIGIN_TEXT_SIZE wxSize(FromDIP(10), FromDIP(24))
 #define PRINTER_PRESET_VENDOR_SIZE wxSize(FromDIP(150), FromDIP(24))
 #define PRINTER_PRESET_MODEL_SIZE wxSize(FromDIP(280), FromDIP(24))
-#define STATIC_TEXT_COLOUR wxColour("#363636")
-#define PRINTER_LIST_COLOUR wxColour("#EEEEEE")
-#define FILAMENT_OPTION_COLOUR wxColour("#D9D9D9")
+#define STATIC_TEXT_COLOUR wxColour("#233A49")
+#define PRINTER_LIST_COLOUR wxColour("#EBEFF1")
+#define FILAMENT_OPTION_COLOUR wxColour("#D3DADF")
 #define SELECT_ALL_OPTION_COLOUR wxColour("#1E90D8")
-#define DEFAULT_PROMPT_TEXT_COLOUR wxColour("#ACACAC")
+#define DEFAULT_PROMPT_TEXT_COLOUR wxColour("#9FAFB9")
 
 namespace Slic3r { 
 namespace GUI {
@@ -469,7 +469,7 @@ static std::string get_machine_model(const std::string &preset_model)
      //wxPanel* panel = new wxPanel(parent, wxID_ANY,wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxBORDER_SIMPLE);
      wxPanel* panel = new wxPanel(parent, wxID_ANY,wxDefaultPosition, wxDefaultSize);
      //panel->SetMinSize(wxSize(912, -1));
-     panel->SetBackgroundColour(wxColour("#474749"));
+     panel->SetBackgroundColour(wxColour("#324D5E"));
      int iNum = vecPrinterInherits.size();
      if (iNum)
      {
@@ -983,7 +983,7 @@ wxBoxSizer *CreateFilamentPresetDialog::create_serial_item()
         });
 
     wxStaticText *static_eg_text = new wxStaticText(this, wxID_ANY, _L("e.g. Basic, Matte, Silk, Marble"), wxDefaultPosition, wxDefaultSize);
-    static_eg_text->SetForegroundColour(wxColour("#6B6B6B"));
+    static_eg_text->SetForegroundColour(wxColour("#547082"));
     static_eg_text->SetFont(::Label::Body_12);
     comboBoxSizer->Add(static_eg_text, 0, wxEXPAND | wxTOP, FromDIP(5));
     horizontal_sizer->Add(comboBoxSizer, 0, wxEXPAND | wxALL | wxALIGN_CENTER_VERTICAL, FromDIP(5));
@@ -1261,12 +1261,12 @@ wxBoxSizer *CreateFilamentPresetDialog::create_button_item()
         EndModal(wxID_OK); 
         });
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
     m_button_cancel = new Button(this, _L("Cancel"));
     m_button_cancel->SetBackgroundColor(btn_bg_white);
-    m_button_cancel->SetBorderColor(wxColour(38, 46, 48));
+    m_button_cancel->SetBorderColor(wxColour(27, 47, 59));
     m_button_cancel->SetFont(Label::Body_12);
     m_button_cancel->SetSize(wxSize(FromDIP(58), FromDIP(24)));
     m_button_cancel->SetMinSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -2684,11 +2684,11 @@ wxBoxSizer *CreatePrinterPresetDialog::create_hot_bed_stl_item(wxWindow *parent)
 
     wxBoxSizer *hot_bed_stl_sizer = new wxBoxSizer(wxVERTICAL);
 
-    StateColor flush_bg_col(std::pair<wxColour, int>(wxColour(220, 240, 252), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal));
+    StateColor flush_bg_col(std::pair<wxColour, int>(wxColour(220, 240, 252), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
+                            std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Normal));
 
     StateColor flush_bd_col(std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Pressed), std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(172, 172, 172), StateColor::Normal));
+                            std::pair<wxColour, int>(wxColour(159, 175, 185), StateColor::Normal));
 
     m_button_bed_stl = new Button(parent, _L("Load stl"));
     m_button_bed_stl->Bind(wxEVT_BUTTON, ([this](wxCommandEvent &e) { load_model_stl(); }));
@@ -2721,11 +2721,11 @@ wxBoxSizer *CreatePrinterPresetDialog::create_hot_bed_svg_item(wxWindow *parent)
 
     wxBoxSizer *hot_bed_stl_sizer = new wxBoxSizer(wxVERTICAL);
 
-    StateColor flush_bg_col(std::pair<wxColour, int>(wxColour(220, 240, 252), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal));
+    StateColor flush_bg_col(std::pair<wxColour, int>(wxColour(220, 240, 252), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
+                            std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Normal));
 
     StateColor flush_bd_col(std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Pressed), std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(172, 172, 172), StateColor::Normal));
+                            std::pair<wxColour, int>(wxColour(159, 175, 185), StateColor::Normal));
 
     m_button_bed_svg = new Button(parent, _L("Load svg"));
     m_button_bed_svg->Bind(wxEVT_BUTTON, ([this](wxCommandEvent &e) { load_texture(); }));
@@ -2851,12 +2851,12 @@ wxBoxSizer *CreatePrinterPresetDialog::create_page1_btns_item(wxWindow *parent)
         show_page2();
         });
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
     m_button_page1_cancel = new Button(parent, _L("Cancel"));
     m_button_page1_cancel->SetBackgroundColor(btn_bg_white);
-    m_button_page1_cancel->SetBorderColor(wxColour(38, 46, 48));
+    m_button_page1_cancel->SetBorderColor(wxColour(27, 47, 59));
     m_button_page1_cancel->SetFont(Label::Body_12);
     m_button_page1_cancel->SetSize(wxSize(FromDIP(58), FromDIP(24)));
     m_button_page1_cancel->SetMinSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -3466,12 +3466,12 @@ wxBoxSizer *CreatePrinterPresetDialog::create_page2_btns_item(wxWindow *parent)
     StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
                             std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal));
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
     m_button_page2_back = new Button(parent, _L("Back Page 1"));
     m_button_page2_back->SetBackgroundColor(btn_bg_white);
-    m_button_page2_back->SetBorderColor(wxColour(38, 46, 48));
+    m_button_page2_back->SetBorderColor(wxColour(27, 47, 59));
     m_button_page2_back->SetFont(Label::Body_12);
     m_button_page2_back->SetSize(wxSize(FromDIP(58), FromDIP(24)));
     m_button_page2_back->SetMinSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -3731,7 +3731,7 @@ wxBoxSizer *CreatePrinterPresetDialog::create_page2_btns_item(wxWindow *parent)
 
     m_button_page2_cancel = new Button(parent, _L("Cancel"));
     m_button_page2_cancel->SetBackgroundColor(btn_bg_white);
-    m_button_page2_cancel->SetBorderColor(wxColour(38, 46, 48));
+    m_button_page2_cancel->SetBorderColor(wxColour(27, 47, 59));
     m_button_page2_cancel->SetFont(Label::Body_12);
     m_button_page2_cancel->SetSize(wxSize(FromDIP(58), FromDIP(24)));
     m_button_page2_cancel->SetMinSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -4725,7 +4725,7 @@ CreatePresetSuccessfulDialog::CreatePresetSuccessfulDialog(wxWindow *parent, con
     StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
                             std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal));
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
     m_button_ok->SetBackgroundColor(btn_bg_green);
     m_button_ok->SetBorderColor(wxColour(*wxWHITE));
@@ -4747,8 +4747,8 @@ CreatePresetSuccessfulDialog::CreatePresetSuccessfulDialog(wxWindow *parent, con
     if (PRINTER == create_success_type || sync_user_preset_need_enabled) {
         m_button_cancel = new Button(this, _L("Cancel"));
         m_button_cancel->SetBackgroundColor(btn_bg_white);
-        m_button_cancel->SetBorderColor(wxColour(38, 46, 48));
-        m_button_cancel->SetTextColor(wxColour(38, 46, 48));
+        m_button_cancel->SetBorderColor(wxColour(27, 47, 59));
+        m_button_cancel->SetTextColor(wxColour(27, 47, 59));
         m_button_cancel->SetFont(Label::Body_12);
         m_button_cancel->SetSize(wxSize(FromDIP(58), FromDIP(24)));
         m_button_cancel->SetMinSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -4781,22 +4781,22 @@ void CreatePresetSuccessfulDialog::on_dpi_changed(const wxRect &suggested_rect) 
 namespace {
 wxColour export_panel_colour()
 {
-    return wxGetApp().dark_mode() ? wxColour("#4B4B4D") : wxColour("#FFFFFF");
+    return wxGetApp().dark_mode() ? wxColour("#365162") : wxColour("#FFFFFF");
 }
 
 wxColour export_section_colour()
 {
-    return wxGetApp().dark_mode() ? wxColour("#474749") : wxColour("#F5F5F5");
+    return wxGetApp().dark_mode() ? wxColour("#324D5E") : wxColour("#F5F5F5");
 }
 
 wxColour export_row_colour()
 {
-    return wxGetApp().dark_mode() ? wxColour("#3E3E40") : wxColour("#EEEEEE");
+    return wxGetApp().dark_mode() ? wxColour("#2A4454") : wxColour("#EBEFF1");
 }
 
 wxColour export_text_colour()
 {
-    return wxGetApp().dark_mode() ? wxColour("#FFFFFF") : wxColour("#262626");
+    return wxGetApp().dark_mode() ? wxColour("#FFFFFF") : wxColour("#172935");
 }
 } // namespace
 
@@ -4935,7 +4935,7 @@ public:
                 wxGraphicsContext* gc = wxGraphicsContext::Create(memDC);
                 if (gc) {
                     if (m_state == 0) {
-                        gc->SetPen(wxPen(wxColour("#6E6E72"), 1, wxPENSTYLE_SOLID));
+                        gc->SetPen(wxPen(wxColour("#597587"), 1, wxPENSTYLE_SOLID));
                         gc->DrawRoundedRectangle(m_rtCheckbox.x, m_rtCheckbox.y, m_rtCheckbox.width, m_rtCheckbox.height, m_round);
                     } else if (m_state == 1) {
                         gc->SetBrush(wxBrush(wxColour("#1E90D8"), wxBRUSHSTYLE_SOLID));
@@ -4950,7 +4950,7 @@ public:
                 }
             } else {
                 if (m_state == 0) {
-                    memDC.SetPen(wxPen(wxColour("#6E6E72"), 2, wxPENSTYLE_SOLID));
+                    memDC.SetPen(wxPen(wxColour("#597587"), 2, wxPENSTYLE_SOLID));
                 } else if (m_state == 1) {
                     memDC.SetBrush(wxBrush(wxColour("#1E90D8"), wxBRUSHSTYLE_SOLID));
                 }
@@ -6267,12 +6267,12 @@ wxBoxSizer *ExportConfigsDialog::create_export_config_item(wxWindow *parent)
     radioBoxSizer->Add(0, 0, 0, wxTOP, FromDIP(6));
     wxStaticText *static_export_printer_preset_bundle_text = new wxStaticText(parent, wxID_ANY, _L("Printer and all the filament&&process presets that belongs to the printer. \nCan be shared with others."), wxDefaultPosition, wxDefaultSize);
     static_export_printer_preset_bundle_text->SetFont(Label::Body_12);
-    static_export_printer_preset_bundle_text->SetForegroundColour(wxColour("#6B6B6B"));
+    static_export_printer_preset_bundle_text->SetForegroundColour(wxColour("#547082"));
     radioBoxSizer->Add(static_export_printer_preset_bundle_text, 0, wxEXPAND | wxLEFT, FromDIP(22));
     radioBoxSizer->Add(create_radio_item(m_exprot_type.filament_bundle, parent, wxEmptyString, m_export_type_btns), 0, wxEXPAND | wxTOP, FromDIP(10));
     wxStaticText *static_export_filament_preset_bundle_text = new wxStaticText(parent, wxID_ANY, _L("User's fillment preset set. \nCan be shared with others."), wxDefaultPosition, wxDefaultSize);
     static_export_filament_preset_bundle_text->SetFont(Label::Body_12);
-    static_export_filament_preset_bundle_text->SetForegroundColour(wxColour("#6B6B6B"));
+    static_export_filament_preset_bundle_text->SetForegroundColour(wxColour("#547082"));
     radioBoxSizer->Add(static_export_filament_preset_bundle_text, 0, wxEXPAND | wxLEFT, FromDIP(22));
     radioBoxSizer->Add(create_radio_item(m_exprot_type.printer_preset, parent, wxEmptyString, m_export_type_btns), 0, wxEXPAND | wxTOP, FromDIP(10));
     radioBoxSizer->Add(create_radio_item(m_exprot_type.filament_preset, parent, wxEmptyString, m_export_type_btns), 0, wxEXPAND | wxTOP, FromDIP(10));
@@ -7278,12 +7278,12 @@ wxBoxSizer *ExportConfigsDialog::create_button_item(wxWindow* parent)
         EndModal(wxID_OK);
         });
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
     m_button_cancel = new Button(this, _L("Cancel"));
     m_button_cancel->SetBackgroundColor(btn_bg_white);
-    m_button_cancel->SetBorderColor(wxColour(38, 46, 48));
+    m_button_cancel->SetBorderColor(wxColour(27, 47, 59));
     m_button_cancel->SetFont(Label::Body_12);
     m_button_cancel->SetSize(wxSize(FromDIP(58), FromDIP(24)));
     m_button_cancel->SetMinSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -7846,14 +7846,14 @@ wxBoxSizer *EditFilamentPresetDialog::create_add_filament_btn()
     m_add_filament_btn->SetPaddingSize(wxSize(FromDIP(8), FromDIP(3)));
     m_add_filament_btn->SetCornerRadius(FromDIP(8));
 
-    StateColor flush_bg_col(std::pair<wxColour, int>(wxColour(220, 240, 252), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal));
+    StateColor flush_bg_col(std::pair<wxColour, int>(wxColour(220, 240, 252), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
+                            std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Normal));
 
-    StateColor flush_fg_col(std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Pressed), std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Normal));
+    StateColor flush_fg_col(std::pair<wxColour, int>(wxColour(84, 112, 129), StateColor::Pressed), std::pair<wxColour, int>(wxColour(84, 112, 129), StateColor::Hovered),
+                            std::pair<wxColour, int>(wxColour(84, 112, 129), StateColor::Normal));
 
     StateColor flush_bd_col(std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Pressed), std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(172, 172, 172), StateColor::Normal));
+                            std::pair<wxColour, int>(wxColour(159, 175, 185), StateColor::Normal));
 
     m_add_filament_btn->SetBackgroundColor(flush_bg_col);
     m_add_filament_btn->SetBorderColor(flush_bd_col);
@@ -7924,7 +7924,7 @@ wxBoxSizer *EditFilamentPresetDialog::create_button_sizer()
     m_ok_btn->SetCornerRadius(FromDIP(12));
     bSizer_button->Add(m_ok_btn, 0, wxRIGHT | wxBOTTOM, FromDIP(10));
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
     m_del_filament_btn->Bind(wxEVT_BUTTON, ([this](wxCommandEvent &e) {
@@ -8131,12 +8131,12 @@ wxBoxSizer *CreatePresetForPrinterDialog::create_button_sizer()
     m_ok_btn->SetCornerRadius(FromDIP(12));
     bSizer_button->Add(m_ok_btn, 0, wxRIGHT | wxBOTTOM, FromDIP(10));
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
     m_cancel_btn = new Button(this, _L("Cancel"));
     m_cancel_btn->SetBackgroundColor(btn_bg_white);
-    m_cancel_btn->SetBorderColor(wxColour(38, 46, 48));
+    m_cancel_btn->SetBorderColor(wxColour(27, 47, 59));
     m_cancel_btn->SetFont(Label::Body_12);
     m_cancel_btn->SetSize(wxSize(FromDIP(58), FromDIP(24)));
     m_cancel_btn->SetMinSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -8259,14 +8259,14 @@ wxPanel *PresetTree::get_child_item(wxPanel *parent, std::shared_ptr<Preset> pre
     }
     sizer->Add(0, 0, 1, wxEXPAND, 0);
 
-    StateColor flush_bg_col(std::pair<wxColour, int>(wxColour(220, 240, 252), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Normal));
+    StateColor flush_bg_col(std::pair<wxColour, int>(wxColour(220, 240, 252), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
+                            std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Normal));
 
-    StateColor flush_fg_col(std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Pressed), std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(107, 107, 106), StateColor::Normal));
+    StateColor flush_fg_col(std::pair<wxColour, int>(wxColour(84, 112, 129), StateColor::Pressed), std::pair<wxColour, int>(wxColour(84, 112, 129), StateColor::Hovered),
+                            std::pair<wxColour, int>(wxColour(84, 112, 129), StateColor::Normal));
 
     StateColor flush_bd_col(std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Pressed), std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Hovered),
-                            std::pair<wxColour, int>(wxColour(172, 172, 172), StateColor::Normal));
+                            std::pair<wxColour, int>(wxColour(159, 175, 185), StateColor::Normal));
 
     StateColor btn_bg_green(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
                             std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal));
@@ -8535,15 +8535,15 @@ SelectPrinterPresetPanel::SelectPrinterPresetPanel(nlohmann::json& profile_json,
     sizer_data->Add(right_sizer, 4, wxEXPAND);
     sizer_data->AddSpacer(10 * em_unit(this) / 10);
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
         std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
     wxBoxSizer* sizer_button = new wxBoxSizer(wxHORIZONTAL);
     Button* button_confirm = new Button(this, _L("Confirm"));
     {
         button_confirm->SetBackgroundColor(btn_bg_white);
-        button_confirm->SetBorderColor(wxColour(38, 46, 48));
+        button_confirm->SetBorderColor(wxColour(27, 47, 59));
         //button_confirm->SetTextColor(wxColour(0xFFFFFE));
         button_confirm->SetFont(Label::Body_12);
         button_confirm->SetSize(wxSize(FromDIP(58), FromDIP(24)));
@@ -8553,7 +8553,7 @@ SelectPrinterPresetPanel::SelectPrinterPresetPanel(nlohmann::json& profile_json,
     Button* button_cancel = new Button(this, _L("Cancel"));
     {
         button_cancel->SetBackgroundColor(btn_bg_white);
-        button_cancel->SetBorderColor(wxColour(38, 46, 48));
+        button_cancel->SetBorderColor(wxColour(27, 47, 59));
         //button_cancel->SetTextColor(wxColour(0xFFFFFE));
         button_cancel->SetFont(Label::Body_12);
         button_cancel->SetSize(wxSize(FromDIP(58), FromDIP(24)));

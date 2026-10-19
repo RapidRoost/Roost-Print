@@ -121,7 +121,7 @@ void GLToolbarItem::render_icon_top_label_bottom_px(
 
             ImVec4 base_col = dark
                 ? ImVec4(0.92f, 0.94f, 0.97f, 1.00f) 
-                : ImVec4(0.14f, 0.16f, 0.18f, 0.95f);
+                : ImVec4(0.098f, 0.176f, 0.224f, 0.95f);
 
             ImGui::PushStyleColor(ImGuiCol_Text, base_col);
 
@@ -294,7 +294,7 @@ void GLToolbar::render_horizontal_simple(const GLCanvas3D& parent,
     const bool  drop_shadow = false;
     const float shadow_px = 8.0f * m_layout.scale;
 
-    ImU32 fill = ImGui::GetColorU32(dark ? ImVec4(0.10f,0.10f,0.12f,0.50f)
+    ImU32 fill = ImGui::GetColorU32(dark ? ImVec4(0.067f,0.122f,0.157f,0.50f)
                                          : ImVec4(1.00f,1.00f,1.00f,0.50f));
     ImU32 bord = ImGui::GetColorU32(dark ? ImVec4(0.30f,0.30f,0.35f,0.60f)
                                          : ImVec4(0.00f,0.00f,0.00f,0.10f));

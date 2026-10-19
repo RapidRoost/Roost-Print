@@ -35,7 +35,7 @@
 
 #RecentClearAllBtn:hover
 {
-	background-color:#CDCECE;
+	background-color:#C6CFD5;
 }
 
 #Recent_LEFT_Title
@@ -143,7 +143,7 @@
 .FileImg
 {
 	text-align: center;
-	background-color: #E4E4E4;
+	background-color: #E0E5E8;
 	width: 100%;
 	border-radius: 8px;
 	line-height: 0px;
@@ -170,7 +170,7 @@
 
 .FileDate
 {
-	color: #A8A8A8;
+	color: #9AABB6;
 	font-size: 10px;
 	padding: 0px 4px;	
 }
@@ -182,7 +182,7 @@
 	padding: 10px;
 	border: 0px;
 	min-width: 100px;
-	border: 1px solid #D7D7D7;
+	border: 1px solid #D1D8DD;
     top: 100px;
 	border-radius: 5px;
 	color: #323A3D;
@@ -246,7 +246,7 @@
 
 .CT_Seperate
 {
-	border-bottom:1px solid  #C5C5C5;
+	border-bottom:1px solid  #BCC7CE;
 }
 
 .CT_Text

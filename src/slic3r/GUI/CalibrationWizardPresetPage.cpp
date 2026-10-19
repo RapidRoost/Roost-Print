@@ -364,7 +364,7 @@ CaliPresetTipsPanel::CaliPresetTipsPanel(
     long style)
     : wxPanel(parent, id, pos, size, style)
 {
-    this->SetBackgroundColour(wxColour(238, 238, 238));
+    this->SetBackgroundColour(wxColour(235, 239, 241));
     this->SetMinSize(wxSize(MIN_CALIBRATION_PAGE_WIDTH, -1));
     
     m_top_sizer = new wxBoxSizer(wxVERTICAL);
@@ -605,7 +605,7 @@ void CalibrationPresetPage::create_filament_list_panel(wxWindow* parent)
     m_filament_list_tips = new Label(parent, _L("Tips for calibration material: \n- Materials that can share same hot bed temperature\n- Different filament brand and family"));
     m_filament_list_tips->Hide();
     m_filament_list_tips->SetFont(Label::Body_13);
-    m_filament_list_tips->SetForegroundColour(wxColour(145, 145, 145));
+    m_filament_list_tips->SetForegroundColour(wxColour(126, 149, 164));
     m_filament_list_tips->Wrap(CALIBRATION_TEXT_MAX_LENGTH);
     panel_sizer->Add(m_filament_list_tips, 0, wxBOTTOM, FromDIP(10));
 

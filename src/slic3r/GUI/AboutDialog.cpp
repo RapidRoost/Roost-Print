@@ -217,7 +217,7 @@ AboutDialog::AboutDialog()
         wxDefaultSize, /*wxCAPTION*/wxDEFAULT_DIALOG_STYLE)
 {
     SetFont(wxGetApp().normal_font());
-    const wxColour font_bg = wxGetApp().dark_mode() ? wxColour("#4B4B4D") : wxColour("#FFFFFF");
+    const wxColour font_bg = wxGetApp().dark_mode() ? wxColour("#365162") : wxColour("#FFFFFF");
     SetBackgroundColour(font_bg);
 
     std::string icon_path = (boost::format("%1%/images/%2%.ico") % resources_dir() % Slic3r::CxBuildInfo::getIconName()).str();
@@ -365,7 +365,7 @@ AboutDialog::AboutDialog()
           wxString website_url = _L("offical_webside");
 
           //m_email_html->SetMinSize(wxSize(FromDIP(-1), FromDIP(16)));
-          //m_email_html->SetBackgroundColour(wxColour(122, 122, 122));
+          //m_email_html->SetBackgroundColour(wxColour(98, 127, 146));
           m_email_html->SetForegroundColour(color);
           m_email_html->SetLabel(email_url);
           m_email_html->SetCursor(wxCURSOR_HAND);
@@ -408,13 +408,13 @@ AboutDialog::AboutDialog()
 
     //Add "Portions copyright" button
     Button* button_portions = new Button(this,_L("Portions copyright"));
-    StateColor report_bg(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled), std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-                         std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered), std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled),
+    StateColor report_bg(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled), std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+                         std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered), std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled),
                          std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     button_portions->SetBackgroundColor(report_bg);
-    StateColor report_bd(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+    StateColor report_bd(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
     button_portions->SetBorderColor(report_bd);
-    StateColor report_text(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+    StateColor report_text(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
     button_portions->SetTextColor(report_text);
     button_portions->SetFont(Label::Body_12);
     button_portions->SetCornerRadius(FromDIP(12));

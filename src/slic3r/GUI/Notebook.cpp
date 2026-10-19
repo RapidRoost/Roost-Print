@@ -25,7 +25,7 @@ ButtonsListCtrl::ButtonsListCtrl(wxWindow *parent, wxBoxSizer* side_tools) :
 #ifdef __APPLE__
     default_btn_bg = wxColour("#3B4446"); // Gradient #414B4E
 #else
-    default_btn_bg = wxColour("#2D2D30"); // Gradient #414B4E
+    default_btn_bg = wxColour("#1D3240"); // Gradient #414B4E
 #endif
 
    
@@ -145,7 +145,7 @@ void ButtonsListCtrl::SetSelection(int sel)
     wxColour selected_btn_bg("#1E90D8");    // Gradient #1E90D8
     if (m_selection >= 0) {
         StateColor bg_color = StateColor(
-        std::pair{wxColour(107, 107, 107), (int) StateColor::Hovered},
+        std::pair{wxColour(84, 112, 130), (int) StateColor::Hovered},
         std::pair{wxColour(59, 68, 70), (int) StateColor::Normal});
         m_pageButtons[m_selection]->SetBackgroundColor(bg_color);
         StateColor text_color = StateColor(
@@ -180,7 +180,7 @@ bool ButtonsListCtrl::InsertPage(size_t n, const wxString &text, bool bSelect /*
     btn->SetMinSize({(text.empty() ? 40 : 136) * em / 10, 36 * em / 10});
 
     StateColor bg_color = StateColor(
-        std::pair{wxColour(107, 107, 107), (int) StateColor::Hovered},
+        std::pair{wxColour(84, 112, 130), (int) StateColor::Hovered},
         std::pair{wxColour(59, 68, 70), (int) StateColor::Normal});
 
     btn->SetBackgroundColor(bg_color);

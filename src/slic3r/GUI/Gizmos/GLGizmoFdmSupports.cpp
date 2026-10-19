@@ -347,7 +347,7 @@ void GLGizmoFdmSupports::on_render_input_window(float x, float y, float bottom_l
 
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0);
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));						// ORCA: Fixes icon rendered without colors while using Light theme
-        ImGui::PushStyleColor(ImGuiCol_Button, m_is_dark_mode ? ImVec4(0.43f, 0.43f, 0.447f, 1.f) : ImVec4(1.f, 1.f, 1.f, 1.f));	// ORCA use orca color for selected tool / brush
+        ImGui::PushStyleColor(ImGuiCol_Button, m_is_dark_mode ? ImVec4(0.349f, 0.459f, 0.529f, 1.f) : ImVec4(1.f, 1.f, 1.f, 1.f));	// ORCA use orca color for selected tool / brush
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiWrapper::COL_CREALITY);	// ORCA use orca color for selected tool / brush
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiWrapper::COL_CREALITY);	// ORCA use orca color for selected tool / brush
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0);

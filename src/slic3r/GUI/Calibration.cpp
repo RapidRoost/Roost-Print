@@ -27,7 +27,7 @@ CalibrationDialog::CalibrationDialog(Plater *plater)
     SetBackgroundColour(*wxWHITE);
     wxBoxSizer *m_sizer_main = new wxBoxSizer(wxVERTICAL);
     auto        m_line_top   = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1), wxTAB_TRAVERSAL);
-    m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
     m_sizer_main->Add(m_line_top, 0, wxEXPAND, 0);
 
     wxBoxSizer *sizer_body = new wxBoxSizer(wxHORIZONTAL);
@@ -196,7 +196,7 @@ wxWindow* CalibrationDialog::create_check_option(wxString title, wxWindow* paren
 
     auto text = new wxStaticText(checkbox, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END);
     text->SetFont(::Label::Body_13);
-    text->SetForegroundColour(wxColour(107, 107, 107));
+    text->SetForegroundColour(wxColour(84, 112, 130));
     text->Wrap(-1);
     sizer_checkbox->Add(text, 0, wxBOTTOM | wxEXPAND | wxTOP, FromDIP(5));
 

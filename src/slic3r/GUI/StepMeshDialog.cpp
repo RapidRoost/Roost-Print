@@ -313,12 +313,12 @@ StepMeshDialog::StepMeshDialog(wxWindow* parent, Slic3r::Step& file, double line
         SetFocusIgnoringChildren();
     });
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
     m_button_cancel = new Button(this, _L("Cancel"));
     m_button_cancel->SetBackgroundColor(btn_bg_white);
-    m_button_cancel->SetBorderColor(wxColour(38, 46, 48));
+    m_button_cancel->SetBorderColor(wxColour(27, 47, 59));
     m_button_cancel->SetFont(Label::Body_13);
     m_button_cancel->SetSize(BUTTON_SIZE);
     m_button_cancel->SetMinSize(BUTTON_SIZE);
@@ -397,7 +397,7 @@ void StepMeshDialog::update_mesh_number_text()
         return;
 
     if (m_button_ok) {
-        m_button_ok->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour(180, 180, 180), StateColor::Normal)));
+        m_button_ok->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour(168, 183, 192), StateColor::Normal)));
         m_button_ok->Enable(false);
     }
     wxString newText = wxString::Format(_L("Calculating, please wait..."));

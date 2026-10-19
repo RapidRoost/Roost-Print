@@ -37,7 +37,7 @@ namespace GUI {
 AddMachinePanel::AddMachinePanel(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
     : wxPanel(parent, id, pos, size, style)
 {
-    this->SetBackgroundColour(0xEEEEEE);
+    this->SetBackgroundColour(0xEBEFF1);
 
     wxBoxSizer* topsizer = new wxBoxSizer(wxVERTICAL);
 
@@ -55,17 +55,17 @@ AddMachinePanel::AddMachinePanel(wxWindow* parent, wxWindowID id, const wxPoint&
     m_button_add_machine = new Button(this, "", "monitor_add_machine", FromDIP(24));
     m_button_add_machine->SetCornerRadius(FromDIP(12));
     StateColor button_bg(
-        std::pair<wxColour, int>(0xCECECE, StateColor::Pressed),
-        std::pair<wxColour, int>(0xCECECE, StateColor::Hovered),
+        std::pair<wxColour, int>(0xC6D0D6, StateColor::Pressed),
+        std::pair<wxColour, int>(0xC6D0D6, StateColor::Hovered),
         std::pair<wxColour, int>(this->GetBackgroundColour(), StateColor::Normal)
     );
     m_button_add_machine->SetBackgroundColor(button_bg);
-    m_button_add_machine->SetBorderColor(0x909090);
+    m_button_add_machine->SetBorderColor(0x7D94A3);
     m_button_add_machine->SetMinSize(wxSize(96, 39));
     btn_sizer->Add(m_button_add_machine, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 5);
     m_staticText_add_machine = new wxStaticText(this, wxID_ANY, wxT("click to add machine"), wxDefaultPosition, wxDefaultSize, 0);
     m_staticText_add_machine->Wrap(-1);
-    m_staticText_add_machine->SetForegroundColour(0x909090);
+    m_staticText_add_machine->SetForegroundColour(0x7D94A3);
     btn_sizer->Add(m_staticText_add_machine, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 5);
 
     horiz_sizer->Add(btn_sizer);

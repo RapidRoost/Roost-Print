@@ -96,7 +96,7 @@ void OneFilamentColorItem::OnPaint(wxPaintEvent& event)
 {
     wxAutoBufferedPaintDC dc(this); // Use double-buffering to avoid flicker
     if (Slic3r::GUI::wxGetApp().dark_mode())
-        dc.SetBackground(wxBrush(wxColour(75, 75, 75)));
+        dc.SetBackground(wxBrush(wxColour(53, 80, 97)));
     else
         dc.SetBackground(wxBrush(wxColour(255, 255, 255)));
     dc.Clear();
@@ -114,7 +114,7 @@ void OneFilamentColorItem::OnPaint(wxPaintEvent& event)
         // dc.DrawRectangle(m_border_width, m_border_width, size.GetWidth() - 2 * m_border_width, size.GetHeight() - 2 * m_border_width);
     } else {
         // Set the brush and pen to transparent
-        dc.SetBrush(wxColour(75, 75, 75));
+        dc.SetBrush(wxColour(53, 80, 97));
         dc.SetPen(*wxTRANSPARENT_PEN);
     }
 
@@ -160,7 +160,7 @@ OneBoxFilamentColorItem::OneBoxFilamentColorItem(wxWindow* parent, const wxSize&
 	this->SetSizer(m_box_sizer);
 	m_box_sizer->AddSpacer(FromDIP(8));
 
-    m_bk_color = wxColour(75, 75, 77);
+    m_bk_color = wxColour(54, 81, 98);
 
     // SetBackgroundStyle(wxBG_STYLE_PAINT); // 使得双缓冲绘图生效
     Bind(wxEVT_PAINT, &OneBoxFilamentColorItem::OnPaint, this);
@@ -229,7 +229,7 @@ void OneBoxFilamentColorItem::update_ui_item_info_by_material_box_info(const DM:
             if (!has_exact_material) {
                 DM::Material tmp_material;
                 tmp_material.material_id = material_id;
-                tmp_material.color      = "#808080"; // grey
+                tmp_material.color      = "#688698"; // grey
                 filament_item->set_sync_state(false);
                 filament_item->set_is_ext(false);
                 filament_item->update_item_info_by_material(material_box_info.box_id, tmp_material);
@@ -313,7 +313,7 @@ void OneBoxFilamentColorItem::update_ui_item_info_by_material_box_info(const DM:
         if (!has_exact_material) {
             DM::Material tmp_material;
             tmp_material.material_id = 0;
-            tmp_material.color       = "#808080"; // grey
+            tmp_material.color       = "#688698"; // grey
             filament_item->set_sync_state(false);
             filament_item->set_is_ext(false);
             filament_item->update_item_info_by_material(material_box_info.box_id, tmp_material);
@@ -359,7 +359,7 @@ PrinterBoxFilamentPanel::PrinterBoxFilamentPanel(wxWindow* parent, wxWindowID wi
 
     // Create the auto mapping button
     //m_autoMappingButton = new wxButton(this, wxID_ANY, _L("Auto Mapping"));
-    //m_autoMappingButton->SetBackgroundColour(wxColour(38,38,38)); // Set background color to grey
+    //m_autoMappingButton->SetBackgroundColour(wxColour(23,41,53)); // Set background color to grey
     //main_sizer->Add(m_autoMappingButton, 0, wxALIGN_RIGHT | wxALL, 5);
 
     // Set the main sizer for the panel

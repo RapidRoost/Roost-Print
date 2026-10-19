@@ -132,7 +132,7 @@ SatisfactionSurveyDialog::SatisfactionSurveyDialog(wxWindow* parent,
     , m_on_ready(std::move(on_ready))
     , m_on_failed(std::move(on_failed))
 {
-    SetBackgroundColour(wxGetApp().dark_mode() ? wxColour("#4B4B4D") : *wxWHITE);
+    SetBackgroundColour(wxGetApp().dark_mode() ? wxColour("#365162") : *wxWHITE);
     m_requested_height_dip = kDefaultDialogHeightDip;
     apply_dialog_size();
 

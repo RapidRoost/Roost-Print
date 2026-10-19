@@ -545,7 +545,7 @@ void GLGizmoSimplePaint::on_render_input_window(float x, float y, float bottom_l
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f);
         bool is_selected = (m_current_tool == tool_ids[i]);
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Button, m_is_dark_mode ? ImVec4(0.3f, 0.3f, 0.32f, 1.f) : ImVec4(0.95f, 0.95f, 0.95f, 1.f));
+        ImGui::PushStyleColor(ImGuiCol_Button, m_is_dark_mode ? ImVec4(0.220f, 0.329f, 0.400f, 1.f) : ImVec4(0.941f, 0.949f, 0.957f, 1.f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiWrapper::COL_CREALITY);
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiWrapper::COL_CREALITY);
         if (is_selected)

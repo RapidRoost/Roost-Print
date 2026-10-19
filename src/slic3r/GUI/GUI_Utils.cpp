@@ -282,7 +282,7 @@ void update_dark_ui(wxWindow* window)
 #else
     bool is_dark = false;
 #endif
-    //window->SetBackgroundColour(is_dark ? wxColour(43,  43,  43)  : wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+    //window->SetBackgroundColour(is_dark ? wxColour(27,  47,  59)  : wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
     //window->SetForegroundColour(is_dark ? wxColour(250, 250, 250) : wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
 }
 #endif

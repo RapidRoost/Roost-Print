@@ -162,7 +162,7 @@ bool ProgressDialog::Create(const wxString &title, const wxString &message, int 
     wxBoxSizer *m_sizer_main = new wxBoxSizer(wxVERTICAL);
 
     m_top_line = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
-    m_top_line->SetBackgroundColour(wxColour(166, 169, 170));
+    m_top_line->SetBackgroundColour(wxColour(154, 171, 182));
 
     m_sizer_main->Add(m_top_line, 0, wxEXPAND, 0);
     m_sizer_main->Add(0, 0, 0, wxTOP, FromDIP(24));
@@ -304,13 +304,13 @@ bool ProgressDialog::Create(const wxString &title, const wxString &message, int 
     //    sizerTop->Add(m_message_area, 0, wxLEFT | wxRIGHT | wxBottom | wxEXPAND, 2 * LAYOUT_MARGIN);
     //
     //    m_msg = new wxStaticText(m_message_area, wxID_ANY, wxString(""), wxPoint(0, 10), wxSize(def_size_width, 20), wxST_ELLIPSIZE_END);
-    //    m_msg->SetForegroundColour(wxColour(107, 107, 107));
+    //    m_msg->SetForegroundColour(wxColour(84, 112, 130));
     //    m_msg->SetBackgroundColour(DESIGN_RESOUTION_DEF_BK_COLOR);
     //    m_msg->SetMinSize(wxSize(def_size_width, 20));
     //    m_msg->SetMaxSize(wxSize(def_size_width, 20));
     //
     //    m_msg_2line = new wxStaticText(m_message_area, wxID_ANY, wxString(""), wxPoint(0, 0), wxSize(def_size_width, 40), wxST_ELLIPSIZE_END);
-    //    m_msg_2line->SetForegroundColour(wxColour(107, 107, 107));
+    //    m_msg_2line->SetForegroundColour(wxColour(84, 112, 130));
     //    m_msg_2line->SetBackgroundColour(DESIGN_RESOUTION_DEF_BK_COLOR);
     //    m_msg_2line->SetMinSize(wxSize(def_size_width, 40));
     //    m_msg_2line->SetMaxSize(wxSize(def_size_width, 40));
@@ -395,7 +395,7 @@ bool ProgressDialog::Create(const wxString &title, const wxString &message, int 
     //        m_btnAbort->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ProgressDialog::OnCancel, this);*/
     //
     //        m_button_calcel = new Button(m_button_sizer, _T("Cancel"));
-    //        m_button_calcel->SetTextColor(wxColour(107, 107, 107));
+    //        m_button_calcel->SetTextColor(wxColour(84, 112, 130));
     //        m_button_calcel->SetSize(60, 24);
     //        m_button_calcel->SetPosition(wxPoint(m_button_sizer->GetSize().GetWidth() - m_button_calcel->GetSize().GetWidth(), 0));
     //

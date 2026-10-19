@@ -225,7 +225,7 @@ public:
 
     void apply_theme(bool is_dark)
     {
-        const wxColour bg = is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF");
+        const wxColour bg = is_dark ? wxColour("#365162") : wxColour("#FFFFFF");
         const wxColour fg = is_dark ? *wxWHITE : *wxBLACK;
         SetBackgroundColour(bg);
         if (m_title_text) {
@@ -388,11 +388,11 @@ void AppUpdateProgressDialog::apply_theme()
     const bool is_dark = wxGetApp().dark_mode();
     wxGetApp().UpdateDlgDarkUI(this);
 
-    const wxColour bg = is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF");
+    const wxColour bg = is_dark ? wxColour("#365162") : wxColour("#FFFFFF");
     const wxColour fg = is_dark ? *wxWHITE : *wxBLACK;
-    const wxColour line = is_dark ? wxColour("#616165") : wxColour("#E8EAEE");
-    const wxColour border = is_dark ? wxColour("#6E6E72") : wxColour("#DBDBDB");
-    const wxColour progress_track = is_dark ? wxColour("#616165") : wxColour("#E8EAEE");
+    const wxColour line = is_dark ? wxColour("#4C687A") : wxColour("#E8EAEE");
+    const wxColour border = is_dark ? wxColour("#597587") : wxColour("#D5DCE1");
+    const wxColour progress_track = is_dark ? wxColour("#4C687A") : wxColour("#E8EAEE");
     const wxColour progress_fill = wxColour("#1877B4");
 
     SetBackgroundColour(bg);
@@ -629,15 +629,15 @@ void AppUpdateFinishDialog::apply_theme()
     const bool is_dark = wxGetApp().dark_mode();
     wxGetApp().UpdateDlgDarkUI(this);
 
-    const wxColour content_bg = is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF");
+    const wxColour content_bg = is_dark ? wxColour("#365162") : wxColour("#FFFFFF");
     const wxColour fg = is_dark ? *wxWHITE : *wxBLACK;
-    const wxColour line = is_dark ? wxColour("#616165") : wxColour("#E8EAEE");
+    const wxColour line = is_dark ? wxColour("#4C687A") : wxColour("#E8EAEE");
     const wxColour accent = is_dark ? wxColour("#197DBC") : wxColour("#1877B4");
     const wxColour now_hover = is_dark ? wxColour("#1E8BD0") : wxColour("#1E8BD0");
     const wxColour now_pressed = is_dark ? wxColour("#166EA6") : wxColour("#166EA6");
-    const wxColour cancel_border = is_dark ? wxColour("#6E6E72") : wxColour("#DBDBDB");
-    const wxColour cancel_hover_bg = is_dark ? wxColour("#535355") : wxColour("#F3F4F6");
-    const wxColour cancel_pressed_bg = is_dark ? wxColour("#434345") : wxColour("#E8EAEE");
+    const wxColour cancel_border = is_dark ? wxColour("#597587") : wxColour("#D5DCE1");
+    const wxColour cancel_hover_bg = is_dark ? wxColour("#3D596B") : wxColour("#F3F4F6");
+    const wxColour cancel_pressed_bg = is_dark ? wxColour("#2E495A") : wxColour("#E8EAEE");
 
     SetBackgroundColour(content_bg);
 

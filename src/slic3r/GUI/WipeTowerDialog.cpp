@@ -20,7 +20,7 @@ using namespace Slic3r::GUI;
 
 int scale(const int val) { return val * Slic3r::GUI::wxGetApp().em_unit() / 10; }
 int ITEM_WIDTH() { return scale(30); }
-static const wxColour g_text_color = wxColour(107, 107, 107, 255);
+static const wxColour g_text_color = wxColour(84, 112, 130, 255);
 
 #define ICON_SIZE               wxSize(FromDIP(16), FromDIP(16))
 #define TABLE_BORDER            FromDIP(28)
@@ -226,17 +226,17 @@ wxBoxSizer* WipingDialog::create_btn_sizer(long flags)
     );
 
     StateColor cancel_btn_bg(
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal)
     );
 
     StateColor cancel_btn_bd_(
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal)
     );
 
     StateColor cancel_btn_text(
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal)
     );
 
 
@@ -389,7 +389,7 @@ WipingDialog::WipingDialog(wxWindow* parent, const std::vector<WipingNozzleData>
     SetIcon(wxIcon(Slic3r::encode_path(icon_path.c_str()), wxBITMAP_TYPE_ICO));
 
     auto m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1));
-    m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
 
     this->SetBackgroundColour(*wxWHITE);
     this->SetMinSize(wxSize(MIN_WIPING_DIALOG_WIDTH, -1));
@@ -481,7 +481,7 @@ void WipingPanel::create_panels(wxWindow* parent, const int num) {
     for (size_t i = 0; i < num; i++)
     {
         wxPanel* panel = new wxPanel(parent);
-        panel->SetBackgroundColour(i % 2 == 0 ? *wxWHITE : wxColour(238, 238, 238));
+        panel->SetBackgroundColour(i % 2 == 0 ? *wxWHITE : wxColour(235, 239, 241));
         auto sizer = new wxBoxSizer(wxHORIZONTAL);
         panel->SetSizer(sizer);
 
@@ -627,7 +627,7 @@ WipingPanel::WipingPanel(wxWindow* parent, const std::vector<float>& matrix, con
     // BBS
     m_sizer_advanced->AddSpacer(FromDIP(10));
     auto tip_message_panel = new wxPanel(m_page_advanced, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
-    tip_message_panel->SetBackgroundColour(wxColour(238, 238, 238));
+    tip_message_panel->SetBackgroundColour(wxColour(235, 239, 241));
     auto message_sizer = new wxBoxSizer(wxVERTICAL);
     tip_message_panel->SetSizer(message_sizer);
     {
@@ -650,7 +650,7 @@ WipingPanel::WipingPanel(wxWindow* parent, const std::vector<float>& matrix, con
     //m_sizer_advanced->AddSpacer(FromDIP(10));
     m_sizer_advanced->AddSpacer(FromDIP(5));
     header_line_panel = new wxPanel(m_page_advanced, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
-    header_line_panel->SetBackgroundColour(wxColour(238, 238, 238));
+    header_line_panel->SetBackgroundColour(wxColour(235, 239, 241));
     auto header_line_sizer = new wxBoxSizer(wxHORIZONTAL);
     header_line_panel->SetSizer(header_line_sizer);
 
@@ -890,7 +890,7 @@ WipingPanel::WipingPanel(wxWindow* parent, const std::vector<float>& matrix, con
         int p1_y = base_y;
         int p2_x = base_x + from_text_size.x + from_text_size.y;
         int p2_y = base_y + from_text_size.y + to_text_size.y;
-        dc.SetPen(wxPen(wxColour(172, 172, 172, 1)));
+        dc.SetPen(wxPen(wxColour(159, 175, 185, 1)));
         dc.DrawLine(p1_x, p1_y, p2_x, p2_y);
     });
     wxFont basic_font = header_line_panel->GetFont();

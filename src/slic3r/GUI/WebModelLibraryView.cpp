@@ -69,7 +69,7 @@ wxBEGIN_EVENT_TABLE(WebModelLibraryView, wxPanel) EVT_WEBVIEW_NAVIGATING(wxID_AN
     , m_main_sizer(nullptr)
     , m_toolbar_sizer(nullptr)
 {
-    SetBackgroundColour(wxColour(54, 54, 56)); // Match the dark theme background
+    SetBackgroundColour(wxColour(36, 59, 74)); // Match the dark theme background
 
     CreateControls();
     CreateWebView();
@@ -101,7 +101,7 @@ void WebModelLibraryView::CreateControls()
 
     // Create toolbar panel (but don't add it to layout to hide it)
     m_toolbar_panel = new wxPanel(this, wxID_ANY);
-    m_toolbar_panel->SetBackgroundColour(wxColour(238, 238, 238));
+    m_toolbar_panel->SetBackgroundColour(wxColour(235, 239, 241));
 
     m_toolbar_sizer = new wxBoxSizer(wxHORIZONTAL);
 

@@ -506,7 +506,7 @@ void Mouse3DController::render_settings_dialog(GLCanvas3D& canvas) const
                 canvas.request_extra_frame();
             }
 
-            const ImVec4& color = ImVec4(0.56f, 0.56f, 0.56f, 1.00f);
+            const ImVec4& color = ImVec4(0.482f, 0.576f, 0.639f, 1.00f);
             /*imgui.text(_L("Device:"));
             ImGui::SameLine();
             imgui.text(m_device_str);*/

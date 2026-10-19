@@ -171,12 +171,12 @@ void ExtrusionCalibration::create()
     m_error_text->Hide();
 
     m_button_cali = new Button(m_step_1_panel, _L("Start calibration"));
-    m_btn_bg_green = StateColor(std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Disabled), std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
+    m_btn_bg_green = StateColor(std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Disabled), std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed), std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal));
     m_button_cali->SetBackgroundColor(m_btn_bg_green);
     m_button_cali->SetFont(Label::Body_13);
-    m_button_cali->SetBorderColor({ std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Disabled), std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Enabled) });
-    m_button_cali->SetTextColor({ std::pair<wxColour, int>(wxColour(172, 172, 172), StateColor::Disabled), std::pair<wxColour, int>(EXTRUSION_CALIBRATION_GREY200, StateColor::Enabled) });
+    m_button_cali->SetBorderColor({ std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Disabled), std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Enabled) });
+    m_button_cali->SetTextColor({ std::pair<wxColour, int>(wxColour(159, 175, 185), StateColor::Disabled), std::pair<wxColour, int>(EXTRUSION_CALIBRATION_GREY200, StateColor::Enabled) });
     m_button_cali->SetCornerRadius(FromDIP(12));
     m_button_cali->SetMinSize(wxSize(-1, FromDIP(24)));
     m_button_cali->Bind(wxEVT_BUTTON, &ExtrusionCalibration::on_click_cali, this);
@@ -193,8 +193,8 @@ void ExtrusionCalibration::create()
     m_cali_cancel->Bind(wxEVT_BUTTON, &ExtrusionCalibration::on_click_cancel, this);
 
     m_button_next_step = new Button(m_step_1_panel, _L("Next"));
-    m_btn_bg_gray = StateColor(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(*wxWHITE, StateColor::Focused),
-        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    m_btn_bg_gray = StateColor(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(*wxWHITE, StateColor::Focused),
+        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
         std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
     m_button_next_step->SetBackgroundColor(m_btn_bg_gray);
     m_button_next_step->SetFont(Label::Body_13);

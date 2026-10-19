@@ -304,7 +304,7 @@ void NotificationManager::ObjectInfoNotification::render(
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
         ImVec2      wpos      = ImGui::GetWindowPos();
         ImVec2      wsz       = ImGui::GetWindowSize();
-        ImU32       bg        = ImGui::ColorConvertFloat4ToU32(m_is_dark ? ImVec4(0.1f,0.1f,0.1f,0.4f) : ImVec4(1.0f, 1.0f, 1.0f, 0.4f));
+        ImU32       bg        = ImGui::ColorConvertFloat4ToU32(m_is_dark ? ImVec4(0.063f,0.110f,0.141f,0.4f) : ImVec4(1.0f, 1.0f, 1.0f, 0.4f));
         float       rounding  = 18.0f * sc;
         draw_list->AddRectFilled(ImVec2(wpos.x, wpos.y - 3.0f * sc), ImVec2(wpos.x + wsz.x, wpos.y + wsz.y + 3.0f * sc), bg, rounding);
         if (ImGui::IsMouseHoveringRect(win_pos, win_pos + win_size))
@@ -682,9 +682,9 @@ void NotificationManager::PopNotification::render_hypertext(ImGuiWrapper& imgui,
 	ImVec2 part_size = ImGui::CalcTextSize(text.c_str());
 	ImGui::SetCursorPosX(text_x -4);
 	ImGui::SetCursorPosY(text_y -5);
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(.4f, .4f, .4f, 0.0f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.5f, .5f, .5f, 0.0f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.7f, .7f, .7f, 0.0f));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.314f, 0.420f, 0.486f, 0.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.408f, 0.525f, 0.596f, 0.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.651f, 0.710f, 0.745f, 0.0f));
 	if (imgui.button("      ", part_size.x + 6, part_size.y + 10))
 	{
 		if (more)
@@ -1255,14 +1255,14 @@ void NotificationManager::ProgressBarNotification::render_text(ImGuiWrapper& img
 void NotificationManager::ProgressBarNotification::render_bar(ImGuiWrapper& imgui, const float win_size_x, const float win_size_y, const float win_pos_x, const float win_pos_y)
 {
 	//ImVec4 orange_color			= ImVec4(.99f, .313f, .0f, 1.0f);
-	//ImVec4 gray_color			= ImVec4(.34f, .34f, .34f, 1.0f);
+	//ImVec4 gray_color			= ImVec4(0.251f, 0.361f, 0.431f, 1.0f);
 
     int alpha = (int)(255 * m_current_fade_opacity);
     ImColor bg_color(74, 74, 77, alpha);   
     ImColor fg_color(23, 204, 95, alpha);  
 
     ImVec4 orange_color         = ImVec4(0.118f, 0.565f, 0.847f, 1);
-    ImVec4 gray_color           = ImVec4(.7f, .7f, .7f, 1.0f);
+    ImVec4 gray_color           = ImVec4(0.651f, 0.710f, 0.745f, 1.0f);
 	ImVec2 lineEnd				= ImVec2(win_pos_x - m_window_width_offset, win_pos_y + win_size_y / 2 + (m_multiline ? m_line_height / 2 : 0));
 	ImVec2 lineStart			= ImVec2(win_pos_x - win_size_x + m_left_indentation, win_pos_y + win_size_y / 2 + (m_multiline ? m_line_height / 2 : 0));
 	ImVec2 midPoint				= ImVec2(lineStart.x + (lineEnd.x - lineStart.x) * m_percentage, lineStart.y);
@@ -2944,7 +2944,7 @@ void NotificationManager::render_notifications(GLCanvas3D &canvas, float overlay
             return;
         }
 	
-		ImVec4 scroll_col = ImVec4(0.77f, 0.77f, 0.77f, 1.0f);
+		ImVec4 scroll_col = ImVec4(0.733f, 0.776f, 0.804f, 1.0f);
         ImGui::PushStyleColor(ImGuiCol_ScrollbarBg,ImVec4(0.f, 0.f, 0.f,0.f));
         ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, scroll_col);
         ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, scroll_col);

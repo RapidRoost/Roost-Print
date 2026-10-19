@@ -404,8 +404,8 @@ std::string CommWithAICloudService::getApiUrl()
 AICloudService_ResultListItem::AICloudService_ResultListItem(wxWindow* parent, wxSize itemSize)
     : wxPanel(parent, wxID_ANY)
 {
-    wxString bgColor  = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
-    wxString bgColor2 = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
+    wxString bgColor  = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
+    wxString bgColor2 = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
     wxString fgColor = wxGetApp().dark_mode() ? "#FFFFFF" : "#30373D";
     this->SetMinSize(wxSize(FromDIP(-1), itemSize.GetHeight()));
     this->SetMaxSize(wxSize(FromDIP(-1), itemSize.GetHeight()));
@@ -421,7 +421,7 @@ AICloudService_ResultListItem::AICloudService_ResultListItem(wxWindow* parent, w
     auto panel = new wxPanel(this);
     panel->SetMinSize(wxSize(FromDIP(1), itemSize.GetHeight()));
     panel->SetMaxSize(wxSize(FromDIP(1), itemSize.GetHeight()));
-    panel->SetBackgroundColour("#505052");
+    panel->SetBackgroundColour("#3A5668");
     panel->SetWindowStyle(wxBORDER_NONE);
     m_mainSizer->Add(panel);
     m_beforeProcessing = new wxStaticText(this, wxID_ANY, _L("Before processing"));
@@ -433,7 +433,7 @@ AICloudService_ResultListItem::AICloudService_ResultListItem(wxWindow* parent, w
     panel = new wxPanel(this);
     panel->SetMinSize(wxSize(FromDIP(1), itemSize.GetHeight()));
     panel->SetMaxSize(wxSize(FromDIP(1), itemSize.GetHeight()));
-    panel->SetBackgroundColour("#505052");
+    panel->SetBackgroundColour("#3A5668");
     panel->SetWindowStyle(wxBORDER_NONE);
     m_mainSizer->Add(panel);
     m_afterProcessing = new wxStaticText(this, wxID_ANY, _L("After processing"));
@@ -546,8 +546,8 @@ void AICloudService_ResultDialog::build_dialog()
 {
     this->SetMinSize(wxSize(FromDIP(1138), FromDIP(557)));
     this->SetMaxSize(wxSize(FromDIP(1138), FromDIP(557)));
-    wxString bgColor  = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
-    wxString bgColor2 = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
+    wxString bgColor  = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
+    wxString bgColor2 = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
     wxString fgColor  = wxGetApp().dark_mode() ? "#FFFFFF" : "#30373D";
     SetFont(wxGetApp().normal_font());
     wxGetApp().UpdateDlgDarkUI(this);
@@ -568,7 +568,7 @@ void AICloudService_ResultDialog::build_dialog()
     m_scrolled_window = new wxScrolledWindow(panel);
     m_scrolled_window->SetMinSize(wxSize(FromDIP(1130), FromDIP(470)));
     m_scrolled_window->SetMaxSize(wxSize(FromDIP(1130), FromDIP(470)));
-    m_scrolled_window->SetBackgroundColour(wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6");
+    m_scrolled_window->SetBackgroundColour(wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6");
     m_scrolled_window->SetScrollbars(1, 20, 1, 2);
     m_scrolled_window->SetWindowStyle(wxBORDER_NONE);
     panelSizer->Add(m_scrolled_window);
@@ -682,7 +682,7 @@ void AICloudService_ResultDialog::updateData(const std::list<CommWithAICloudServ
                 auto panel = new wxPanel(m_scrolled_window);
                 panel->SetMinSize(panelsize);
                 panel->SetMaxSize(panelsize);
-                panel->SetBackgroundColour("#505052");
+                panel->SetBackgroundColour("#3A5668");
                 panel->SetWindowStyle(wxBORDER_NONE);
                 m_scrolled_window_sizer->Add(panel);
                 auto item = new AICloudService_ResultListItem(m_scrolled_window, wxSize(FromDIP(355), FromDIP(96)));
@@ -1036,8 +1036,8 @@ void AICloudService_ProgressDialog::build_dialog()
 {
     this->SetMinSize(wxSize(FromDIP(600), FromDIP(358)));
     this->SetMaxSize(wxSize(FromDIP(600), FromDIP(358)));
-    wxString bgColor  = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
-    wxString bgColor2 = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
+    wxString bgColor  = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
+    wxString bgColor2 = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
     wxString fgColor  = wxGetApp().dark_mode() ? "#FFFFFF" : "#30373D";
     SetFont(wxGetApp().normal_font());
     wxGetApp().UpdateDlgDarkUI(this);
@@ -1062,7 +1062,7 @@ void AICloudService_ProgressDialog::build_dialog()
     m_timeoutText = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
     m_timeoutText->SetMinSize(wxSize(FromDIP(100), FromDIP(-1)));
     m_timeoutText->SetMaxSize(wxSize(FromDIP(100), FromDIP(-1)));
-    m_timeoutText->SetForegroundColour(wxGetApp().dark_mode() ? "#3C3C3C" : "#F2F2F2");
+    m_timeoutText->SetForegroundColour(wxGetApp().dark_mode() ? "#284150" : "#F0F2F4");
     panelSizer->Add(m_timeoutText, 1, wxRIGHT | wxALIGN_RIGHT, FromDIP(40));
 
     panel = new wxPanel(this, wxID_ANY);
@@ -1101,7 +1101,7 @@ void AICloudService_ProgressDialog::build_dialog()
     m_progressBar->SetMinSize(wxSize(FromDIP(-1), FromDIP(10)));
     m_progressBar->SetMaxSize(wxSize(FromDIP(-1), FromDIP(10)));
     m_progressBar->SetBackgroundColour(bgColor);
-    m_progressBar->SetProgressForedColour(wxGetApp().dark_mode() ? wxColour("#505052") : wxColour("#E1E4E9"));
+    m_progressBar->SetProgressForedColour(wxGetApp().dark_mode() ? wxColour("#3A5668") : wxColour("#E1E4E9"));
     m_progressBar->SetProgressBackgroundColour(wxColour("#1E90D8"));
     m_progressBar->SetRadius(5);
     m_progressBar->SetValue(1);
@@ -1241,8 +1241,8 @@ void AICloudService_QueueDialog::build_dialog()
 {
     this->SetMinSize(wxSize(FromDIP(600), FromDIP(358)));
     this->SetMaxSize(wxSize(FromDIP(600), FromDIP(358)));
-    wxString bgColor  = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
-    wxString bgColor2 = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
+    wxString bgColor  = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
+    wxString bgColor2 = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
     wxString fgColor  = wxGetApp().dark_mode() ? "#FFFFFF" : "#30373D";
     SetFont(wxGetApp().normal_font());
     wxGetApp().UpdateDlgDarkUI(this);
@@ -1361,8 +1361,8 @@ void AICloudService_TipDialog::build_dialog()
 {
     this->SetMinSize(wxSize(FromDIP(600), FromDIP(358)));
     this->SetMaxSize(wxSize(FromDIP(600), FromDIP(358)));
-    wxString bgColor = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
-    wxString bgColor2 = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
+    wxString bgColor = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
+    wxString bgColor2 = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
     wxString fgColor = wxGetApp().dark_mode() ? "#FFFFFF" : "#30373D";
     this->SetFont(Label::Head_20);
     wxGetApp().UpdateDlgDarkUI(this);
@@ -1491,7 +1491,7 @@ void AICloudService_TipDialog::build_dialog()
     m_okBtn->SetMinSize(wxSize(FromDIP(104), FromDIP(32)));
     m_okBtn->SetMaxSize(wxSize(FromDIP(104), FromDIP(32)));
     m_okBtn->SetFont(Label::Body_16);
-    m_okBtn->SetBorderColor(wxColour(wxGetApp().dark_mode() ? "#6C6E71" : "#A6ACB4"));
+    m_okBtn->SetBorderColor(wxColour(wxGetApp().dark_mode() ? "#577486" : "#A6ACB4"));
     m_okBtn->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour("#1E90D8"), StateColor::Pressed),
                                          std::pair<wxColour, int>(wxColour("#1E90D8"), StateColor::Hovered),
                                          std::pair<wxColour, int>(wxColour("#1E90D8"), StateColor::Normal)));

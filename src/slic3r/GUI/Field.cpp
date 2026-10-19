@@ -2393,7 +2393,7 @@ MultiVariantField::VariantControl MultiVariantField::create_control(int opt_inde
     row->SetBackgroundColour(m_panel->GetBackgroundColour());
     auto* label = new wxStaticText(row, wxID_ANY, wxEmptyString);
     label->SetFont(wxGetApp().normal_font());
-    label->SetForegroundColour(StateColor::darkModeColorFor("#6B6B6B"));
+    label->SetForegroundColour(StateColor::darkModeColorFor("#547082"));
     t_field field = create_field(opt_index, row);
 
     auto* row_sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -2618,7 +2618,7 @@ void MultiVariantField::sys_color_changed()
         m_panel->SetBackgroundColour(m_parent->GetBackgroundColour());
     for (VariantControl& control : m_controls) {
         control.row->SetBackgroundColour(m_panel->GetBackgroundColour());
-        control.label->SetForegroundColour(StateColor::darkModeColorFor("#6B6B6B"));
+        control.label->SetForegroundColour(StateColor::darkModeColorFor("#547082"));
         control.label->Refresh();
         control.field->sys_color_changed();
         if (control.override_checkbox != nullptr)

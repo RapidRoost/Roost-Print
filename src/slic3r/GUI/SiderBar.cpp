@@ -66,7 +66,7 @@ SidebarPrinter::SidebarPrinter(Plater* parent): wxPanel(parent, wxID_ANY, wxDefa
     // 1.1 create title bar resources
     p->m_panel_printer_title = new StaticBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | wxBORDER_NONE);
     p->m_panel_printer_title->SetBackgroundColor(title_bg);
-    p->m_panel_printer_title->SetBackgroundColor2(0xF1F1F1);
+    p->m_panel_printer_title->SetBackgroundColor2(0xEFF1F3);
 
     p->m_printer_icon          = new ScalableButton(p->m_panel_printer_title, wxID_ANY, "printer");
     p->m_text_printer_settings = new Label(p->m_panel_printer_title, _L("Printer"), LB_PROPAGATE_MOUSE_EVENT);
@@ -98,7 +98,7 @@ SidebarPrinter::SidebarPrinter(Plater* parent): wxPanel(parent, wxID_ANY, wxDefa
     // 1.2 Add spliters around title bar
     // add spliter 1
     // auto spliter_1 = new ::StaticLine(p->scrolled);
-    // spliter_1->SetBackgroundColour("#A6A9AA");
+    // spliter_1->SetBackgroundColour("#9AABB6");
     // scrolled_sizer->Add(spliter_1, 0, wxEXPAND);
 
     // add printer title
@@ -108,7 +108,7 @@ SidebarPrinter::SidebarPrinter(Plater* parent): wxPanel(parent, wxID_ANY, wxDefa
 
     //         // add spliter 2
     //         auto spliter_2 = new ::StaticLine(p->scrolled);
-    //         spliter_2->SetLineColour("#CECECE");
+    //         spliter_2->SetLineColour("#C6D0D6");
     //         scrolled_sizer->Add(spliter_2, 0, wxEXPAND);
 
     /***************** 2. create printer context  **************/

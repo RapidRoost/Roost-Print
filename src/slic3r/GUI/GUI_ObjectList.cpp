@@ -6586,7 +6586,7 @@ void ObjectList::render_plate(ObjectDataViewModelNode* plate)
 
     bool   is_dark    = wxGetApp().dark_mode();
     ImVec4 text_color = is_dark ? ImVec4(1.0f, 1.0f, 1.0, 1.0f) :
-                                  (plate_selected ? ImVec4(1.0f, 1.0f, 1.0, 1.0f) : ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+                                  (plate_selected ? ImVec4(1.0f, 1.0f, 1.0, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 
     bool open = ImGui::TreeNodeEx(plate_full_name.c_str(), tree_node_flags);
@@ -6672,7 +6672,7 @@ void ObjectList::render_plate(ObjectDataViewModelNode* plate)
         }
 
         if (ImGui::IsItemHovered()) {
-            ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+            ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
             ImGui::PushStyleColor(ImGuiCol_Text, text_color);
             ImGui::SetTooltip(_u8L("Click the icon to reset all settings of the object").c_str());
             ImGui::PopStyleColor();
@@ -6769,7 +6769,7 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
 
     bool   is_dark    = wxGetApp().dark_mode();
     ImVec4 text_color = is_dark ? ImVec4(1.0f, 1.0f, 1.0, 1.0f) :
-                                  (node_selected ? ImVec4(1.0f, 1.0f, 1.0, 1.0f) : ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+                                  (node_selected ? ImVec4(1.0f, 1.0f, 1.0, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 
     if (node_selected) {
@@ -6840,7 +6840,7 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
             if (window_size.x > 0.0f && window_size.y > 0.0f && 
                 !std::isnan(window_size.x) && !std::isnan(window_size.y) &&
                 !std::isinf(window_size.x) && !std::isinf(window_size.y)) {
-                ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+                ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
                 ImGui::PushStyleColor(ImGuiCol_Text, text_color);
                 ImGui::SetTooltip(_u8L("Click the icon to toggle printable property of the object").c_str());
                 ImGui::PopStyleColor();
@@ -6878,7 +6878,7 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
             if (window_size.x > 0.0f && window_size.y > 0.0f && 
                 !std::isnan(window_size.x) && !std::isnan(window_size.y) &&
                 !std::isinf(window_size.x) && !std::isinf(window_size.y)) {
-                ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+                ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
                 ImGui::PushStyleColor(ImGuiCol_Text, text_color);
                 ImGui::SetTooltip("%s", tooltip.ToUTF8().data());
                 ImGui::PopStyleColor();
@@ -6975,7 +6975,7 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
             }
 
             if (ImGui::IsItemHovered()) {
-                ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+                ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
                 ImGui::PushStyleColor(ImGuiCol_Text, text_color);
                 ImGui::SetTooltip("%s", node_name);
                 ImGui::PopStyleColor();
@@ -7025,7 +7025,7 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
         bool right_clicked = ImGui::IsItemClicked(ImGuiMouseButton_Right);
 
         if (ImGui::IsItemHovered()) {
-            ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+            ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
             ImGui::PushStyleColor(ImGuiCol_Text, text_color);
             ImGui::SetTooltip("%s", node_name);
             ImGui::PopStyleColor();
@@ -7073,7 +7073,7 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
         }
 
         if (ImGui::IsItemHovered()) {
-            ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+            ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
             ImGui::PushStyleColor(ImGuiCol_Text, text_color);
             ImGui::SetTooltip("%s", node_name);
             ImGui::PopStyleColor();
@@ -7165,7 +7165,7 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
                 if (window_size.x > 0.0f && window_size.y > 0.0f && 
                     !std::isnan(window_size.x) && !std::isnan(window_size.y) &&
                     !std::isinf(window_size.x) && !std::isinf(window_size.y)) {
-                    ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+                    ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
                     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
                     ImGui::SetTooltip(_u8L("Click the icon to edit support painting of the object").c_str());
                     ImGui::PopStyleColor();
@@ -7214,7 +7214,7 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
                 if (window_size.x > 0.0f && window_size.y > 0.0f && 
                     !std::isnan(window_size.x) && !std::isnan(window_size.y) &&
                     !std::isinf(window_size.x) && !std::isinf(window_size.y)) {
-                    ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+                    ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
                     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
                     ImGui::SetTooltip(_u8L("Click the icon to edit color painting of the object").c_str());
                     ImGui::PopStyleColor();
@@ -7264,7 +7264,7 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
             if (window_size.x > 0.0f && window_size.y > 0.0f && 
                 !std::isnan(window_size.x) && !std::isnan(window_size.y) &&
                 !std::isinf(window_size.x) && !std::isinf(window_size.y)) {
-                ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+                ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
                 ImGui::PushStyleColor(ImGuiCol_Text, text_color);
                 ImGui::SetTooltip(_u8L("Click the icon to shift this object to the bed").c_str());
                 ImGui::PopStyleColor();
@@ -7313,7 +7313,7 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
             if (window_size.x > 0.0f && window_size.y > 0.0f && 
                 !std::isnan(window_size.x) && !std::isnan(window_size.y) &&
                 !std::isinf(window_size.x) && !std::isinf(window_size.y)) {
-                ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+                ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
                 ImGui::PushStyleColor(ImGuiCol_Text, text_color);
                 ImGui::SetTooltip(_u8L("Click the icon to reset all settings of the object").c_str());
                 ImGui::PopStyleColor();
@@ -7555,7 +7555,7 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
                         if (window_size.x > 0.0f && window_size.y > 0.0f && 
                             !std::isnan(window_size.x) && !std::isnan(window_size.y) &&
                             !std::isinf(window_size.x) && !std::isinf(window_size.y)) {
-                            ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+                            ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
                             ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 
                             ImGui::SetTooltip("%s", ext_names[ext_idx].c_str());
@@ -7726,7 +7726,7 @@ void GUI::ObjectList::render_current_device_name(const float max_right)
 
     if (ImGui::IsItemHovered()) {
         bool   is_dark    = wxGetApp().dark_mode();
-        ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+        ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
         ImGui::PushStyleColor(ImGuiCol_Text, text_color);
         ImGui::SetTooltip(_u8L("Can be set in the \"Worktop\" or \"Device\"").c_str());
         ImGui::PopStyleColor();
@@ -7746,7 +7746,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
     const ImVec4 transparent(0.0f, 0.0f, 0.0f, 0.0f);
     bool         is_dark = wxGetApp().dark_mode();
     ImGui::PushStyleColor(ImGuiCol_Header, ImGuiWrapper::COL_CREALITY);
-    ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+    ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 
     // Check if should disable printer preset selection (for gcode/gcode.3mf mode)
@@ -8047,7 +8047,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
                                             ImGuiComboFlags_HeightLargest, 225.0f * scale, 30.0f * scale);
     } else {
         // Show disabled preview text (gray color)
-        ImVec4 disabled_color = is_dark ? ImVec4(0.4f, 0.4f, 0.4f, 1.0f) : ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+        ImVec4 disabled_color = is_dark ? ImVec4(0.314f, 0.420f, 0.486f, 1.0f) : ImVec4(0.408f, 0.525f, 0.596f, 1.0f);
         ImGui::PushStyleColor(ImGuiCol_Text, disabled_color);
         float current_y = ImGui::GetCursorPosY();
         float target_y  = current_y + (30.0f * scale - ImGui::GetTextLineHeight()) * 0.3f;
@@ -8185,7 +8185,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
 
     
     if (edit_hover_active) {
-        ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.2, 0.2, 0.2, 1.0);
+        ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
         ImGui::PushStyleColor(ImGuiCol_Text, text_color);
         ImGui::SetTooltip(_u8L("Click to edit preset").c_str());
         ImGui::PopStyleColor();
@@ -8257,7 +8257,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
    
         if (m_device_list_popup_opened)
         {
-            ImVec4 mask_col    = is_dark ? ImVec4{0.8588, 0.8588, 0.8588, 0.1} : ImVec4{0.5294, 0.5569, 0.6039, 0.1};
+            ImVec4 mask_col    = is_dark ? ImVec4{0.835f, 0.863f, 0.882f, 0.1} : ImVec4{0.5294, 0.5569, 0.6039, 0.1};
             ImU32  mask_colu32 = IM_COL32(mask_col.x * 255, mask_col.y * 255, mask_col.z * 255, mask_col.w * 255);
             ImGui::GetCurrentWindow()->DrawList->AddRectFilled(wifi_btn_min, wifi_btn_max, mask_colu32, 4.0 * scale);
         }
@@ -8290,7 +8290,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
         ImVec4 dark_sep_color(80 / 255.0, 80 / 255.0, 82 / 255.0, 1.0);
         ImVec4 light_sep_color(214.0 / 255, 214.0 / 255, 220.0 / 255, 1.0f);
         ImGui::PushStyleColor(ImGuiCol_Separator, is_dark ? dark_sep_color : light_sep_color);
-        ImGui::PushStyleColor(ImGuiCol_PopupBg, is_dark ? ImVec4{0.1922f, 0.1922f, 0.1922f, 1.0f} : ImVec4{1.0f, 1.0f, 1.0f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_PopupBg, is_dark ? ImVec4{0.122f, 0.208f, 0.263f, 1.0f} : ImVec4{1.0f, 1.0f, 1.0f, 1.0f});
         ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 6 * scale);
         if (m_device_list_popup_opened = ImGui::BeginPopup(deviceListID)) {
             draw_device_list_popup();
@@ -8355,7 +8355,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
             bool bed_type_enabled = bar.get_bed_type_enable_status();
             if (!bed_type_enabled) {
                 ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4, 0.4, 0.4, 1.0));
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.314f, 0.420f, 0.486f, 1.0));
             }
 
             if (ImGui::BBLBeginCombo("##combo_bed_type", remake_text_to_fit_size(combo_preview_value).c_str(),
@@ -8473,9 +8473,9 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
         const std::string preview = selected == variants.end() ? std::string() : nozzle_label(*selected);
 
         ImGui::PushID(physical_extruder_id);
-        const ImVec4 combo_background = is_dark ? ImVec4(0.18f, 0.18f, 0.19f, 1.0f)
+        const ImVec4 combo_background = is_dark ? ImVec4(0.114f, 0.200f, 0.255f, 1.0f)
                                                  : ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-        const ImVec4 combo_hovered = is_dark ? ImVec4(0.21f, 0.21f, 0.22f, 1.0f)
+        const ImVec4 combo_hovered = is_dark ? ImVec4(0.141f, 0.231f, 0.290f, 1.0f)
                                               : ImVec4(0.97f, 0.98f, 0.98f, 1.0f);
         const ImVec4 combo_border = is_dark ? ImVec4(0.39f, 0.40f, 0.43f, 1.0f)
                                              : ImVec4(0.64f, 0.67f, 0.71f, 1.0f);
@@ -9399,13 +9399,13 @@ void ObjectList::draw_device_list_content()
             auto textSize2  = ImGui::CalcTextSize(showText2);
             ImGui::SameLine(curWidth + colDesigneWidth[col] / 2 - textSize.x / 2);
             ImGui::SetCursorPosY(originCursorY + rowHeight / 2 - textSize.y);
-            ImGui::TextColored(is_dark ? ImVec4{1.0f, 1.0f, 1.0f, 1.0f} : ImVec4{0.1686f, 0.1686f, 0.1765f, 1.0f}, "%s", showText);
+            ImGui::TextColored(is_dark ? ImVec4{1.0f, 1.0f, 1.0f, 1.0f} : ImVec4{0.106f, 0.188f, 0.239f, 1.0f}, "%s", showText);
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", it.second.name.c_str());
             }
             ImGui::SameLine(curWidth + colDesigneWidth[col] / 2 - textSize2.x / 2);
             ImGui::SetCursorPosY(originCursorY + rowHeight / 2);
-            ImGui::TextColored(is_dark ? ImVec4{0.6824, 0.6824, 0.6980, 1.0f} : ImVec4{0.3059f, 0.3490f, 0.4118f, 1.0f}, "%s", showText2);
+            ImGui::TextColored(is_dark ? ImVec4{0.643f, 0.702f, 0.737f, 1.0f} : ImVec4{0.3059f, 0.3490f, 0.4118f, 1.0f}, "%s", showText2);
             curWidth += colDesigneWidth[col];
 
             ++col;

@@ -306,7 +306,7 @@ function renderTreeCard (cardList) {
            let btnHtml = ''
            $.each(item.nozzleSelected, function (idx, val) {
                 btnHtml += `
-						<button type="button" class="card-list-item-button" style="background: ${isChangeColor ? '#fff' : '#74747B' }; border: ${isChangeColor ? '1px solid #D6D6DC' : '1px solid #6E6E72'}">
+						<button type="button" class="card-list-item-button" style="background: ${isChangeColor ? '#fff' : '#5F7D90' }; border: ${isChangeColor ? '1px solid #D3DADF' : '1px solid #597587'}">
                             <span style="color: ${isChangeColor ? '#333' : '#fff' }">${val}mm</span>
 							<svg
                                 data-model=\"${item.model}\"
@@ -315,9 +315,9 @@ function renderTreeCard (cardList) {
 								xmlns="http://www.w3.org/2000/svg"
 								xmlns:xlink="http://www.w3.org/1999/xlink"
 								width="23px" height="23px">
-								<path fill-rule="evenodd" stroke="${isChangeColor ? '#eee' : 'rgb(93, 93, 97)'}" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" fill="rgb(255, 255, 255)"
+								<path fill-rule="evenodd" stroke="${isChangeColor ? '#eee' : 'rgb(72, 100, 118)'}" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" fill="rgb(255, 255, 255)"
 								d="M10.999,1.000 C16.523,1.000 21.000,5.477 21.000,11.000 C21.000,16.523 16.523,21.000 10.999,21.000 C5.477,21.000 1.000,16.523 1.000,11.000 C1.000,5.477 5.477,1.000 10.999,1.000 Z"/>
-								<path fill-rule="evenodd"  fill="rgb(75, 75, 77)"
+								<path fill-rule="evenodd"  fill="rgb(54, 81, 98)"
 								d="M11.864,10.999 L13.794,9.062 C14.036,8.819 14.036,8.425 13.794,8.182 C13.552,7.939 13.159,7.939 12.918,8.182 L10.987,10.119 L9.057,8.182 C8.816,7.939 8.423,7.939 8.181,8.182 C7.939,8.425 7.939,8.819 8.181,9.062 L10.110,10.999 L8.181,12.937 C7.939,13.180 7.939,13.574 8.181,13.817 C8.297,13.934 8.455,14.000 8.619,13.999 C8.784,14.000 8.941,13.934 9.057,13.817 L10.987,11.880 L12.918,13.817 C13.033,13.934 13.191,14.000 13.356,13.999 C13.520,14.000 13.678,13.934 13.794,13.817 C14.036,13.574 14.036,13.180 13.794,12.937 L11.864,10.999 Z"/>
 							</svg>
 						</button>
@@ -330,7 +330,7 @@ function renderTreeCard (cardList) {
 
            // 判断是否只有一个喷嘴且为0.4mm，只有一个不显示悬浮弹窗，多个就显示
            const isShowHoverBtn = (item.nozzleDiameter.length === 1 && item.nozzleDiameter[0] === '0.4') ? `` : 
-                        `<button data-index=${index} style="background: ${isChangeColor ? '#fff' : '#5D5D61'}; border: ${isChangeColor ? '1px solid #D6D6DC' : '1px solid #6E6E72'}" data-value=${item.nozzleSelected} data-model=\"${item.model}\" type="button" class="card-add-printer-button" onmouseover="isShowCheckboxArea(this)" onmouseout="hideCheckBox(this, event)">
+                        `<button data-index=${index} style="background: ${isChangeColor ? '#fff' : '#486476'}; border: ${isChangeColor ? '1px solid #D3DADF' : '1px solid #597587'}" data-value=${item.nozzleSelected} data-model=\"${item.model}\" type="button" class="card-add-printer-button" onmouseover="isShowCheckboxArea(this)" onmouseout="hideCheckBox(this, event)">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -341,7 +341,7 @@ function renderTreeCard (cardList) {
 									d="M14.799,8.322 L11.199,8.322 L11.199,11.983 C11.199,12.656 10.662,13.203 10.000,13.203 C9.337,13.203 8.800,12.656 8.800,11.983 L8.800,8.322 L5.199,8.322 C4.537,8.322 3.999,7.775 3.999,7.101 C3.999,6.427 4.537,5.881 5.199,5.881 L8.800,5.881 L8.800,2.220 C8.800,1.784 9.028,1.381 9.400,1.163 C9.771,0.945 10.228,0.945 10.599,1.163 C10.971,1.381 11.199,1.784 11.199,2.220 L11.199,5.881 L14.799,5.881 C15.462,5.881 15.999,6.427 15.999,7.101 C15.999,7.775 15.462,8.322 14.799,8.322 ZM5.199,16.559 L14.799,16.559 C15.462,16.559 15.999,17.105 15.999,17.779 C15.999,18.453 15.462,19.000 14.799,19.000 L5.199,19.000 C4.537,19.000 3.999,18.453 3.999,17.779 C3.999,17.105 4.537,16.559 5.199,16.559 Z"/>
 						   </svg>
 						   <!-- 弹框里面的checkbox -->
-						   <div class="card-list-item-checked-printer-wrapper" data-model=\"${item.model}\"  onmouseout="closeCheckBox(this)" style="display: ${item.isShowCheckBox ? 'block': 'none'}; top: ${ changePosition }; background: ${ isChangeColor ? '#F6F6F9' : '#4B4B4D' }; border-color: ${isChangeColor ? '#D6D6DC' : '#6E6E72'}">
+						   <div class="card-list-item-checked-printer-wrapper" data-model=\"${item.model}\"  onmouseout="closeCheckBox(this)" style="display: ${item.isShowCheckBox ? 'block': 'none'}; top: ${ changePosition }; background: ${ isChangeColor ? '#F6F6F9' : '#365162' }; border-color: ${isChangeColor ? '#D3DADF' : '#597587'}">
 								<div class="card-list-item-checked-printer">
                            `
                              +   checkboxHtml +
@@ -351,7 +351,7 @@ function renderTreeCard (cardList) {
 						</button>
                         `
             html = `
-                <div class="card-list-item" style="background: ${isChangeColor ? '#f6f6f9' : '#5D5D61'}; border-color: ${isChangeColor ? '#D6D6DC' : '#6E6E72'}" data-id=\"${item.model}\">
+                <div class="card-list-item" style="background: ${isChangeColor ? '#f6f6f9' : '#486476'}; border-color: ${isChangeColor ? '#D3DADF' : '#597587'}" data-id=\"${item.model}\">
 					<!-- 标题 -->
 					<div class="card-item-title" onclick="toggleChecked(this, event)">
 						<span style="color: ${isChangeColor ? '#333' : '#fff' }">${item.model}</span>
@@ -361,13 +361,13 @@ function renderTreeCard (cardList) {
 						</div>
 					</div>
 					<!-- 尺寸 -->
-					<div class="card-list-size" style="color: ${isChangeColor ? '#999' : '#ADADAD' }">${item.area ? item.area + ' mm' : ''}</div>
+					<div class="card-list-size" style="color: ${isChangeColor ? '#999' : '#A0B0BA' }">${item.area ? item.area + ' mm' : ''}</div>
 					<!-- 图片 -->
 					<div class="card-list-img" onclick="toggleChecked(this, event)">
 						<img src=\"${item.cover}\" alt="">
 					</div>
 					<!-- 孔径 -->
-					<div class="card-list-aperture trans" tid="t117" style="color: ${isChangeColor ? '#999' : '#ADADAD' }">喷嘴孔径</div>
+					<div class="card-list-aperture trans" tid="t117" style="color: ${isChangeColor ? '#999' : '#A0B0BA' }">喷嘴孔径</div>
 					<!-- 添加喷嘴 -->
 					 <div class="card-list-add-nozzle"> ` + btnHtml + `${item.nozzleSelected.length ===0 ? unSelectedBtn : ''}` 
                         +
@@ -867,7 +867,7 @@ function renderCard (userPresetArr) {
     if (userPresetArr.length) {
         $.each(userPresetArr, function (index, item) {
             const cardHTML =  `
-                <div class="card-area" style="background: ${isChangeColor ? '#fff' : '#5D5D61' }; border: ${isChangeColor ? '1px solid #D6D6DC' : '1px solid #6E6E72'}">
+                <div class="card-area" style="background: ${isChangeColor ? '#fff' : '#486476' }; border: ${isChangeColor ? '1px solid #D3DADF' : '1px solid #597587'}">
                     <div class="card-header">
                         <span>${item.printer_model}</span>
                         <div>
@@ -880,20 +880,20 @@ function renderCard (userPresetArr) {
                     </div>
                     <div class="content-area">
                         <div>
-                            <span class="params-name trans" tid="t121" style="color: ${ isChangeColor ? '#7E7E7E': '#ADADAD' }">配置名称：</span>
-                            <span class="params-value" title=\"${item.printer_name}\" style="color: ${ isChangeColor ? '#333': '#ADADAD' }">${item.printer_name}</span>
+                            <span class="params-name trans" tid="t121" style="color: ${ isChangeColor ? '#668496': '#A0B0BA' }">配置名称：</span>
+                            <span class="params-value" title=\"${item.printer_name}\" style="color: ${ isChangeColor ? '#333': '#A0B0BA' }">${item.printer_name}</span>
                         </div>
                         <div>
-                            <span class="params-name trans" tid="t129" style="color: ${ isChangeColor ? '#7E7E7E': '#ADADAD' }">尺寸：</span>
-                            <span class="params-value-common" style="color: ${ isChangeColor ? '#333': '#ADADAD' }">${item.dimensions.x +'*'+ item.dimensions.y +'*'+ item.dimensions.z}</span>
+                            <span class="params-name trans" tid="t129" style="color: ${ isChangeColor ? '#668496': '#A0B0BA' }">尺寸：</span>
+                            <span class="params-value-common" style="color: ${ isChangeColor ? '#333': '#A0B0BA' }">${item.dimensions.x +'*'+ item.dimensions.y +'*'+ item.dimensions.z}</span>
                         </div>
                         <div>
-                            <span class="params-name trans" tid="t122" style="color: ${ isChangeColor ? '#7E7E7E': '#ADADAD' }">喷嘴直径：</span>
-                            <span class="params-value-common" style="color: ${ isChangeColor ? '#333': '#ADADAD' }">${item.nozzle_diameter}</span>
+                            <span class="params-name trans" tid="t122" style="color: ${ isChangeColor ? '#668496': '#A0B0BA' }">喷嘴直径：</span>
+                            <span class="params-value-common" style="color: ${ isChangeColor ? '#333': '#A0B0BA' }">${item.nozzle_diameter}</span>
                         </div>
                         <div>
-                            <span class="params-name trans" tid="t123" style="color: ${ isChangeColor ? '#7E7E7E': '#ADADAD' }">固件类型：</span>
-                            <span class="params-value-common" style="color: ${ isChangeColor ? '#333': '#ADADAD' }">${item.gcode_flavor}</span>
+                            <span class="params-name trans" tid="t123" style="color: ${ isChangeColor ? '#668496': '#A0B0BA' }">固件类型：</span>
+                            <span class="params-value-common" style="color: ${ isChangeColor ? '#333': '#A0B0BA' }">${item.gcode_flavor}</span>
                         </div>
                     </div>
                 </div>`

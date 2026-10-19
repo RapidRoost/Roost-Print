@@ -158,13 +158,13 @@ Button* MsgDialog::add_button(wxWindowID btn_id, bool set_focus /*= false*/, con
     
     btn->SetCornerRadius(FromDIP(12));
     StateColor btn_bg_grey(
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal)
     );
 
     StateColor btn_bd_grey(
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal)
     );
 
     StateColor btn_text_green(
@@ -172,17 +172,17 @@ Button* MsgDialog::add_button(wxWindowID btn_id, bool set_focus /*= false*/, con
     );
 
     StateColor btn_bg_white(
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal)
     );
 
     StateColor btn_bd_white(
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal)
     );
 
     StateColor btn_text_white(
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal)
     );
 
     if (btn_id == wxID_OK || btn_id == wxID_YES) {
@@ -561,7 +561,7 @@ DeleteConfirmDialog::DeleteConfirmDialog(wxWindow *parent, const wxString &title
 
     wxBoxSizer *bSizer_button = new wxBoxSizer(wxHORIZONTAL);
     bSizer_button->Add(0, 0, 1, wxEXPAND, 0);
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
     m_cancel_btn = new Button(this, _L("Cancel"));
     m_cancel_btn->SetBackgroundColor(btn_bg_white);
@@ -672,11 +672,11 @@ wxBoxSizer *Newer3mfVersionDialog::get_btn_sizer()
     wxBoxSizer *horizontal_sizer = new wxBoxSizer(wxHORIZONTAL);
     horizontal_sizer->Add(0, 0, 1, wxEXPAND, 0);
     StateColor btn_bg_grey(
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-        std::pair<wxColour, int>(wxColour(150, 150, 155), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+        std::pair<wxColour, int>(wxColour(135, 156, 170), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal)
     );
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
     bool       file_version_newer = (*m_file_version) > (*m_cloud_version);
     if (!file_version_newer) {
@@ -705,7 +705,7 @@ wxBoxSizer *Newer3mfVersionDialog::get_btn_sizer()
     if (!file_version_newer) {
         m_later_btn = new Button(this, _L("Not for now"));
         m_later_btn->SetBackgroundColor(btn_bg_white);
-        m_later_btn->SetBorderColor(wxColour(38, 46, 48));
+        m_later_btn->SetBorderColor(wxColour(27, 47, 59));
     } else {
         m_later_btn = new Button(this, _L("OK"));
         m_later_btn->SetBackgroundColor(btn_bg_grey);

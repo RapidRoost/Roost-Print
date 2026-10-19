@@ -245,13 +245,13 @@ void GLGizmoSimplify::on_render_input_window(float x, float y, float bottom_limi
     std::string name = m_volume->name;
     if (name.length() > m_gui_cfg->max_char_in_name)
         name = name.substr(0, m_gui_cfg->max_char_in_name - 3) + "...";
-    m_imgui->text_colored(ImVec4(0.42f, 0.42f, 0.42f, 1.00f), name);
+    m_imgui->text_colored(ImVec4(0.329f, 0.439f, 0.510f, 1.00f), name);
 
     m_imgui->text(tr_triangles + ":");
     ImGui::SameLine(text_left_width + space_size);
 
     size_t orig_triangle_count = m_volume->mesh().its.indices.size();
-    m_imgui->text_colored(ImVec4(0.42f, 0.42f, 0.42f, 1.00f), std::to_string(orig_triangle_count));
+    m_imgui->text_colored(ImVec4(0.329f, 0.439f, 0.510f, 1.00f), std::to_string(orig_triangle_count));
 
     ImGui::Separator();
 
@@ -273,9 +273,9 @@ void GLGizmoSimplify::on_render_input_window(float x, float y, float bottom_limi
     ImGui::SameLine(bottom_left_width);
     ImGui::PushItemWidth(bottom_left_width - space_size);
     static int reduction = 2;
-    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.81f, 0.81f, 0.81f, 1.00f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.81f, 0.81f, 0.81f, 1.00f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.81f, 0.81f, 0.81f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.784f, 0.820f, 0.839f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.784f, 0.820f, 0.839f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.784f, 0.820f, 0.839f, 1.00f));
     ImGui::PushStyleColor(ImGuiCol_Text, ImGuiWrapper::COL_CREALITY); // ORCA Use orca color for step slider text
     ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImGuiWrapper::COL_CREALITY); // ORCA Use orca color for step slider thumb
 
@@ -350,7 +350,7 @@ void GLGizmoSimplify::on_render_input_window(float x, float y, float bottom_limi
         ImGui::BBLProgressBar2(progress / 100., progress_size);
         ImGui::SameLine();
         ImGui::AlignTextToFramePadding();
-        ImGui::TextColored(ImVec4(0.42f, 0.42f, 0.42f, 1.00f), "%s", progress_text.c_str());
+        ImGui::TextColored(ImVec4(0.329f, 0.439f, 0.510f, 1.00f), "%s", progress_text.c_str());
         ImGui::SameLine(bottom_left_width + slider_width +  m_imgui->scaled(1.0f));
     } else {
         ImGui::Dummy(ImVec2(bottom_left_width - space_size, -1));
@@ -361,7 +361,7 @@ void GLGizmoSimplify::on_render_input_window(float x, float y, float bottom_limi
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding,12);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,ImVec2(10,3));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,ImVec2(10,0));
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.15f, 0.18f, 0.19f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.106f, 0.184f, 0.231f, 1.00f));
 
     m_imgui->disabled_begin(is_worker_running || ! is_result_ready);
     m_imgui->push_confirm_button_style();

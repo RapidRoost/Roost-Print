@@ -70,7 +70,7 @@ public:
 protected:
 
 private:
-    wxColor m_bgColor = wxColor("#4b4b4d");
+    wxColor m_bgColor = wxColor("#365162");
     wxString m_title;
     wxBitmap m_closeBitmap;
     wxBitmap m_closeBitmapHover;

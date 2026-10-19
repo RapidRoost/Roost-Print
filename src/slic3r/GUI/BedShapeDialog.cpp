@@ -318,11 +318,11 @@ wxPanel* BedShapePanel::init_texture_panel()
     line.full_width = 1;
     line.widget = [this](wxWindow* parent) {
 
-        StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Disabled), std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-            std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Hovered),
+        StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Disabled), std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+            std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Hovered),
             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
-        StateColor btn_bd_white(std::pair<wxColour, int>(*wxWHITE, StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+        StateColor btn_bd_white(std::pair<wxColour, int>(*wxWHITE, StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
 
         Button* load_btn = new Button(parent, _L("Load..."));
         load_btn->SetBackgroundColor(btn_bg_white);
@@ -407,11 +407,11 @@ wxPanel* BedShapePanel::init_model_panel()
     Line line{ "", "" };
     line.full_width = 1;
     line.widget = [this](wxWindow* parent) {
-        StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Disabled), std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-            std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Hovered),
+        StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Disabled), std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+            std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Hovered),
             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
-        StateColor btn_bd_white(std::pair<wxColour, int>(*wxWHITE, StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+        StateColor btn_bd_white(std::pair<wxColour, int>(*wxWHITE, StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
 
 
         Button* load_btn = new Button(parent, _L("Load..."));

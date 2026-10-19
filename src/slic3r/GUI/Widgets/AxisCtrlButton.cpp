@@ -6,12 +6,12 @@
 #include <wx/dcgraph.h>
 
 StateColor blank_bg(StateColor(std::make_pair(wxColour("#FFFFFF"), (int)StateColor::Normal)));
-static const wxColour BUTTON_BG_COL = wxColour("#EEEEEE");
-static const wxColour BUTTON_IN_BG_COL = wxColour("#CECECE");
+static const wxColour BUTTON_BG_COL = wxColour("#EBEFF1");
+static const wxColour BUTTON_IN_BG_COL = wxColour("#C6D0D6");
 
 static const wxColour bd = wxColour(30, 144, 216);
-static const wxColour text_num_color = wxColour(0x898989);
-static const wxColour BUTTON_PRESS_COL = wxColour(172, 172, 172);
+static const wxColour text_num_color = wxColour(0x738E9F);
+static const wxColour BUTTON_PRESS_COL = wxColour(159, 175, 185);
 static const double sqrt2 = std::sqrt(2);
 
 BEGIN_EVENT_TABLE(AxisCtrlButton, wxPanel)
@@ -36,7 +36,7 @@ AxisCtrlButton::AxisCtrlButton(wxWindow *parent, ScalableBitmap &icon, long stly
     , gap(GAP_SIZE)
     , last_pos(UNDEFINED)
     , current_pos(UNDEFINED) // don't change init value
-    , text_color(std::make_pair(0x6B6B6B, (int) StateColor::Disabled), std::make_pair(*wxBLACK, (int) StateColor::Normal))
+    , text_color(std::make_pair(0x547082, (int) StateColor::Disabled), std::make_pair(*wxBLACK, (int) StateColor::Normal))
 	, state_handler(this)
 {
     m_icon = icon;

@@ -112,7 +112,7 @@ MachineInfoPanel::MachineInfoPanel(wxWindow* parent, wxWindowID id, const wxPoin
     m_main_left_sizer->Add(m_ota_sizer, 0, wxEXPAND, 0);
 
     m_staticline = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
-    m_staticline->SetBackgroundColour(wxColour(206,206,206));
+    m_staticline->SetBackgroundColour(wxColour(198,208,214));
     m_staticline->Show(false);
     m_main_left_sizer->Add(m_staticline, 0, wxEXPAND | wxLEFT, FromDIP(40));
 
@@ -176,7 +176,7 @@ MachineInfoPanel::MachineInfoPanel(wxWindow* parent, wxWindowID id, const wxPoin
     show_extra_ams(false, true);
 
     m_staticline2 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
-    m_staticline2->SetBackgroundColour(wxColour(206, 206, 206));
+    m_staticline2->SetBackgroundColour(wxColour(198, 208, 214));
     m_main_left_sizer->Add(m_staticline2, 0, wxEXPAND | wxLEFT, FromDIP(40));
 
     // ext
@@ -210,8 +210,8 @@ MachineInfoPanel::MachineInfoPanel(wxWindow* parent, wxWindowID id, const wxPoin
     StateColor btn_bg(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled), std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed),
                       std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered), std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Enabled),
                       std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal));
-    StateColor btn_bd(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Enabled));
-    StateColor btn_text(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled));
+    StateColor btn_bd(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled), std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Enabled));
+    StateColor btn_text(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled), std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled));
     m_button_upgrade_firmware->SetBackgroundColor(btn_bg);
     m_button_upgrade_firmware->SetBorderColor(btn_bd);
     m_button_upgrade_firmware->SetTextColor(btn_text);
@@ -296,7 +296,7 @@ wxPanel *MachineInfoPanel::create_caption_panel(wxWindow *parent)
     m_caption_sizer->Add(m_upgrade_status_img, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(5));
 
     m_caption_text = new wxStaticText(caption_panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
-    m_caption_text->SetForegroundColour("#262E30");
+    m_caption_text->SetForegroundColour("#1B2F3B");
     m_caption_text->Wrap(-1);
     m_caption_sizer->Add(m_caption_text, 1, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(5));
 
@@ -1046,7 +1046,7 @@ void MachineInfoPanel::on_show_release_note(wxMouseEvent &event)
 UpgradePanel::UpgradePanel(wxWindow *parent, wxWindowID id, const wxPoint &pos, const wxSize &size, long style)
     :wxPanel(parent, id, pos, size, style)
 {
-    this->SetBackgroundColour(wxColour(238, 238, 238));
+    this->SetBackgroundColour(wxColour(235, 239, 241));
 
     auto m_main_sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -1229,17 +1229,17 @@ bool UpgradePanel::Show(bool show)
      ams_sizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
      m_staticText_ams = new wxStaticText(this, wxID_ANY, "-", wxDefaultPosition, wxDefaultSize, 0);
-     m_staticText_ams->SetForegroundColour("#262E30");
+     m_staticText_ams->SetForegroundColour("#1B2F3B");
      m_staticText_ams->SetFont(Label::Head_14);
      m_staticText_ams->Wrap(-1);
 
      auto m_staticText_ams_sn = new wxStaticText(this, wxID_ANY, _L("Serial:"), wxDefaultPosition, wxDefaultSize, 0);
-     m_staticText_ams_sn->SetForegroundColour("#262E30");
+     m_staticText_ams_sn->SetForegroundColour("#1B2F3B");
      m_staticText_ams_sn->Wrap(-1);
      m_staticText_ams_sn->SetFont(Label::Head_14);
 
      m_staticText_ams_sn_val = new wxStaticText(this, wxID_ANY, "-", wxDefaultPosition, wxDefaultSize, 0);
-     m_staticText_ams_sn_val->SetForegroundColour("#262E30");
+     m_staticText_ams_sn_val->SetForegroundColour("#1B2F3B");
      m_staticText_ams_sn_val->Wrap(-1);
 
      wxBoxSizer *m_ams_ver_sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -1254,11 +1254,11 @@ bool UpgradePanel::Show(bool show)
      auto m_staticText_ams_ver = new wxStaticText(this, wxID_ANY, _L("Version:"), wxDefaultPosition, wxDefaultSize, 0);
      m_staticText_ams_ver->Wrap(-1);
      m_staticText_ams_ver->SetFont(Label::Head_14);
-     m_staticText_ams_ver->SetForegroundColour("#262E30");
+     m_staticText_ams_ver->SetForegroundColour("#1B2F3B");
      m_ams_ver_sizer->Add(m_staticText_ams_ver, 0, wxALL, FromDIP(5));
 
      m_staticText_ams_ver_val = new wxStaticText(this, wxID_ANY, "-", wxDefaultPosition, wxDefaultSize, 0);
-     m_staticText_ams_ver_val->SetForegroundColour("#262E30");
+     m_staticText_ams_ver_val->SetForegroundColour("#1B2F3B");
      m_staticText_ams_ver_val->Wrap(-1);
      
      m_staticText_beta_version = new wxStaticText(this, wxID_ANY, "Beta", wxDefaultPosition, wxDefaultSize, 0);
@@ -1312,18 +1312,18 @@ bool UpgradePanel::Show(bool show)
 
      auto title_sizer = new wxBoxSizer(wxHORIZONTAL);
      m_staticText_ext = new wxStaticText(this, wxID_ANY, _L("Extension Board"), wxDefaultPosition, wxDefaultSize, 0);
-     m_staticText_ext->SetForegroundColour("#262E30");
+     m_staticText_ext->SetForegroundColour("#1B2F3B");
      m_staticText_ext->SetFont(Label::Head_14);
      m_staticText_ext->Wrap(-1);
      title_sizer->Add(m_staticText_ext, 0, wxALL, FromDIP(5));
 
      auto m_staticText_ext_sn = new wxStaticText(this, wxID_ANY, _L("Serial:"), wxDefaultPosition, wxDefaultSize, 0);
-     m_staticText_ext_sn->SetForegroundColour("#262E30");
+     m_staticText_ext_sn->SetForegroundColour("#1B2F3B");
      m_staticText_ext_sn->Wrap(-1);
      m_staticText_ext_sn->SetFont(Label::Head_14);
 
      m_staticText_ext_sn_val = new wxStaticText(this, wxID_ANY, "-", wxDefaultPosition, wxDefaultSize, 0);
-     m_staticText_ext_sn_val->SetForegroundColour("#262E30");
+     m_staticText_ext_sn_val->SetForegroundColour("#1B2F3B");
      m_staticText_ext_sn_val->Wrap(-1);
 
      wxBoxSizer* m_ext_ver_sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -1336,11 +1336,11 @@ bool UpgradePanel::Show(bool show)
      m_staticText_ext_ver = new wxStaticText(this, wxID_ANY, _L("Version:"), wxDefaultPosition, wxDefaultSize, 0);
      m_staticText_ext_ver->Wrap(-1);
      m_staticText_ext_ver->SetFont(Label::Head_14);
-     m_staticText_ext_ver->SetForegroundColour("#262E30");
+     m_staticText_ext_ver->SetForegroundColour("#1B2F3B");
      m_ext_ver_sizer->Add(m_staticText_ext_ver, 0, wxALL, FromDIP(5));
 
      m_staticText_ext_ver_val = new wxStaticText(this, wxID_ANY, "-", wxDefaultPosition, wxDefaultSize, 0);
-     m_staticText_ext_ver_val->SetForegroundColour("#262E30");
+     m_staticText_ext_ver_val->SetForegroundColour("#1B2F3B");
      m_staticText_ext_ver_val->Wrap(-1);
 
      ext_sizer->Add(m_staticText_ext_sn, 0, wxALIGN_RIGHT | wxALL, FromDIP(5));

@@ -118,7 +118,13 @@ nlohmann::json gcode_file_size_bytes(const std::string& file_path)
 
 CxSentToPrinterDialog::CxSentToPrinterDialog(Plater *plater,
                                              SendType sendtype,std::string mapString)
+    // Roost Print: no owner window on Windows, so it gets its own taskbar button and minimises
+    // like any other window instead of sitting on top of the slicer.
+#ifdef __WINDOWS__
+    : DPIDialog(nullptr,
+#else
     : DPIDialog(wxGetApp().mainframe,
+#endif
                 wxID_ANY,
                 _L("Send to Lan Printer"),
                 wxDefaultPosition,
@@ -128,7 +134,8 @@ CxSentToPrinterDialog::CxSentToPrinterDialog(Plater *plater,
                 #if defined(__linux__) || defined(__LINUX__) || defined(__WXGTK__)
                 wxCAPTION | wxCLOSE_BOX
                 #else
-                wxCAPTION | wxCLOSE_BOX | wxRESIZE_BORDER
+                // Roost Print: its own taskbar window that can be minimised, so it never pins the slicer.
+                wxCAPTION | wxCLOSE_BOX | wxRESIZE_BORDER | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxSYSTEM_MENU | wxDIALOG_NO_PARENT
                 #endif
                 ), m_sendtype(sendtype),m_mapString(mapString)
     , m_plater(plater)
@@ -170,7 +177,7 @@ CxSentToPrinterDialog::CxSentToPrinterDialog(Plater *plater,
             {
                 wxSize newSize = wxSize(FromDIP(1170), FromDIP(650) + position.y);
                 SetSize(newSize);
-                SetPosition(wxPoint(position.x, GetParent()->GetPosition().y));
+                SetPosition(wxPoint(position.x, GetParent() ? GetParent()->GetPosition().y : 0));
             }
                 
         }
@@ -278,13 +285,28 @@ CxSentToPrinterDialog::~CxSentToPrinterDialog()
     UnregisterHandler("request_user_operation_state");
 
 }
+void CxSentToPrinterDialog::finish_close(wxCloseEvent& event)
+{
+    if (!m_modeless) {
+        event.Skip();
+        return;
+    }
+    // Modeless: nothing waits on ShowModal(), so tidy up here and destroy the window.
+    if (m_on_closed) {
+        auto on_closed = std::move(m_on_closed);
+        m_on_closed    = nullptr;
+        on_closed();
+    }
+    Destroy();
+}
+
 void CxSentToPrinterDialog::OnCloseWindow(wxCloseEvent& event)
 {
     if (m_close_allowed || m_uploadingIp.IsEmpty()) {
         // need to reopen the detail-page Video when close the send page
         wxGetApp().mainframe->get_printer_mgr_view()->request_reopen_detail_video();
         m_close_allowed = true;
-        event.Skip();
+        finish_close(event);
         return;
     }
 
@@ -297,7 +319,7 @@ void CxSentToPrinterDialog::OnCloseWindow(wxCloseEvent& event)
             upload_manager.cancelUploadTask(task_id);
         else
             upload_manager.cancelUpload(uploading_ip.ToStdString());
-        event.Skip();
+        finish_close(event);
         return;
     }
 
@@ -1031,7 +1053,8 @@ void CxSentToPrinterDialog::handle_send_3mf(const nlohmann::json& json_data)
     
 
     m_uploadingIp = ipAddress;
-    m_upload_task_id = RemotePrint::RemotePrinterManager::getInstance().pushUploadTasks(
+    m_upload_task_id = RemotePrint::RemotePrinterManager::getInstance().pushUploadMultTasks( // Roost Print: up to 3 printers at once
+        
         ipAddress.ToStdString(), upload3mfName, tmp_3mf_path,
         [weak_ui_gate, upload_generation, json_data](std::string ip, float progress,double speed) {
             nlohmann::json top_level_json;
@@ -1285,7 +1308,8 @@ void CxSentToPrinterDialog::handle_send_gcode(const nlohmann::json& json_data)
         }
         
         m_uploadingIp = ipAddress;
-        m_upload_task_id = RemotePrint::RemotePrinterManager::getInstance().pushUploadTasks(
+        m_upload_task_id = RemotePrint::RemotePrinterManager::getInstance().pushUploadMultTasks( // Roost Print: up to 3 printers at once
+        
             ipAddress.ToStdString(), uploadName, gcodeFilePath,
             [weak_ui_gate, upload_generation, uploadTaskId, is_wan_upload, json_data](std::string ip, float progress,double speed) {
 

@@ -6,25 +6,25 @@
  d="M-0.002,-0.001 L299.999,-0.001 L299.999,146.999 L-0.002,146.999 L-0.002,-0.001 Z"/>
 <path fill-rule="evenodd"  fill="rgb(30, 144, 216)"
  d="M173.009,113.420 C175.148,112.271 176.163,110.277 175.968,108.395 C176.176,106.402 175.148,104.518 173.009,103.369 L126.922,78.699 C124.881,77.550 122.436,77.024 119.992,77.024 C117.548,77.024 115.090,77.550 113.049,78.699 L66.961,103.272 C64.822,104.422 63.905,106.415 64.003,108.298 C63.905,110.291 64.822,112.271 66.961,113.420 L113.049,138.007 C115.090,139.156 117.534,139.682 119.992,139.682 C122.436,139.682 124.881,139.156 126.922,138.007 L173.009,113.420 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(30, 144, 216)" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" fill="rgb(127, 127, 127)"
+<path fill-rule="evenodd"  stroke="rgb(30, 144, 216)" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" fill="rgb(102, 133, 152)"
  d="M173.009,113.154 C175.148,112.005 176.163,110.012 175.968,108.129 C176.176,106.136 175.148,104.252 173.009,103.103 L126.922,78.433 C124.881,77.284 122.436,76.758 119.992,76.758 C117.548,76.758 115.090,77.284 113.049,78.433 L66.961,103.007 C64.822,104.156 63.905,106.149 64.003,108.032 C63.905,110.025 64.822,112.005 66.961,113.154 L113.049,137.741 C115.090,138.890 117.534,139.416 119.992,139.416 C122.436,139.416 124.881,138.890 126.922,137.741 L173.009,113.154 Z"/>
 <path fill-rule="evenodd"  stroke="rgb(30, 144, 216)" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M167.334,112.536 C169.244,111.510 173.149,109.728 172.976,108.045 C173.162,106.264 169.244,104.580 167.334,103.553 L126.181,81.504 C124.360,80.476 122.177,80.007 119.995,80.007 C117.812,80.007 115.618,80.476 113.795,81.504 L72.643,103.467 C70.733,104.494 66.915,106.275 67.001,107.958 C66.915,109.740 70.733,111.510 72.643,112.536 L113.795,134.511 C115.618,135.538 117.800,136.008 119.995,136.008 C122.177,136.008 124.360,135.538 126.181,134.511 L167.334,112.536 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(109, 109, 109)" stroke-width="1px" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(86, 114, 132)" stroke-width="1px" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M161.684,111.050 C163.365,110.134 164.162,108.543 164.010,107.040 C164.173,105.450 163.365,103.946 161.684,103.029 L125.457,83.343 C123.854,82.426 121.932,82.006 120.011,82.006 C118.090,82.006 116.158,82.426 114.553,83.343 L78.327,102.953 C76.646,103.870 75.925,105.460 76.001,106.963 C75.925,108.553 76.646,110.134 78.327,111.050 L114.553,130.671 C116.158,131.588 118.078,132.007 120.011,132.007 C121.932,132.007 123.854,131.588 125.457,130.671 L161.684,111.050 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(109, 109, 109)" stroke-width="1px" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(86, 114, 132)" stroke-width="1px" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M122.455,87.250 L120.851,86.540 L117.106,88.196 L124.596,88.196 L125.933,89.142 L114.431,89.142 L112.024,90.325 L129.143,90.325 L131.283,91.743 L109.617,91.743 L107.744,92.926 L134.225,92.926 L136.900,94.345 L104.535,94.345 L102.128,95.764 L140.109,95.764 L142.250,97.183 L99.185,97.183 L97.313,98.366 L145.726,98.602 L147.867,99.785 L93.568,100.021 L91.429,101.204 L151.344,101.441 L153.216,102.624 L88.486,102.860 L86.346,104.279 L156.099,104.279 L158.239,105.698 L82.601,105.698 L81.633,106.881 L159.518,107.354 L158.773,108.773 L83.137,108.773 L85.009,109.956 L154.821,110.429 L152.681,111.848 L89.289,111.848 L91.161,113.030 L150.007,113.030 L148.402,114.449 L94.638,114.449 L96.243,115.632 L144.121,115.868 L142.250,117.288 L99.988,117.288 L101.860,118.470 L138.772,118.470 L136.900,119.889 L105.338,120.125 L107.210,121.308 L132.620,121.544 L130.748,122.964 L111.757,122.964 L113.629,124.383 L127.271,124.147 L125.666,125.566 L117.641,125.802 L120.851,127.458 L122.723,126.748 "/>
-<path fill-rule="evenodd"  stroke="rgb(127, 127, 127)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(102, 133, 152)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M173.009,44.155 C175.148,43.005 176.163,41.012 175.968,39.129 C176.176,37.136 175.148,35.252 173.009,34.103 L126.922,9.433 C124.881,8.284 122.436,7.758 119.992,7.758 C117.548,7.758 115.090,8.284 113.049,9.433 L66.961,34.007 C64.822,35.156 63.905,37.149 64.003,39.032 C63.905,41.025 64.822,43.005 66.961,44.155 L113.049,68.741 C115.090,69.890 117.534,70.416 119.992,70.416 C122.436,70.416 124.881,69.890 126.922,68.741 L173.009,44.155 Z"/>
-<path fill-rule="evenodd"  stroke="rgb(127, 127, 127)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(102, 133, 152)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M64.997,43.999 L64.997,107.999 "/>
-<path fill-rule="evenodd"  stroke="rgb(127, 127, 127)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(102, 133, 152)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M175.997,43.999 L175.997,107.999 "/>
-<path fill-rule="evenodd"  stroke="rgb(127, 127, 127)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(102, 133, 152)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M120.998,71.999 L120.998,139.999 "/>
-<path fill-rule="evenodd"  stroke="rgb(127, 127, 127)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
+<path fill-rule="evenodd"  stroke="rgb(102, 133, 152)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M120.998,9.999 L120.998,72.999 "/>
-<path fill-rule="evenodd"  stroke="rgb(127, 127, 127)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="rgb(64, 64, 66)"
+<path fill-rule="evenodd"  stroke="rgb(102, 133, 152)" stroke-width="1px" stroke-dasharray="4, 2" stroke-linecap="butt" stroke-linejoin="miter" fill="rgb(44, 70, 86)"
  d="M221.999,17.000 C235.806,17.000 246.999,28.193 246.999,42.000 C246.999,55.807 235.806,67.000 221.999,67.000 C208.192,67.000 196.999,55.807 196.999,42.000 C196.999,28.193 208.192,17.000 221.999,17.000 Z"/>
 <path fill-rule="evenodd"  stroke="rgb(30, 144, 216)" stroke-width="8px" stroke-linecap="butt" stroke-linejoin="miter" fill="none"
  d="M235.334,53.553 L204.881,37.237 "/>

@@ -391,9 +391,9 @@ ProcessTip::ProcessTip()
     SetSizerAndFit(frameSizer);
 
     bool is_dark = wxGetApp().dark_mode();
-    SetBackgroundColour(is_dark ? wxColor("#222222") : wxColor("#F7F8FA"));
+    SetBackgroundColour(is_dark ? wxColor("#15252F") : wxColor("#F7F8FA"));
 
-    const wxColour fontColor = is_dark ? wxColour("#DBDBDB") : wxColour("#222222");
+    const wxColour fontColor = is_dark ? wxColour("#D5DCE1") : wxColour("#15252F");
 
     m_Title_text = new wxStaticText(this, wxID_ANY, m_Content.CS_Title, wxDefaultPosition, wxDefaultSize);
     m_Title_text->SetFont(Label::Head_14);
@@ -430,9 +430,9 @@ ProcessTip::ProcessTip()
     m_ImgBox->SetSize(FromDIP(contentWidth), FromDIP(contentWidth * 0.6));
     m_ImgBox->SetMaxSize(wxSize(FromDIP(contentWidth), FromDIP(contentWidth * 0.6)));
     m_ImgBox->SetMinSize(wxSize(FromDIP(contentWidth), FromDIP(contentWidth * 0.6)));
-    m_ImgBox->SetBackgroundColour(is_dark ? wxColour("#414143"):wxColour("#e1e4e9"));
+    m_ImgBox->SetBackgroundColour(is_dark ? wxColour("#2D4757"):wxColour("#e1e4e9"));
     m_ImgBox->SetBorderWidth(0);
-    m_ImgBox->SetBorderColor(0x7A7A7F);
+    m_ImgBox->SetBorderColor(0x648295);
     m_ImgBox->SetCornerFlags(0xF);
     //m_ImgBox->SetSize(wxSize(226, 227));
     //m_ImgBox->SetMaxSize(wxSize(226, 227));
@@ -603,14 +603,14 @@ void ProcessTip::updateUI()
 void ProcessTip::themeChanged()
 {
     bool is_dark = wxGetApp().dark_mode();
-    SetBackgroundColour(is_dark ? wxColor("#222222") : wxColor("#F7F8FA"));
+    SetBackgroundColour(is_dark ? wxColor("#15252F") : wxColor("#F7F8FA"));
 
-    const wxColour fontColor = is_dark ? wxColour("#DBDBDB") : wxColour("#222222");
+    const wxColour fontColor = is_dark ? wxColour("#D5DCE1") : wxColour("#15252F");
     m_Title_text->SetForegroundColour(fontColor);
     m_Content_text->SetForegroundColour(fontColor);
     m_Url_text->SetForegroundColour(fontColor);
     m_KeyText->SetForegroundColour(fontColor);
-    m_ImgBox->SetBackgroundColour(is_dark ? wxColour("#414143"):wxColour("#e1e4e9"));
+    m_ImgBox->SetBackgroundColour(is_dark ? wxColour("#2D4757"):wxColour("#e1e4e9"));
     m_Url_text->Refresh(); 
 }
 
@@ -736,7 +736,7 @@ bool MarkdownTip::ShowTip(wxPoint pos, std::string const& tip)
 
         if (!m_Content.CS_Image.empty()) {
             std::string url = Slic3r::var(m_Content.CS_Image);
-            content += std::string("<div style=\"background-color:#313131; border-radius:0px; padding:0px; display:flex; justify-content:center; align-items:center; width:226px; height:227px;\">") +
+            content += std::string("<div style=\"background-color:#1F3543; border-radius:0px; padding:0px; display:flex; justify-content:center; align-items:center; width:226px; height:227px;\">") +
                        std::string("<img style=\"margin:0 auto; display:block;\" src=\"file:///") + url +
                        std::string("\" width=\"150\" height=\"120\" /></div>");
         }
@@ -986,7 +986,7 @@ void ProcessTip::OnPaint(wxPaintEvent& event)
     wxAutoBufferedPaintDC dc(this);
 
     const bool     is_dark = wxGetApp().dark_mode();
-    const wxColour bg      = is_dark ? wxColour("#222222") : wxColour("#F7F8FA");
+    const wxColour bg      = is_dark ? wxColour("#15252F") : wxColour("#F7F8FA");
 
     dc.SetBackground(wxBrush(bg));
     dc.Clear();

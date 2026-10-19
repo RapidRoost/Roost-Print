@@ -123,7 +123,7 @@ namespace ConfigRelateGUI {
         
             m_defaultColor = StateColor(std::pair<wxColour, int>(green, StateColor::Pressed),
                                         std::pair<wxColour, int>(green, StateColor::Hovered),
-                                        std::pair<wxColour, int>(wxColour("#6E6E73"), StateColor::Normal),
+                                        std::pair<wxColour, int>(wxColour("#597688"), StateColor::Normal),
                                         std::pair<wxColour, int>(green, StateColor::Checked));
             SetBackgroundColor(m_defaultColor);
             SetForegroundColour(white);
@@ -294,7 +294,7 @@ namespace ConfigRelateGUI {
             : wxPanel(parent, winId, pos, size, style)
         {
             bool is_dark = wxGetApp().dark_mode();
-            SetBackgroundColour(is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF"));
+            SetBackgroundColour(is_dark ? wxColour("#365162") : wxColour("#FFFFFF"));
         }
     };
 
@@ -317,7 +317,7 @@ namespace ConfigRelateGUI {
             toolBar->SetWindowStyleFlag(toolBar->GetWindowStyleFlag() | wxTB_NOICONS);
 
             bool is_dark = wxGetApp().dark_mode();
-            SetBackgroundColour(is_dark ? wxColour("#4B4B4D") : wxColour("#FFFFFF"));
+            SetBackgroundColour(is_dark ? wxColour("#365162") : wxColour("#FFFFFF"));
         }
     };
 
@@ -362,8 +362,8 @@ namespace ConfigRelateGUI {
         int m_hoverRow = -1;
         wxColour m_hoverBgColour    = green; 
         bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
-        wxColour m_normalBGColour = is_dark ? wxColour("#4E4E52") : wxColour("#FFFFFF");//wxColour("#4E4E52");
-        wxColour m_singleBGColour   = is_dark ?  wxColour("#474749") : wxColour("#F4F4F4");
+        wxColour m_normalBGColour = is_dark ? wxColour("#395567") : wxColour("#FFFFFF");//wxColour("#395567");
+        wxColour m_singleBGColour   = is_dark ?  wxColour("#324D5E") : wxColour("#F4F4F4");
         wxColour m_userTextColour = green;
         wxColour m_systemTextColour = is_dark ? white : wxColour("#000000");
         int m_nameColumnWidth = 0;
@@ -452,7 +452,7 @@ namespace ConfigRelateGUI {
                     }
                 }
 
-                dc.SetPen(wxPen(wxColour("#6E6E72")));
+                dc.SetPen(wxPen(wxColour("#597587")));
                 if (firstLine)
                 {
                     firstLine = false;
@@ -461,7 +461,7 @@ namespace ConfigRelateGUI {
                 dc.DrawLine(itemRect.GetLeftBottom(), itemRect.GetRightBottom());
             }
 
-            dc.SetPen(wxPen(wxColour("#6E6E72")));
+            dc.SetPen(wxPen(wxColour("#597587")));
 
             dc.DrawLine(clientRect.GetLeftBottom(), clientRect.GetLeftTop());
             dc.DrawLine(clientRect.GetRightBottom(), clientRect.GetRightTop());
@@ -591,7 +591,7 @@ namespace ConfigRelateGUI {
             wxPaintDC dc(this);
             StaticBox::doRender(dc);
 
-            dc.SetPen(wxPen(wxColour("#6E6E72"), 1));
+            dc.SetPen(wxPen(wxColour("#597587"), 1));
 
             wxRect rect = GetRect();
             dc.DrawLine(rect.GetLeftBottom(), rect.GetLeftTop());
@@ -611,13 +611,13 @@ namespace ConfigRelateGUI {
         _ListWidget(wxWindow* parent) : DrawBorderBox(parent) 
         { 
             bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
-            SetBackgroundColor(is_dark ? wxColour("#474749") : wxColour("#ffffff"));
+            SetBackgroundColor(is_dark ? wxColour("#324D5E") : wxColour("#ffffff"));
 
             wxBoxSizer* main_sizer = new wxBoxSizer(wxVERTICAL);
 
             { /* header */
                 StaticBox* header = new StaticBox(this, wxID_ANY, wxDefaultPosition, scaleSize(this, wxSize(798, 37)));
-                const wxColour header_bg = is_dark ? wxColour("#474749") : wxColour("#ffffff");
+                const wxColour header_bg = is_dark ? wxColour("#324D5E") : wxColour("#ffffff");
                 header->SetBackgroundColour(header_bg);
                 header->SetBorderWidth(0);
                 header->SetMinSize(wxSize(-1, scalePx(this, 37)));
@@ -657,7 +657,7 @@ namespace ConfigRelateGUI {
                                                           wxSize(-1, scalePx(this, 2)));
                 //DrawBorderBox* footer = new DrawBorderBox(this, wxID_ANY);
                 // footer->topEnable     = false;
-                footer->SetBackgroundColor(wxColour("#6E6E72"));
+                footer->SetBackgroundColor(wxColour("#597587"));
                 main_sizer->Add(footer, 0, wxEXPAND | wxALL, 0);
             }
             SetSizer(main_sizer);
@@ -2602,7 +2602,7 @@ public:
 
                 m_printerSearch = new ::TextInput(parent, wxEmptyString, wxEmptyString, wxEmptyString, wxDefaultPosition, scaleSize(parent, wxSize(124, 24)),
                                              wxTE_PROCESS_ENTER);
-                StateColor input_bg(std::pair<wxColour, int>(wxColour("#F0F0F1"), StateColor::Disabled),
+                StateColor input_bg(std::pair<wxColour, int>(wxColour("#EEF1F3"), StateColor::Disabled),
                                     std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
                 m_printerSearch->SetBackgroundColor(input_bg);
 
@@ -3152,7 +3152,7 @@ public:
 
             m_printerSearch = new ::TextInput(parent, wxEmptyString, wxEmptyString, wxEmptyString, wxDefaultPosition, scaleSize(parent, wxSize(124, 24)),
                                               wxTE_PROCESS_ENTER);
-            StateColor input_bg(std::pair<wxColour, int>(wxColour("#F0F0F1"), StateColor::Disabled),
+            StateColor input_bg(std::pair<wxColour, int>(wxColour("#EEF1F3"), StateColor::Disabled),
                                 std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
             m_printerSearch->SetBackgroundColor(input_bg);
 

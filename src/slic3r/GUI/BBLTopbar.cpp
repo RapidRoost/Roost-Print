@@ -200,9 +200,9 @@ ButtonsCtrl::ButtonsCtrl(wxWindow* parent, wxBoxSizer* side_tools)
 
     wxColour default_btn_bg;
 #ifdef __APPLE__
-    default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#010101") : wxColour(214, 214, 220); // Gradient #414B4E
+    default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#070C12") : wxColour(211, 218, 223); // Gradient #414B4E
 #else
-    default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#010101") : wxColour(214, 214, 220); // Gradient #414B4E
+    default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#070C12") : wxColour(211, 218, 223); // Gradient #414B4E
 
 #endif
 
@@ -292,7 +292,7 @@ void ButtonsCtrl::SetSelection(int sel)
         if (m_selection >= 0) {
             wxColour   hover_bg = is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202);
             StateColor bg_color = StateColor(std::pair{hover_bg, (int) StateColor::Hovered},
-                                             std::pair{is_dark ? wxColour(1, 1, 1) : wxColour(214, 214, 220), (int) StateColor::Normal});
+                                             std::pair{is_dark ? wxColour(7, 12, 18) : wxColour(211, 218, 223), (int) StateColor::Normal});
             m_mapPageButtons[m_selection]->SetBackgroundColor(bg_color);
             m_mapPageButtons[m_selection]->SetSelected(false);
             ApplyButtonStyle(m_selection, false);
@@ -307,7 +307,7 @@ void ButtonsCtrl::SetSelection(int sel)
         if (m_selection >= 0) {
             wxColour   hover_bg = is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202);
             StateColor bg_color = StateColor(std::pair{hover_bg, (int) StateColor::Hovered},
-                                             std::pair{is_dark ? wxColour(1, 1, 1) : wxColour(214, 214, 220), (int) StateColor::Normal});
+                                             std::pair{is_dark ? wxColour(7, 12, 18) : wxColour(211, 218, 223), (int) StateColor::Normal});
             m_mapPageButtons[m_selection]->SetBackgroundColor(bg_color);
             m_mapPageButtons[m_selection]->SetSelected(false);
             ApplyButtonStyle(m_selection, false);
@@ -322,7 +322,7 @@ void ButtonsCtrl::SetSelection(int sel)
     if (m_selection >= 0) {
         wxColour   hover_bg = is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202);
         StateColor bg_color = StateColor(std::pair{hover_bg, (int) StateColor::Hovered},
-                                         std::pair{is_dark ? wxColour(1, 1, 1) : wxColour(214, 214, 220), (int) StateColor::Normal});
+                                         std::pair{is_dark ? wxColour(7, 12, 18) : wxColour(211, 218, 223), (int) StateColor::Normal});
         m_mapPageButtons[m_selection]->SetBackgroundColor(bg_color);
         m_mapPageButtons[m_selection]->SetSelected(false);
         ApplyButtonStyle(m_selection, false);
@@ -353,8 +353,8 @@ void ButtonsCtrl::SuppressHoverUntilReenter(int index)
 
     m_suppressed_hover.insert(index);
     const wxColour normal_bg = Slic3r::GUI::wxGetApp().dark_mode()
-        ? wxColour(1, 1, 1)
-        : wxColour(214, 214, 220);
+        ? wxColour(7, 12, 18)
+        : wxColour(211, 218, 223);
     button->SetBackgroundColor(StateColor(std::pair{normal_bg, (int) StateColor::Hovered},
                                           std::pair{normal_bg, (int) StateColor::Normal}));
     button->Refresh();
@@ -368,12 +368,12 @@ void ButtonsCtrl::RefreshColor()
 	//	Slic3r::GUI::wxGetApp().UpdateDarkUI(it.second);
 	//}
     bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
-    wxColour default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#010101") : wxColour(214, 214, 220); // Gradient #414B4E
+    wxColour default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#070C12") : wxColour(211, 218, 223); // Gradient #414B4E
     SetBackgroundColour(default_btn_bg);
     for (auto& [index, button] : m_mapPageButtons) {
         wxColour   hover_bg = is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202);
         StateColor bg_color = StateColor(std::pair{hover_bg, (int) StateColor::Hovered},
-                                         std::pair{is_dark ? wxColour(1, 1, 1) : wxColour(214, 214, 220), (int) StateColor::Normal});
+                                         std::pair{is_dark ? wxColour(7, 12, 18) : wxColour(211, 218, 223), (int) StateColor::Normal});
         button->SetCornerRadius(FromDIP(3));
         button->SetFontBold(true);
         button->SetBackgroundColor(bg_color);     
@@ -451,7 +451,7 @@ bool ButtonsCtrl::InsertPage(
     bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
     wxColour   hover_bg = is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202);
     StateColor bg_color = StateColor(std::pair{hover_bg, (int) StateColor::Hovered},
-                                     std::pair{is_dark ? wxColour("1, 1, 1") : wxColour(214, 214, 220), (int) StateColor::Normal});
+                                     std::pair{is_dark ? wxColour("1, 1, 1") : wxColour(211, 218, 223), (int) StateColor::Normal});
 
     btn->SetBackgroundColor(bg_color);
     btn->SetTextColor(DefaultTextColor(false));
@@ -509,7 +509,7 @@ bool ButtonsCtrl::InsertPage(
             const bool selected = m_selection == static_cast<int>(index);
             const wxColour normal_bg = selected
                 ? (is_dark ? wxColour(30, 144, 216) : wxColour(25, 125, 188))
-                : (is_dark ? wxColour(1, 1, 1) : wxColour(214, 214, 220));
+                : (is_dark ? wxColour(7, 12, 18) : wxColour(211, 218, 223));
             const wxColour hover_bg = selected
                 ? wxColour(71, 151, 202)
                 : (is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202));
@@ -589,8 +589,8 @@ private:
         wxPaintDC dc(this);
         UpdateSwitchBitmap();
         const bool is_dark = wxGetApp().dark_mode();
-        const wxColour bg = is_dark ? wxColour("#010101") : wxColour(214, 214, 220);
-        const wxColour text_col = is_dark ? wxColour(235, 235, 235) : wxColour(80, 80, 80);
+        const wxColour bg = is_dark ? wxColour("#070C12") : wxColour(211, 218, 223);
+        const wxColour text_col = is_dark ? wxColour(232, 236, 238) : wxColour(57, 85, 103);
 
         dc.SetBackground(wxBrush(bg));
         dc.Clear();
@@ -741,7 +741,7 @@ void BBLTopbarArt::DrawLabel(wxDC& dc, wxWindow* wnd, const wxAuiToolBarItem& it
 void BBLTopbarArt::DrawBackground(wxDC& dc, wxWindow* wnd, const wxRect& rect)
 {
     bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
-    dc.SetBrush(wxBrush(is_dark ? wxColour(1, 1, 1) : wxColour(214, 214, 220)));
+    dc.SetBrush(wxBrush(is_dark ? wxColour(7, 12, 18) : wxColour(211, 218, 223)));
     dc.SetPen(*wxTRANSPARENT_PEN);
     dc.SetClippingRegion(rect);
     dc.DrawRectangle(rect);
@@ -923,8 +923,8 @@ void BBLTopbarArt::DrawSeparator(wxDC& dc, wxWindow* wnd, const wxRect& _rect)
     }
 
      bool     is_dark = Slic3r::GUI::wxGetApp().dark_mode();
-    wxColour startColour = is_dark ? ("#454548") : ("#AAAAB0");
-    wxColour endColour   = is_dark ? ("#454548") : ("#AAAAB0");
+    wxColour startColour = is_dark ? ("#314B5C") : ("#A0B0BA");
+    wxColour endColour   = is_dark ? ("#314B5C") : ("#A0B0BA");
     dc.GradientFillLinear(rect, startColour, endColour, horizontal ? wxSOUTH : wxEAST);
 }
 
@@ -955,7 +955,7 @@ void BBLTopbar::Init(wxFrame* parent)
     m_tabCtrol = nullptr;
 
     const bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
-    const wxColour topbar_bg = is_dark ? wxColour("#010101") : wxColour(214, 214, 220);
+    const wxColour topbar_bg = is_dark ? wxColour("#070C12") : wxColour(211, 218, 223);
     SetBackgroundColour(topbar_bg);
     SetArtProvider(new BBLTopbarArt());
 #ifdef __WXGTK__
@@ -994,7 +994,7 @@ void BBLTopbar::Init(wxFrame* parent)
     basic_font.SetPointSize(10);
     this->SetFont(basic_font);
 
-    this->SetForegroundColour(is_dark ? wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) : wxColour(214, 214, 220));
+    this->SetForegroundColour(is_dark ? wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT) : wxColour(211, 218, 223));
 
     wxBitmap dropdown_bitmap = create_scaled_bitmap(is_dark ? "menu_down" : "menu_down_light", this, (8));
     m_dropdown_menu_item = this->AddTool(ID_TOP_DROPDOWN_MENU, "", dropdown_bitmap);
@@ -1054,8 +1054,7 @@ void BBLTopbar::Init(wxFrame* parent)
     m_tabs_leading_spacer_item = AddStretchSpacer(1);
     //CX
     ButtonsCtrl* pCtr = new ButtonsCtrl(this);
-    pCtr->InsertPage(MainFrame::tpAICreation, _L("AI Creation"), false, "tab_ai_creation");
-    pCtr->InsertPage(MainFrame::tpOnlineModel, _L("Online Models"), 0);
+    // Roost Print: no AI Creation or Online Models tabs.
     pCtr->InsertPage(MainFrame::tp3DEditor, _L("Prepare"), 0);
     pCtr->InsertPage(MainFrame::tpPreview, _L("Preview"), 0);
     pCtr->InsertPage(MainFrame::tpDeviceMgr, _L("Device"), 0);
@@ -1109,22 +1108,10 @@ void BBLTopbar::Init(wxFrame* parent)
     m_feedback_separator_item = this->AddSeparator();
     addDipSpacer(10);
 
-    m_easy_mode_switch_ctrl = new EasyModeSwitchCtrl(this);
-    BindWindowDragEvents(m_easy_mode_switch_ctrl);
-    m_easy_mode_switch_item = this->AddControl(m_easy_mode_switch_ctrl);
-    m_easy_mode_switch_item->SetMinSize(m_easy_mode_switch_ctrl->GetMinSize());
-    m_action_spacer_items.push_back(addDipSpacer(10));
-
-    {
-        wxSize   feedbackSize(FromDIP(24), FromDIP(24));
-        wxBitmap feedback_bitmap = create_scaled_bitmap3(is_dark ? "user_feedback" : "user_feedback_light", this, (TOPBAR_ICON_SIZE), feedbackSize);
-        wxBitmap feedback_disable_bitmap = create_scaled_bitmap3("user_feedback_disable", this, (TOPBAR_ICON_SIZE), feedbackSize);
-        wxBitmap feedback_hover_bitmap = create_scaled_bitmap3("user_feedback_hover", this, (TOPBAR_ICON_SIZE), feedbackSize);
-        m_feedback_item = this->AddTool(ID_FEEDBACK_BTN, "", feedback_bitmap, _L("User Feedback"));
-        m_feedback_item->SetDisabledBitmap(feedback_disable_bitmap);
-        m_feedback_item->SetHoverBitmap(feedback_hover_bitmap);
-        m_action_spacer_items.push_back(addDipSpacer(10));
-    }
+    // Roost Print: no AI/Pro mode switch and no customer support (feedback) button.
+    m_easy_mode_switch_ctrl = nullptr;
+    m_easy_mode_switch_item = nullptr;
+    m_feedback_item = nullptr;
     m_more_item = AddTool(ID_TOP_MORE, "", create_scaled_bitmap("toolbar_more", this, 20), _L("More"));
     m_more_item->SetKind(m_title_spacer_item->GetKind());
     m_more_item->SetSpacerPixels(0);
@@ -1678,12 +1665,10 @@ void BBLTopbar::SetActionsCollapsed(bool collapsed)
     // from the existing spacer and tab control items.
     const int spacer_kind = m_title_spacer_item->GetKind();
     const int control_kind = item_ctrl->GetKind();
-    m_easy_mode_switch_item->SetKind(collapsed ? spacer_kind : control_kind);
-    m_easy_mode_switch_item->SetSpacerPixels(0);
-    m_easy_mode_switch_ctrl->Show(!collapsed);
-    m_feedback_item->SetKind(collapsed ? spacer_kind : wxITEM_NORMAL);
-    m_feedback_item->SetSpacerPixels(0);
-    m_more_item->SetKind(collapsed ? wxITEM_NORMAL : spacer_kind);
+    (void)control_kind;
+    // Roost Print: the overflow menu only held the AI/Pro switch and support, both removed,
+    // so the "More" button stays hidden.
+    m_more_item->SetKind(spacer_kind);
     for (auto* spacer : m_action_spacer_items)
         spacer->SetSpacerPixels(collapsed ? 0 : FromDIP(10));
 }
@@ -1733,20 +1718,8 @@ void BBLTopbar::UpdateResponsiveLayout(int width, bool rebuild_metrics)
 
 void BBLTopbar::OnMore(wxAuiToolBarEvent& event)
 {
-    wxMenu menu;
-    const int mode_id = menu.Append(wxID_ANY, _L("Switch AI/Pro mode"))->GetId();
-    menu.Enable(mode_id, m_easy_mode_switch_ctrl->IsEnabled());
-    const int feedback_id = menu.Append(wxID_ANY, _L("User Feedback"))->GetId();
-    menu.Enable(feedback_id, GetToolEnabled(ID_FEEDBACK_BTN));
-    menu.Bind(wxEVT_MENU, [this](wxCommandEvent&) {
-        static_cast<EasyModeSwitchCtrl*>(m_easy_mode_switch_ctrl)->ToggleMode();
-    }, mode_id);
-    menu.Bind(wxEVT_MENU, [this](wxCommandEvent&) {
-        wxAuiToolBarEvent feedback_event(wxEVT_AUITOOLBAR_TOOL_DROPDOWN, ID_FEEDBACK_BTN);
-        OnFeedback(feedback_event);
-    }, feedback_id);
-    const wxRect rect = GetToolRect(ID_TOP_MORE);
-    PopupMenu(&menu, wxPoint(rect.x, rect.GetBottom()));
+    // Roost Print: nothing left to put in this menu.
+    (void)event;
 }
 
 void BBLTopbar::UpdateToolbarWidth(int width)
@@ -1762,7 +1735,7 @@ void BBLTopbar::Rescale(bool isResize) {
     //auto  = [=](int x) {return x * em_unit(this) / 10; };
     wxAuiToolBarItem* item;
     bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
-    const wxColour topbar_bg = is_dark ? wxColour("#010101") : wxColour(214, 214, 220);
+    const wxColour topbar_bg = is_dark ? wxColour("#070C12") : wxColour(211, 218, 223);
     SetBackgroundColour(topbar_bg);
     // wxWidgets 3.3 caches the toolbar background bitmap. The Preferences
     // dark-mode toggle does not send a system colour event to this toolbar,

@@ -26,15 +26,15 @@ void TextDisplay::Create(wxWindow* parent, const wxString& text, const wxString&
     SetLabel(text);
 
     StaticBox::SetFont(Label::Body_13);
-    StaticBox::SetBorderColor(StateColor(std::make_pair(0xDBDBDB, (int) StateColor::Disabled),
+    StaticBox::SetBorderColor(StateColor(std::make_pair(0xD5DCE1, (int) StateColor::Disabled),
                                          std::make_pair(0x1877B4, (int) StateColor::Hovered),
-                                         std::make_pair(0xDBDBDB, (int) StateColor::Normal)));
+                                         std::make_pair(0xD5DCE1, (int) StateColor::Normal)));
     StaticBox::SetBackgroundColor(
-        StateColor(std::make_pair(0xF0F0F1, (int) StateColor::Disabled),
+        StateColor(std::make_pair(0xEEF1F3, (int) StateColor::Disabled),
                    std::make_pair(wxColour("#787565"), (int) StateColor::Focused), // ORCA updated background color for focused item
                    std::make_pair(*wxWHITE, (int) StateColor::Normal)));
     SetLabelColor(StateColor(
-        std::make_pair(wxColour("#ACACAC"), (int) StateColor::Disabled), // ORCA: Use same color for disabled text on combo boxes
+        std::make_pair(wxColour("#9FAFB9"), (int) StateColor::Disabled), // ORCA: Use same color for disabled text on combo boxes
         std::make_pair(0x000000, (int) StateColor::Normal)));
 
     state_handler.update_binds();

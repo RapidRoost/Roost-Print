@@ -48,7 +48,7 @@ DropDown::DropDown(std::vector<wxString> &texts,
     , tips(tips)
     , icons(icons)
     , state_handler(this)
-    , border_color(0xDBDBDB)
+    , border_color(0xD5DCE1)
     , text_color(0x000000)
     , selector_border_color(std::make_pair(0x1877B4, (int) StateColor::Hovered),
         std::make_pair(*wxWHITE, (int) StateColor::Normal))
@@ -539,8 +539,8 @@ void DropDown::render(wxDC &dc)
                 auto pre_clr = dc.GetTextForeground();
                 auto pre_pen = dc.GetPen();
                 auto pre_font = dc.GetFont();
-                dc.SetTextForeground(StateColor::darkModeColorFor(wxColour(190, 190, 190)));
-                dc.SetPen(wxPen(StateColor::darkModeColorFor(wxColour(166, 169, 170)), 1));
+                dc.SetTextForeground(StateColor::darkModeColorFor(wxColour(180, 192, 200)));
+                dc.SetPen(wxPen(StateColor::darkModeColorFor(wxColour(154, 171, 182)), 1));
                 auto font = GetFont();
                 font.SetPointSize(font.GetPointSize() - 2);
                 dc.SetFont(font);

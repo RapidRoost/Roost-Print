@@ -49,8 +49,8 @@ WeightLimitItem::WeightLimitItem(AccelerationAndSpeedLimitPanel* limitPanel, wxW
 {
     m_limitPanel = limitPanel;
     m_nIdx = idx;
-    wxString bgColor = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
-    wxString fgColor = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
+    wxString bgColor = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
+    wxString fgColor = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
     this->SetMinSize(wxSize(FromDIP(728), FromDIP(144)));
     this->SetMaxSize(wxSize(FromDIP(728), FromDIP(144)));
     this->SetBackgroundColour(bgColor);
@@ -330,7 +330,7 @@ const WeightLimitItem::LimitData& WeightLimitItem::getEditLimitData()
 
 void WeightLimitItem::showSubCtrl()
 {
-    wxString bgColor = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
+    wxString bgColor = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
     wxString fgColor = wxGetApp().dark_mode() ? "#FFFFFF" : "#30373D";
     this->SetBackgroundColour(bgColor);
 
@@ -431,8 +431,8 @@ HeightLimitItem::HeightLimitItem(AccelerationAndSpeedLimitPanel* limitPanel, wxW
 {
     m_limitPanel = limitPanel;
     m_nIdx = idx;
-    wxString bgColor = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
-    wxString fgColor = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
+    wxString bgColor = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
+    wxString fgColor = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
     this->SetMinSize(wxSize(FromDIP(728), FromDIP(144)));
     this->SetMaxSize(wxSize(FromDIP(728), FromDIP(144)));
     this->SetBackgroundColour(bgColor);
@@ -691,7 +691,7 @@ const WeightLimitItem::LimitData& HeightLimitItem::getEditLimitData()
 
 void HeightLimitItem::showSubCtrl()
 {
-    wxString bgColor = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
+    wxString bgColor = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
     wxString fgColor = wxGetApp().dark_mode() ? "#FFFFFF" : "#30373D";
     this->SetBackgroundColour(bgColor);
 
@@ -798,12 +798,12 @@ AccelerationAndSpeedLimitPanel::AccelerationAndSpeedLimitPanel(const std::string
     this->SetMinSize(wxSize(FromDIP(760), FromDIP(736)));
     this->SetMaxSize(wxSize(FromDIP(760), FromDIP(736)));
     //wxGetApp().UpdateDarkUI(this);
-    wxString bgColor = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
+    wxString bgColor = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
     wxString fgColor = wxGetApp().dark_mode() ? "#FFFFFF" : "#30373D";
 
     auto main_sizer = new wxBoxSizer(wxVERTICAL);
     m_scrolled_window = new wxScrolledWindow(this);
-    m_scrolled_window->SetBackgroundColour(wxGetApp().dark_mode() ?"#2B2B2B":"#EFF0F6");
+    m_scrolled_window->SetBackgroundColour(wxGetApp().dark_mode() ?"#1B2F3B":"#EFF0F6");
     m_scrolled_window->SetScrollbars(1, 20, 1, 2);
     m_scrolled_window->SetWindowStyle(wxBORDER_NONE);
 
@@ -1162,8 +1162,8 @@ void AccelerationAndSpeedLimitDialog::build_dialog(bool bDefaultCheckbox, const 
     BOOST_LOG_TRIVIAL(warning) << "AccelerationAndSpeedLimitDialog::build_dialog type=" << m_type
                                << ",bDefaultCheckbox=" << bDefaultCheckbox << ",defaultData=" << defaultData.serialize()
                                << ",bCheckbox=" << bCheckbox << ",data=" << data.serialize();
-    wxString bgColor = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
-    wxString bgColor2 = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
+    wxString bgColor = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
+    wxString bgColor2 = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
     wxString fgColor = wxGetApp().dark_mode() ? "#FFFFFF" : "#30373D";
     SetFont(wxGetApp().normal_font());
     wxGetApp().UpdateDlgDarkUI(this);
@@ -1191,7 +1191,7 @@ void AccelerationAndSpeedLimitDialog::build_dialog(bool bDefaultCheckbox, const 
     cancelBtn->SetMinSize(wxSize(FromDIP(104), FromDIP(32)));
     cancelBtn->SetMaxSize(wxSize(FromDIP(104), FromDIP(32)));
     cancelBtn->SetFont(Label::Body_13);
-    cancelBtn->SetBorderColor(wxColour(wxGetApp().dark_mode() ? "#6C6E71" : "#A6ACB4"));
+    cancelBtn->SetBorderColor(wxColour(wxGetApp().dark_mode() ? "#577486" : "#A6ACB4"));
     cancelBtn->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour(bgColor2), StateColor::Pressed),
                                              std::pair<wxColour, int>(wxColour(bgColor2), StateColor::Hovered),
                                              std::pair<wxColour, int>(wxColour(bgColor2), StateColor::Normal)));
@@ -1205,7 +1205,7 @@ void AccelerationAndSpeedLimitDialog::build_dialog(bool bDefaultCheckbox, const 
     okBtn->SetMinSize(wxSize(FromDIP(104), FromDIP(32)));
     okBtn->SetMaxSize(wxSize(FromDIP(104), FromDIP(32)));
     okBtn->SetFont(Label::Body_13);
-    okBtn->SetBorderColor(wxColour(wxGetApp().dark_mode() ? "#6C6E71" : "#A6ACB4"));
+    okBtn->SetBorderColor(wxColour(wxGetApp().dark_mode() ? "#577486" : "#A6ACB4"));
     okBtn->SetBackgroundColor(StateColor(std::pair<wxColour, int>(wxColour("#1E90D8"), StateColor::Pressed),
                                          std::pair<wxColour, int>(wxColour("#1E90D8"), StateColor::Hovered),
                                          std::pair<wxColour, int>(wxColour("#1E90D8"), StateColor::Normal)));

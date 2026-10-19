@@ -20,7 +20,7 @@
 	justify-content: flex-start;
 	align-content: flex-start;
 	flex-wrap: wrap;
-	background-color: #313133;
+	background-color: #203644;
 	padding: 10px;
 	border-radius: 5px;
 	column-gap: 20px;
@@ -215,20 +215,20 @@ input
 }
 
 #AcceptBtn:hover {
-	color: #333;
+	color: #203746;
 	background: #fff;
 	border: 1px solid #fff;
 }
 #PreBtn:hover {
 	background: #fff;
-	color: #333;
+	color: #203746;
 }
 
 #MachineId{
 	display: flex;
 	gap: 5px;
 	padding: 10px 0;
-	color: #6b6b6d;
+	color: #557183;
 }
 .checkTitle{
 	display: flex;
@@ -242,12 +242,12 @@ input
 .filaTypeItem {
 	display: flex;
 	width: 100%;
-	background-color: #363638;
-	border: 1px solid #404040;
+	background-color: #243B4A;
+	border: 1px solid #2B4555;
 	border-radius: 5px;
 }
 .filaTypeItem .filaType{
-	background-color: #403f44;
+	background-color: #2c4657;
 	width: 80px;
 	display: flex;
 	align-items: center;

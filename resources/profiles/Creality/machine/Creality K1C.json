@@ -9,5 +9,5 @@
     "hotend_model": "",
     "machine_tech": "FFF",
     "model_id": "Creality_K1C",
-    "default_materials": "Hyper PETG;Hyper PLA-CF;Hyper PLA;Hyper ABS;Generic TPU;Generic PLA-Silk;Generic PLA-CF;Generic PLA;Generic PETG;Generic ASA;Generic ABS;CR-Silk;CR-PLA;CR-PETG;CR-ABS"
+    "default_materials": "Fiberon PA12-CF;Fiberon PA12-CF10;Fiberon PA6-CF;Fiberon PA6-CF20;Fiberon PA6-GF;Fiberon PA6-GF25;Fiberon PA612-CF;Fiberon PA612-CF15;Fiberon PET-CF;Fiberon PET-CF17;Fiberon PETG-ESD;Fiberon PETG-rCF;Fiberon PETG-rCF08;Panchroma CoPE;Panchroma PLA;Panchroma PLA Celestial;Panchroma PLA Galaxy;Panchroma PLA Glow;Panchroma PLA Luminous;Panchroma PLA Marble;Panchroma PLA Matte;Panchroma PLA Metallic;Panchroma PLA Neon;Panchroma PLA Satin;Panchroma PLA Silk;Panchroma PLA Starlight;Panchroma PLA Temp Shift;Panchroma PLA Translucent;Panchroma PLA UV Shift;PolyLite ABS;PolyLite ASA;PolyLite CosPLA;PolyLite Dual PLA;PolyLite PETG;PolyLite PLA;PolyLite PLA Galaxy;PolyLite PLA Glow;PolyLite PLA Luminous;PolyLite PLA Neon;PolyLite PLA Pro;PolyLite PLA Starlight;PolyLite PLA Translucent;PolyTerra PLA;PolyTerra PLA Marble;PolyTerra PLA+;Polymaker HT-PLA;Polymaker HT-PLA-GF;Polymaker PLA Pro;Fiberon PA612-ESD;PolySonic PLA;PolySonic PLA Pro"
 }

@@ -38,7 +38,7 @@ void render_simple_input_window()
     const bool  dark = wxGetApp().dark_mode();
 
     // Headings
-    ImGui::PushStyleColor(ImGuiCol_Text, dark ? ImVec4(1,1,1,1) : ImVec4(0.17f,0.17f,0.18f,1));
+    ImGui::PushStyleColor(ImGuiCol_Text, dark ? ImVec4(1,1,1,1) : ImVec4(0.110f,0.188f,0.239f,1));
     // Scale font to 16px for headings and restore after
     const float prev_win_scale = ImGui::GetFontSize() / ImGui::GetFont()->FontSize;
     // ImGui::SetWindowFontScale(18.0f / ImGui::GetFont()->FontSize);
@@ -100,7 +100,7 @@ void render_simple_input_window()
     const ImU32  radio_fill  = IM_COL32(41, 190, 85, 180);
     // Text color follows dark/light mode (match general UI palette used elsewhere)
     const ImVec4 text_col    = dark ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
-                                    : ImVec4(0.1686f, 0.1686f, 0.1765f, 1.0f);
+                                    : ImVec4(0.106f, 0.188f, 0.239f, 1.0f);
 
     ImGui::SetCursorPosX(left_inset + std::max(0.0f, 0.5f * (avail_w - table_w)));
     ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(tile_gap * 0.5f, ImGui::GetStyle().CellPadding.y));

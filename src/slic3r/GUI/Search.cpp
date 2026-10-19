@@ -463,7 +463,7 @@ wxSize SearchItem::DrawTextString(wxDC &dc, const wxString &text, const wxPoint 
     }
 
     dc.SetBackgroundMode(wxTRANSPARENT);
-    dc.SetTextForeground(StateColor::darkModeColorFor(wxColour("#323A3C")));
+    dc.SetTextForeground(StateColor::darkModeColorFor(wxColour("#243B4A")));
     dc.DrawText(text, pt);
     return dc.GetTextExtent(text);
 }
@@ -535,7 +535,7 @@ void SearchItem::OnPaint(wxPaintEvent &event)
 
 void SearchItem::on_mouse_enter(wxMouseEvent &evt)
 {
-    SetBackgroundColour(StateColor::darkModeColorFor(wxColour(238, 238, 238)));
+    SetBackgroundColour(StateColor::darkModeColorFor(wxColour(235, 239, 241)));
     Refresh();
 }
 
@@ -547,7 +547,7 @@ void SearchItem::on_mouse_leave(wxMouseEvent &evt)
 
 void SearchItem::on_mouse_left_down(wxMouseEvent &evt)
 {
-    SetBackgroundColour(StateColor::darkModeColorFor(wxColour(228, 228, 228)));
+    SetBackgroundColour(StateColor::darkModeColorFor(wxColour(224, 229, 232)));
     Refresh();
 }
 
@@ -590,14 +590,14 @@ SearchDialog::SearchDialog(OptionsSearcher *searcher, Preset::Type type, wxWindo
 
     // set border color
     Freeze();
-    SetBackgroundColour(wxColour(238, 238, 238));
+    SetBackgroundColour(wxColour(235, 239, 241));
 
     em = GUI::wxGetApp().em_unit();
 
-    m_text_color   = wxColour(38, 46, 48);
+    m_text_color   = wxColour(27, 47, 59);
     m_bg_colour    = wxColour(255, 255, 255);
     m_hover_colour = wxColour(248, 248, 248);
-    m_thumb_color  = wxColour(196, 196, 196);
+    m_thumb_color  = wxColour(187, 198, 205);
 
     SetFont(Label::Body_13);
     SetSizeHints(wxDefaultSize, wxDefaultSize);
@@ -618,7 +618,7 @@ SearchDialog::SearchDialog(OptionsSearcher *searcher, Preset::Type type, wxWindo
     //search_line = new wxTextCtrl(m_client_panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 #ifdef __WXGTK__
     search_line = new TextInput(m_client_panel, wxEmptyString, wxEmptyString, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
-    search_line->SetBackgroundColour(wxColour(238, 238, 238));
+    search_line->SetBackgroundColour(wxColour(235, 239, 241));
     search_line->SetForegroundColour(wxColour(43, 52, 54));
     search_line->SetFont(GUI::wxGetApp().bold_font());
 #endif
@@ -952,13 +952,13 @@ SearchObjectDialog::SearchObjectDialog(GUI::ObjectList* object_list, wxWindow* p
     : PopupWindow(parent, wxBORDER_NONE|wxPU_CONTAINS_CONTROLS), m_object_list(object_list)
 {
     Freeze();
-    SetBackgroundColour(wxColour(238, 238, 238));
+    SetBackgroundColour(wxColour(235, 239, 241));
 
     em = GUI::wxGetApp().em_unit();
 
-    m_text_color = wxColour(38, 46, 48);
+    m_text_color = wxColour(27, 47, 59);
     m_bg_color = wxColour(255, 255, 255);
-    m_thumb_color = wxColour(196, 196, 196);
+    m_thumb_color = wxColour(187, 198, 205);
 
     SetFont(Label::Body_13);
     SetSizeHints(wxDefaultSize, wxDefaultSize);

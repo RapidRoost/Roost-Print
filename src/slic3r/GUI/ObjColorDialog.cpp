@@ -27,7 +27,7 @@ using namespace Slic3r::GUI;
 
 int objcolor_scale(const int val) { return val * Slic3r::GUI::wxGetApp().em_unit() / 10; }
 int OBJCOLOR_ITEM_WIDTH() { return objcolor_scale(30); }
-static const wxColour g_text_color = wxColour(107, 107, 107, 255);
+static const wxColour g_text_color = wxColour(84, 112, 130, 255);
 const int HEADER_BORDER  = 5;
 const int CONTENT_BORDER = 3;
 const int PANEL_WIDTH = 648;
@@ -74,9 +74,9 @@ static const float COLOR_CLOSE_MATCH_THRESHOLD = 10.0f;
 const  StateColor ok_btn_bg(std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed),
                      std::pair<wxColour, int>(wxColour(74, 168, 228), StateColor::Hovered),
                      std::pair<wxColour, int>(wxColour(30, 144, 216), StateColor::Normal));
-const StateColor  ok_btn_disable_bg(std::pair<wxColour, int>(wxColour(205, 201, 201), StateColor::Pressed),
-                                   std::pair<wxColour, int>(wxColour(205, 201, 201), StateColor::Hovered),
-                                   std::pair<wxColour, int>(wxColour(205, 201, 201), StateColor::Normal));
+const StateColor  ok_btn_disable_bg(std::pair<wxColour, int>(wxColour(195, 205, 211), StateColor::Pressed),
+                                   std::pair<wxColour, int>(wxColour(195, 205, 211), StateColor::Hovered),
+                                   std::pair<wxColour, int>(wxColour(195, 205, 211), StateColor::Normal));
 wxBoxSizer* ObjColorDialog::create_btn_sizer(long flags)
 {
     auto btn_sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -89,16 +89,16 @@ wxBoxSizer* ObjColorDialog::create_btn_sizer(long flags)
         std::pair<wxColour, int>(wxColour(255, 255, 254), StateColor::Normal)
     );
     StateColor cancel_btn_bg(
-        std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-        //std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+        std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+        //std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Hovered),
         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal)
     );
     StateColor cancel_btn_bd_(
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal)
     );
     StateColor cancel_btn_text(
-        std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Normal)
+        std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Normal)
     );
     StateColor calc_btn_bg(
         std::pair<wxColour, int>(wxColour(24, 119, 180), StateColor::Pressed),
@@ -184,7 +184,7 @@ ObjColorDialog::ObjColorDialog(wxWindow *                      parent,
     SetIcon(wxIcon(Slic3r::encode_path(icon_path.c_str()), wxBITMAP_TYPE_ICO));
 
     auto m_line_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 1));
-    m_line_top->SetBackgroundColour(wxColour(166, 169, 170));
+    m_line_top->SetBackgroundColour(wxColour(154, 171, 182));
 
     this->SetBackgroundColour(*wxWHITE);
     this->SetMinSize(wxSize(MIN_OBJCOLOR_DIALOG_WIDTH, -1));
@@ -299,9 +299,9 @@ ObjColorPanel::ObjColorPanel(wxWindow *                       parent,
     this->SetMinSize(wxSize(FromDIP(680), FromDIP(716)));
     this->SetMaxSize(wxSize(FromDIP(680), FromDIP(716)));
 
-    wxString bgColor = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
-    wxString bgColor2 = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
-    wxString bgColor3 = wxGetApp().dark_mode() ? "#6C6E71" : "#D0D4DE";
+    wxString bgColor = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
+    wxString bgColor2 = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
+    wxString bgColor3 = wxGetApp().dark_mode() ? "#577486" : "#D0D4DE";
     wxString fgColor = wxGetApp().dark_mode() ? "#FFFFFF" : "#30373D";
     wxString fgColor2 = wxGetApp().dark_mode() ? "#F0F0FF" : "#30373D";
     this->SetBackgroundColour(*wxWHITE);
@@ -887,9 +887,9 @@ void ObjColorPanel::update_warning_text(const wxString& strTxt)
 wxBoxSizer *ObjColorPanel::create_approximate_match_btn_sizer(wxWindow *parent)
 {
     auto       btn_sizer = new wxBoxSizer(wxHORIZONTAL);
-    wxString   bgColor   = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
-    wxString   bgColor2  = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
-    wxString   bgColor3  = wxGetApp().dark_mode() ? "#6C6E71" : "#D0D4DE";
+    wxString   bgColor   = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
+    wxString   bgColor2  = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
+    wxString   bgColor3  = wxGetApp().dark_mode() ? "#577486" : "#D0D4DE";
     wxString   fgColor   = wxGetApp().dark_mode() ? "#1E90D8" : "#1E90D8";
     wxString   fgColor2  = wxGetApp().dark_mode() ? "#F0F0FF" : "#30373D";
     StateColor calc_btn_bg(std::pair<wxColour, int>(wxColour(bgColor /*0, 137, 123*/), StateColor::Pressed), 
@@ -924,9 +924,9 @@ wxBoxSizer *ObjColorPanel::create_approximate_match_btn_sizer(wxWindow *parent)
 wxBoxSizer *ObjColorPanel::create_add_btn_sizer(wxWindow *parent)
 {
     auto       btn_sizer = new wxBoxSizer(wxHORIZONTAL);
-    wxString   bgColor   = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
-    wxString   bgColor2  = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
-    wxString   bgColor3  = wxGetApp().dark_mode() ? "#6C6E71" : "#D0D4DE";
+    wxString   bgColor   = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
+    wxString   bgColor2  = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
+    wxString   bgColor3  = wxGetApp().dark_mode() ? "#577486" : "#D0D4DE";
     wxString   fgColor   = wxGetApp().dark_mode() ? "#1E90D8" : "#1E90D8";
     wxString   fgColor2  = wxGetApp().dark_mode() ? "#F0F0FF" : "#30373D";
     StateColor calc_btn_bg(std::pair<wxColour, int>(wxColour(bgColor /*0, 137, 123*/), StateColor::Pressed), 
@@ -961,9 +961,9 @@ wxBoxSizer *ObjColorPanel::create_add_btn_sizer(wxWindow *parent)
 wxBoxSizer *ObjColorPanel::create_reset_btn_sizer(wxWindow *parent)
 {
     auto       btn_sizer = new wxBoxSizer(wxHORIZONTAL);
-    wxString   bgColor   = wxGetApp().dark_mode() ? "#313131" : "#FFFFFF";
-    wxString   bgColor2  = wxGetApp().dark_mode() ? "#2B2B2B" : "#EFF0F6";
-    wxString   bgColor3  = wxGetApp().dark_mode() ? "#6C6E71" : "#D0D4DE";
+    wxString   bgColor   = wxGetApp().dark_mode() ? "#1F3543" : "#FFFFFF";
+    wxString   bgColor2  = wxGetApp().dark_mode() ? "#1B2F3B" : "#EFF0F6";
+    wxString   bgColor3  = wxGetApp().dark_mode() ? "#577486" : "#D0D4DE";
     wxString   fgColor   = wxGetApp().dark_mode() ? "#1E90D8" : "#1E90D8";
     wxString   fgColor2  = wxGetApp().dark_mode() ? "#F0F0FF" : "#30373D";
     StateColor calc_btn_bg(std::pair<wxColour, int>(wxColour(bgColor /*0, 137, 123*/), StateColor::Pressed), 
@@ -1162,7 +1162,7 @@ void ObjColorPanel::redraw_part_table() {
         for (size_t i = m_row_sizer_list.size(); i < m_cluster_colours.size(); i++) {
             int      id                       = i;
             wxPanel *row_panel = new wxPanel(m_scrolledWindow);
-            row_panel->SetBackgroundColour((i+1) % 2 == 0 ? *wxWHITE : wxColour(238, 238, 238));
+            row_panel->SetBackgroundColour((i+1) % 2 == 0 ? *wxWHITE : wxColour(235, 239, 241));
             auto row_sizer = new wxGridSizer(1, 2, 1, 3);
             row_panel->SetSizer(row_sizer);
 
@@ -1192,8 +1192,8 @@ void ObjColorPanel::draw_table()
     auto row                = std::max(m_cluster_colours.size(), m_colours.size()) + 1;
     m_gridsizer             = new wxGridSizer(row, 1, 1, 3); //(int rows, int cols, int vgap, int hgap );
 
-    wxString evenbgColor = wxGetApp().dark_mode() ? "#222222" : "#EFF0F6";
-    wxString oddbgColor = wxGetApp().dark_mode() ? "#2B2B2B" : "#F7F8FA";
+    wxString evenbgColor = wxGetApp().dark_mode() ? "#15252F" : "#EFF0F6";
+    wxString oddbgColor = wxGetApp().dark_mode() ? "#1B2F3B" : "#F7F8FA";
     m_color_cluster_icon_list.clear();
     float row_height ;
     for (size_t ii = 0; ii < row; ii++) {

@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include "wx/artprov.h"
 #include "wx/cmdline.h"
@@ -140,6 +141,22 @@ private:
     bool m_close_allowed = false;
     bool m_is_only_gcode_mode = false;
     bool m_send_was_canceled = false;
+
+public:
+    // Roost Print: open as an ordinary window (not modal) so the slicer stays usable while it
+    // uploads, several can be open at once (one per plate), and it can be minimised.
+    // on_closed runs just before the window destroys itself.
+    void set_modeless(std::function<void()> on_closed)
+    {
+        m_modeless  = true;
+        m_on_closed = std::move(on_closed);
+    }
+    bool is_modeless() const { return m_modeless; }
+
+private:
+    void finish_close(wxCloseEvent& event);
+    bool m_modeless = false;
+    std::function<void()> m_on_closed;
 };
 
 } // namespace GUI

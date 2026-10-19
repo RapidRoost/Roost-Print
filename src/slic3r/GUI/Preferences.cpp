@@ -482,7 +482,7 @@ wxBoxSizer *PreferencesDialog::create_item_input(wxString title, wxString title2
     input_title->Wrap(-1);
 
     auto       input = new ::TextInput(parent, wxEmptyString, wxEmptyString, wxEmptyString, wxDefaultPosition, DESIGN_INPUT_SIZE, wxTE_PROCESS_ENTER);
-    StateColor input_bg(std::pair<wxColour, int>(wxColour("#F0F0F1"), StateColor::Disabled), std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
+    StateColor input_bg(std::pair<wxColour, int>(wxColour("#EEF1F3"), StateColor::Disabled), std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
     input->SetBackgroundColor(input_bg);
     input->GetTextCtrl()->SetValue(app_config->get(param));
     wxTextValidator validator(wxFILTER_DIGITS);
@@ -528,7 +528,7 @@ wxBoxSizer *PreferencesDialog::create_item_backup_input(wxString title, wxWindow
     input_title->Wrap(-1);
 
     auto input = new ::TextInput(parent, wxEmptyString, wxEmptyString, wxEmptyString, wxDefaultPosition, DESIGN_INPUT_SIZE, wxTE_PROCESS_ENTER);
-    StateColor input_bg(std::pair<wxColour, int>(wxColour("#F0F0F1"), StateColor::Disabled), std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
+    StateColor input_bg(std::pair<wxColour, int>(wxColour("#EEF1F3"), StateColor::Disabled), std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
     input->SetBackgroundColor(input_bg);
     input->GetTextCtrl()->SetValue(app_config->get(param));
     wxTextValidator validator(wxFILTER_DIGITS);
@@ -790,7 +790,7 @@ wxBoxSizer *PreferencesDialog::create_item_checkbox(wxString title, wxWindow *pa
         wxPanel* panel = new wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
         //panel->SetBackgroundColour(DESIGN_GRAY400_COLOR); // 设置面板背景颜色
         bool     is_dark = Slic3r::GUI::wxGetApp().dark_mode();
-        wxColour color   = is_dark ? wxColor("#4b4b4d") : wxColour(255, 255, 255);
+        wxColour color   = is_dark ? wxColor("#365162") : wxColour(255, 255, 255);
         wxColour textColor = is_dark ? wxColor("#4287FF") : wxColour("#387DFF");
 
         wxString text = _L("(Content of the collected data)");
@@ -1032,13 +1032,13 @@ wxBoxSizer* PreferencesDialog::create_item_button(
 
     auto m_button_download = new Button(parent, title2);
 
-    StateColor abort_bg(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled), std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-                        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered), std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled),
+    StateColor abort_bg(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled), std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+                        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered), std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled),
                         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_button_download->SetBackgroundColor(abort_bg);
-    StateColor abort_bd(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+    StateColor abort_bd(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
     m_button_download->SetBorderColor(abort_bd);
-    StateColor abort_text(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+    StateColor abort_text(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
     m_button_download->SetTextColor(abort_text);
     m_button_download->SetFont(Label::Body_10);
     m_button_download->SetMinSize(wxSize(FromDIP(58), FromDIP(22)));
@@ -1067,7 +1067,7 @@ wxBoxSizer* PreferencesDialog ::create_item_downloads(wxWindow* parent)
     wxBoxSizer* hbox_sizer = new wxBoxSizer(wxHORIZONTAL);
     hbox_sizer->Add(0, 0, 0, wxEXPAND | wxLEFT, 23);
 #if CUSTOM_CXCLOUD
-    // StateColor download_input_bg(std::pair<wxColour, int>(wxColour("#F0F0F1"), StateColor::Disabled), std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
+    // StateColor download_input_bg(std::pair<wxColour, int>(wxColour("#EEF1F3"), StateColor::Disabled), std::pair<wxColour, int>(*wxWHITE, StateColor::Enabled));
     auto item_panel = new ::TextDisplay(parent, wxEmptyString, is_dark ? "open_dialog" : "open_dialog_light", wxDefaultPosition, DESIGN_COMMON_INPUT_SIZE, wxTE_PROCESS_ENTER);
 
     auto download_title = new wxStaticText(parent, wxID_ANY, _L("Downloads"), wxDefaultPosition, DESIGN_TITLE_SIZE, 0);
@@ -1104,7 +1104,7 @@ wxBoxSizer* PreferencesDialog ::create_item_downloads(wxWindow* parent)
     hbox_sizer->Add(item_panel, 0, wxALIGN_CENTER, 0);
 
 
-    wxColour bg_color = is_dark ? wxColour("#383636") : wxColour("#FFFFFF");
+    wxColour bg_color = is_dark ? wxColour("#243B4A") : wxColour("#FFFFFF");
     item_panel->SetLabel(download_path);
 
     // item_panel->SetTextColor(bg_color);
@@ -1551,8 +1551,9 @@ wxWindow* PreferencesDialog::create_general_page()
     sizer_page->AddSpacer(FromDIP(5));
 #endif
 
+    // Roost Print: the AI ("Easy") mode is removed, so no switch for it.
     sizer_page->Add(item_easymode, 0, wxTOP, FromDIP(3));
-    sizer_page->AddSpacer(FromDIP(5));
+    sizer_page->Hide(item_easymode, true);
 
     sizer_page->Add(item_zoom_to_mouse, 0, wxTOP, FromDIP(3));
     sizer_page->AddSpacer(FromDIP(5));
@@ -1703,7 +1704,7 @@ wxWindow* PreferencesDialog::create_debug_page()
     StateColor btn_bg_white(std::pair<wxColour, int>(AMS_CONTROL_DISABLE_COLOUR, StateColor::Disabled), std::pair<wxColour, int>(AMS_CONTROL_DISABLE_COLOUR, StateColor::Pressed),
         std::pair<wxColour, int>(AMS_CONTROL_DEF_BLOCK_BK_COLOUR, StateColor::Hovered),
         std::pair<wxColour, int>(AMS_CONTROL_WHITE_COLOUR, StateColor::Normal));
-    StateColor btn_bd_white(std::pair<wxColour, int>(AMS_CONTROL_WHITE_COLOUR, StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+    StateColor btn_bd_white(std::pair<wxColour, int>(AMS_CONTROL_WHITE_COLOUR, StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
 
     Button* debug_button = new Button(page, _L("debug save button"));
     debug_button->SetBackgroundColor(btn_bg_white);

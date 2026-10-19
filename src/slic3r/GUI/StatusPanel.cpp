@@ -40,30 +40,30 @@ static const int nozzle_temp_range[2] = {20, 300};
 static const int nozzle_chamber_range[2] = {20, 60};
 
 /* colors */
-static const wxColour STATUS_PANEL_BG     = wxColour(238, 238, 238);
+static const wxColour STATUS_PANEL_BG     = wxColour(235, 239, 241);
 static const wxColour STATUS_TITLE_BG     = wxColour(248, 248, 248);
-static const wxColour STATIC_BOX_LINE_COL = wxColour(238, 238, 238);
+static const wxColour STATIC_BOX_LINE_COL = wxColour(235, 239, 241);
 
-static const wxColour BUTTON_NORMAL1_COL = wxColour(238, 238, 238);
-static const wxColour BUTTON_NORMAL2_COL = wxColour(206, 206, 206);
-static const wxColour BUTTON_PRESS_COL   = wxColour(172, 172, 172);
+static const wxColour BUTTON_NORMAL1_COL = wxColour(235, 239, 241);
+static const wxColour BUTTON_NORMAL2_COL = wxColour(198, 208, 214);
+static const wxColour BUTTON_PRESS_COL   = wxColour(159, 175, 185);
 static const wxColour BUTTON_HOVER_COL   = wxColour(30, 144, 216);
 
-static const wxColour DISCONNECT_TEXT_COL = wxColour(171, 172, 172);
+static const wxColour DISCONNECT_TEXT_COL = wxColour(158, 174, 185);
 static const wxColour NORMAL_TEXT_COL     = wxColour(48,58,60);
-static const wxColour NORMAL_FAN_TEXT_COL = wxColour(107, 107, 107);
+static const wxColour NORMAL_FAN_TEXT_COL = wxColour(84, 112, 130);
 static const wxColour WARNING_INFO_BG_COL = wxColour(255, 111, 0);
 static const wxColour STAGE_TEXT_COL      = wxColour(30, 144, 216);
 
-static const wxColour GROUP_STATIC_LINE_COL = wxColour(206, 206, 206);
+static const wxColour GROUP_STATIC_LINE_COL = wxColour(198, 208, 214);
 
 /* font and foreground colors */
 static const wxFont PAGE_TITLE_FONT  = Label::Body_14;
 //static const wxFont GROUP_TITLE_FONT = Label::sysFont(17);
 
-static wxColour PAGE_TITLE_FONT_COL  = wxColour(107, 107, 107);
-static wxColour GROUP_TITLE_FONT_COL = wxColour(172, 172, 172);
-static wxColour TEXT_LIGHT_FONT_COL  = wxColour(107, 107, 107);
+static wxColour PAGE_TITLE_FONT_COL  = wxColour(84, 112, 130);
+static wxColour GROUP_TITLE_FONT_COL = wxColour(159, 175, 185);
+static wxColour TEXT_LIGHT_FONT_COL  = wxColour(84, 112, 130);
 
 static std::vector<std::string> message_containing_retry{
     "0701 8004",
@@ -198,9 +198,9 @@ void PrintingTaskPanel::create_panel(wxWindow* parent)
     #ifdef __WXOSX_MAC__
     m_staticText_subtask_value->SetFont(::Label::Body_13);
     #else
-    m_staticText_subtask_value->SetFont(wxFont(13, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("HarmonyOS Sans SC")));
+    m_staticText_subtask_value->SetFont(wxFont(13, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Manrope")));
     #endif
-    m_staticText_subtask_value->SetForegroundColour(wxColour(44, 44, 46));
+    m_staticText_subtask_value->SetForegroundColour(wxColour(28, 49, 62));
 
     m_bitmap_static_use_time = new wxStaticBitmap(task_name_panel, wxID_ANY, m_bitmap_use_time.bmp(), wxDefaultPosition, wxSize(FromDIP(16), FromDIP(16)));
 
@@ -245,7 +245,7 @@ void PrintingTaskPanel::create_panel(wxWindow* parent)
     #ifdef __WXOSX_MAC__
     m_printing_stage_value->SetFont(::Label::Body_11);
     #else
-    m_printing_stage_value->SetFont(wxFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("HarmonyOS Sans SC")));
+    m_printing_stage_value->SetFont(wxFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Manrope")));
     #endif
 
     m_printing_stage_value->SetForegroundColour(STAGE_TEXT_COL);
@@ -256,10 +256,10 @@ void PrintingTaskPanel::create_panel(wxWindow* parent)
 #ifdef __WXOSX_MAC__
     m_staticText_profile_value->SetFont(::Label::Body_11);
 #else
-    m_staticText_profile_value->SetFont(wxFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("HarmonyOS Sans SC")));
+    m_staticText_profile_value->SetFont(wxFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Manrope")));
 #endif
 
-    m_staticText_profile_value->SetForegroundColour(0x6B6B6B);
+    m_staticText_profile_value->SetForegroundColour(0x547082);
 
 
     auto m_panel_progress = new wxPanel(parent, wxID_ANY);
@@ -354,15 +354,15 @@ void PrintingTaskPanel::create_panel(wxWindow* parent)
 
     m_staticText_progress_left = new wxStaticText(penel_text, wxID_ANY, L("N/A"), wxDefaultPosition, wxDefaultSize, 0);
     m_staticText_progress_left->Wrap(-1);
-    m_staticText_progress_left->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("HarmonyOS Sans SC")));
-    m_staticText_progress_left->SetForegroundColour(wxColour(146, 146, 146));
+    m_staticText_progress_left->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Manrope")));
+    m_staticText_progress_left->SetForegroundColour(wxColour(127, 150, 165));
 
     // Orca: display the end time of the print
     m_staticText_progress_end = new wxStaticText(penel_text, wxID_ANY, L("N/A"), wxDefaultPosition, wxDefaultSize, 0);
     m_staticText_progress_end->Wrap(-1);
     m_staticText_progress_end->SetFont(
-        wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("HarmonyOS Sans SC")));
-    m_staticText_progress_end->SetForegroundColour(wxColour(146, 146, 146));
+        wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Manrope")));
+    m_staticText_progress_end->SetForegroundColour(wxColour(127, 150, 165));
 
     //fgSizer_task->Add(bSizer_buttons, 0, wxEXPAND, 0);
     //fgSizer_task->Add(0, 0, 0, wxEXPAND, FromDIP(5));
@@ -374,8 +374,8 @@ void PrintingTaskPanel::create_panel(wxWindow* parent)
     panel_button_block->SetBackgroundColour(*wxWHITE);
 
     m_staticText_layers = new wxStaticText(penel_text, wxID_ANY, _L("Layer: N/A"));
-    m_staticText_layers->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("HarmonyOS Sans SC")));
-    m_staticText_layers->SetForegroundColour(wxColour(146, 146, 146));
+    m_staticText_layers->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Manrope")));
+    m_staticText_layers->SetForegroundColour(wxColour(127, 150, 165));
     m_staticText_layers->Hide();
 
     //bSizer_text->Add(m_staticText_progress_percent, 0,  wxALL, 0);
@@ -415,7 +415,7 @@ void PrintingTaskPanel::create_panel(wxWindow* parent)
 
 
     m_staticline = new wxPanel( parent, wxID_ANY);
-    m_staticline->SetBackgroundColour(wxColour(238,238,238));
+    m_staticline->SetBackgroundColour(wxColour(235,239,241));
     m_staticline->Layout();
     m_staticline->Hide();
 
@@ -429,11 +429,11 @@ void PrintingTaskPanel::create_panel(wxWindow* parent)
     static_text_sizer->Add(m_error_text, 1, wxEXPAND | wxLEFT, FromDIP(17));
 
     m_button_clean = new Button(m_panel_error_txt, _L("Clear"));
-    StateColor clean_bg(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled), std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-                        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered), std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled),
+    StateColor clean_bg(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled), std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+                        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered), std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled),
                         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
-    StateColor clean_bd(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
-    StateColor clean_text(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+    StateColor clean_bd(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
+    StateColor clean_text(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
 
 
     m_button_clean->SetBackgroundColor(clean_bg);
@@ -457,7 +457,7 @@ void PrintingTaskPanel::create_panel(wxWindow* parent)
     sizer->Add(0, FromDIP(12), 0);
 
     m_score_staticline = new wxPanel(parent, wxID_ANY);
-    m_score_staticline->SetBackgroundColour(wxColour(238, 238, 238));
+    m_score_staticline->SetBackgroundColour(wxColour(235, 239, 241));
     m_score_staticline->Layout();
     m_score_staticline->Hide();
     sizer->Add(0, 0, 0, wxTOP, FromDIP(15));
@@ -1546,13 +1546,13 @@ wxBoxSizer *StatusBasePanel::create_extruder_control(wxWindow *parent)
 
     m_button_unload = new Button(panel, _L("Unload"));
 
-    StateColor abort_bg(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled), std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed),
-                        std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered), std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled),
+    StateColor abort_bg(std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Disabled), std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed),
+                        std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered), std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Enabled),
                         std::pair<wxColour, int>(wxColour(255, 255, 255), StateColor::Normal));
     m_button_unload->SetBackgroundColor(abort_bg);
-    StateColor abort_bd(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+    StateColor abort_bd(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
     m_button_unload->SetBorderColor(abort_bd);
-    StateColor abort_text(std::pair<wxColour, int>(wxColour(144, 144, 144), StateColor::Disabled), std::pair<wxColour, int>(wxColour(38, 46, 48), StateColor::Enabled));
+    StateColor abort_text(std::pair<wxColour, int>(wxColour(125, 148, 163), StateColor::Disabled), std::pair<wxColour, int>(wxColour(27, 47, 59), StateColor::Enabled));
     m_button_unload->SetTextColor(abort_text);
     m_button_unload->SetFont(Label::Body_10);
     m_button_unload->SetMinSize(wxSize(-1, FromDIP(24)));
@@ -3977,7 +3977,7 @@ void StatusPanel::on_switch_speed(wxCommandEvent &event)
 #else
     PopupWindow *popUp = new PopupWindow(m_switch_speed);
 #endif
-    popUp->SetBackgroundColour(StateColor::darkModeColorFor(0xeeeeee));
+    popUp->SetBackgroundColour(StateColor::darkModeColorFor(0xEBEFF1));
     StepCtrl *step = new StepCtrl(popUp, wxID_ANY);
     wxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
     sizer->Add(step, 1, wxEXPAND, 0);
@@ -4771,7 +4771,7 @@ void ScoreDialog::create_comment_text(const wxString& comment) {
     }
     m_comment_text->SetHint(_L("Rate this print"));
     m_comment_text->SetBackgroundColour(*wxWHITE);
-    //m_comment_text->SetForegroundColour(wxColor("#BBBBBB"));
+    //m_comment_text->SetForegroundColour(wxColor("#B0BDC6"));
     m_comment_text->SetMinSize(wxSize(FromDIP(492), FromDIP(104)));
 
     m_comment_text->Bind(wxEVT_SET_FOCUS, [this](auto &event) {
@@ -4791,13 +4791,13 @@ wxBoxSizer *ScoreDialog::get_photo_btn_sizer() {
     m_photo_sizer->Add(little_photo_img, 0, wxEXPAND | wxLEFT, FromDIP(24));
     m_add_photo = new Label(this, _L("Add Photo"));
     m_add_photo->SetBackgroundColour(*wxWHITE);
-    //m_add_photo->SetForegroundColour(wxColor("#898989"));
+    //m_add_photo->SetForegroundColour(wxColor("#738E9F"));
     m_add_photo->SetSize(wxSize(-1, FromDIP(20)));
     m_photo_sizer->Add(m_add_photo, 0, wxEXPAND | wxLEFT, FromDIP(12));
 
     m_delete_photo = new Label(this, _L("Delete Photo"));
     m_delete_photo->SetBackgroundColour(*wxWHITE);
-    //m_delete_photo->SetForegroundColour(wxColor("#898989"));
+    //m_delete_photo->SetForegroundColour(wxColor("#738E9F"));
     m_delete_photo->SetSize(wxSize(-1, FromDIP(20)));
     m_photo_sizer->Add(m_delete_photo, 0, wxEXPAND | wxLEFT, FromDIP(12));
     m_delete_photo->Hide();
@@ -5011,12 +5011,12 @@ wxBoxSizer *ScoreDialog::get_button_sizer()
         }
     });
 
-    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(206, 206, 206), StateColor::Pressed), std::pair<wxColour, int>(wxColour(238, 238, 238), StateColor::Hovered),
+    StateColor btn_bg_white(std::pair<wxColour, int>(wxColour(198, 208, 214), StateColor::Pressed), std::pair<wxColour, int>(wxColour(235, 239, 241), StateColor::Hovered),
                             std::pair<wxColour, int>(*wxWHITE, StateColor::Normal));
 
     m_button_cancel = new Button(this, _L("Cancel"));
     m_button_cancel->SetBackgroundColor(btn_bg_white);
-    m_button_cancel->SetBorderColor(wxColour(38, 46, 48));
+    m_button_cancel->SetBorderColor(wxColour(27, 47, 59));
     m_button_cancel->SetFont(Label::Body_12);
     m_button_cancel->SetSize(wxSize(FromDIP(58), FromDIP(24)));
     m_button_cancel->SetMinSize(wxSize(FromDIP(58), FromDIP(24)));

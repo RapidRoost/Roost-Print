@@ -1,6 +1,6 @@
 body
 {
-    background-color:#eeeeee;
+    background-color:#ebeff1;
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
@@ -14,5 +14,5 @@ body
     padding: 30px;
     border-radius: 10px;
     background-color: #ffffff;
-    box-shadow: 0 4px 6px rgba(39, 39, 39, 0.1);
+    box-shadow: 0 4px 6px rgba(24, 42, 54, 0.1);
 }

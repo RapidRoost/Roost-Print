@@ -23,7 +23,7 @@
 
 #RegionList
 {
-	border: 3px solid #C7C7C7;
+	border: 3px solid #BEC9D0;
 	width: 400px;
 	cursor: pointer;
 }
@@ -38,7 +38,7 @@
 
 .RegionItem:hover
 {
-	background-color: #ECECEC;
+	background-color: #E9EDEF;
 }
 
 
