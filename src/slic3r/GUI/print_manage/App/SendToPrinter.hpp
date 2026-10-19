@@ -1,5 +1,7 @@
 #include <cstdint>
 #include <functional>
+#include <map>
+#include <vector>
 #include <memory>
 #include "wx/artprov.h"
 #include "wx/cmdline.h"
@@ -43,7 +45,10 @@ public:
         Single = 1, // send single plate
         Multi = 2   // send multiple plates
     };
-    CxSentToPrinterDialog(Plater* plater = nullptr,SendType type = Single,std::string mapString="");
+    // roost_orders: Roost Print, the order number(s) each plate is for (plate index -> orders),
+    // put at the front of its file name so PrintCam can show the customer their print.
+    CxSentToPrinterDialog(Plater* plater = nullptr,SendType type = Single,std::string mapString="",
+                          std::map<int, std::vector<std::string>> roost_orders = {});
     ~CxSentToPrinterDialog();
 
     void load_url(const wxString& url, const wxString& apikey = "");
@@ -156,6 +161,7 @@ public:
 private:
     void finish_close(wxCloseEvent& event);
     bool m_modeless = false;
+    std::map<int, std::vector<std::string>> m_roost_orders;
     std::function<void()> m_on_closed;
 };
 

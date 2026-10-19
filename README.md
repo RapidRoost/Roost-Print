@@ -5,10 +5,11 @@ Rapid Roost's slicer for the shop's printers. It's [Creality Print](https://gith
 1. **The look.** Rapid Roost blue instead of Creality green, and blue-tinted navy and slate instead of flat greys (like rapidroost.net at night). The site's fonts: Manrope for text, Orbitron for big headings. The Rapid Roost printer-and-chicken icon, its own splash screen, the name Roost Print, and RAPID ROOST on the build plates instead of Creality's logo.
 2. **The printers.** On a fresh install, the shop's printers are set up straight away: Creality K2 Plus and Creality K1C, 0.4 mm nozzles. No first-run printer picker.
 3. **Polymaker filament.** Every Polymaker material has a profile for the K2 Plus and the K1C, and those are the ones shown. Creality's filaments are still installed, just hidden (tick them back on in the filament list).
-4. **PrintCam.** A PrintCam tab next to Device shows PrintCam's page. Roost Print starts PrintCam in the background when it opens, if PrintCam is installed on the computer. It never holds PrintCam's settings or keys: those stay in PrintCam's own folder.
+4. **PrintCam.** A PrintCam tab next to Device shows PrintCam's page. Roost Print keeps PrintCam running in the background, names every print it sends for its order (`RR1042_...`, asking when it can't tell) so customers always get their print, shows **PrintCam (2)** while customers wait for a yes/no on their email, and warns when something would stop a customer watching. It never holds PrintCam's settings or keys: those stay in PrintCam's own folder. See `tools/roost/PRINTCAM.md`.
 5. **Sending doesn't lock the app.** The send-to-printer window is an ordinary window: you can minimise it, keep slicing, and open another for the next plate while one uploads (up to 3 printers upload at once).
-6. **Removed.** AI Creation, Online Models, the AI/Pro mode switch (it's always the full slicer), the customer support button and the AI assistant bot.
-7. **No cloud profile packages.** Printer and filament profiles come with the app, so Creality's online packages can't replace them.
+6. **No Creality updates.** No update checks, no "Update Ready" window, no downloads or installs, no plugin or profile updates from Creality. Roost Print updates come from this repo.
+7. **Removed.** AI Creation, Online Models, the AI/Pro mode switch (it's always the full slicer), the customer support button and the AI assistant bot.
+8. **No cloud profile packages.** Printer and filament profiles come with the app, so Creality's online packages can't replace them.
 
 Roost Print keeps its settings in its own folder, so it can sit next to a normal Creality Print.
 
@@ -32,7 +33,8 @@ The changes live in a few small places, so Creality's updates can be merged in:
 | Fonts | `resources/fonts/` (Manrope, Orbitron); `Widgets/Label.cpp`, `ImGuiWrapper.cpp`, and `Widgets/WebView.cpp` for the app's web pages |
 | Polymaker profiles | `tools/roost/polymaker.py`, from `tools/roost/polymaker/`; turned on by `GUI_App::roost_apply_polymaker()` |
 | Printers on first run | `GUI_App::roost_install_fleet()` in `src/slic3r/GUI/GUI_App.cpp` |
-| PrintCam tab | `src/slic3r/GUI/RoostPrintCam.cpp`, wired in `MainFrame.cpp` and `BBLTopbar.cpp` |
+| PrintCam (tab, order names, watching) | `src/slic3r/GUI/RoostPrintCam.cpp`, wired in `MainFrame.cpp`, `BBLTopbar.cpp`, `Plater.cpp`, `SendToPrinter.cpp`; design in `tools/roost/PRINTCAM.md` |
+| Creality updates off | marked `Roost Print:` in `GUI_App.cpp` (checks, "Update Ready"), `AppUpdater.cpp` (download, install), `Utils/PresetUpdater.cpp` (background sync), `MainFrame.cpp` (Help menu) |
 | Send window | `print_manage/App/SendToPrinter.cpp` (`set_modeless`) and `Plater.cpp` |
 | Removed features | marked `Roost Print:` in `BBLTopbar.cpp`, `MainFrame.cpp`, `GUI_App.cpp`, `GLCanvas3D.cpp`, `simple/MCPChatPanel.cpp` |
 | Windows build | `.github/workflows/roost_build.yml` |

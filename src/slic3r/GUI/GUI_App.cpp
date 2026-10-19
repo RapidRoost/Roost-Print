@@ -605,6 +605,9 @@ static bool mark_legacy_multi_extruder_preset_name_migration_complete(const fs::
 // Use a minimal re-entrancy guard to prevent showing duplicate dialogs at the same time.
 static int show_update_ready_dialog_guarded(wxWindow* parent)
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    (void)parent; return wxID_CANCEL;
+
     if (g_update_ready_dialog_showing)
         return wxID_CANCEL;
     g_update_ready_dialog_showing = true;
@@ -706,6 +709,9 @@ static void clear_pending_app_update(AppConfig* /*cfg*/)
 // or empty string otherwise.
 static std::string get_pending_app_update_version()
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    return "";
+
     bool attempted = false;
     std::string ver = read_update_state(&attempted);
     if (ver.empty() || attempted)
@@ -9614,6 +9620,9 @@ void GUI_App::process_msg_loop()
 
 void GUI_App::check_update(bool show_tips, int by_user)
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    (void)show_tips; (void)by_user; return;
+
 #if defined(CREALITYPRINT_APP_STORE) && defined(__WXOSX__)
     (void)show_tips;
     (void)by_user;
@@ -9645,6 +9654,9 @@ void GUI_App::check_update(bool show_tips, int by_user)
 
 void GUI_App::check_new_version_local(bool show_tips, int by_user)
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    (void)show_tips; (void)by_user; return;
+
 #ifdef __WXMSW__
     // 从配置文件读取updater_server_ip，如果没有配置则使用localhost:9000
     std::string updater_server_ip = app_config->get("updater_server_ip");
@@ -9840,6 +9852,9 @@ void GUI_App::trigger_deferred_restore_project()
 
 void GUI_App::check_new_version(bool show_tips, int by_user)
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    (void)show_tips; (void)by_user; return;
+
 #if defined(CREALITYPRINT_APP_STORE) && defined(__WXOSX__)
     (void)show_tips;
     (void)by_user;
@@ -9919,6 +9934,9 @@ Semver get_version(const std::string& str, const std::regex& regexp) {
 }
 void GUI_App::check_new_version_cx(bool show_tips, int by_user)
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    (void)show_tips; (void)by_user; return;
+
 #if defined(CREALITYPRINT_APP_STORE) && defined(__WXOSX__)
     (void)show_tips;
     (void)by_user;
@@ -10032,6 +10050,9 @@ void GUI_App::check_new_version_cx(bool show_tips, int by_user)
 
 void GUI_App::check_new_version_cx_updated(bool show_tips, int by_user)
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    (void)show_tips; (void)by_user; return;
+
     const bool automatic_startup_check = !show_tips && by_user == 0;
 
     // Convert version to 3-part format for compatibility
@@ -10439,6 +10460,9 @@ void GUI_App::process_update_packages(const std::vector<PackageInfo>& updater_pa
 }
 void GUI_App::check_new_version_sf(bool show_tips, int by_user)
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    (void)show_tips; (void)by_user; return;
+
 #if defined(CREALITYPRINT_APP_STORE) && defined(__WXOSX__)
     (void)show_tips;
     (void)by_user;

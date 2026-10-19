@@ -82,6 +82,8 @@ public:
 
     void ShowCalibrationButton(bool show = true);
     void SetSelection(size_t index);
+    // Roost Print: change a tab's label (e.g. "PrintCam (2)").
+    void SetTabText(size_t index, const wxString& text);
 
     void update_mode(int mode);
 

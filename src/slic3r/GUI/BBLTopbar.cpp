@@ -98,6 +98,8 @@ public:
     void RefreshColor();
     void reLayout(bool compact = false);
     void SetDevMode(bool dev_mode);
+    // Roost Print: change a tab's label (e.g. "PrintCam (2)").
+    void SetPageText(int index, const wxString& text);
     bool IsDevMode() const { return m_dev_mode; }
 private:
     void ApplyButtonStyle(int index, bool selected);
@@ -451,7 +453,7 @@ bool ButtonsCtrl::InsertPage(
     bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
     wxColour   hover_bg = is_dark ? wxColour(79, 159, 210) : wxColour(71, 151, 202);
     StateColor bg_color = StateColor(std::pair{hover_bg, (int) StateColor::Hovered},
-                                     std::pair{is_dark ? wxColour("1, 1, 1") : wxColour(211, 218, 223), (int) StateColor::Normal});
+                                     std::pair{is_dark ? wxColour(7, 12, 18) : wxColour(211, 218, 223), (int) StateColor::Normal});
 
     btn->SetBackgroundColor(bg_color);
     btn->SetTextColor(DefaultTextColor(false));
@@ -1472,6 +1474,26 @@ void BBLTopbar::ShowCalibrationButton(bool show)
     if (!show && nullptr != m_calib_item)
         m_calib_item->GetSizerItem()->SetDimension({-1000, 0}, {0, 0});
     Refresh();
+}
+
+void ButtonsCtrl::SetPageText(int index, const wxString& text)
+{
+    auto it = m_mapPageButtons.find(index);
+    if (it == m_mapPageButtons.end() || it->second == nullptr)
+        return;
+    const wxString label = text.empty() ? text : " " + text;
+    if (it->second->GetLabel() == label)
+        return;
+    it->second->SetLabel(label);
+    reLayout();
+    if (GetParent())
+        GetParent()->Layout();
+}
+
+void BBLTopbar::SetTabText(size_t index, const wxString& text)
+{
+    if (auto* tabs = dynamic_cast<ButtonsCtrl*>(m_tabCtrol))
+        tabs->SetPageText(int(index), text);
 }
 
 void BBLTopbar::SetSelection(size_t index)

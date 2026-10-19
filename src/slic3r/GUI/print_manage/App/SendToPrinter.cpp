@@ -1,4 +1,5 @@
 #include "SendToPrinter.hpp"
+#include "slic3r/GUI/RoostPrintCam.hpp"
 
 #include "slic3r/GUI/I18N.hpp"
 #include "slic3r/GUI/wxExtensions.hpp"
@@ -117,7 +118,8 @@ nlohmann::json gcode_file_size_bytes(const std::string& file_path)
 
 
 CxSentToPrinterDialog::CxSentToPrinterDialog(Plater *plater,
-                                             SendType sendtype,std::string mapString)
+                                             SendType sendtype,std::string mapString,
+                                             std::map<int, std::vector<std::string>> roost_orders)
     // Roost Print: no owner window on Windows, so it gets its own taskbar button and minimises
     // like any other window instead of sitting on top of the slicer.
 #ifdef __WINDOWS__
@@ -140,6 +142,7 @@ CxSentToPrinterDialog::CxSentToPrinterDialog(Plater *plater,
                 ), m_sendtype(sendtype),m_mapString(mapString)
     , m_plater(plater)
 {
+    m_roost_orders = std::move(roost_orders);
     m_ui_gate = std::make_shared<SendToPrinterUiGate>();
     m_ui_gate->dialog = this;
 
@@ -516,6 +519,15 @@ run_script(strJS.ToStdString());
 
     RegisterHandler("get_threeMF", [this](const nlohmann::json& json_data) {
         wxString project_name = Slic3r::GUI::wxGetApp().plater()->get_project_name();
+        // Roost Print: the project file goes up with the order number(s) in front too.
+        {
+            std::vector<std::string> orders;
+            for (const auto& [plate, plate_orders] : m_roost_orders)
+                for (const auto& o : plate_orders)
+                    if (std::find(orders.begin(), orders.end(), o) == orders.end())
+                        orders.push_back(o);
+            project_name = wxString::FromUTF8(RoostPrintCam::order_file_name(std::string(project_name.ToUTF8().data()), orders));
+        }
 
         boost::property_tree::wptree req;
         req.put(L"command", L"get_threeMF");
@@ -1966,6 +1978,19 @@ std::string CxSentToPrinterDialog::get_plate_data_on_show()
                 } else {
                     default_gcode_name = "plate" + std::to_string(i + 1);
                 }
+                // Roost Print: start the name with the plate's order number(s) (asked for when
+                // sending, or already in the object names), so PrintCam knows whose print it is.
+                std::vector<std::string> orders;
+                auto asked = m_roost_orders.find(plate->get_index());
+                if (asked != m_roost_orders.end())
+                    orders = asked->second;
+                else
+                    for (const ModelObject* obj : plate_objects)
+                        if (obj != nullptr)
+                            for (const auto& o : RoostPrintCam::orders_in_name(obj->name))
+                                if (std::find(orders.begin(), orders.end(), o) == orders.end())
+                                    orders.push_back(o);
+                default_gcode_name = RoostPrintCam::order_file_name(default_gcode_name, orders);
             }
 
             nlohmann::json json_data;

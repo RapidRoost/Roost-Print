@@ -311,6 +311,9 @@ void AppUpdater::cleanup_partial_downloads(const std::string& version_for_path)
 
 void AppUpdater::start_download(const std::vector<PackageInfo>& packages, const std::string& version, const std::string& base_package_name, const std::string& manual_url)
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    (void)packages; (void)version; (void)base_package_name; (void)manual_url; return;
+
     if (m_downloading) {
         BOOST_LOG_TRIVIAL(warning) << "AppUpdater: Download already in progress.";
         return;
@@ -329,6 +332,9 @@ void AppUpdater::start_download(const std::vector<PackageInfo>& packages, const 
 
 void AppUpdater::start_download(const std::string& url, const std::string& version)
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    (void)url; (void)version; return;
+
     if (m_downloading) {
         BOOST_LOG_TRIVIAL(warning) << "AppUpdater: Download already in progress.";
         return;
@@ -356,6 +362,9 @@ void AppUpdater::start_download(const std::string& url, const std::string& versi
 
 bool AppUpdater::prepare_cached_hot_update(const std::vector<PackageInfo>& packages, const std::string& version, const std::string& base_package_name, const std::string& manual_url)
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    (void)packages; (void)version; (void)base_package_name; (void)manual_url; return false;
+
     if (m_downloading)
         return false;
     if (packages.empty() || version.empty())
@@ -418,6 +427,9 @@ bool AppUpdater::prepare_cached_installer(const std::string& url, const std::str
 
 bool AppUpdater::prepare_cached_hot_update_from_version(const std::string& version, const std::string& manual_url)
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    (void)version; (void)manual_url; return false;
+
     if (m_downloading)
         return false;
     if (version.empty())
@@ -696,6 +708,9 @@ void AppUpdater::download_packages()
 
 void AppUpdater::install_update()
 {
+    // Roost Print: Creality app updates are removed (they would replace Roost Print).
+    return;
+
     // Execute the installer or updater
 #ifdef _WIN32
     if (m_is_hot_update) {

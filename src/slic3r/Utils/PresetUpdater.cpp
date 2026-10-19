@@ -1419,17 +1419,9 @@ void PresetUpdater::sync(std::string http_url, std::string language, std::string
         std::string res = GUI::wxGetApp().app_config->get("is_first_install");
         if(res!="1")
             return;
-		this->p->sync_version();
-		if (p->cancel)
-			return;
+		// Roost Print: no app version check and no Creality profile/parameter updates; the
+		// printer and filament profiles come with Roost Print itself.
         if (!vendors.empty()) {
-            Slic3r::GUI::UpdateParams::getInstance().checkParamsNeedUpdate();
-		    //this->p->sync_config();
-		    //if (p->cancel)
-			//    return;
-            GUI::wxGetApp().CallAfter([] {
-                GUI::wxGetApp().check_config_updates_from_updater();
-            });
             if (GUI::wxGetApp().is_login()) {
                 Slic3r::GUI::CommunicateWithCXCloud           commWithCXCloud;
                 std::vector<Slic3r::GUI::UserProfileListItem> vtUserProfileListItem;
@@ -1453,7 +1445,8 @@ void PresetUpdater::sync(std::string http_url, std::string language, std::string
         }
 		if (p->cancel)
 			return;
-        this->p->sync_plugins(http_url, plugin_version);
+        // Roost Print: no plugin downloads either.
+        (void)http_url; (void)plugin_version;
         //this->p->sync_printer_config(http_url);
 		//if (p->cancel)
 		//	return;

@@ -158,6 +158,11 @@ enum class NotificationType
 	SupportManualHint,
     // Filament vendor tip
     FilamentVendorTip,
+    // Roost Print: PrintCam needs a yes/no before emailing a customer whose print started.
+    RoostPrintCamAsk,
+    // Roost Print: something stops customers watching their print (PrintCam off, website not
+    // connected, a print with no order number, an order number the website doesn't know).
+    RoostPrintCamWarning,
 };
 
 class NotificationManager

@@ -1233,6 +1233,7 @@ void MainFrame::shutdown()
     // remember an embedded parent owned by Plater, which must not be accessed
     // once wxWidgets starts destroying the main frame's children.
     DestroyAIChatPanelsForGUIRecreate();
+    RoostPrintCam::stop_watching();
 
     // Roost Print: send windows are separate top-level windows now; close them while the
     // plater they read from still exists (deleting runs their clean-up right away).
@@ -1587,7 +1588,8 @@ void MainFrame::init_tabpanel() {
     m_tabpanel->AddPage(m_printcam_view, _L("PrintCam"), std::string("tab_monitor_active"), std::string("tab_monitor_active"), false);
     m_printcam_view->Hide();
     // And start PrintCam in the background now (if it's on this computer), so the cameras run while you slice.
-    CallAfter([] { RoostPrintCam::ensure_started(); });
+    // (The watcher starts it, keeps it running, and flags anything that stops customers watching.)
+    CallAfter([] { RoostPrintCam::start_watching(); });
     if(m_plater) {
         m_plater->create_send_to_printer_dlg();  // BBS : pre create the send dialog on program startup
     }
@@ -2918,7 +2920,8 @@ static wxMenu* generate_help_menu(MainFrame* mainframe)
     //        //TODO
     //    });
 #if !defined(CUSTOMIZED) || defined(CUSTOM_CHECKUPDATE_ENABLED)
-    // Check New Version
+    // Roost Print: no "Check for Update" (Creality's updates would replace Roost Print).
+    if (false)
     append_menu_item(helpMenu, wxID_ANY, _L("Check for Update"), _L("Check for Update"),
         [](wxCommandEvent&) {
 

@@ -3,6 +3,7 @@
 #include "print_manage/PrinterBoxFilamentPanel.hpp"
 #include "slic3r/GUI/print_manage/Upload3mfToCloud.hpp"
 #include "slic3r/GUI/print_manage/App/SendToPrinter.hpp"
+#include "slic3r/GUI/RoostPrintCam.hpp"
 #include "libslic3r/Config.hpp"
 #include "libslic3r/Color.hpp"
 #include "libslic3r_version.h"
@@ -14434,8 +14435,13 @@ void Plater::priv::on_action_send_to_multi_machine(SimpleEvent&)
 
     wxGetApp().mainframe->get_printer_mgr_view()->request_close_detail_page();
 
+    // Roost Print: which order is this for? (So PrintCam can show the customer their print.)
+    std::vector<std::string> roost_orders;
+    const int roost_plate = partplate_list.get_curr_plate_index();
+    if (!RoostPrintCam::orders_for_plate(this->q, roost_plate, roost_orders))
+        return;
     // Roost Print: an ordinary window, so the slicer stays usable while it works.
-    auto* dlg = new CxSentToPrinterDialog(this->q, CxSentToPrinterDialog::SendType::Multi);
+    auto* dlg = new CxSentToPrinterDialog(this->q, CxSentToPrinterDialog::SendType::Multi, "", {{roost_plate, roost_orders}});
     dlg->set_modeless([this]() {
         if (wxGetApp().preset_bundle && wxGetApp().preset_bundle->machine_is_belt())
             restore_belt_transformation();
@@ -14649,8 +14655,13 @@ bool Plater::priv::on_action_send_to_local_net_printer(bool isall, bool skip_saf
 
     // Roost Print: an ordinary window instead of a modal one. The slicer stays usable while it
     // uploads, it can be minimised, and you can open another for the next plate meanwhile.
+    // Roost Print: which order is this for? (So PrintCam can show the customer their print.)
+    std::vector<std::string> roost_orders;
+    const int roost_plate = partplate_list.get_curr_plate_index();
+    if (!RoostPrintCam::orders_for_plate(this->q, roost_plate, roost_orders))
+        return false;
     auto* dlg = new CxSentToPrinterDialog(this->q, CxSentToPrinterDialog::SendType::Single,
-                                          sidebar->get_filament_map_string().ToStdString());
+                                          sidebar->get_filament_map_string().ToStdString(), {{roost_plate, roost_orders}});
     dlg->set_modeless([this]() {
         if (wxGetApp().preset_bundle && wxGetApp().preset_bundle->machine_is_belt())
             restore_belt_transformation();
