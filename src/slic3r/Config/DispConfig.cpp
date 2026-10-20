@@ -503,7 +503,7 @@ ImU32 DispConfig::getColorImU32(ColorType ct) {
         ret = IM_COL32(105, 134, 153, 255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_btnBg:
-        ret = s_isDark ? IM_COL32(68, 96, 114,255) : IM_COL32(255, 255, 255,255);
+        ret = s_isDark ? IM_COL32(0x22, 0x36, 0x4B, 255) : IM_COL32(255, 255, 255,255); // Roost: night chip / white
         break;
     case Slic3r::GUI::DispConfig::e_ct_inter:
         ret = s_isDark ? IM_COL32(42, 68, 84, 255) : IM_COL32(233,237,239, 255);
@@ -512,13 +512,13 @@ ImU32 DispConfig::getColorImU32(ColorType ct) {
         ret = IM_COL32(78, 106, 124, 255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_btnBgSelWhite:
-        ret = s_isDark ? IM_COL32(89, 118, 136, 255) : IM_COL32(242, 244, 245,255);
+        ret = s_isDark ? IM_COL32(0x4A, 0x60, 0x76, 255) : IM_COL32(0xEE, 0xF1, 0xF4, 255); // Roost: night field / chip
         break;
     case Slic3r::GUI::DispConfig::e_ct_btnBgSel:
-        ret = IM_COL32(30, 144, 216, 255);
+        ret = IM_COL32(0x12, 0x68, 0xA8, 255); // Roost: blue-ink (primary fill)
         break;
     case Slic3r::GUI::DispConfig::e_ct_text:
-        ret = s_isDark ? IM_COL32(255, 255, 255, 255) : IM_COL32(32, 55, 70,255);
+        ret = s_isDark ? IM_COL32(0xDF, 0xE8, 0xF1, 255) : IM_COL32(0x1F, 0x2A, 0x36, 255); // Roost: night outline / text
         break;
     case Slic3r::GUI::DispConfig::e_ct_slider:
         ret = s_isDark ? IM_COL32(53, 81, 98,255) : IM_COL32(199, 208, 214,255);

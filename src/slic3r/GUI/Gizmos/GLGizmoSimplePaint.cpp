@@ -2,6 +2,7 @@
 
 #include "slic3r/GUI/GLCanvas3D.hpp"
 #include "slic3r/GUI/GUI_App.hpp"
+#include "slic3r/GUI/RoostImGuiBrand.hpp"
 #include "slic3r/GUI/ImGuiWrapper.hpp"
 #include "slic3r/GUI/Camera.hpp"
 #include "slic3r/GUI/Plater.hpp"
@@ -546,16 +547,16 @@ void GLGizmoSimplePaint::on_render_input_window(float x, float y, float bottom_l
         bool is_selected = (m_current_tool == tool_ids[i]);
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
         ImGui::PushStyleColor(ImGuiCol_Button, m_is_dark_mode ? ImVec4(0.220f, 0.329f, 0.400f, 1.f) : ImVec4(0.941f, 0.949f, 0.957f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiWrapper::COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiWrapper::COL_CREALITY);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, RoostImGui::wash()); // Roost: hover = blue wash
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, RoostImGui::yolk());  // Roost: press = yolk
         if (is_selected)
-            ImGui::PushStyleColor(ImGuiCol_Button, ImGuiWrapper::COL_CREALITY);
+            RoostImGui::push_selected_button_colors(); // Roost: selected tool = yolk, ink icon
 
         float view_scale = wxGetApp().plater()->get_current_canvas3D()->get_scale();
         ImVec2 tool_btn_size(34.f * view_scale, 34.f * view_scale);
         bool btn_clicked = ImGui::Button(into_u8(btn_name).c_str(), tool_btn_size);
 
-        ImGui::PopStyleColor(is_selected ? 5 : 4);
+        ImGui::PopStyleColor(is_selected ? 4 + RoostImGui::kSelectedButtonColorCount : 4);
         ImGui::PopStyleVar(2);
 
         // Label under icon, centered

@@ -96,6 +96,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
 #include <imgui/imgui_internal.h>
+#include "RoostImGuiBrand.hpp"
 
 #include <imguizmo/ImGuizmo.h>
 #include "libslic3r/common_header/common_header.h"
@@ -400,8 +401,8 @@ void GLCanvas3D::LayersEditing::render_variable_layer_height_dialog(const GLCanv
         if (btn_func == nullptr)
             return;
 
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiWrapper::COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiWrapper::COL_CREALITY);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, RoostImGui::primary()); // Roost: blue-ink (white text on hover)
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, RoostImGui::primary());
         ImGui::PushStyleColor(ImGuiCol_Button, dark ? normal_color : ImGui::GetStyleColorVec4(ImGuiCol_WindowBg));
         ImGui::PushStyleColor(ImGuiCol_Border,
                               dark ? ImGui::GetStyleColorVec4(ImGuiCol_Border) : ImVec4(211 / 255.0f, 218 / 255.0f, 223 / 255.0f, 1.0f));
@@ -10639,19 +10640,35 @@ void GLCanvas3D::_render_slice_control() const
             bool   main_active  = (ImGui::IsItemActive() ||
                                    (main_click_pending && ImGui::IsMouseDown(ImGuiMouseButton_Left))) &&
                                   en != 1;
-            ImVec4 main_bg      = en == 2 ? config.getColor(bigcfg.fg) : config.getColor(bigcfg.bg);
-            ImVec4 main_hv      = ImVec4(68.f / 255.f, 205.f / 255.f, 122.f / 255.f, 1.0f);
-            ImVec4 main_ac      = config.getColor(bigcfg.fg);
-            ImVec4 main_col     = main_active ? main_ac : (main_hovered ? main_hv : main_bg);
-            float  main_round   = 4.0f * scale;
-            auto*  dl           = ImGui::GetWindowDrawList();
-            dl->AddRectFilled(main_pos, ImVec2(main_pos.x + main_size.x, main_pos.y + main_size.y), ImGui::GetColorU32(main_col),
-                              main_round, ImDrawFlags_RoundCornersLeft);
+            // Roost: "Slice plate | ^" is drawn as one rapidroost.net sticker pill: blue-ink fill, white bold
+            // text, 2px ink outline and a hard ink shadow. Hover lifts the pill, press sinks it. The hit
+            // areas stay exactly where they were (the resting face rects).
+            const bool   slice_enabled = en == 2;
+            const ImVec2 slice_pair_min = main_pos;
+            const ImVec2 slice_pair_max = ImVec2(main_pos.x + main_size.x + smallcfg.size.x, main_pos.y + main_size.y);
+            const bool   slice_pair_hovered = slice_enabled &&
+                                            main_mouse_pos.x >= slice_pair_min.x && main_mouse_pos.x < slice_pair_max.x &&
+                                            main_mouse_pos.y >= slice_pair_min.y && main_mouse_pos.y < slice_pair_max.y;
+            const bool   slice_pair_held = main_active || (slice_pair_hovered && ImGui::IsMouseDown(ImGuiMouseButton_Left));
+            const float  slice_shift = slice_enabled ? RoostImGui::sticker_face_shift(slice_pair_hovered, slice_pair_held, scale) : 0.0f;
+            const float  slice_round = main_size.y * 0.5f;
+            const RoostImGui::StickerColors slice_cols = RoostImGui::sticker_colors(RoostImGui::StickerKind::Primary, slice_enabled);
+            const ImU32  slice_seg_hover = RoostImGui::to_u32(RoostBrand::kBlueDeep); // hovered half of the split pill
+            auto*        dl = ImGui::GetWindowDrawList();
+            if (slice_enabled)
+                RoostImGui::draw_shadow(dl, ImVec2(slice_pair_min.x + slice_shift, slice_pair_min.y + slice_shift),
+                                        ImVec2(slice_pair_max.x + slice_shift, slice_pair_max.y + slice_shift), slice_cols.shadow,
+                                        slice_round, RoostImGui::sticker_shadow(slice_pair_hovered, slice_pair_held, scale));
+            const ImVec2 slice_main_face_min(main_pos.x + slice_shift, main_pos.y + slice_shift);
+            const ImVec2 slice_main_face_max(slice_main_face_min.x + main_size.x, slice_main_face_min.y + main_size.y);
+            RoostImGui::draw_fill(dl, slice_main_face_min, slice_main_face_max, (slice_enabled && main_hovered) ? slice_seg_hover : slice_cols.fill,
+                                  slice_round, ImDrawFlags_RoundCornersLeft);
 
             const char* main_label = s_slice_string[s_sst].c_str();
             ImVec2      text_sz    = ImGui::CalcTextSize(main_label);
-            ImVec2      text_pos   = ImVec2(main_pos.x + (main_size.x - text_sz.x) * 0.5f, main_pos.y + (main_size.y - text_sz.y) * 0.5f);
-            ImU32       text_col   = (en == 2) ? IM_COL32(255, 255, 255, 255) : ImGui::GetColorU32(config.getColor(DispConfig::e_ct_text));
+            ImVec2      text_pos   = ImVec2(slice_main_face_min.x + (main_size.x - text_sz.x) * 0.5f,
+                                            slice_main_face_min.y + (main_size.y - text_sz.y) * 0.5f);
+            ImU32       text_col   = slice_cols.text;
             dl->AddText(text_pos, text_col, main_label);
             ImVec2 slicePlateSize = ImGui::GetItemRectSize();
 #ifdef __APPLE__
@@ -10677,34 +10694,34 @@ void GLCanvas3D::_render_slice_control() const
             ImGui::InvisibleButton("slice_drop_custom", drop_size);
             bool   drop_hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup);
             bool   drop_active  = ImGui::IsItemActive();
-            ImVec4 sm_bg        = (en == 2 ? config.getColor(bigcfg.fg) : config.getColor(bigcfg.bg));
-            ImVec4 sm_hv        = ImVec4(68.f / 255.f, 205.f / 255.f, 122.f / 255.f, 1.0f);
-            ImVec4 sm_ac        = config.getColor(smallcfg.fg);
-            ImVec4 drop_col     = drop_active ? sm_ac : (drop_hovered ? sm_hv : sm_bg);
-            float  drop_round   = 4.0f * scale;
+            // Roost: right half of the slice sticker pill (see above).
+            (void) drop_active;
+            const ImVec2 slice_drop_face_min(drop_pos.x + slice_shift, drop_pos.y + slice_shift);
+            const ImVec2 slice_drop_face_max(slice_drop_face_min.x + drop_size.x, slice_drop_face_min.y + drop_size.y);
+            const ImU32  slice_drop_fill = drop_hovered ? (slice_enabled ? slice_seg_hover : RoostImGui::u32(RoostImGui::wash())) :
+                                                          slice_cols.fill;
             auto*  dl2          = ImGui::GetWindowDrawList();
-            dl2->AddRectFilled(drop_pos, ImVec2(drop_pos.x + drop_size.x, drop_pos.y + drop_size.y), ImGui::GetColorU32(drop_col),
-                               drop_round, ImDrawFlags_RoundCornersRight);
+            RoostImGui::draw_fill(dl2, slice_drop_face_min, slice_drop_face_max, slice_drop_fill, slice_round, ImDrawFlags_RoundCornersRight);
             // draw chevron-style caret (up) with stroke instead of text
             {
                 float  w      = 10.0f * scale; // overall width of chevron
                 float  h      = 6.0f * scale;  // overall height of chevron
                 float  thick  = 2.0f * scale;
-                ImVec2 center = ImVec2(drop_pos.x + drop_size.x * 0.5f, drop_pos.y + drop_size.y * 0.5f + 0.5f * scale);
+                ImVec2 center = ImVec2(slice_drop_face_min.x + drop_size.x * 0.5f, slice_drop_face_min.y + drop_size.y * 0.5f + 0.5f * scale);
                 ImVec2 left   = ImVec2(center.x - w * 0.5f, center.y + h * 0.5f);
                 ImVec2 peak   = ImVec2(center.x, center.y - h * 0.5f);
                 ImVec2 right  = ImVec2(center.x + w * 0.5f, center.y + h * 0.5f);
-                // caret color adapts to background brightness/theme
-                // - Dark mode or enabled/hovered -> white; light idle -> dark gray
-                bool  dark_mode = wxGetApp().dark_mode();
-                bool  bright_bg = (en == 2) || drop_hovered; // green or hover
-                ImU32 caret_col = (dark_mode || bright_bg) ? IM_COL32(255, 255, 255, 255) : IM_COL32(0x58, 0x63, 0x70, 255);
+                // caret: white on the blue-ink pill; theme text on the disabled/washed pill
+                ImU32 caret_col = slice_enabled ? slice_cols.text :
+                                                  (drop_hovered ? RoostImGui::u32(RoostImGui::text()) : slice_cols.text);
                 dl2->AddLine(left, peak, caret_col, thick);
                 dl2->AddLine(peak, right, caret_col, thick);
             }
-            // vertical separator between main and dropdown buttons
-            ImU32 sep_col = IM_COL32(0xE1, 0xE4, 0xE9, 255);
-            dl2->AddLine(ImVec2(drop_pos.x, drop_pos.y + 1.0f), ImVec2(drop_pos.x, drop_pos.y + drop_size.y - 1.0f), sep_col, 1.0f);
+            // ink divider between the two halves, then the pill's 2px outline over both
+            dl2->AddLine(ImVec2(slice_drop_face_min.x, slice_drop_face_min.y + 1.0f),
+                         ImVec2(slice_drop_face_min.x, slice_drop_face_max.y - 1.0f), slice_cols.outline, RoostImGui::kOutline * scale);
+            RoostImGui::draw_outline(dl2, slice_main_face_min, slice_drop_face_max, slice_cols.outline, slice_round,
+                                     RoostImGui::kOutline * scale);
             ImVec2 drop_min_slice = drop_pos;
             if (ImGui::IsItemClicked() || (drop_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)))
                 ImGui::OpenPopup("^##id0");
@@ -10820,19 +10837,19 @@ void GLCanvas3D::_render_slice_control() const
                 }
                 const bool mapping_mode_popup_rect_hovered_now =
                     mapping_mode_popup_rect_valid && is_point_in_rect(mouse_pos, mapping_mode_popup_pos, mapping_mode_popup_size);
-                const ImVec4 popup_bg = wxGetApp().dark_mode() ? ImVec4(0x53 / 255.f, 0x58 / 255.f, 0x5F / 255.f, 1.0f) :
-                                                                 ImVec4(0x4E / 255.f, 0x59 / 255.f, 0x69 / 255.f, 1.0f);
-                const ImVec4 item_active = config.getColor(bigcfg.fg);
+                // Roost: night-surface card; the chosen mode is yolk, hover is the night wash.
+                const ImVec4 popup_bg = RoostImGui::to_vec4(RoostBrand::kNightSurface);
+                const ImVec4 item_active = RoostImGui::yolk();
                 const ImVec4 title_text = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
                 ImVec4 detail_text = title_text;
                 detail_text.w = 0.88f;
-                const ImVec4 option_hover = ImVec4(1.0f, 1.0f, 1.0f, 0.10f);
+                const ImVec4 option_hover = RoostImGui::to_vec4(RoostBrand::kNightWash);
                 const ImVec4 radio_border = ImVec4(1.0f, 1.0f, 1.0f, 0.65f);
 
                 ImGui::PushStyleColor(ImGuiCol_PopupBg, popup_bg);
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-                ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 4.0f * scale);
+                ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, RoostImGui::kRadiusCard * scale);
                 ImGui::SetNextWindowSize(popup_size);
                 ImGui::SetNextWindowPos(popup_pos, ImGuiCond_Always);
 
@@ -10871,7 +10888,7 @@ void GLCanvas3D::_render_slice_control() const
                             const bool option_selected = option.mode == selected_mode;
                             if (option_hovered) {
                                 popup_draw_list->AddRectFilled(option_pos, ImVec2(option_pos.x + option_size.x, option_pos.y + option_size.y),
-                                                               ImGui::GetColorU32(option_hover), 4.0f * scale);
+                                                               ImGui::GetColorU32(option_hover), RoostImGui::kRadiusField * scale);
                             }
 
                             const ImVec2 radio_center(option_pos.x + radio_control_size * 0.5f,
@@ -10930,19 +10947,18 @@ void GLCanvas3D::_render_slice_control() const
                 });
             }
 
-            // Popup menu width equals main+dropdown width; white menu background; no padding
-            {
-                ImVec4 dark_bg  = ImVec4(68 / 255.0f, 96 / 255.0f, 114 / 255.0f, 1.0f); // #446072
-                ImVec4 light_bg = config.getColor(DispConfig::e_ct_white);
-                ImGui::PushStyleColor(ImGuiCol_PopupBg, wxGetApp().dark_mode() ? dark_bg : light_bg);
-            }
+            // Popup menu width equals main+dropdown width. Roost: a card (surface, 2px ink outline,
+            // rounded corners); hover = wash, the current choice = yolk with ink text.
+            ImGui::PushStyleColor(ImGuiCol_PopupBg, RoostImGui::surface());
+            ImGui::PushStyleColor(ImGuiCol_Border, RoostImGui::ink());
             const float popup_padding = 4.0f;
             const float item_gap      = 1.0f; // 1px separator between items
+            (void) item_gap;
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(popup_padding, popup_padding));
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(popup_padding, popup_padding));
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 4.0f));
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-            ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 4.0f * scale);
+            ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, RoostImGui::kOutline * scale);
+            ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 12.0f * scale);
             // Fix popup size and align left to the combined buttons
             float  target_w   = bigcfg.size.x + smallcfg.size.x;
             ImVec2 item_size  = ImVec2(target_w - 2.0f * popup_padding, bigcfg.size.y);
@@ -10956,25 +10972,26 @@ void GLCanvas3D::_render_slice_control() const
             // no shadow / no extra drawing behind popup
             int ret = -1;
             if (ImGui::BeginPopup("^##id0")) {
-                ImVec4 list_bg = wxGetApp().dark_mode() ? ImVec4(68 / 255.0f, 96 / 255.0f, 114 / 255.0f, 1.0f) :
-                                                          config.getColor(DispConfig::e_ct_white);
-                ImVec4 list_ac = config.getColor(bigcfg.fg);
-                ImVec4 list_hv = ImVec4(68.f / 255.f, 205.f / 255.f, 122.f / 255.f, 1.0f);
-                ImGui::PushStyleColor(ImGuiCol_Button, list_bg);
-                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, list_hv);
-                ImGui::PushStyleColor(ImGuiCol_ButtonActive, list_ac);
-                // Add 4px rounded corners to each menu item
-                ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f * scale);
+                ImGui::PushStyleColor(ImGuiCol_Button, RoostImGui::surface());
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, RoostImGui::wash());
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, RoostImGui::wash_pressed());
+                // Roost: pill-shaped rows
+                ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, item_size.y * 0.5f);
                 for (int i = 0; i < (int) s_slice_string.size(); ++i) {
+                    const bool current_choice = (i == s_sst);
+                    if (current_choice)
+                        RoostImGui::push_selected_button_colors();
                     if (ImGui::Button(s_slice_string[i].c_str(), item_size))
                         ret = i;
+                    if (current_choice)
+                        ImGui::PopStyleColor(RoostImGui::kSelectedButtonColorCount);
                 }
                 ImGui::PopStyleVar(1);
                 ImGui::PopStyleColor(3);
                 ImGui::EndPopup();
             }
             ImGui::PopStyleVar(5);
-            ImGui::PopStyleColor();
+            ImGui::PopStyleColor(2);
             if (ret >= 0) {
                 s_sst = ret;
                 if (wxGetApp().mainframe)
@@ -11060,26 +11077,39 @@ void GLCanvas3D::_render_slice_control() const
                 }
                 auto sendGCodeItem   = ImGui::GetCursorScreenPos(); // ImGui::GetCursorPos();
                 bool print_triggered = false;
-                // Custom-drawn main print button with 4px rounding on left outer corners
+                // Roost: "Send print | ^" is one rapidroost.net sticker pill (blue-ink, 2px ink outline, hard
+                // ink shadow; hover lifts, press sinks). Hit areas are unchanged (the resting face rects).
+                const ImVec2 print_pair_min = ImGui::GetCursorScreenPos();
+                const ImVec2 print_pair_max = ImVec2(print_pair_min.x + bigcfg.size.x + smallcfg.size.x, print_pair_min.y + bigcfg.size.y);
+                const ImVec2 print_mouse    = ImGui::GetIO().MousePos;
+                const bool   print_pair_hovered = enprint &&
+                                                print_mouse.x >= print_pair_min.x && print_mouse.x < print_pair_max.x &&
+                                                print_mouse.y >= print_pair_min.y && print_mouse.y < print_pair_max.y;
+                const bool   print_pair_held = print_pair_hovered && ImGui::IsMouseDown(ImGuiMouseButton_Left);
+                const float  print_shift = enprint ? RoostImGui::sticker_face_shift(print_pair_hovered, print_pair_held, scale) : 0.0f;
+                const float  print_round = bigcfg.size.y * 0.5f;
+                const RoostImGui::StickerColors print_cols = RoostImGui::sticker_colors(RoostImGui::StickerKind::Primary, enprint);
+                const ImU32  print_seg_hover = RoostImGui::to_u32(RoostBrand::kBlueDeep);
+                const ImVec2 print_main_face_min(print_pair_min.x + print_shift, print_pair_min.y + print_shift);
                 {
                     ImVec2 main_pos  = ImGui::GetCursorScreenPos();
                     ImVec2 main_size = bigcfg.size;
                     ImGui::InvisibleButton("print_main_custom", main_size);
                     bool   main_hovered = ImGui::IsItemHovered() && enprint;
-                    bool   main_active  = ImGui::IsItemActive() && enprint;
-                    ImVec4 main_bg      = (enprint ? config.getColor(bigcfg.fg) : config.getColor(bigcfg.bg));
-                    ImVec4 main_hv      = ImVec4(68.f / 255.f, 205.f / 255.f, 122.f / 255.f, 1.0f);
-                    ImVec4 main_ac      = config.getColor(bigcfg.fg);
-                    ImVec4 main_col     = main_active ? main_ac : (main_hovered ? main_hv : main_bg);
-                    float  main_round   = 4.0f * scale;
                     auto*  dl           = ImGui::GetWindowDrawList();
-                    dl->AddRectFilled(main_pos, ImVec2(main_pos.x + main_size.x, main_pos.y + main_size.y), ImGui::GetColorU32(main_col),
-                                      main_round, ImDrawFlags_RoundCornersLeft);
+                    if (enprint)
+                        RoostImGui::draw_shadow(dl, print_main_face_min,
+                                                ImVec2(print_pair_max.x + print_shift, print_pair_max.y + print_shift), print_cols.shadow,
+                                                print_round, RoostImGui::sticker_shadow(print_pair_hovered, print_pair_held, scale));
+                    const ImVec2 face_min(main_pos.x + print_shift, main_pos.y + print_shift);
+                    const ImVec2 face_max(face_min.x + main_size.x, face_min.y + main_size.y);
+                    RoostImGui::draw_fill(dl, face_min, face_max, main_hovered ? print_seg_hover : print_cols.fill, print_round,
+                                          ImDrawFlags_RoundCornersLeft);
                     // Centered text
                     const char* main_label = s_print_string[s_pst].c_str();
                     ImVec2      text_sz    = ImGui::CalcTextSize(main_label);
-                    ImVec2 text_pos = ImVec2(main_pos.x + (main_size.x - text_sz.x) * 0.5f, main_pos.y + (main_size.y - text_sz.y) * 0.5f);
-                    ImU32  text_col = enprint ? IM_COL32(255, 255, 255, 255) : ImGui::GetColorU32(config.getColor(DispConfig::e_ct_text));
+                    ImVec2 text_pos = ImVec2(face_min.x + (main_size.x - text_sz.x) * 0.5f, face_min.y + (main_size.y - text_sz.y) * 0.5f);
+                    ImU32  text_col = print_cols.text;
                     dl->AddText(text_pos, text_col, main_label);
                     if (ImGui::IsItemClicked() && enprint) {
                         if (wxGetApp().mainframe) {
@@ -11120,50 +11150,46 @@ void GLCanvas3D::_render_slice_control() const
                 ImVec2 drop_size_p = smallcfg.size;
                 ImGui::InvisibleButton("print_drop_custom", drop_size_p);
                 bool   drop_hovered_p = ImGui::IsItemHovered();
-                bool   drop_active_p  = ImGui::IsItemActive();
-                ImVec4 smp_bg         = (enprint ? config.getColor(bigcfg.fg) : config.getColor(bigcfg.bg));
-                ImVec4 smp_hv         = ImVec4(68.f / 255.f, 205.f / 255.f, 122.f / 255.f, 1.0f);
-                ImVec4 smp_ac         = config.getColor(smallcfg.fg);
-                ImVec4 drop_col_p     = drop_active_p ? smp_ac : (drop_hovered_p ? smp_hv : smp_bg);
-                float  drop_round_p   = 4.0f * scale;
+                // Roost: right half of the print sticker pill (see above).
+                const ImVec2 print_drop_face_min(drop_pos_p.x + print_shift, drop_pos_p.y + print_shift);
+                const ImVec2 print_drop_face_max(print_drop_face_min.x + drop_size_p.x, print_drop_face_min.y + drop_size_p.y);
+                const ImU32  print_drop_fill = drop_hovered_p ? (enprint ? print_seg_hover : RoostImGui::u32(RoostImGui::wash())) :
+                                                                print_cols.fill;
                 auto*  dlp            = ImGui::GetWindowDrawList();
-                dlp->AddRectFilled(drop_pos_p, ImVec2(drop_pos_p.x + drop_size_p.x, drop_pos_p.y + drop_size_p.y),
-                                   ImGui::GetColorU32(drop_col_p), drop_round_p, ImDrawFlags_RoundCornersRight);
+                RoostImGui::draw_fill(dlp, print_drop_face_min, print_drop_face_max, print_drop_fill, print_round, ImDrawFlags_RoundCornersRight);
                 // draw chevron-style caret (up) with stroke instead of text
                 {
                     float  w      = 10.0f * scale; // overall width of chevron
                     float  h      = 6.0f * scale;  // overall height of chevron
                     float  thick  = 2.0f * scale;
-                    ImVec2 center = ImVec2(drop_pos_p.x + drop_size_p.x * 0.5f, drop_pos_p.y + drop_size_p.y * 0.5f + 0.5f * scale);
+                    ImVec2 center = ImVec2(print_drop_face_min.x + drop_size_p.x * 0.5f, print_drop_face_min.y + drop_size_p.y * 0.5f + 0.5f * scale);
                     ImVec2 left   = ImVec2(center.x - w * 0.5f, center.y + h * 0.5f);
                     ImVec2 peak   = ImVec2(center.x, center.y - h * 0.5f);
                     ImVec2 right  = ImVec2(center.x + w * 0.5f, center.y + h * 0.5f);
-                    // caret color adapts to background brightness/theme
-                    bool  dark_mode_p = wxGetApp().dark_mode();
-                    bool  bright_bg_p = enprint || drop_hovered_p; // green or hover
-                    ImU32 caret_col_p = (dark_mode_p || bright_bg_p) ? IM_COL32(255, 255, 255, 255) : IM_COL32(0x58, 0x63, 0x70, 255);
+                    // caret: white on the blue-ink pill; theme text on the disabled/washed pill
+                    ImU32 caret_col_p = enprint ? print_cols.text :
+                                                  (drop_hovered_p ? RoostImGui::u32(RoostImGui::text()) : print_cols.text);
                     dlp->AddLine(left, peak, caret_col_p, thick);
                     dlp->AddLine(peak, right, caret_col_p, thick);
                 }
-                // vertical separator between main and dropdown buttons
-                ImU32 sep_col_p = IM_COL32(0xE1, 0xE4, 0xE9, 255);
-                dlp->AddLine(ImVec2(drop_pos_p.x, drop_pos_p.y + 1.0f), ImVec2(drop_pos_p.x, drop_pos_p.y + drop_size_p.y - 1.0f),
-                             sep_col_p, 1.0f);
+                // ink divider between the two halves, then the pill's 2px outline over both
+                dlp->AddLine(ImVec2(print_drop_face_min.x, print_drop_face_min.y + 1.0f),
+                             ImVec2(print_drop_face_min.x, print_drop_face_max.y - 1.0f), print_cols.outline, RoostImGui::kOutline * scale);
+                RoostImGui::draw_outline(dlp, print_main_face_min, print_drop_face_max, print_cols.outline, print_round,
+                                         RoostImGui::kOutline * scale);
                 ImVec2 drop_min_print = drop_pos_p;
                 if (ImGui::IsItemClicked())
                     ImGui::OpenPopup("^##id1");
-                {
-                    ImVec4 dark_bg2  = ImVec4(68 / 255.0f, 96 / 255.0f, 114 / 255.0f, 1.0f); // #446072
-                    ImVec4 light_bg2 = config.getColor(DispConfig::e_ct_white);
-                    ImGui::PushStyleColor(ImGuiCol_PopupBg, wxGetApp().dark_mode() ? dark_bg2 : light_bg2);
-                }
+                // Roost: the list is a card (surface, 2px ink outline); hover = wash, current choice = yolk.
+                ImGui::PushStyleColor(ImGuiCol_PopupBg, RoostImGui::surface());
+                ImGui::PushStyleColor(ImGuiCol_Border, RoostImGui::ink());
                 const float popup_padding2 = 4.0f;
                 const float item_gap2      = 4.0f; // 4px separator between items
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(popup_padding2, popup_padding2));
                 ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(popup_padding2, popup_padding2));
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, item_gap2));
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-                ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 4.0f * scale);
+                ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, RoostImGui::kOutline * scale);
+                ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 12.0f * scale);
                 // Fix popup size and align left to the combined buttons
                 float  target_w2   = bigcfg.size.x + smallcfg.size.x;
                 ImVec2 item_size2  = ImVec2(target_w2 - 2.0f * popup_padding2, bigcfg.size.y);
@@ -11177,25 +11203,26 @@ void GLCanvas3D::_render_slice_control() const
                 // no shadow / no extra drawing behind popup
                 int ret = -1;
                 if (ImGui::BeginPopup("^##id1")) {
-                    ImVec4 list_bg = wxGetApp().dark_mode() ? ImVec4(68 / 255.0f, 96 / 255.0f, 114 / 255.0f, 1.0f) :
-                                                              config.getColor(DispConfig::e_ct_white);
-                    ImVec4 list_ac = config.getColor(bigcfg.fg);
-                    ImVec4 list_hv = ImVec4(68.f / 255.f, 205.f / 255.f, 122.f / 255.f, 1.0f);
-                    ImGui::PushStyleColor(ImGuiCol_Button, list_bg);
-                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, list_hv);
-                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, list_ac);
-                    // Add 4px rounded corners to each menu item
-                    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f * scale);
+                    ImGui::PushStyleColor(ImGuiCol_Button, RoostImGui::surface());
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, RoostImGui::wash());
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, RoostImGui::wash_pressed());
+                    // Roost: pill-shaped rows
+                    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, item_size2.y * 0.5f);
                     for (int i = 0; i < (int) s_print_string.size(); ++i) {
+                        const bool current_choice = (i == s_pst);
+                        if (current_choice)
+                            RoostImGui::push_selected_button_colors();
                         if (ImGui::Button(s_print_string[i].c_str(), item_size2))
                             ret = i;
+                        if (current_choice)
+                            ImGui::PopStyleColor(RoostImGui::kSelectedButtonColorCount);
                     }
                     ImGui::PopStyleVar(1);
                     ImGui::PopStyleColor(3);
                     ImGui::EndPopup();
                 }
                 ImGui::PopStyleVar(5);
-                ImGui::PopStyleColor();
+                ImGui::PopStyleColor(2);
                 if (ret >= 0) {
                     s_pst = ret;
                     if (s_print_string[s_pst] == _u8L("Send print"))
@@ -11984,8 +12011,9 @@ void GLCanvas3D::_render_imgui_select_plate_toolbar()
     float window_width  = m_sel_plate_toolbar.icon_width + margin_size * 2 + (show_scroll ? 25.0f * f_scale : 20.0f * f_scale);
 
     ImVec4 window_bg     = ImVec4(0, 0, 0, 0);
-    ImVec4 button_active = ImGuiWrapper::COL_CREALITY; // ORCA: Use orca color for selected sliced plate border
-    ImVec4 button_hover  = ImVec4(0.408f, 0.525f, 0.596f, 1.0f);
+    // Roost: the selected plate is yolk (rapidroost.net "selected"); hover is the brand link blue.
+    ImVec4 button_active = RoostImGui::yolk();
+    ImVec4 button_hover  = RoostImGui::link();
     ImVec4 scroll_col    = ImVec4(0.733f, 0.776f, 0.804f, 1.0f);
     // ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 0.f, 0.f, 1.0f));
     // use white text as the background switch to black
@@ -12094,6 +12122,8 @@ void GLCanvas3D::_render_imgui_select_plate_toolbar()
 
         ImVec4      text_clr = m_is_dark ? ImVec4(0.0f, 150.f / 255.0f, 136.0f / 255, 1.0f) :
                                            ImVec4(48.0f / 255.0f, 55.0f / 255.0f, 61.0f / 255.0f, 1.0f);
+        if (all_plates_stats_item->selected)
+            text_clr = RoostImGui::yolk_text(); // ink on the yolk "selected" fill
         ImTextureID btn_texture_id;
         if (all_plates_stats_item->slice_state == IMToolbarItem::SliceState::UNSLICED ||
             all_plates_stats_item->slice_state == IMToolbarItem::SliceState::SLICING ||
@@ -14378,8 +14408,8 @@ void GLCanvas3D::_render_printer_preset_and_obj_list()
         ImGui::PushStyleColor(ImGuiCol_FrameBg, is_dark ? bgc : bgc_light);
         ImGui::PushStyleColor(ImGuiCol_PopupBg, is_dark ? ImVec4(0.0, 0.0, 0.0, 0.9) : ImVec4(1.0, 1.0, 1.0, 1.0f));
         // ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0, 0.0, 0.0, 0.9));
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImGuiWrapper::COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImGuiWrapper::COL_CREALITY);
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, RoostImGui::wash());     // Roost: hover = wash
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, RoostImGui::yolk_row());  // Roost: selected = yolk
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(225.0f / 255.0f, 228.0f / 255.0f, 233.0f / 255.0f, 1.0f));
         ImVec4 tmp_color = ImVec4(142 / 255.0f, 162 / 255.0f, 174 / 255.0f, 1.0f);
         ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK_TRANS));
@@ -14507,10 +14537,10 @@ bool GLCanvas3D::_render_global_objects_switch_button()
     float view_scale    = wxGetApp().plater()->get_current_canvas3D()->get_scale();
     bool  enable_object = wxGetApp().params_panel()->get_switch_of_object();
 
-    ImVec4 border_color = m_is_dark ? ImVec4(89 / 255.0f, 117 / 255.0f, 135 / 255.0f, 1.0f) :
-                                      ImVec4(160 / 255.0f, 176 / 255.0f, 186 / 255.0f, 1.0f);
+    // Roost: a rapidroost.net segmented pill: 2px ink outline, the selected half is yolk with ink text.
+    ImVec4 border_color = RoostImGui::ink();
     ImGui::PushStyleColor(ImGuiCol_Border, border_color);
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, RoostImGui::kOutline * view_scale);
 
     ImGuiContext&     g      = *GImGui;
     ImGuiWindow*      window = g.CurrentWindow;
@@ -14528,6 +14558,7 @@ bool GLCanvas3D::_render_global_objects_switch_button()
 
     ImVec2 p_min = window->DC.CursorPos;
     ImVec2 p_max = ImVec2(p_min.x + global_size.x + objects_size.x + pading * 4.0, p_min.y + 20.0f * view_scale);
+    rounding     = (p_max.y - p_min.y) * 0.5f; // Roost: pill
 
     // background with white border
     ImGui::RenderFrame(p_min, p_max, IM_COL32(0, 0, 0, 0), true, rounding);
@@ -14537,13 +14568,15 @@ bool GLCanvas3D::_render_global_objects_switch_button()
     // selected tab
     if (enable_object == false) {
         ImVec2 p_max2 = ImVec2(p_min.x + global_size.x + pading * 2.0, p_max.y);
-        window->DrawList->AddRectFilled(p_min, p_max2, ImGui::GetColorU32(ImGuiWrapper::COL_CREALITY), rounding,
+        window->DrawList->AddRectFilled(p_min, p_max2, ImGui::GetColorU32(RoostImGui::yolk()), rounding,
                                         ImDrawFlags_RoundCornersLeft);
     } else {
         ImVec2 p_min2 = ImVec2(p_min.x + global_size.x + pading * 2.0, p_min.y);
-        window->DrawList->AddRectFilled(p_min2, p_max, ImGui::GetColorU32(ImGuiWrapper::COL_CREALITY), rounding,
+        window->DrawList->AddRectFilled(p_min2, p_max, ImGui::GetColorU32(RoostImGui::yolk()), rounding,
                                         ImDrawFlags_RoundCornersRight);
     }
+    // outline on top of the yolk half
+    RoostImGui::draw_outline(window->DrawList, p_min, p_max, ImGui::GetColorU32(border_color), rounding, RoostImGui::kOutline * view_scale);
 
     ImGui::PopStyleColor(1);
 
@@ -14553,7 +14586,7 @@ bool GLCanvas3D::_render_global_objects_switch_button()
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, transparent);
 
     // switch button has diffrent text color
-    ImVec4 text_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImVec4 text_color = RoostImGui::yolk_text(); // ink on the yolk (selected) half
     if (enable_object == true) {
         text_color = m_is_dark ? ImVec4(193 / 255.0f, 203 / 255.0f, 209 / 255.0f, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
     }
@@ -14572,7 +14605,7 @@ bool GLCanvas3D::_render_global_objects_switch_button()
     }
     ImGui::PopStyleColor();
 
-    text_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    text_color = RoostImGui::yolk_text(); // ink on the yolk (selected) half
     if (enable_object == false) {
         text_color = m_is_dark ? ImVec4(193 / 255.0f, 203 / 255.0f, 209 / 255.0f, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
     }

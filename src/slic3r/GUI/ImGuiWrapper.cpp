@@ -44,9 +44,24 @@
 #include <nanosvg/nanosvgrast.h>
 #include "OpenGLManager.hpp"
 #include "GUI_App.hpp"
+#include "RoostImGuiBrand.hpp"
 
 namespace Slic3r {
 namespace GUI {
+
+// Roost Print: while push_confirm_button_style()/push_cancel_button_style() are active, the
+// ImGuiWrapper text buttons are drawn as rapidroost.net stickers. -1 = plain ImGui button.
+static int s_roost_sticker_kind = -1;
+
+static bool roost_sticker_active() { return s_roost_sticker_kind >= 0; }
+
+static bool roost_sticker_button(const char *label, const ImVec2 &size, float scale)
+{
+    const bool enabled = (GImGui->CurrentItemFlags & ImGuiItemFlags_Disabled) == 0;
+    const RoostImGui::StickerKind kind = s_roost_sticker_kind == 0 ? RoostImGui::StickerKind::Primary :
+                                                                      RoostImGui::StickerKind::Secondary;
+    return RoostImGui::sticker_button(label, size, kind, enabled, scale);
+}
 
 static const std::map<const wchar_t, std::string> font_icons = {
     {ImGui::PrintIconMarker       , "cog"                           },
@@ -176,7 +191,7 @@ const ImVec4 ImGuiWrapper::COL_BUTTON_ACTIVE     = COL_BUTTON_HOVERED;
 
 const ImVec4 ImGuiWrapper::COL_BLUE_LIGHT        = ImVec4(0.122f, 0.557f, 0.918f, 1.0f);
 const ImVec4 ImGuiWrapper::COL_GREEN_LIGHT       = ImVec4(0.863f, 0.937f, 0.984f, 1.0f);
-const ImVec4 ImGuiWrapper::COL_HOVER             = { 235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.0f };
+const ImVec4 ImGuiWrapper::COL_HOVER             = { 0xEE / 255.0f, 0xF6 / 255.0f, 0xFC / 255.0f, 1.0f }; // Roost blue-wash (hover)
 const ImVec4 ImGuiWrapper::COL_ACTIVE            = { 159 / 255.0f, 175 / 255.0f, 185 / 255.0f, 1.0f };
 const ImVec4 ImGuiWrapper::COL_SEPARATOR         = { 234 / 255.0f, 238 / 255.0f, 240 / 255.0f, 1.0f };
 const ImVec4 ImGuiWrapper::COL_SEPARATOR_DARK    = { 44 / 255.0f, 70 / 255.0f, 86 / 255.0f, 1.0f };
@@ -186,7 +201,9 @@ const ImVec4 ImGuiWrapper::COL_WINDOW_BG         = { 1.000f, 1.000f, 1.000f, 1.0
 const ImVec4 ImGuiWrapper::COL_WINDOW_BG_DARK    = { 54 / 255.0f, 81 / 255.0f, 98 / 255.0f, 1.f };
 //const ImVec4 ImGuiWrapper::COL_WINDOW_BG_DARK    = {54 / 255.0f, 81 / 255.0f, 98 / 255.0f, 1.f};
 const ImVec4 ImGuiWrapper::COL_ORCA              = to_ImVec4(ColorRGBA::ORCA());
-const ImVec4 ImGuiWrapper::COL_CREALITY          = ImVec4{0.118f, 0.565f, 0.847f, 1.0f};
+// Roost: the accent is rapidroost.net brand blue #1e90d8 (reads on both themes; used for links, slider
+// thumbs and focus text). "Selected" fills use RoostImGui::yolk() instead (see RoostImGuiBrand.hpp).
+const ImVec4 ImGuiWrapper::COL_CREALITY          = ImVec4{0x1E / 255.0f, 0x90 / 255.0f, 0xD8 / 255.0f, 1.0f};
 
 int ImGuiWrapper::TOOLBAR_WINDOW_FLAGS = ImGuiWindowFlags_AlwaysAutoResize
                                  | ImGuiWindowFlags_NoMove
@@ -975,7 +992,8 @@ void ImGuiWrapper::end()
 bool ImGuiWrapper::button(const wxString &label, const wxString& tooltip)
 {
     auto label_utf8 = into_u8(label);
-    const bool ret = ImGui::Button(label_utf8.c_str());
+    const bool ret = roost_sticker_active() ? roost_sticker_button(label_utf8.c_str(), ImVec2(0.0f, 0.0f), m_style_scaling) :
+                                              ImGui::Button(label_utf8.c_str());
 
     if (!tooltip.IsEmpty() && ImGui::IsItemHovered()) {
         auto tooltip_utf8 = into_u8(tooltip);
@@ -988,7 +1006,8 @@ bool ImGuiWrapper::button(const wxString &label, const wxString& tooltip)
 bool ImGuiWrapper::bbl_button(const wxString &label, const wxString& tooltip)
 {
     auto label_utf8 = into_u8(label);
-    const bool ret = ImGui::BBLButton(label_utf8.c_str());
+    const bool ret = roost_sticker_active() ? roost_sticker_button(label_utf8.c_str(), ImVec2(0.0f, 0.0f), m_style_scaling) :
+                                              ImGui::BBLButton(label_utf8.c_str());
 
     if (!tooltip.IsEmpty() && ImGui::IsItemHovered()) {
         auto tooltip_utf8 = into_u8(tooltip);
@@ -1001,6 +1020,8 @@ bool ImGuiWrapper::bbl_button(const wxString &label, const wxString& tooltip)
 bool ImGuiWrapper::button(const wxString& label, float width, float height)
 {
     auto label_utf8 = into_u8(label);
+    if (roost_sticker_active())
+        return roost_sticker_button(label_utf8.c_str(), ImVec2(width, height), m_style_scaling);
     return ImGui::Button(label_utf8.c_str(), ImVec2(width, height));
 }
 
@@ -1009,7 +1030,8 @@ bool ImGuiWrapper::button(const wxString& label, const ImVec2 &size, bool enable
     disabled_begin(!enable);
 
     auto label_utf8 = into_u8(label);
-    bool res = ImGui::Button(label_utf8.c_str(), size);
+    bool res = roost_sticker_active() ? roost_sticker_button(label_utf8.c_str(), size, m_style_scaling) :
+                                        ImGui::Button(label_utf8.c_str(), size);
 
     disabled_end();
     return (enable) ? res : false;
@@ -1062,10 +1084,11 @@ bool ImGuiWrapper::bbl_checkbox(const wxString& label, bool& value, bool enabled
     bool result;
     bool b_value = value;
     if (b_value) {
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));  
+        // Roost: a ticked box is "selected" -> yolk with an ink tick.
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, RoostImGui::yolk());
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, RoostImGui::yolk());
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, RoostImGui::yolk());
+        ImGui::PushStyleColor(ImGuiCol_CheckMark, RoostImGui::yolk_text());
     }
     if (!enabled) {
         float factor = b_value ? 0.8f : 1.0f;
@@ -1095,12 +1118,14 @@ bool ImGuiWrapper::bbl_radio_button(const char *label, bool active)
     bool result;
     bool b_value = active;
     if (b_value) {
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, COL_CREALITY);
+        // Roost: selected radio -> yolk with an ink dot.
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, RoostImGui::yolk());
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, RoostImGui::yolk());
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, RoostImGui::yolk());
+        ImGui::PushStyleColor(ImGuiCol_CheckMark, RoostImGui::yolk_text());
     }
     result = ImGui::BBLRadioButton(label,active);
-    if (b_value) { ImGui::PopStyleColor(3); }
+    if (b_value) { ImGui::PopStyleColor(4); }
     return result;
 }
 
@@ -1620,7 +1645,10 @@ static bool selectable(const char* label, bool selected, ImGuiSelectableFlags fl
     char marked_label[512]; //255 symbols is not enough for translated string (e.t. to Russian)
     if (hovered || selected) {
         sprintf(marked_label, "%c%s", ImGui::ColorMarkerHovered, label);
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+        // Roost: hover is the blue wash and selection is yolk, so the row keeps the theme's text
+        // colour (ink by day) instead of switching to white as it did on the old blue highlight.
+        ImGui::PushStyleColor(ImGuiCol_Text, (selected && !RoostImGui::is_dark()) ? RoostImGui::yolk_text() :
+                                                                                    ImGui::GetStyleColorVec4(ImGuiCol_Text));
     }
     else
         strcpy(marked_label, label);
@@ -2615,89 +2643,154 @@ std::vector<unsigned char> ImGuiWrapper::load_svg(const std::string& bitmap_name
 //BBS
 static bool m_is_dark_mode = false;
 
+// Roost Print: global ImGui colours, matched to rapidroost.net (light rr.css / night dark.css).
+// Hover = blue wash, selected/active = yolk, primary = blue-ink, outlines = ink.
+static void apply_roost_style_colors()
+{
+    if (ImGui::GetCurrentContext() == nullptr)
+        return;
+
+    namespace R = RoostImGui;
+    ImGuiStyle &style = ImGui::GetStyle();
+    auto set_color = [&style](ImGuiCol_ entity, const ImVec4 &color) { style.Colors[entity] = color; };
+    const ImVec4 clear(0.0f, 0.0f, 0.0f, 0.0f);
+    const ImVec4 button_bg = R::is_dark() ? R::chip() : R::to_vec4(RoostBrand::kWhite);
+    ImVec4 text_sel = R::yolk();
+    text_sel.w = 0.45f;
+
+    // Text
+    set_color(ImGuiCol_Text, R::text());
+    set_color(ImGuiCol_TextDisabled, R::disabled_text());
+    set_color(ImGuiCol_TextSelectedBg, text_sel);
+
+    // Windows / cards
+    set_color(ImGuiCol_WindowBg, R::surface());
+    set_color(ImGuiCol_ChildBg, clear);
+    set_color(ImGuiCol_PopupBg, R::surface());
+    set_color(ImGuiCol_Border, R::line());
+    set_color(ImGuiCol_BorderActive, R::yolk()); // focus ring
+    set_color(ImGuiCol_BorderShadow, clear);
+    set_color(ImGuiCol_TitleBg, R::page());
+    set_color(ImGuiCol_TitleBgActive, R::page());
+    set_color(ImGuiCol_TitleBgCollapsed, R::page());
+    set_color(ImGuiCol_MenuBarBg, R::surface());
+
+    // Frames (inputs, checkboxes, combos)
+    set_color(ImGuiCol_FrameBg, R::chip());
+    set_color(ImGuiCol_FrameBgHovered, R::wash());
+    set_color(ImGuiCol_FrameBgActive, R::wash());
+
+    // Buttons: hover = wash, press = deeper wash. Selected/toggled buttons push yolk themselves.
+    set_color(ImGuiCol_Button, button_bg);
+    set_color(ImGuiCol_ButtonHovered, R::wash());
+    set_color(ImGuiCol_ButtonActive, R::wash_pressed());
+
+    // Checkbox / radio / sliders
+    set_color(ImGuiCol_CheckMark, R::ink());
+    set_color(ImGuiCol_SliderGrab, R::primary());
+    set_color(ImGuiCol_SliderGrabActive, R::yolk());
+
+    // Selectable rows / combo items / tree nodes
+    set_color(ImGuiCol_Header, R::yolk_row());
+    set_color(ImGuiCol_HeaderHovered, R::wash());
+    set_color(ImGuiCol_HeaderActive, R::yolk_row());
+
+    // Separators / resize grips
+    set_color(ImGuiCol_Separator, R::line());
+    set_color(ImGuiCol_SeparatorHovered, R::link());
+    set_color(ImGuiCol_SeparatorActive, R::yolk());
+    set_color(ImGuiCol_ResizeGrip, R::line());
+    set_color(ImGuiCol_ResizeGripHovered, R::link());
+    set_color(ImGuiCol_ResizeGripActive, R::yolk());
+
+    // Tabs: selected tab = yolk
+    set_color(ImGuiCol_Tab, R::chip());
+    set_color(ImGuiCol_TabHovered, R::wash());
+    set_color(ImGuiCol_TabActive, R::yolk_row());
+    set_color(ImGuiCol_TabUnfocused, R::chip());
+    set_color(ImGuiCol_TabUnfocusedActive, R::yolk_row());
+
+    // Scrollbars
+    set_color(ImGuiCol_ScrollbarBg, clear);
+    set_color(ImGuiCol_ScrollbarGrab, R::field());
+    set_color(ImGuiCol_ScrollbarGrabHovered, R::link());
+    set_color(ImGuiCol_ScrollbarGrabActive, R::link());
+
+    // Plots / progress bars
+    set_color(ImGuiCol_PlotLines, R::link());
+    set_color(ImGuiCol_PlotLinesHovered, R::yolk());
+    set_color(ImGuiCol_PlotHistogram, R::primary());
+    set_color(ImGuiCol_PlotHistogramHovered, R::yolk());
+
+    // Tables
+    set_color(ImGuiCol_TableHeaderBg, R::chip());
+    set_color(ImGuiCol_TableBorderStrong, R::line());
+    set_color(ImGuiCol_TableBorderLight, R::line());
+
+    // Navigation / drag and drop: yolk focus ring
+    set_color(ImGuiCol_DragDropTarget, R::yolk());
+    set_color(ImGuiCol_NavHighlight, R::yolk());
+    set_color(ImGuiCol_NavWindowingHighlight, R::yolk());
+}
+
 void ImGuiWrapper::on_change_color_mode(bool is_dark)
 {
     m_is_dark_mode = is_dark;
+    RoostImGui::set_dark(is_dark);
+    apply_roost_style_colors();
 }
 
 void ImGuiWrapper::push_toolbar_style(const float scale)
 {
+    // Roost: gizmo / tool panels are cards: 14px corners, 2px ink outline, 8px frames.
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f * scale);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.0f, 10.0f) * scale);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 3.0f * scale);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2.0f * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, RoostImGui::kRadiusCard * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, RoostImGui::kOutline * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, RoostImGui::kRadiusFrame * scale);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10.0f, 10.0f) * scale);
 
-    if (m_is_dark_mode) {
+    ImVec4 text_sel = RoostImGui::yolk();
+    text_sel.w      = 0.45f;
+    const ImVec4 button_bg = RoostImGui::is_dark() ? RoostImGui::chip() : RoostImGui::to_vec4(RoostBrand::kWhite);
 
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));                                        // 1
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImGuiWrapper::COL_WINDOW_BG_DARK);                                   // 2
-        ImGui::PushStyleColor(ImGuiCol_TitleBg, ImGuiWrapper::COL_TITLE_BG_DARK);                                     // 3
-        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImGuiWrapper::COL_TITLE_BG_DARK);                               // 4
-        ImGui::PushStyleColor(ImGuiCol_Separator, ImGuiWrapper::COL_SEPARATOR_DARK);                                  // 5
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(44 / 255.0f, 70 / 255.0f, 87 / 255.0f, 1.00f));                 // 6
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(53 / 255.0f, 81 / 255.0f, 98 / 255.0f, 1.00f));          // 7
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(53 / 255.0f, 81 / 255.0f, 98 / 255.0f, 1.00f));           // 8
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(64 / 255.0f, 92 / 255.0f, 110 / 255.0f, 1.00f));         // 9
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(44 / 255.0f, 70 / 255.0f, 87 / 255.0f, 1.00f));          // 10
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));             // 11
-        ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, ImVec4(43 / 255.0f, 64 / 255.0f, 54 / 255.0f, 1.00f));         // 12
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                                // 13
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.329f, 0.439f, 0.510f, 1.00f));                            // 14
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(0.918f, 0.933f, 0.941f, 1.00f));                     // 15
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, ImVec4(0.918f, 0.933f, 0.941f, 1.00f));                      // 16
-    }
-    else {
-        
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(50 / 255.0f, 58 / 255.0f, 61 / 255.0f, 1.00f));       // 1
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImGuiWrapper::COL_WINDOW_BG);          // 2
-        ImGui::PushStyleColor(ImGuiCol_TitleBg, ImGuiWrapper::COL_TITLE_BG);            // 3
-        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImGuiWrapper::COL_TITLE_BG);      // 4
-        ImGui::PushStyleColor(ImGuiCol_Separator, ImGuiWrapper::COL_SEPARATOR);         // 5
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));     // 6
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiWrapper::COL_HOVER);         // 7
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.00f)); // 8
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(159 / 255.0f, 175 / 255.0f, 185 / 255.0f, 1.00f));                        // 9
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.00f));  // 10
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));        // 11
-        ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, COL_GREEN_LIGHT);                                     // 12
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));//13
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.329f, 0.439f, 0.510f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(0.918f, 0.933f, 0.941f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, ImVec4(0.918f, 0.933f, 0.941f, 1.00f));
-    }
+    ImGui::PushStyleColor(ImGuiCol_Text, RoostImGui::text());                                    // 1
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, RoostImGui::surface());                             // 2
+    ImGui::PushStyleColor(ImGuiCol_TitleBg, RoostImGui::page());                                 // 3
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, RoostImGui::page());                           // 4
+    ImGui::PushStyleColor(ImGuiCol_Separator, RoostImGui::line());                               // 5
+    ImGui::PushStyleColor(ImGuiCol_Button, button_bg);                                           // 6
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, RoostImGui::wash());                           // 7
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, RoostImGui::wash_pressed());                    // 8
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, RoostImGui::wash());                          // 9
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, RoostImGui::wash());                           // 10
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f)); // 11
+    ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, text_sel);                                    // 12
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));               // 13
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, RoostImGui::field());                          // 14
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, RoostImGui::link());                    // 15
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, RoostImGui::link());                     // 16
+    ImGui::PushStyleColor(ImGuiCol_Border, RoostImGui::ink());                                   // 17
 }
 
 void ImGuiWrapper::pop_toolbar_style()
 {
     // size in push toolbar style
-    ImGui::PopStyleColor(16);
+    ImGui::PopStyleColor(17);
     ImGui::PopStyleVar(6);
 }
 
 void ImGuiWrapper::push_menu_style(const float scale)
 {
-    if (m_is_dark_mode) {
-        ImGuiWrapper::push_toolbar_style(scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.0f, 10.0f) * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 4.0f * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 0.0f);
-        ImGui::PushStyleColor(ImGuiCol_PopupBg, ImGuiWrapper::COL_WINDOW_BG_DARK);
-        ImGui::PushStyleColor(ImGuiCol_Header, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, COL_CREALITY);
-    }
-    else {
-        ImGuiWrapper::push_toolbar_style(scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.0f, 10.0f) * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 4.0f * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 0.0f);
-        ImGui::PushStyleColor(ImGuiCol_PopupBg, ImGuiWrapper::COL_WINDOW_BG);
-        ImGui::PushStyleColor(ImGuiCol_Header, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, COL_CREALITY);
-    }
+    // Roost: menus are cards; the hovered row is the wash, the open/selected row is yolk.
+    ImGuiWrapper::push_toolbar_style(scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.0f, 10.0f) * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 12.0f * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, RoostImGui::kOutline * scale);
+    ImGui::PushStyleColor(ImGuiCol_PopupBg, RoostImGui::surface());
+    ImGui::PushStyleColor(ImGuiCol_Header, RoostImGui::yolk_row());
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, RoostImGui::wash());
+    ImGui::PushStyleColor(ImGuiCol_HeaderActive, RoostImGui::yolk_row());
 }
 void ImGuiWrapper::pop_menu_style()
 {
@@ -2707,112 +2800,73 @@ void ImGuiWrapper::pop_menu_style()
 }
 
 void ImGuiWrapper::push_common_window_style(const float scale) {
-    if (m_is_dark_mode) {
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.0f, 10.0f) * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.05f, 0.50f) * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 3.0f * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 0.88f));                                   // 1
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImGuiWrapper::COL_WINDOW_BG_DARK);                              // 2
-        ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(37 / 255.0f, 61 / 255.0f, 77 / 255.0f, 1.00f));           // 3
-        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(37 / 255.0f, 61 / 255.0f, 77 / 255.0f, 1.00f));     // 4
-        ImGui::PushStyleColor(ImGuiCol_Separator, ImGuiWrapper::COL_SEPARATOR_DARK);                             // 5
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                              // 6
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COL_CREALITY);                       // 7
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, COL_CREALITY);                        // 8
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(64 / 255.0f, 92 / 255.0f, 110 / 255.0f, 1.00f));    // 9
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(44 / 255.0f, 70 / 255.0f, 87 / 255.0f, 1.00f));     // 10
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));        // 11
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                           // 12
-        ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, ImVec4(43 / 255.0f, 64 / 255.0f, 54 / 255.0f, 1.00f));    // 13
-        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, COL_CREALITY);                       // 14
-    }
-    else {
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.0f, 10.0f) * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.05f, 0.50f) * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 3.0f * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(27 / 255.0f, 47 / 255.0f, 59 / 255.0f, 1.00f));              // 1
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                            // 2
-        ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(245 / 255.0f, 245 / 255.0f, 245 / 255.0f, 1.00f));        // 3
-        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(245 / 255.0f, 245 / 255.0f, 245 / 255.0f, 1.00f));  // 4
-        ImGui::PushStyleColor(ImGuiCol_Separator, ImGuiWrapper::COL_SEPARATOR);                                  // 5
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                              // 6
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COL_CREALITY);                       // 7
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, COL_CREALITY);                        // 8
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.00f)); // 9
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.00f));  // 10
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));        // 11
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                           // 12
-        ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, ImGuiWrapper::COL_GREEN_LIGHT);                           // 13
-        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, COL_CREALITY);                       // 14
-    }
+    ImVec4 text_sel = RoostImGui::yolk();
+    text_sel.w      = 0.45f;
+    const ImVec4 button_bg = RoostImGui::is_dark() ? RoostImGui::chip() : RoostImGui::to_vec4(RoostBrand::kWhite);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.0f, 10.0f) * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.05f, 0.50f) * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, RoostImGui::kRadiusCard * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, RoostImGui::kOutline * scale);
+    ImGui::PushStyleColor(ImGuiCol_Text, RoostImGui::text());                                    // 1
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, RoostImGui::surface());                             // 2
+    ImGui::PushStyleColor(ImGuiCol_TitleBg, RoostImGui::page());                                 // 3
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, RoostImGui::page());                           // 4
+    ImGui::PushStyleColor(ImGuiCol_Separator, RoostImGui::line());                               // 5
+    ImGui::PushStyleColor(ImGuiCol_Button, button_bg);                                           // 6
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, RoostImGui::wash());                           // 7
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, RoostImGui::wash_pressed());                    // 8
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, RoostImGui::wash());                          // 9
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, RoostImGui::wash());                           // 10
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f)); // 11
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));               // 12
+    ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, text_sel);                                    // 13
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, RoostImGui::primary());                        // 14
+    ImGui::PushStyleColor(ImGuiCol_Border, RoostImGui::ink());                                   // 15
 }
 
 void ImGuiWrapper::pop_common_window_style() {
-    ImGui::PopStyleColor(14);
+    ImGui::PopStyleColor(15);
     ImGui::PopStyleVar(5);
 }
 
+// Roost: confirm = primary sticker (blue-ink, white bold text), cancel = white/surface sticker.
+// The ImGuiWrapper text buttons (button(), bbl_button()) draw as stickers between push and pop.
 void ImGuiWrapper::push_confirm_button_style() {
-    if (m_is_dark_mode) {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(23.f / 255.f, 204.f / 255.f, 95.f / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(23.f / 255.f, 204.f / 255.f, 95.f / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, to_ImVec4(decode_color_to_float_array("#285B7C")));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(27.f / 255.f, 136.f / 255.f, 68.f / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.f, 1.f, 1.f, 0.88f));
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 0.88f));
-    }
-    else {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(23.f / 255.f, 204.f / 255.f, 95.f / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(23.f / 255.f, 204.f / 255.f, 95.f / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, to_ImVec4(decode_color_to_float_array("#419FDB")));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(27.f / 255.f, 136.f / 255.f, 68.f / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.f, 1.f, 1.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
-    }
+    ImGui::PushStyleColor(ImGuiCol_Button, RoostImGui::primary());
+    ImGui::PushStyleColor(ImGuiCol_Border, RoostImGui::ink());
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, RoostImGui::brand_blue());
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, RoostImGui::primary());
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, RoostImGui::primary_text());
+    ImGui::PushStyleColor(ImGuiCol_Text, RoostImGui::primary_text());
+    s_roost_sticker_kind = 0;
 }
 
 void ImGuiWrapper::pop_confirm_button_style() {
+    s_roost_sticker_kind = -1;
     ImGui::PopStyleColor(6);
 }
 
 void ImGuiWrapper::push_cancel_button_style() {
-    if (m_is_dark_mode) {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
-        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1.f, 1.f, 1.f, 0.64f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(53 / 255.0f, 81 / 255.0f, 98 / 255.0f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(106 / 255.0f, 135 / 255.0f, 154 / 255.0f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.f, 1.f, 1.f, 0.64f));
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 0.64f));
-    }
-    else {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(27 / 255.0f, 47 / 255.0f, 59 / 255.0f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(198 / 255.0f, 208 / 255.0f, 214 / 255.0f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.f, 0.f, 0.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(27 / 255.0f, 47 / 255.0f, 59 / 255.0f, 1.00f));
-    }
+    ImGui::PushStyleColor(ImGuiCol_Button, RoostImGui::is_dark() ? RoostImGui::surface() : RoostImGui::to_vec4(RoostBrand::kWhite));
+    ImGui::PushStyleColor(ImGuiCol_Border, RoostImGui::ink());
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, RoostImGui::wash());
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, RoostImGui::wash_pressed());
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, RoostImGui::ink());
+    ImGui::PushStyleColor(ImGuiCol_Text, RoostImGui::text());
+    s_roost_sticker_kind = 1;
 }
 
 void ImGuiWrapper::pop_cancel_button_style() {
+    s_roost_sticker_kind = -1;
     ImGui::PopStyleColor(6);
 }
 
 void ImGuiWrapper::push_button_disable_style() {
-    if (m_is_dark_mode) {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(37 / 255.0f, 61 / 255.0f, 77 / 255.0f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(37 / 255.0f, 61 / 255.0f, 77 / 255.0f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 0.4f));
-    }
-    else {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(198 / 255.0f, 208 / 255.0f, 214 / 255.0f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(198 / 255.0f, 208 / 255.0f, 214 / 255.0f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
-    }
+    ImGui::PushStyleColor(ImGuiCol_Button, RoostImGui::disabled_fill());
+    ImGui::PushStyleColor(ImGuiCol_Border, RoostImGui::line());
+    ImGui::PushStyleColor(ImGuiCol_Text, RoostImGui::disabled_text());
 }
 
 void ImGuiWrapper::pop_button_disable_style() {
@@ -2821,27 +2875,16 @@ void ImGuiWrapper::pop_button_disable_style() {
 
 void ImGuiWrapper::push_combo_style(const float scale)
 {
-    if (m_is_dark_mode) {
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 1.0f * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f * scale);
-        ImGui::PushStyleColor(ImGuiCol_PopupBg, ImGuiWrapper::COL_WINDOW_BG_DARK);
-        ImGui::PushStyleColor(ImGuiCol_BorderActive, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(COL_CREALITY.x, COL_CREALITY.y, COL_CREALITY.z, 0.5f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_Header, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGuiWrapper::COL_WINDOW_BG_DARK);
-        ImGui::PushStyleColor(ImGuiCol_Button, {1.00f, 1.00f, 1.00f, 0.0f});
-    } else {
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 1.0f * scale);
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f * scale);
-        ImGui::PushStyleColor(ImGuiCol_PopupBg, ImGuiWrapper::COL_WINDOW_BG);
-        ImGui::PushStyleColor(ImGuiCol_BorderActive, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(COL_CREALITY.x, COL_CREALITY.y, COL_CREALITY.z, 0.5f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_Header, COL_CREALITY);
-        ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGuiWrapper::COL_WINDOW_BG);
-        ImGui::PushStyleColor(ImGuiCol_Button, {1.00f, 1.00f, 1.00f, 0.0f});
-    }
+    // Roost: fields have 10px corners; the chosen item is yolk, hover is the wash, focus is yolk.
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, RoostImGui::kRadiusField * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f * scale);
+    ImGui::PushStyleColor(ImGuiCol_PopupBg, RoostImGui::surface());
+    ImGui::PushStyleColor(ImGuiCol_BorderActive, RoostImGui::yolk());
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, RoostImGui::wash());
+    ImGui::PushStyleColor(ImGuiCol_HeaderActive, RoostImGui::yolk_row());
+    ImGui::PushStyleColor(ImGuiCol_Header, RoostImGui::yolk_row());
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, RoostImGui::surface());
+    ImGui::PushStyleColor(ImGuiCol_Button, {1.00f, 1.00f, 1.00f, 0.0f});
 }
 
 void ImGuiWrapper::pop_combo_style()
@@ -2852,11 +2895,7 @@ void ImGuiWrapper::pop_combo_style()
 
 void ImGuiWrapper::push_radio_style()
 {
-    if (m_is_dark_mode) {
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, COL_CREALITY);
-    } else {
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, COL_CREALITY);
-    }
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, RoostImGui::link());
 }
 
 void ImGuiWrapper::pop_radio_style()
@@ -3459,55 +3498,19 @@ void ImGuiWrapper::init_style()
 {
     ImGuiStyle &style = ImGui::GetStyle();
 
-    auto set_color = [&](ImGuiCol_ entity, ImVec4 color) {
-        style.Colors[entity] = color;
-    };
+    // Roost Print: shapes from rapidroost.net. These are unscaled DIP values; set_scaling()
+    // multiplies them with ScaleAllSizes() whenever the canvas scale changes.
+    style.WindowRounding    = RoostImGui::kRadiusCard;  // cards: 14px
+    style.ChildRounding     = RoostImGui::kRadiusField;
+    style.FrameRounding     = RoostImGui::kRadiusFrame; // inputs / frames: 8px
+    style.PopupRounding     = 12.0f;
+    style.ScrollbarRounding = 12.0f;
+    style.GrabRounding      = 12.0f;                    // round slider thumbs
+    style.TabRounding       = RoostImGui::kRadiusField;
+    style.PopupBorderSize   = RoostImGui::kOutline;
 
-    //BBS modify style
-    // Window
-    style.WindowRounding = 0.0f;
-    set_color(ImGuiCol_WindowBg, COL_WINDOW_BACKGROUND);
-    set_color(ImGuiCol_TitleBgActive, COL_WINDOW_BACKGROUND);
-
-    // Generics
-    set_color(ImGuiCol_FrameBg, COL_GREY_DARK);
-    set_color(ImGuiCol_FrameBgHovered, COL_GREY_LIGHT);
-    set_color(ImGuiCol_FrameBgActive, COL_GREY_LIGHT);
-
-    // Text selection
-    set_color(ImGuiCol_TextSelectedBg, COL_ORANGE_DARK);
-
-    // Buttons
-    set_color(ImGuiCol_Button, COL_BUTTON_BACKGROUND);
-    set_color(ImGuiCol_ButtonHovered, COL_HOVER);
-    set_color(ImGuiCol_ButtonActive, COL_ACTIVE);
-
-    // Checkbox
-    set_color(ImGuiCol_CheckMark, COL_BLUE_LIGHT);
-
-    // ComboBox items
-    set_color(ImGuiCol_Header, COL_ORANGE_DARK);
-    set_color(ImGuiCol_HeaderHovered,	to_ImVec4(to_rgba(ColorRGB::ORCA(), 0.50f))); // ORCA Use orca color for headers
-    set_color(ImGuiCol_HeaderActive,	to_ImVec4(to_rgba(ColorRGB::ORCA(), 0.75f)));  // ORCA Use orca color for headers
-
-    // Slider
-    set_color(ImGuiCol_SliderGrab,			to_ImVec4(to_rgba(ColorRGB::ORCA(), 0.50f))); // ORCA Use orca color for slider thumbs 
-    set_color(ImGuiCol_SliderGrabActive,	to_ImVec4(to_rgba(ColorRGB::ORCA(), 0.75f))); // ORCA Use orca color for slider thumbs 
-
-    // Separator
-    set_color(ImGuiCol_Separator, COL_BLUE_LIGHT);
-
-    // Tabs
-    set_color(ImGuiCol_Tab, COL_ORANGE_DARK);
-    set_color(ImGuiCol_TabHovered, COL_BLUE_LIGHT);
-    set_color(ImGuiCol_TabActive, COL_BLUE_LIGHT);
-    set_color(ImGuiCol_TabUnfocused, COL_GREY_DARK);
-    set_color(ImGuiCol_TabUnfocusedActive, COL_GREY_LIGHT);
-
-    // Scrollbars
-    set_color(ImGuiCol_ScrollbarGrab, COL_ORANGE_DARK);
-    set_color(ImGuiCol_ScrollbarGrabHovered, COL_ORANGE_LIGHT);
-    set_color(ImGuiCol_ScrollbarGrabActive, COL_ORANGE_LIGHT);
+    // The theme flag starts as night (the app default) and is updated by on_change_color_mode().
+    apply_roost_style_colors();
 }
 
 void ImGuiWrapper::render_draw_data(ImDrawData *draw_data)

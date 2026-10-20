@@ -27,6 +27,7 @@
 #include "MsgDialog.hpp"
 #include "Widgets/ProgressDialog.hpp"
 #include "SingleChoiceDialog.hpp"
+#include "RoostImGuiBrand.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
@@ -6407,7 +6408,7 @@ void ObjectList::render_plate_tree_by_ImGui()
 {
     ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.0f, 0.0f, 0.0, 0.0f));
     ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0, 0.0f));
-    ImGui::PushStyleColor(ImGuiCol_Header, ImGuiWrapper::COL_CREALITY); // use for TreeNode be selected
+    ImGui::PushStyleColor(ImGuiCol_Header, RoostImGui::yolk()); // use for TreeNode be selected (Roost: yolk)
 
     wxDataViewItemArray all_plates;
     m_objects_model->GetChildren(wxDataViewItem(nullptr), all_plates);
@@ -6544,12 +6545,15 @@ void ObjectList::render_plate(ObjectDataViewModelNode* plate)
 
     if (plate_selected) {
         bool focused = get_object_list_window_focus();
+        // Roost: a selected row is yolk (ink text); when the list is not focused it keeps a yolk tint.
+        ImVec4 roost_unfocused_sel = RoostImGui::yolk();
+        roost_unfocused_sel.w      = 0.30f;
         if (focused) {
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(ImGuiWrapper::COL_CREALITY));
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(ImGuiWrapper::COL_CREALITY));
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(RoostImGui::yolk()));
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(RoostImGui::yolk()));
         } else {
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(ImVec4{0.118f, 0.565f, 0.847f, 0.15f}));
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(ImVec4{0.118f, 0.565f, 0.847f, 0.15f}));
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(roost_unfocused_sel));
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(roost_unfocused_sel));
         }
     } else {
         ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, IM_COL32_BLACK_TRANS);
@@ -6585,8 +6589,9 @@ void ObjectList::render_plate(ObjectDataViewModelNode* plate)
     }
 
     bool   is_dark    = wxGetApp().dark_mode();
-    ImVec4 text_color = is_dark ? ImVec4(1.0f, 1.0f, 1.0, 1.0f) :
-                                  (plate_selected ? ImVec4(1.0f, 1.0f, 1.0, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0f));
+    // Roost: ink text on the yolk selected row; otherwise the theme text colour.
+    ImVec4 text_color = (plate_selected && get_object_list_window_focus()) ? RoostImGui::yolk_text() :
+                        (is_dark ? ImVec4(1.0f, 1.0f, 1.0, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 
     bool open = ImGui::TreeNodeEx(plate_full_name.c_str(), tree_node_flags);
@@ -6768,18 +6773,22 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
     }
 
     bool   is_dark    = wxGetApp().dark_mode();
-    ImVec4 text_color = is_dark ? ImVec4(1.0f, 1.0f, 1.0, 1.0f) :
-                                  (node_selected ? ImVec4(1.0f, 1.0f, 1.0, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0f));
+    // Roost: ink text on the yolk selected row; otherwise the theme text colour.
+    ImVec4 text_color = (node_selected && get_object_list_window_focus()) ? RoostImGui::yolk_text() :
+                        (is_dark ? ImVec4(1.0f, 1.0f, 1.0, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 
     if (node_selected) {
         bool focused = get_object_list_window_focus();
+        // Roost: a selected row is yolk (ink text); when the list is not focused it keeps a yolk tint.
+        ImVec4 roost_unfocused_sel = RoostImGui::yolk();
+        roost_unfocused_sel.w      = 0.30f;
         if (focused) {
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(ImGuiWrapper::COL_CREALITY));
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(ImGuiWrapper::COL_CREALITY));
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(RoostImGui::yolk()));
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(RoostImGui::yolk()));
         } else {
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(ImVec4{0.118f, 0.565f, 0.847f, 0.15f}));
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(ImVec4{0.118f, 0.565f, 0.847f, 0.15f}));
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(roost_unfocused_sel));
+            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::GetColorU32(roost_unfocused_sel));
         }
 
     } else {
@@ -7745,7 +7754,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
 
     const ImVec4 transparent(0.0f, 0.0f, 0.0f, 0.0f);
     bool         is_dark = wxGetApp().dark_mode();
-    ImGui::PushStyleColor(ImGuiCol_Header, ImGuiWrapper::COL_CREALITY);
+    ImGui::PushStyleColor(ImGuiCol_Header, RoostImGui::yolk_row()); // Roost: selected option = yolk
     ImVec4 text_color = is_dark ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 
@@ -7948,7 +7957,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
 
     ImGui::PushItemWidth(printer_combo_width);
     ImGui::PushStyleColor(ImGuiCol_FrameBg, transparent);
-    ImGui::PushStyleColor(ImGuiCol_Header, ImGuiWrapper::COL_CREALITY);
+    ImGui::PushStyleColor(ImGuiCol_Header, RoostImGui::yolk_row()); // Roost: selected option = yolk
 
     static bool                    next_loop_open = false;
     static PrinterMachineKey       pending_machine_key;
@@ -8065,7 +8074,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
     m_PrintCombo = rect;
     if (click) {
         const auto draw_printer_option = [scale, transparent](const char* label, bool is_selected) {
-            const ImVec4 option_hover_background = is_selected ? ImGuiWrapper::COL_CREALITY : transparent;
+            const ImVec4 option_hover_background = is_selected ? RoostImGui::yolk_row() : transparent; // Roost: selected = yolk
             ImGui::PushStyleColor(ImGuiCol_HeaderHovered, option_hover_background);
             ImGui::PushStyleColor(ImGuiCol_HeaderActive, option_hover_background);
             const bool pressed = ImGui::CPSelectable(label, is_selected);
@@ -8333,7 +8342,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
         {
             ImGui::PushItemWidth(bed_type_combo_width);
             ImGui::PushStyleColor(ImGuiCol_FrameBg, transparent);
-            ImGui::PushStyleColor(ImGuiCol_Header, ImGuiWrapper::COL_CREALITY);
+            ImGui::PushStyleColor(ImGuiCol_Header, RoostImGui::yolk_row()); // Roost: selected option = yolk
 
             int bed_type_selected_idx = bar.get_selection_bed_type(); // Here we store our selection data as an index.
             // Pass in the preview value visible before opening the combo (it could technically be different contents or not pulled
@@ -8362,7 +8371,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
                                      ImGuiComboFlags_HeightLargest, 200.0f * scale, 30.0f * scale)) {
                 for (int n = 0; n < bed_types.size(); n++) {
                     const bool is_selected = (bed_type_selected_idx == n);
-                    const ImVec4 option_hover_background = is_selected ? ImGuiWrapper::COL_CREALITY : transparent;
+                    const ImVec4 option_hover_background = is_selected ? RoostImGui::yolk_row() : transparent; // Roost: selected = yolk
                     ImGui::PushStyleColor(ImGuiCol_HeaderHovered, option_hover_background);
                     ImGui::PushStyleColor(ImGuiCol_HeaderActive, option_hover_background);
                     if (ImGui::Selectable(bed_types[n].c_str(), is_selected)) {
@@ -8491,7 +8500,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
         ImGui::PushStyleColor(ImGuiCol_Button, combo_background);
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, combo_hovered);
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, combo_hovered);
-        ImGui::PushStyleColor(ImGuiCol_Header, ImGuiWrapper::COL_CREALITY);
+        ImGui::PushStyleColor(ImGuiCol_Header, RoostImGui::yolk_row()); // Roost: selected option = yolk
         if (should_disable_combo) {
             ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
             ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
@@ -8517,7 +8526,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
                 // Keep the selected nozzle filled green. Other options use the
                 // same green outline hover treatment as the application's
                 // standard dropdowns instead of another filled background.
-                const ImVec4 option_hover_background = is_selected ? ImGuiWrapper::COL_CREALITY : transparent;
+                const ImVec4 option_hover_background = is_selected ? RoostImGui::yolk_row() : transparent; // Roost: selected = yolk
                 ImGui::PushStyleColor(ImGuiCol_HeaderHovered, option_hover_background);
                 ImGui::PushStyleColor(ImGuiCol_HeaderActive, option_hover_background);
                 if (ImGui::Selectable(label.c_str(), is_selected)) {

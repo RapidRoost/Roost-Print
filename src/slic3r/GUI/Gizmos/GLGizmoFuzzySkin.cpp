@@ -8,6 +8,7 @@
 
 #include "slic3r/GUI/GLCanvas3D.hpp"
 #include "slic3r/GUI/GUI_App.hpp"
+#include "slic3r/GUI/RoostImGuiBrand.hpp"
 #include "slic3r/GUI/GUI_ObjectList.hpp"
 #include "slic3r/GUI/ImGuiWrapper.hpp"
 #include "slic3r/GUI/MsgDialog.hpp"
@@ -271,19 +272,19 @@ void GLGizmoFuzzySkin::on_render_input_window(float x, float y, float bottom_lim
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0);
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));						// ORCA: Fixes icon rendered without colors while using Light theme
         ImGui::PushStyleColor(ImGuiCol_Button, m_is_dark_mode ? ImVec4(0.349f, 0.459f, 0.529f, 1.f) : ImVec4(1.f, 1.f, 1.f, 1.f));	// ORCA use orca color for selected tool / brush
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiWrapper::COL_CREALITY);	// ORCA use orca color for selected tool / brush
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiWrapper::COL_CREALITY);	// ORCA use orca color for selected tool / brush
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, RoostImGui::wash()); // Roost: hover = blue wash
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, RoostImGui::yolk()); // Roost: press = yolk
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0);
         if (m_current_tool == tool_ids[i]) {
     
-            ImGui::PushStyleColor(ImGuiCol_Button, ImGuiWrapper::COL_CREALITY);	// ORCA use orca color for selected tool / brush
+            RoostImGui::push_selected_button_colors(); // Roost: selected tool = yolk, ink icon
  
         }
         bool btn_clicked = ImGui::Button(into_u8(btn_name).c_str());
         if (m_current_tool == tool_ids[i])
         {
-            ImGui::PopStyleColor(1);
+            ImGui::PopStyleColor(RoostImGui::kSelectedButtonColorCount);
         }
         ImGui::PopStyleColor(4);
         ImGui::PopStyleVar(3);
