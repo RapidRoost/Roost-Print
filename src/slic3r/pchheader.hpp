@@ -201,10 +201,15 @@
 // sign) instead of the plain Windows box. The real one is still there as (wxMessageBox)(...),
 // and is used before the app is up. See roost_message_box in GUI/MsgDialog.cpp.
 #include <wx/msgdlg.h>
+#ifndef ROOST_MESSAGE_BOX_DECLARED // this header can be included twice (forced, then by name)
+#define ROOST_MESSAGE_BOX_DECLARED
 namespace Slic3r { namespace GUI {
 int roost_message_box(const wxString& message, const wxString& caption = wxMessageBoxCaptionStr,
                       long style = wxOK | wxCENTRE, wxWindow* parent = nullptr, int x = wxDefaultCoord, int y = wxDefaultCoord);
 } }
+#endif
+#ifndef wxMessageBox
 #define wxMessageBox(...) ::Slic3r::GUI::roost_message_box(__VA_ARGS__)
+#endif
 
 #endif // __cplusplus
