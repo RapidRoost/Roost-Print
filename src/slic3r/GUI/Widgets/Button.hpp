@@ -6,6 +6,10 @@
 
 class Button : public StaticBox
 {
+public:
+    enum class RoostLook { Auto, Sticker, Tab, Plain }; // Roost Print: see SetRoostLook
+
+private:
     wxRect textSize;
     wxSize minSize; // set by outer
     wxSize paddingSize;
@@ -20,6 +24,8 @@ class Button : public StaticBox
     bool isCenter = true;
     bool isFtBold = false;
     bool iconAtTextTopRight = false;
+    RoostLook m_roost_look = RoostLook::Auto;
+    bool m_roost_selected = false;
 
     static const int buttonWidth = 200;
     static const int buttonHeight = 50;
@@ -67,6 +73,14 @@ public:
 
     void SetFontBold(bool bBold);
 
+    // Roost Print: how the button is drawn.
+    //   Auto     a "sticker" (the website's .rr-btn) when it has a label, else as before
+    //   Sticker  pill, 2px outline, hard shadow; blue-ink when it was a blue button, yolk when checked
+    //   Tab      the website's tabs: plain, blue wash on hover, yolk pill with an outline when selected
+    //   Plain    as Creality drew it
+    void SetRoostLook(RoostLook look);
+    void SetRoostSelected(bool selected);
+
 protected:
 #ifdef __WIN32__
     WXLRESULT MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam) override;
@@ -76,6 +90,9 @@ private:
     void paintEvent(wxPaintEvent& evt);
 
     void render(wxDC& dc);
+    void renderContent(wxDC& dc, const wxRect& area, const wxColour& text);
+    void renderRoost(wxDC& dc, RoostLook look);
+    RoostLook roostLook() const;
 
     void messureSize();
 

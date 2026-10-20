@@ -27,7 +27,7 @@ SpinInput::SpinInput()
     , text_color(std::make_pair(0x7D94A3, (int) StateColor::Disabled), std::make_pair(0x1B2F3B, (int) StateColor::Normal))
     , text_updating(false)
 {
-    radius = 4;
+    radius = 8; // Roost Print: the website's rounder fields
     border_width     = 1;
     border_color     = StateColor(std::make_pair(0xD5DCE1, (int) StateColor::Disabled), std::make_pair(wxColour("#1877B4"), (int) StateColor::Hovered),
                               std::make_pair(0xD5DCE1, (int) StateColor::Normal));

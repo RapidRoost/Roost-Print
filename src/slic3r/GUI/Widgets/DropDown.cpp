@@ -1,5 +1,7 @@
 #include "DropDown.hpp"
 #include "Label.hpp"
+#include "RoostBrand.hpp"
+#include "slic3r/GUI/GUI_App.hpp"
 
 #include <wx/display.h>
 #include <wx/dcbuffer.h>
@@ -456,11 +458,17 @@ void DropDown::render(wxDC &dc)
     if (hover_item >= 0 && (states & StateColor::Hovered) && !IsGroupHeader(hover_item)) {
         rcContent.y += GetItemY(hover_item);
         if (rcContent.GetBottom() > 0 && rcContent.y < size.y) {
-            if (selection == hover_item)
-                dc.SetBrush(wxBrush(selector_background_color.colorForStates(states | StateColor::Checked)));
-            dc.SetPen(wxPen(selector_border_color.colorForStates(states)));
+            // Roost Print: hover is the website's blue wash; the chosen row is yolk with an outline.
+            const RoostBrand::Palette P = RoostBrand::palette(Slic3r::GUI::wxGetApp().dark_mode());
+            if (selection == hover_item) {
+                dc.SetBrush(wxBrush(P.yolk));
+                dc.SetPen(wxPen(P.ink, dip(RoostBrand::kOutline)));
+            } else {
+                dc.SetBrush(wxBrush(P.wash));
+                dc.SetPen(*wxTRANSPARENT_PEN);
+            }
             rcContent.Deflate(4, 1);
-            dc.DrawRectangle(rcContent);
+            dc.DrawRoundedRectangle(rcContent, dip(8));
             rcContent.Inflate(4, 1);
         }
         rcContent.y = offset.y;
@@ -469,10 +477,11 @@ void DropDown::render(wxDC &dc)
     if (selection >= 0 && (selection != hover_item || (states & StateColor::Hovered) == 0) && !IsGroupHeader(selection)) {
         rcContent.y += GetItemY(selection);
         if (rcContent.GetBottom() > 0 && rcContent.y < size.y) {
-            dc.SetBrush(wxBrush(selector_background_color.colorForStates(states | StateColor::Checked)));
-            dc.SetPen(wxPen(selector_background_color.colorForStates(states)));
+            const RoostBrand::Palette P = RoostBrand::palette(Slic3r::GUI::wxGetApp().dark_mode());
+            dc.SetBrush(wxBrush(P.yolk));
+            dc.SetPen(wxPen(P.ink, dip(RoostBrand::kOutline)));
             rcContent.Deflate(4, 1);
-            dc.DrawRectangle(rcContent);
+            dc.DrawRoundedRectangle(rcContent, dip(8));
             rcContent.Inflate(4, 1);
         }
         rcContent.y = offset.y;
@@ -568,6 +577,8 @@ void DropDown::render(wxDC &dc)
 
         wxPoint pt   = wxPoint(rcContent.x, item_y);
         pt.x += indentFor(i);
+        // Roost Print: ink text on the yolk row.
+        dc.SetTextForeground(i == selection ? RoostBrand::kInk : text_color.colorForStates(states));
         auto & icon = icons[i];
         auto size2 = GetBmpSize(icon);
         if (iconSize.x > 0) {

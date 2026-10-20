@@ -1,5 +1,7 @@
 #include "TabButton.hpp"
 #include "Widgets/Label.hpp"
+#include "Widgets/RoostBrand.hpp"
+#include "GUI_App.hpp"
 
 #include <wx/dcclient.h>
 #include <wx/dcgraph.h>
@@ -146,13 +148,27 @@ void TabButton::paintEvent(wxPaintEvent &evt)
  */
 void TabButton::render(wxDC &dc)
 {
-    StaticBox::render(dc);
     int    states = state_handler.states();
     wxSize size   = GetSize();
 
-    dc.SetPen(wxPen(border_color.colorForStates(states)));
-    dc.SetBrush(*wxTRANSPARENT_BRUSH);
-    dc.DrawRectangle(0, 0, size.x, size.y);
+    // Roost Print: like the website's tabs. Selected is a yolk pill with an ink outline,
+    // hover is the blue wash, the rest sit flat on the panel.
+    const RoostBrand::Palette P = RoostBrand::palette(Slic3r::GUI::wxGetApp().dark_mode());
+    const bool selected = background_color.colorForStatesNoDark(StateColor::Enabled) == TAB_BUTTON_SEL;
+    const bool hovered  = (states & StateColor::Hovered) != 0;
+    {
+        dc.SetPen(*wxTRANSPARENT_PEN);
+        dc.SetBrush(wxBrush(GetBackgroundColour()));
+        dc.DrawRectangle(0, 0, size.x, size.y);
+        const int line = FromDIP(RoostBrand::kOutline);
+        wxRect pill(FromDIP(4), FromDIP(2), size.x - FromDIP(8), size.y - FromDIP(4));
+        if (selected || hovered) {
+            dc.SetBrush(wxBrush(selected ? P.yolk : P.wash));
+            dc.SetPen(selected ? wxPen(P.ink, line) : *wxTRANSPARENT_PEN);
+            dc.DrawRoundedRectangle(pill, FromDIP(RoostBrand::kRadiusField));
+        }
+        dc.SetBrush(*wxTRANSPARENT_BRUSH);
+    }
 
     // calc content size
     wxSize szIcon;
@@ -177,8 +193,10 @@ void TabButton::render(wxDC &dc)
     if (!text.IsEmpty()) {
         pt.x = paddingSize.x;
         pt.y = rcContent.y + (rcContent.height - textSize.y) / 2;
-        dc.SetFont(GetFont());
-        dc.SetTextForeground(text_color.colorForStates(states));
+        wxFont f = GetFont();
+        if (selected) f.SetWeight(wxFONTWEIGHT_BOLD);
+        dc.SetFont(f);
+        dc.SetTextForeground(selected ? P.yolk_text : text_color.colorForStates(states));
         dc.DrawText(text, pt);
     }
 

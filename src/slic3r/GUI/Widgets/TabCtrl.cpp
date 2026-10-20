@@ -119,6 +119,7 @@ int TabCtrl::AppendItem(const wxString &item,
         std::make_pair(0x1E90D8, (int)StateColor::Normal),
         std::make_pair(0x1E90D8, (int)StateColor::NotHovered)));
     btn->SetCornerRadius(0);
+    btn->SetRoostLook(Button::RoostLook::Tab); // Roost Print: yolk pill when selected, like the website's tabs
     btn->SetPaddingSize({TAB_BUTTON_PADDING});
     btns.push_back(btn);
     if (btns.size() > 1)

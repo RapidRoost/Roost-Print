@@ -1,6 +1,9 @@
 #include "Button.hpp"
 #include "Label.hpp"
 #include "slic3r/GUI/GUI_App.hpp"
+#include "RoostBrand.hpp"
+
+#include <cstdlib>
 
 #include <wx/dcbuffer.h>
 #include <wx/dcgraph.h>
@@ -203,10 +206,144 @@ void Button::paintEvent(wxPaintEvent& evt)
  */
 void Button::render(wxDC& dc)
 {
+    const RoostLook look = roostLook();
+    if (look != RoostLook::Plain) {
+        renderRoost(dc, look);
+        return;
+    }
     StaticBox::render(dc);
+    renderContent(dc, wxRect({0, 0}, GetSize()), text_color.colorForStates(state_handler.states()));
+}
 
+void Button::SetRoostLook(RoostLook look)
+{
+    if (m_roost_look == look)
+        return;
+    m_roost_look = look;
+    messureSize();
+    Refresh();
+}
+
+void Button::SetRoostSelected(bool selected)
+{
+    if (m_roost_selected == selected)
+        return;
+    m_roost_selected = selected;
+    Refresh();
+}
+
+Button::RoostLook Button::roostLook() const
+{
+    if (m_roost_look != RoostLook::Auto)
+        return m_roost_look;
+    // Icon-only buttons (toolbars, close crosses, expanders) stay as they were.
+    wxString label = GetLabel();
+    if (label.Trim().Trim(false).IsEmpty())
+        return RoostLook::Plain;
+    // So do text links: no border and the same colour as what's behind them.
+    if (border_width == 0) {
+        StateColor bg = background_color;
+        const wxColour mine = bg.colorForStates(StateColor::Enabled);
+        const wxColour behind = GetBackgroundColour();
+        if (mine.IsOk() && behind.IsOk() &&
+            std::abs(mine.Red() - behind.Red()) + std::abs(mine.Green() - behind.Green()) + std::abs(mine.Blue() - behind.Blue()) < 12)
+            return RoostLook::Plain;
+    }
+    return RoostLook::Sticker;
+}
+
+// Roost Print: the website's buttons. Stickers are pills with a 2px outline and a hard shadow
+// down-right (rr.css .rr-btn); they lift on hover and sink when pressed. Tabs are plain until
+// hovered (blue wash) or selected (yolk pill with an outline, like .farm-tabs).
+void Button::renderRoost(wxDC& dc, RoostLook look)
+{
+    const wxSize size = GetSize();
+    if (size.x <= 0 || size.y <= 0)
+        return;
+    const bool dark = Slic3r::GUI::wxGetApp().dark_mode();
+    const RoostBrand::Palette P = RoostBrand::palette(dark);
+    const int  states   = state_handler.states();
+    const bool enabled  = IsThisEnabled();
+    const bool hovered  = enabled && (states & StateColor::Hovered);
+    const bool pressed  = enabled && pressedDown && hovered;
+    const bool checked  = (states & StateColor::Checked) != 0;
+
+    // What Creality meant this button to be: blue (primary), red (alarm) or neutral.
+    wxColour meant = background_color.colorForStatesNoDark(StateColor::Enabled | (states & StateColor::Checked));
+    if (!meant.IsOk() || meant.Alpha() == 0)
+        meant = background_color.colorForStates(StateColor::Enabled);
+    const bool primary = RoostBrand::is_brand_blue(meant);
+    const bool alarm   = RoostBrand::is_alarm(meant);
+
+    const wxColour parent_bg = GetBackgroundColour();
+    wxColour fill, outline = P.ink, text;
+    bool shadow = false, draw_outline = true;
+    if (look == RoostLook::Tab) {
+        const bool selected = m_roost_selected || checked;
+        if (selected)      { fill = P.yolk; text = P.yolk_text; }
+        else if (hovered)  { fill = P.wash; text = P.text; draw_outline = false; }
+        else               { fill = parent_bg; text = P.text; draw_outline = false; }
+    } else {
+        shadow = enabled;
+        if (!enabled)      { fill = P.disabled_fill; text = P.disabled_text; outline = P.line; }
+        else if (checked)  { fill = P.yolk; text = P.yolk_text; }
+        else if (primary)  { fill = hovered ? (dark ? RoostBrand::kBlue : RoostBrand::kBlueDeep) : P.primary; text = P.primary_text; }
+        else if (alarm)    { fill = hovered ? P.error.ChangeLightness(90) : P.error; text = RoostBrand::kWhite; }
+        else               { fill = hovered ? P.wash : P.surface; text = P.text; }
+    }
+
+    const int  line   = FromDIP(RoostBrand::kOutline);
+    const int sh = shadow ? FromDIP(size.y < FromDIP(28) ? 2 : RoostBrand::kShadow) : 0;
+    // The sticker: normal sits 1px up-left of its shadow's full offset; hover lifts, press sinks.
+    const int lift = shadow ? (pressed ? sh : (hovered ? 0 : 1)) : 0;
+    const int reserve = shadow ? sh + 1 : 0;
+    wxRect pill(lift, lift, size.x - reserve, size.y - reserve);
+    if (!shadow) pill = wxRect(0, 0, size.x, size.y);
+    if (pill.width <= 2 * line || pill.height <= 2 * line) {
+        StaticBox::render(dc);
+        renderContent(dc, wxRect({0, 0}, size), text_color.colorForStates(states));
+        return;
+    }
+    const double radius = pill.height / 2.0;
+
+    wxBitmap bmp(size.x, size.y);
+    wxMemoryDC memdc;
+    memdc.SelectObject(bmp);
+    memdc.SetBackground(wxBrush(parent_bg));
+    memdc.Clear();
+    {
+        wxGCDC g(memdc);
+        g.SetFont(GetFont());
+        if (shadow) {
+            g.SetPen(*wxTRANSPARENT_PEN);
+            g.SetBrush(wxBrush(P.ink));
+            g.DrawRoundedRectangle(wxRect(reserve, reserve, pill.width, pill.height), radius);
+        }
+        g.SetBrush(wxBrush(fill));
+        if (draw_outline) {
+            g.SetPen(wxPen(outline, line));
+            wxRect inner = pill;
+            inner.Deflate(line / 2);
+            g.DrawRoundedRectangle(inner, std::max(0.0, radius - line / 2.0));
+        } else {
+            g.SetPen(*wxTRANSPARENT_PEN);
+            g.DrawRoundedRectangle(pill, radius);
+        }
+        wxFont f = GetFont();
+        f.SetWeight(wxFONTWEIGHT_BOLD);
+        g.SetFont(f);
+        wxRect area = pill;
+        area.Deflate(std::min(FromDIP(6), pill.width / 6), 0);
+        renderContent(g, area, text);
+    }
+    memdc.SelectObject(wxNullBitmap);
+    dc.DrawBitmap(bmp, 0, 0);
+}
+
+void Button::renderContent(wxDC& dc, const wxRect& area, const wxColour& text_colour)
+{
     int states = state_handler.states();
-    wxSize size = GetSize();
+    wxSize size = area.GetSize();
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
     // calc content size
     wxSize szIcon;
@@ -237,7 +374,7 @@ void Button::render(wxDC& dc)
         }
     }
     // move to center
-    wxRect rcContent = { {0, 0}, size };
+    wxRect rcContent = area;
     if (isCenter) {
         wxSize offset = (size - szContent) / 2;
         if (offset.x < 0) offset.x = 0;
@@ -259,10 +396,10 @@ void Button::render(wxDC& dc)
     }
     auto text = GetLabel();
     if (!text.IsEmpty()) {
-        if (pt.x + textSize.width > size.x)
-            text = wxControl::Ellipsize(text, dc, wxELLIPSIZE_END, size.x - pt.x);
+        if (pt.x + textSize.width > area.GetRight() + 1)
+            text = wxControl::Ellipsize(text, dc, wxELLIPSIZE_END, std::max(0, area.GetRight() + 1 - pt.x));
         pt.y += (rcContent.height - textSize.height) / 2;
-        dc.SetTextForeground(text_color.colorForStates(states));
+        dc.SetTextForeground(text_colour);
 
         if (isFtBold)
         {
@@ -282,6 +419,12 @@ void Button::render(wxDC& dc)
 void Button::messureSize()
 {
     wxClientDC dc(this);
+    const bool roost = roostLook() != RoostLook::Plain;
+    if (roost) {
+        wxFont f = GetFont();
+        f.SetWeight(wxFONTWEIGHT_BOLD);
+        dc.SetFont(f);
+    }
     dc.GetTextExtent(GetLabel(), &textSize.width, &textSize.height, &textSize.x, &textSize.y);
     wxSize szContent = textSize.GetSize();
     if (this->active_icon.bmp().IsOk()) {
@@ -298,6 +441,12 @@ void Button::messureSize()
             szContent.y = szIcon.y;
     }
     wxSize size = szContent + paddingSize * 2;
+    if (roost) {
+        // Room for the pill's round ends and, for stickers, the shadow.
+        const int sh = roostLook() == RoostLook::Sticker ? FromDIP(RoostBrand::kShadow) + 1 : 0;
+        size.x += FromDIP(12) + sh;
+        size.y += sh;
+    }
     if (minSize.GetHeight() > 0)
         size.SetHeight(minSize.GetHeight());
 
@@ -311,6 +460,7 @@ void Button::mouseDown(wxMouseEvent& event)
 {
     event.Skip();
     pressedDown = true;
+    Refresh(); // Roost Print: stickers sink while pressed
     if (canFocus)
         SetFocus();
     if (!HasCapture())
@@ -322,6 +472,7 @@ void Button::mouseReleased(wxMouseEvent& event)
     event.Skip();
     if (pressedDown) {
         pressedDown = false;
+        Refresh();
         if (HasCapture())
             ReleaseMouse();
         if (wxRect({0, 0}, GetSize()).Contains(event.GetPosition()))
@@ -426,8 +577,16 @@ void RoundedButton::Render(wxDC& dc)
 
         // 绘制圆角背景
         gc->SetBrush(wxBrush(m_bgColor));
-        gc->SetPen(*wxTRANSPARENT_PEN);
-        gc->DrawRoundedRectangle(rect.x, rect.y, rect.width, rect.height, m_cornerRadius);
+        if (GetLabel().IsEmpty()) {
+            gc->SetPen(*wxTRANSPARENT_PEN);
+            gc->DrawRoundedRectangle(rect.x, rect.y, rect.width, rect.height, m_cornerRadius);
+        } else {
+            // Roost Print: a pill with the website's 2px outline.
+            const double line = FromDIP(RoostBrand::kOutline);
+            gc->SetPen(wxPen(RoostBrand::palette(Slic3r::GUI::wxGetApp().dark_mode()).ink, line));
+            gc->DrawRoundedRectangle(rect.x + line / 2, rect.y + line / 2, rect.width - line, rect.height - line,
+                                     (rect.height - line) / 2.0);
+        }
 
         // 绘制图标（如果存在）
         if (m_icon.IsOk()) {

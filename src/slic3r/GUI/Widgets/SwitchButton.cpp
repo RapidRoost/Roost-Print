@@ -1,6 +1,8 @@
 #include "SwitchButton.hpp"
 #include "Label.hpp"
 #include "StaticBox.hpp"
+#include "RoostBrand.hpp"
+#include "../GUI_App.hpp"
 
 #include "../wxExtensions.hpp"
 #include "../Utils/MacDarkMode.hpp"
@@ -27,7 +29,7 @@ SwitchButton::SwitchButton(wxWindow* parent, wxWindowID id)
 	, m_off(this, "toggle_off", 16)
     , text_color(std::pair{0xfffffe, (int) StateColor::Checked}, std::pair{0x547082, (int) StateColor::Normal})
 	, track_color(0xD3DADF)
-    , thumb_color(std::pair{0x1E90D8, (int) StateColor::Checked}, std::pair{0xD3DADF, (int) StateColor::Normal})
+    , thumb_color(std::pair{0x1268A8, (int) StateColor::Checked}, std::pair{0xD3DADF, (int) StateColor::Normal})
 {
 	SetBackgroundColour(StaticBox::GetParentBackgroundColor(parent));
 	Bind(wxEVT_TOGGLEBUTTON, [this](auto& e) { update(); e.Skip(); });
@@ -259,47 +261,42 @@ void SwitchBoard::render(wxDC &dc)
 
 void SwitchBoard::doRender(wxDC &dc)
 {
-    wxColour disable_color = wxColour(0xC6D0D6);
+    // Roost Print: the website's segmented control (.rr-seg): a rounded chip-coloured track, and the
+    // chosen side as a yolk pill with an ink outline (selected things are yolk everywhere).
+    const RoostBrand::Palette P = RoostBrand::palette(Slic3r::GUI::wxGetApp().dark_mode());
+    const wxSize sz   = GetSize();
+    const int    line = FromDIP(RoostBrand::kOutline);
+    const double r    = sz.y / 2.0;
 
     dc.SetPen(*wxTRANSPARENT_PEN);
+    dc.SetBrush(wxBrush(is_enable ? P.chip : P.disabled_fill));
+    dc.DrawRoundedRectangle(0, 0, sz.x, sz.y, r);
 
-    if (is_enable) {dc.SetBrush(wxBrush(0xEBEFF1));
-    } else {dc.SetBrush(disable_color);}
-    dc.DrawRoundedRectangle(0, 0, GetSize().x, GetSize().y, 8);
+    auto draw_side = [&](int x, bool on) {
+        if (!on)
+            return;
+        wxRect rc(x + line, line, sz.x / 2 - 2 * line, sz.y - 2 * line);
+        dc.SetBrush(wxBrush(is_enable ? P.yolk : P.disabled_fill));
+        dc.SetPen(wxPen(is_enable ? P.ink : P.line, line));
+        dc.DrawRoundedRectangle(rc, rc.height / 2.0);
+        dc.SetPen(*wxTRANSPARENT_PEN);
+    };
+    draw_side(0, switch_left);
+    draw_side(sz.x / 2, switch_right);
 
-	/*left*/
-    if (switch_left) {
-        is_enable ? dc.SetBrush(wxBrush(wxColour(30, 144, 216))) : dc.SetBrush(disable_color);
-        dc.DrawRoundedRectangle(0, 0, GetSize().x / 2, GetSize().y, 8);
-	}
+    wxFont f = ::Label::Body_13;
+    f.SetWeight(wxFONTWEIGHT_BOLD);
+    dc.SetFont(f);
+    Slic3r::GUI::WxFontUtils::get_suitable_font_size(0.6 * sz.GetHeight(), dc);
 
-    if (switch_left) {
-		dc.SetTextForeground(*wxWHITE);
-    } else {
-        dc.SetTextForeground(0x203746);
-	}
-
-    dc.SetFont(::Label::Body_13);
-    Slic3r::GUI::WxFontUtils::get_suitable_font_size(0.6 * GetSize().GetHeight(), dc);
-
+    const wxColour off_text = is_enable ? P.text : P.disabled_text;
     auto left_txt_size = dc.GetTextExtent(leftLabel);
-    dc.DrawText(leftLabel, wxPoint((GetSize().x / 2 - left_txt_size.x) / 2, (GetSize().y - left_txt_size.y) / 2));
-
-	/*right*/
-    if (switch_right) {
-        if (is_enable) {dc.SetBrush(wxBrush(wxColour(30, 144, 216)));
-        } else {dc.SetBrush(disable_color);}
-        dc.DrawRoundedRectangle(GetSize().x / 2, 0, GetSize().x / 2, GetSize().y, 8);
-	}
+    dc.SetTextForeground(switch_left && is_enable ? P.yolk_text : off_text);
+    dc.DrawText(leftLabel, wxPoint((sz.x / 2 - left_txt_size.x) / 2, (sz.y - left_txt_size.y) / 2));
 
     auto right_txt_size = dc.GetTextExtent(rightLabel);
-    if (switch_right) {
-        dc.SetTextForeground(*wxWHITE);
-    } else {
-        dc.SetTextForeground(0x203746);
-    }
-    dc.DrawText(rightLabel, wxPoint((GetSize().x / 2 - right_txt_size.x) / 2 + GetSize().x / 2, (GetSize().y - right_txt_size.y) / 2));
-
+    dc.SetTextForeground(switch_right && is_enable ? P.yolk_text : off_text);
+    dc.DrawText(rightLabel, wxPoint((sz.x / 2 - right_txt_size.x) / 2 + sz.x / 2, (sz.y - right_txt_size.y) / 2));
 }
 
 void SwitchBoard::on_left_down(wxMouseEvent &evt)
