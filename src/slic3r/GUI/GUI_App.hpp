@@ -206,6 +206,8 @@ struct Customize_Config
 class GUI_App : public wxApp
 {
 public:
+    // Roost Print: the app is shutting down (message boxes fall back to the plain Windows box).
+    bool is_closing() const { return m_is_closing; }
 
     //BBS: remove GCodeViewer as seperate APP logic
     enum class EAppMode : unsigned char

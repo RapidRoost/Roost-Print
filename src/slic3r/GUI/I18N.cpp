@@ -23,12 +23,35 @@ bool is_chinese()
 	return cached_result;
 }
 
+wxString debrand(const wxString &in)
+{
+	if (!in.Contains("Creality"))
+		return in;
+	wxString s = in;
+	// The app's own name.
+	s.Replace("Creality3DSlicer", "Roost Print");
+	s.Replace("CrealityPrint", "Roost Print");
+	s.Replace("Creality Print", "Roost Print");
+	// Creality's cloud.
+	s.Replace("CrealityCloud", "Cloud");
+	s.Replace("Creality Cloud", "Cloud");
+	// Filament advice: the shop runs on Polymaker.
+	s.Replace("Creality filament", "Polymaker filament");
+	// "Creality printer", "Creality K2 Plus": just the printer.
+	s.Replace("Creality printers", "printers");
+	s.Replace("Creality printer", "printer");
+	s.Replace("Creality ", "");
+	// Anything left ("Creality" on its own).
+	s.Replace("Creality", "Rapid Roost");
+	return s;
+}
+
 } // namespace I18N
 
 wxString L_str(const std::string &str)
 {
 	//! Explicitly specify that the source string is already in UTF-8 encoding
-	return wxGetTranslation(wxString(str.c_str(), wxConvUTF8));
+	return I18N::roost_tr(wxString(str.c_str(), wxConvUTF8));
 }
 
 } }

@@ -5,6 +5,7 @@
 #include <wx/stattext.h>
 #include <wx/button.h>
 #include <wx/statbmp.h>
+#include <wx/thread.h>
 #include <wx/scrolwin.h>
 #include <wx/clipbrd.h>
 #include <wx/checkbox.h>
@@ -225,11 +226,11 @@ void MsgDialog::apply_style(long style)
     if (style & wxNO)       add_button(wxID_NO, false,_L("No"));
     if (style & wxCANCEL)   add_button(wxID_CANCEL, false, _L("Cancel"));
 
-    logo->SetBitmap( create_scaled_bitmap(style & wxAPPLY        ? "completed" :
-                                          style & wxICON_WARNING        ? "exclamation" : // ORCA "exclamation" used for dialogs "obj_warning" used for 16x16 areas
-                                          style & wxICON_INFORMATION    ? "info"        :
-                                          style & wxICON_ERROR    ? "error_message"        :
-                                          style & wxICON_QUESTION       ? "question"    : Slic3r::CxBuildInfo::getIconName(), this, 64, false));
+    logo->SetBitmap( create_scaled_bitmap(style & wxAPPLY        ? "roost_alert_done" :
+                                          style & wxICON_WARNING        ? "roost_alert_warning" : // ORCA "roost_alert_warning" used for dialogs "obj_warning" used for 16x16 areas
+                                          style & wxICON_INFORMATION    ? "roost_alert_info"        :
+                                          style & wxICON_ERROR    ? "roost_alert_error"        :
+                                          style & wxICON_QUESTION       ? "roost_alert_question"    : std::string("roost_alert_info"), this, 64, false));
 }
 
 void MsgDialog::finalize()
@@ -357,7 +358,7 @@ ErrorDialog::ErrorDialog(wxWindow *parent, const wxString &msg, bool monospaced_
 
 	// Use a small bitmap with monospaced font, as the error text will not be wrapped.
     //_grayscale
-    logo->SetBitmap(create_scaled_bitmap(Slic3r::CxBuildInfo::getIconName()  + "_192px.png", this, monospaced_font ? 48 : /*1*/ 84));
+    logo->SetBitmap(create_scaled_bitmap("roost_alert_error", this, monospaced_font ? 48 : /*1*/ 84));
 
     SetMaxSize(wxSize(-1, CONTENT_MAX_HEIGHT*wxGetApp().em_unit()));
 
@@ -453,11 +454,11 @@ void ChangeBtnRichMsgDlg::apply_style(long style) {
     if (style & wxCANCEL)
         add_button(wxID_CANCEL, false, _L("Continue Export (Not Recommended)"));
 
-    logo->SetBitmap( create_scaled_bitmap(style & wxAPPLY        ? "completed" :
-                                          style & wxICON_WARNING        ? "exclamation" : // ORCA "exclamation" used for dialogs "obj_warning" used for 16x16 areas
-                                          style & wxICON_INFORMATION    ? "info"        :
-                                          style & wxICON_ERROR    ? "error_message"        :
-                                          style & wxICON_QUESTION       ? "question"    : Slic3r::CxBuildInfo::getIconName(), this, 64, false));
+    logo->SetBitmap( create_scaled_bitmap(style & wxAPPLY        ? "roost_alert_done" :
+                                          style & wxICON_WARNING        ? "roost_alert_warning" : // ORCA "roost_alert_warning" used for dialogs "obj_warning" used for 16x16 areas
+                                          style & wxICON_INFORMATION    ? "roost_alert_info"        :
+                                          style & wxICON_ERROR    ? "roost_alert_error"        :
+                                          style & wxICON_QUESTION       ? "roost_alert_question"    : std::string("roost_alert_info"), this, 64, false));
 }
 
 #endif
@@ -618,7 +619,7 @@ Newer3mfVersionDialog::Newer3mfVersionDialog(wxWindow *parent, const Semver *fil
     main_sizer->Add(0, 0, 0, wxTOP, FromDIP(5));
 
     wxBoxSizer *    content_sizer = new wxBoxSizer(wxHORIZONTAL);
-    wxStaticBitmap *info_bitmap   = new wxStaticBitmap(this, wxID_ANY, create_scaled_bitmap("info", nullptr, 60), wxDefaultPosition, wxSize(FromDIP(70), FromDIP(70)), 0);
+    wxStaticBitmap *info_bitmap   = new wxStaticBitmap(this, wxID_ANY, create_scaled_bitmap("roost_alert_info", nullptr, 60), wxDefaultPosition, wxSize(FromDIP(70), FromDIP(70)), 0);
     wxBoxSizer *    msg_sizer     = get_msg_sizer();
     content_sizer->Add(info_bitmap, 0, wxEXPAND | wxALL, FromDIP(5));
     content_sizer->Add(msg_sizer, 0, wxEXPAND | wxALL, FromDIP(5));
@@ -740,10 +741,34 @@ void AutoMappingLoginMsgDialog::apply_style(long style) {
     if (style & wxCANCEL) add_button(wxID_CANCEL, false, _L("Cancel"));
     if (style & wxYES) add_button(wxID_YES, true, _L("Login"));
 
-    logo->SetBitmap( create_scaled_bitmap(style & wxAPPLY        ? "completed" :
-                                          style & wxICON_WARNING        ? "exclamation" : // ORCA "exclamation" used for dialogs "obj_warning" used for 16x16 areas
-                                          style & wxICON_INFORMATION    ? "info"        :
-                                          style & wxICON_QUESTION       ? "question"    : Slic3r::CxBuildInfo::getIconName(), this, 64, false));
+    logo->SetBitmap( create_scaled_bitmap(style & wxAPPLY        ? "roost_alert_done" :
+                                          style & wxICON_WARNING        ? "roost_alert_warning" : // ORCA "roost_alert_warning" used for dialogs "obj_warning" used for 16x16 areas
+                                          style & wxICON_INFORMATION    ? "roost_alert_info"        :
+                                          style & wxICON_QUESTION       ? "roost_alert_question"    : std::string("roost_alert_info"), this, 64, false));
+}
+
+// Roost Print: what every wxMessageBox now shows (see pchheader.hpp): Roost Print's own message
+// window, with the chicken holding the right sign. Before the app is up (no settings yet), from a
+// background thread, or while it shuts down, the plain Windows box is used instead.
+int roost_message_box(const wxString& message, const wxString& caption, long style, wxWindow* parent, int x, int y)
+{
+    GUI_App* app = dynamic_cast<GUI_App*>(wxTheApp);
+    if (app == nullptr || app->app_config == nullptr || !wxThread::IsMain() || app->is_closing())
+        return (wxMessageBox)(message, caption, style, parent, x, y);
+
+    long dlg_style = style & (wxOK | wxCANCEL | wxYES_NO | wxICON_MASK | wxCENTRE);
+    if ((dlg_style & wxICON_MASK) == 0)
+        dlg_style |= (style & wxYES_NO) ? wxICON_QUESTION : wxICON_INFORMATION;
+    if ((dlg_style & (wxOK | wxYES_NO)) == 0)
+        dlg_style |= wxOK;
+    const wxString title = (caption.empty() || caption == wxMessageBoxCaptionStr) ? wxString(SLIC3R_APP_FULL_NAME) : caption;
+    MessageDialog dlg(parent, message, title, dlg_style);
+    switch (dlg.ShowModal()) {
+    case wxID_YES: return wxYES;
+    case wxID_NO: return wxNO;
+    case wxID_CANCEL: return wxCANCEL;
+    default: return wxOK;
+    }
 }
 
 } // namespace GUI

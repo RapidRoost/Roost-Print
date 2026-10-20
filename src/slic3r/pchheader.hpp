@@ -197,4 +197,14 @@
 #include "GUI/format.hpp"
 #endif // _WIN32
 
+// Roost Print: every wxMessageBox shows Roost Print's own message window (the chicken with a
+// sign) instead of the plain Windows box. The real one is still there as (wxMessageBox)(...),
+// and is used before the app is up. See roost_message_box in GUI/MsgDialog.cpp.
+#include <wx/msgdlg.h>
+namespace Slic3r { namespace GUI {
+int roost_message_box(const wxString& message, const wxString& caption = wxMessageBoxCaptionStr,
+                      long style = wxOK | wxCENTRE, wxWindow* parent = nullptr, int x = wxDefaultCoord, int y = wxDefaultCoord);
+} }
+#define wxMessageBox(...) ::Slic3r::GUI::roost_message_box(__VA_ARGS__)
+
 #endif // __cplusplus

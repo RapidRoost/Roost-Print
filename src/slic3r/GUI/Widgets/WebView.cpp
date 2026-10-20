@@ -525,7 +525,20 @@ static const wxString& roost_web_theme_script()
              wxString("'") + css + "';"
              "var add=function(){if(document.getElementById('roost-theme'))return true;"
              "var p=document.head||document.documentElement;if(!p)return false;p.appendChild(s);return true;};"
-             "if(!add())document.addEventListener('DOMContentLoaded',add);}catch(e){}})();";
+             "if(!add())document.addEventListener('DOMContentLoaded',add);"
+             // No Creality names in what the pages show (text only; values and data are untouched).
+             "var R=[[/Creality3DSlicer|CrealityPrint|Creality Print/g,'Roost Print'],[/Creality ?Cloud/g,'Cloud'],"
+             "[/Creality filament/g,'Polymaker filament'],[/Creality printers/g,'printers'],[/Creality printer/g,'printer'],"
+             "[/Creality /g,''],[/Creality/g,'Rapid Roost']];"
+             "var fix=function(n){if(n.nodeType===3){var t=n.nodeValue;if(t&&t.indexOf('Creality')>=0){for(var i=0;i<R.length;i++)t=t.replace(R[i][0],R[i][1]);n.nodeValue=t;}return;}"
+             "if(n.nodeType!==1)return;var tg=n.tagName;if(tg==='SCRIPT'||tg==='STYLE'||tg==='TEXTAREA'||tg==='INPUT')return;"
+             "if(n.title&&n.title.indexOf('Creality')>=0){var u=n.title;for(var k=0;k<R.length;k++)u=u.replace(R[k][0],R[k][1]);n.title=u;}"
+             "for(var c=n.firstChild;c;c=c.nextSibling)fix(c);};"
+             "var start=function(){if(!document.body)return;fix(document.body);if(document.title.indexOf('Creality')>=0){var dt=document.title;for(var j=0;j<R.length;j++)dt=dt.replace(R[j][0],R[j][1]);document.title=dt;}"
+             "new MutationObserver(function(ms){for(var m=0;m<ms.length;m++){var x=ms[m];if(x.type==='characterData')fix(x.target);else for(var a=0;a<x.addedNodes.length;a++)fix(x.addedNodes[a]);}})"
+             ".observe(document.body,{childList:true,subtree:true,characterData:true});};"
+             "if(document.body)start();else document.addEventListener('DOMContentLoaded',start);"
+             "}catch(e){}})();";
     return script;
 }
 

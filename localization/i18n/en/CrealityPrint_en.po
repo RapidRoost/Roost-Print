@@ -1113,7 +1113,7 @@ msgid "View all Daily tips"
 msgstr "View all Daily tips"
 
 msgid "The current project has unsaved changes, save it before continue?"
-msgstr ""
+msgstr "This project has unsaved changes. Save it first?"
 "The current project has unsaved changes. Would you like to save before "
 "continuing?"
 

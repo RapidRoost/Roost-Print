@@ -136,9 +136,9 @@ GLTexture* DispConfig::getTexture(TextureType tt, bool hover, bool sel, int half
             {e_tt_setting_dirty, {"setting_dirty.png", true, true, true}},
             {e_tt_lock,{"lock.png",true,true,true}},
             {e_tt_cancle,{"cancel.svg",true,false,false}},
-            {e_tt_error,{"error_message.svg",false,false,false}},
-            {e_tt_warning,{"warning_message.svg",false,false,false}},
-            {e_tt_normal,{"normal_message.svg",false,false,false}},
+            {e_tt_error,{"roost_alert_error.png",false,false,false}},       // Roost Print: chickens for alerts
+            {e_tt_warning,{"roost_alert_warning.png",false,false,false}},
+            {e_tt_normal,{"roost_alert_info.png",false,false,false}},
             {e_tt_gcode_play, {"gcode_preview_play.svg", false, false, false}},
             {e_tt_gcode_pause, {"gcode_preview_pause.svg", false, false, false}},
             {e_tt_rounding_transparent, {"rounding_transparent.svg", false, false, false}},

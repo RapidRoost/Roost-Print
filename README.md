@@ -30,6 +30,8 @@ The changes live in a few small places, so Creality's updates can be merged in:
 | Names, exe name, settings folder | `tools/roost/rebrand.py` |
 | Icon, splash, top-bar logo | `tools/roost/make_art.py`, from `tools/roost/art/` |
 | Build plates | `tools/roost/plates.py` |
+| Chickens for every message and alert; Creality logos replaced | `tools/roost/alerts.py`; used in `MsgDialog.cpp` (also every `wxMessageBox`, via `pchheader.hpp`) and `Config/DispConfig.cpp` |
+| No "Creality" in on-screen text | `I18N::debrand` in `src/slic3r/GUI/I18N.cpp` (all translated text) and the page script in `Widgets/WebView.cpp` (the app's web pages) |
 | Fonts | `resources/fonts/` (Manrope, Orbitron); `Widgets/Label.cpp`, `ImGuiWrapper.cpp`, and `Widgets/WebView.cpp` for the app's web pages |
 | Polymaker profiles | `tools/roost/polymaker.py`, from `tools/roost/polymaker/`; turned on by `GUI_App::roost_apply_polymaker()` |
 | Printers on first run | `GUI_App::roost_install_fleet()` in `src/slic3r/GUI/GUI_App.cpp` |

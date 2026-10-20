@@ -818,7 +818,10 @@ void NotificationManager::PopNotification::bbl_render_block_notif_left_sign(
 	, const float win_pos_x, const float win_pos_y)
 {	
 	ImTextureID img;
-	if (m_data.level == NotificationLevel::ErrorNotificationLevel || m_data.level == NotificationLevel::WarningNotificationLevel)
+	// Roost Print: errors get the red-sign chicken, warnings the yellow one.
+	if (m_data.level == NotificationLevel::ErrorNotificationLevel)
+		img = DispConfig().getTextureId(DispConfig::e_tt_error);
+	else if (m_data.level == NotificationLevel::WarningNotificationLevel)
 		img = DispConfig().getTextureId(DispConfig::e_tt_warning);
     else if (m_data.level == NotificationLevel::NormalNotificationLevel)
         img = DispConfig().getTextureId(DispConfig::e_tt_normal);
