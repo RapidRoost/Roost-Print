@@ -26,11 +26,11 @@ static const ImVec2 ONE_LAYER_MARGIN  = ImVec2(30.0f, 20.0f);
 static const ImVec2 ONE_LAYER_BUTTON_SIZE  = ImVec2(17.0f, 17.0f);
 static const ImVec2 ANIMATE_BUTTON_SIZE    = ImVec2(30.0f, 30.0f);
 
-static const ImU32 BACKGROUND_COLOR_DARK  = IM_COL32(65, 65, 71, 255);
+static const ImU32 BACKGROUND_COLOR_DARK  = IM_COL32(46, 73, 90, 255);
 static const ImU32 BACKGROUND_COLOR_LIGHT = IM_COL32(255, 255, 255, 255);
-static const ImU32 GROOVE_COLOR_DARK      = IM_COL32(45, 45, 49, 255);
-static const ImU32 GROOVE_COLOR_LIGHT     = IM_COL32(206, 206, 206, 255);
-static const ImU32 BRAND_COLOR            = IM_COL32(0, 150, 136, 255);
+static const ImU32 GROOVE_COLOR_DARK      = IM_COL32(29, 51, 65, 255);
+static const ImU32 GROOVE_COLOR_LIGHT     = IM_COL32(198, 208, 214, 255);
+static const ImU32 BRAND_COLOR            = IM_COL32(30, 144, 216, 255);
 
 static const double animate_duration = 200;
 static int m_tick_value = -1;
@@ -766,8 +766,8 @@ void IMSlider::draw_ticks(const ImRect& slideable_region) {
     ImVec2 icon_offset   = ImVec2(16.0f, 7.0f) * m_scale;
     ImVec2 icon_size     = ImVec2(14.0f, 14.0f) * m_scale;
 
-    const ImU32 tick_clr = IM_COL32(144, 144, 144, 255);
-    const ImU32 tick_hover_box_clr = m_is_dark ? IM_COL32(65, 65, 71, 255) : IM_COL32(219, 253, 231, 255);
+    const ImU32 tick_clr = IM_COL32(125, 148, 163, 255);
+    const ImU32 tick_hover_box_clr = m_is_dark ? IM_COL32(46, 73, 90, 255) : IM_COL32(220, 240, 252, 255);
 
     auto get_tick_pos = [this, slideable_region](int tick)
     {
@@ -924,7 +924,7 @@ void IMSlider::draw_tick_on_mouse_position(const ImRect& slideable_region) {
 //     ImVec2 tick_offset   = ImVec2(22.0f, 14.0f) * m_scale;
 //     float  tick_width    = 1.0f * m_scale;
 // 
-//     const ImU32 tick_clr = IM_COL32(144, 144, 144, 255);
+//     const ImU32 tick_clr = IM_COL32(125, 148, 163, 255);
 // 
 //     float tick_pos = get_pos_from_value(v_min, v_max, tick, slideable_region);
 //     ImRect tick_left  = ImRect(slideable_region.GetCenter().x - tick_offset.x, tick_pos - tick_width, slideable_region.GetCenter().x - tick_offset.y, tick_pos);
@@ -994,7 +994,7 @@ bool IMSlider::vertical_slider(const char* str_id, int* higher_value, int* lower
     bool hovered = ImGui::ItemHoverable(active_region, id) && !ImGui::ItemHoverable(m_tick_rect, id);
 
     if (hovered) {
-        ImGui::RenderFrame(active_region.Min, active_region.Max, IM_COL32(75, 75, 77, 125), false, 0.5 * bg_rect.GetWidth()); 
+        ImGui::RenderFrame(active_region.Min, active_region.Max, IM_COL32(54, 81, 98, 125), false, 0.5 * bg_rect.GetWidth()); 
     }
 
     if (hovered && context.IO.MouseDown[0]) {
@@ -1296,7 +1296,7 @@ bool IMSlider::render(int canvas_width, int canvas_height)
         ImGui::SetNextWindowPos(ImVec2(left_widgets_width + remaining_space / 2, canvas_height - 10), ImGuiCond_Always, ImVec2(0.5, 1.0));
         ImGui::SetNextWindowSize(winsize);
 
-        ImGui::PushStyleColor(ImGuiCol_WindowBg,m_is_dark ? ImVec4(75.0 / 255.0, 75.0 / 255.0, 77.0 / 255.0, 1.0) : ImVec4(1,1,1,1));
+        ImGui::PushStyleColor(ImGuiCol_WindowBg,m_is_dark ? ImVec4(54 / 255.0f, 81 / 255.0f, 98 / 255.0f, 1.0) : ImVec4(1,1,1,1));
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(225.0f/255.0f, 228.0f/255.0f, 233.0f/255.0f, 1.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 8);
         // Remove outer window border for the slider card
@@ -1359,7 +1359,7 @@ bool IMSlider::render(int canvas_width, int canvas_height)
             {
                 const std::string label_txt = _u8L("Steps");
                 ImVec4            txt_col   = m_is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
-                                                        : ImVec4(51.0f/255.0f, 51.0f/255.0f, 51.0f/255.0f, 1.0f);
+                                                        : ImVec4(32 / 255.0f, 55 / 255.0f, 70 / 255.0f, 1.0f);
 
                 float base_font_px = ImGui::GetFontSize();
                 float font_scale   = (16.0f * scale) / (base_font_px > 0 ? base_font_px : 14.0f);
@@ -1399,7 +1399,7 @@ bool IMSlider::render(int canvas_width, int canvas_height)
                 ImGui::SameLine();
                 ImGui::PushItemWidth(input_size);
                 ImGui::PushStyleColor(ImGuiCol_Text, m_is_dark ? ImVec4(255 / 255.0f, 255 / 255.f, 255 / 255.f, 1) :
-                                                                 ImVec4(51.0 / 255.f, 51.0 / 255.f, 51.0 / 255.f, 1));
+                                                                 ImVec4(32 / 255.0f, 55 / 255.0f, 70 / 255.0f, 1));
                 //border
                 {
                     ImVec2 win_pos = ImGui::GetWindowPos();
@@ -1411,8 +1411,8 @@ bool IMSlider::render(int canvas_width, int canvas_height)
                     bool hover = ImGui::IsMouseHoveringRect(pos_min, pos_max);
 
                     ImVec4 border_color = hover ? ImGuiWrapper::COL_CREALITY :
-                                                  (m_is_dark ? ImVec4(110.0f / 255.0f, 110.0f / 255.0f, 114.0f / 255.0f, 1.0f) :
-                                                               ImVec4(203.0 / 255, 203.0 / 255, 204.0 / 255, 1.0));
+                                                  (m_is_dark ? ImVec4(89 / 255.0f, 117 / 255.0f, 135 / 255.0f, 1.0f) :
+                                                               ImVec4(196 / 255.0f, 205 / 255.0f, 211 / 255.0f, 1.0));
 
                     draw_list->AddRect(pos_min, pos_max, ImGui::ColorConvertFloat4ToU32(border_color), 5.0f, ImDrawFlags_RoundCornersAll);
                 }
@@ -1430,7 +1430,7 @@ bool IMSlider::render(int canvas_width, int canvas_height)
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
                 ImGui::PushStyleColor(ImGuiCol_Text, m_is_dark ? ImVec4(255 / 255.0f, 255 / 255.f, 255 / 255.f, 1) :
-                                                                 ImVec4(51.0 / 255.f, 51.0 / 255.f, 51.0 / 255.f, 1));
+                                                                 ImVec4(32 / 255.0f, 55 / 255.0f, 70 / 255.0f, 1));
 
                 {
                     ImGui::SameLine(0,0);
@@ -1641,7 +1641,7 @@ void IMSlider::render_input_custom_gcode(std::string custom_gcode)
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.f * m_scale);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 3) * m_scale);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10, 7) * m_scale);
-    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, m_is_dark ? ImVec4(54 / 255.0f, 54 / 255.0f, 60 / 255.0f, 1.00f) : ImVec4(245 / 255.0f, 245 / 255.0f, 245 / 255.0f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, m_is_dark ? ImVec4(37 / 255.0f, 61 / 255.0f, 77 / 255.0f, 1.00f) : ImVec4(245 / 255.0f, 245 / 255.0f, 245 / 255.0f, 1.00f));
     ImGui::GetCurrentContext()->DimBgRatio = 1.0f;
     int windows_flag =
         ImGuiWindowFlags_NoCollapse
@@ -1723,7 +1723,7 @@ void IMSlider::render_go_to_layer_dialog()
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.f * m_scale);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 3) * m_scale);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10, 7) * m_scale);
-    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, m_is_dark ? ImVec4(54 / 255.0f, 54 / 255.0f, 60 / 255.0f, 1.00f) : ImVec4(245 / 255.0f, 245 / 255.0f, 245 / 255.0f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, m_is_dark ? ImVec4(37 / 255.0f, 61 / 255.0f, 77 / 255.0f, 1.00f) : ImVec4(245 / 255.0f, 245 / 255.0f, 245 / 255.0f, 1.00f));
     ImGui::GetCurrentContext()->DimBgRatio = 1.0f;
     int windows_flag =
         ImGuiWindowFlags_NoCollapse
@@ -2213,7 +2213,7 @@ ImVec2 IMSlider::draw_circle_frame(const char* label, const ImVec2& size_arg)
 
     float radius = size.x * 0.5f;
     // Render
-    ImU32 normal = ImGui::GetColorU32(IM_COL32(75, 75, 77, 125));
+    ImU32 normal = ImGui::GetColorU32(IM_COL32(54, 81, 98, 125));
     ImU32 hover = ImGui::GetColorU32(ImGuiWrapper::COL_CREALITY);
     const ImU32 col = (!held && !hovered) ? normal : hover;
     ImGui::RenderNavHighlight(bb, id);

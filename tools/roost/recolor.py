@@ -49,7 +49,7 @@ HEX6 = re.compile(r'(?<![0-9A-Za-z_])#([0-9A-Fa-f]{6})(?![0-9A-Za-z_])')
 HEX3 = re.compile(r'(?<![0-9A-Za-z_&])#([0-9A-Fa-f]{3})(?![0-9A-Za-z_])')
 INT = re.compile(r'(?<![0-9A-Za-z_])0x([0-9A-Fa-f]{6})(?![0-9A-Fa-f])')
 FLOATS = re.compile(r'(ImVec4\s*[({]\s*)([01]?\.\d+|[01])f?(\s*,\s*)([01]?\.\d+|[01])f?(\s*,\s*)([01]?\.\d+|[01])f?')
-TRIPLE = re.compile(r'((?:wxColour|wxColor|ImColor|rgba?)\(\s*)(\d{1,3})(\s*,\s*)(\d{1,3})(\s*,\s*)(\d{1,3})')
+TRIPLE = re.compile(r'((?:wxColour|wxColor|ImColor|IM_COL32|rgba?)\(\s*)(\d{1,3})(\s*,\s*)(\d{1,3})(\s*,\s*)(\d{1,3})')
 
 def fix(text, ext):
     n = [0]

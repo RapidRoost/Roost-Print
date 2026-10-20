@@ -299,7 +299,7 @@ static bool draw_header_add_button(bool enabled, float scale, const ImVec2& pos,
         ? ImGui::GetColorU32(hovered ? rgba(0.34f, 0.86f, 0.54f, 0.78f) : rgba(0.28f, 0.72f, 0.47f, 0.32f))
         : ImGui::GetColorU32(rgba(1.f, 1.f, 1.f, 0.08f));
     const ImU32 text_col = enabled
-        ? (hovered ? IM_COL32(238, 248, 242, 255) : IM_COL32(220, 241, 229, 255))
+        ? (hovered ? IM_COL32(238, 248, 242, 255) : IM_COL32(221, 233, 240, 255))
         : IM_COL32(128, 137, 145, 255);
 
     draw_list->AddRectFilled(ImVec2(pos.x, pos.y + 2.f * scale), ImVec2(max.x, max.y + 2.f * scale), shadow, 999.f);

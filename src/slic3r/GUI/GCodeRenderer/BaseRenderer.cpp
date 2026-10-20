@@ -389,8 +389,8 @@ void BaseRenderer::Marker::render(int canvas_width, int canvas_height, const EVi
     static float last_window_width = 0.0f;
     size_t text_line = 0;
     static size_t last_text_line = 0;
-    const ImU32 text_name_clr = m_is_dark ? IM_COL32(255, 255, 255, 0.88 * 255) : IM_COL32(38, 46, 48, 255);
-    const ImU32   text_value_clr    = m_is_dark ? IM_COL32(255, 255, 255, 255) : IM_COL32(51, 51, 51, 255);
+    const ImU32 text_name_clr = m_is_dark ? IM_COL32(255, 255, 255, 0.88 * 255) : IM_COL32(27, 47, 59, 255);
+    const ImU32   text_value_clr    = m_is_dark ? IM_COL32(255, 255, 255, 255) : IM_COL32(32, 55, 70, 255);
 
     ImGuiWrapper& imgui = *wxGetApp().imgui();
     //BBS: GUI refactor: add canvas size from parameters
@@ -412,10 +412,10 @@ void BaseRenderer::Marker::render(int canvas_width, int canvas_height, const EVi
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,  m_is_dark ? 0.0f : 1.0f);
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
                           m_is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(78.0f / 255.0f, 89.0f / 255.0f, 105.0f / 255.0f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_Text, m_is_dark ? ImVec4(219.0f / 255.0f, 219.0f / 255.0f, 219.0f / 255.0f, 1.0f) :
+    ImGui::PushStyleColor(ImGuiCol_Text, m_is_dark ? ImVec4(213 / 255.0f, 220 / 255.0f, 225 / 255.0f, 1.0f) :
                                                      ImVec4(78.0f / 255.0f, 89.0f / 255.0f, 105.0f / 255.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(225.0f / 255.0f, 228.0f / 255.0f, 233.0f / 255.0f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, m_is_dark ? ImVec4(34.0f / 255.0f, 34.0f / 255.0f, 34.0f / 255.0f, 0.6f) :
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, m_is_dark ? ImVec4(21 / 255.0f, 37 / 255.0f, 47 / 255.0f, 0.6f) :
                                                      ImVec4(1.0f, 1.0f, 1.0f, 0.6f));
 
     const ImGuiStyle& st = ImGui::GetStyle();
@@ -1054,7 +1054,7 @@ public:
         const bool hovered = ImGui::IsItemHovered();
 
         ImDrawList* dl = ImGui::GetWindowDrawList();
-        const ImU32 arrow_tint = wxGetApp().dark_mode() ? IM_COL32_WHITE : IM_COL32(65, 65, 65, 255);
+        const ImU32 arrow_tint = wxGetApp().dark_mode() ? IM_COL32_WHITE : IM_COL32(44, 70, 86, 255);
         const float icon_draw_size = 22.0f * view_scale;
         const float icon_inset = (btn_size.x - icon_draw_size) * 0.5f;
         const ImVec2 icon_min(btn_pos.x + icon_inset, btn_pos.y + icon_inset);
@@ -1068,7 +1068,7 @@ public:
         }
         if (hovered) {
             const ImVec2 btn_max(btn_pos.x + btn_size.x, btn_pos.y + btn_size.y);
-            dl->AddRect(btn_pos, btn_max, IM_COL32(21, 191, 89, 255),
+            dl->AddRect(btn_pos, btn_max, IM_COL32(24, 119, 180, 255),
                 6.0f * view_scale, ImDrawFlags_RoundCornersAll, 1.0f * view_scale);
         }
 
@@ -3607,7 +3607,7 @@ void BaseRenderer::render_shells(int canvas_width, int canvas_height)
 
 void BaseRenderer::render_legend(int canvas_width, int canvas_height) 
  {
-    ImVec4 tmp_color = ImVec4(158.0f / 255.0, 158.0f / 255.0, 158.0f / 255.0, 1.0f);
+    ImVec4 tmp_color = ImVec4(142 / 255.0f, 162 / 255.0f, 174 / 255.0f, 1.0f);
     ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK_TRANS));
     ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, tmp_color);
     ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, tmp_color);
@@ -3733,12 +3733,12 @@ void BaseRenderer::render_legend(int canvas_width, int canvas_height)
                         ImVec2 p_min(cur_pos.x, cur_pos.y + g.Style.ItemSpacing.y);
                         ImVec2 p_max = ImVec2(p_min.x + switch_size.x, p_min.y + switch_size.y);
 
-                        ImVec4 border_color = m_is_dark ? ImVec4(64.0f / 255.0f, 64.0f / 255.0f, 64.0f / 255.0f, 1.0f) :
-                                                          ImVec4(218.0f / 255.0f, 219.0f / 255.0f, 223.0f / 255.0f, 1.0f);
+                        ImVec4 border_color = m_is_dark ? ImVec4(43 / 255.0f, 69 / 255.0f, 85 / 255.0f, 1.0f) :
+                                                          ImVec4(215 / 255.0f, 222 / 255.0f, 226 / 255.0f, 1.0f);
                         ImGui::PushStyleColor(ImGuiCol_Border, border_color);
                         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, is_lite_mode ? 0.0f : 1.0f);
 
-                        ImU32 sw_bg = is_lite_mode ? IM_COL32(8, 122, 51, 255) : IM_COL32_BLACK_TRANS;
+                        ImU32 sw_bg = is_lite_mode ? IM_COL32(11, 77, 119, 255) : IM_COL32_BLACK_TRANS;
 
                         ImGui::RenderFrame(p_min, p_max, sw_bg, true, h * 0.5f);
 
@@ -3771,7 +3771,7 @@ void BaseRenderer::render_legend(int canvas_width, int canvas_height)
                                                ImGui::ColorConvertFloat4ToU32(ImGuiWrapper::COL_CREALITY), true, h * 0.5f);
                         } else {
                             // off at left
-                            ImU32 fill_col = m_is_dark ? IM_COL32(3, 3, 3, 255) : IM_COL32(204, 204, 204, 255);
+                            ImU32 fill_col = m_is_dark ? IM_COL32(14, 26, 39, 255) : IM_COL32(196, 206, 212, 255);
                             ImGui::RenderFrame(p_min, ImVec2(p_min.x + grap_size.x, p_min.y + grap_size.y), fill_col, true, h * 0.5f);
                         }
 

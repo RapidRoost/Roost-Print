@@ -7499,7 +7499,7 @@ void ObjectList::render_generic_columns(ObjectDataViewModelNode* node)
 
             // draw border for default extruder
             if (ext == _(L("default"))) {
-                /*ImVec4 border_color = ImVec4(110.0f / 255.0f, 110.0f / 255.0f, 114.0f / 255.0f, 1.0f);
+                /*ImVec4 border_color = ImVec4(89 / 255.0f, 117 / 255.0f, 135 / 255.0f, 1.0f);
                 ImGui::PushStyleColor(ImGuiCol_Border, border_color);
                 ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0);
 
@@ -7777,7 +7777,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
         m_texture.init_svg_texture();
     }
     ImTextureID normal_id = m_texture.get_texture_id();
-    const ImU32 icon_tint = is_dark ? IM_COL32(214, 214, 220, 255) : IM_COL32(51, 51, 51, 255);
+    const ImU32 icon_tint = is_dark ? IM_COL32(211, 218, 223, 255) : IM_COL32(32, 55, 70, 255);
 
     auto ensure_svg_texture = [](ImTextureID& texture, unsigned& cached_size, const std::string& resource, unsigned raster_size) {
         if (texture != nullptr && cached_size == raster_size)
@@ -7798,7 +7798,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
 
     ImDrawList* header_draw_list = ImGui::GetWindowDrawList();
     auto draw_hover_border = [scale](ImDrawList* draw_list, const ImVec2& min, const ImVec2& max) {
-        draw_list->AddRect(min, max, IM_COL32(21, 191, 89, 255),
+        draw_list->AddRect(min, max, IM_COL32(24, 119, 180, 255),
             6.0f * scale, ImDrawFlags_RoundCornersAll, 1.0f * scale);
     };
 
@@ -7845,7 +7845,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
         const ImVec2 canvas_max = canvas_min + ImVec2(collapse_canvas_size, collapse_canvas_size);
         const float uv_top = folded_view ? 1.0f : 0.0f;
         const float uv_bottom = folded_view ? 0.0f : 1.0f;
-        const ImU32 arrow_tint = is_dark ? IM_COL32_WHITE : IM_COL32(65, 65, 65, 255);
+        const ImU32 arrow_tint = is_dark ? IM_COL32_WHITE : IM_COL32(44, 70, 86, 255);
         header_draw_list->AddImage(m_printer_collapse_svg_texture, canvas_min, canvas_max,
             ImVec2(0.0f, uv_top), ImVec2(1.0f, uv_bottom), arrow_tint);
     } else if (m_texture.valid()) {
@@ -7924,7 +7924,7 @@ void ObjectList::render_printer_preset_by_ImGui(bool folded_view)
     ImGuiContext&     g      = *GImGui;
     ImGuiWindow*      window = g.CurrentWindow;
     const ImGuiStyle& style  = g.Style;
-    ImVec4 border_color = ImVec4(110.0f / 255.0f, 110.0f / 255.0f, 114.0f / 255.0f, 1.0f);
+    ImVec4 border_color = ImVec4(89 / 255.0f, 117 / 255.0f, 135 / 255.0f, 1.0f);
     // ImGui::PushStyleColor(ImGuiCol_Border, border_color);
 
     float  rounding            = 4.0f * scale;

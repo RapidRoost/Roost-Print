@@ -32,7 +32,7 @@
 
 static const float GROUND_Z = -0.04f;
 static const Slic3r::ColorRGBA DEFAULT_MODEL_COLOR             = { 0.8157f, 0.8314f, 0.8706f, 1.0f };
-static const Slic3r::ColorRGBA DEFAULT_MODEL_COLOR_DARK        = { 0.2901f, 0.2901f, 0.3098, 1.0f };
+static const Slic3r::ColorRGBA DEFAULT_MODEL_COLOR_DARK        = { 54 / 255.0f, 82 / 255.0f, 99 / 255.0f, 1.0f };
 
 namespace Slic3r {
 namespace GUI {

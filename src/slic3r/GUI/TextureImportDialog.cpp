@@ -1405,9 +1405,9 @@ void TexturePreviewCanvas::render()
     wxSize viewport_sz = gl_viewport_size(this, sz);
     glViewport(0, 0, viewport_sz.x, viewport_sz.y);
     if (is_dark())
-        glClearColor(0.192f, 0.192f, 0.192f, 1.0f);
+        glClearColor(31 / 255.0f, 53 / 255.0f, 67 / 255.0f, 1.0f);
     else
-        glClearColor(0.933f, 0.933f, 0.933f, 1.0f);
+        glClearColor(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);

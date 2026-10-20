@@ -137,17 +137,17 @@ static void append_role_extruders(std::vector<int>& extruders, std::initializer_
     }
 }
 
-ColorRGBA PartPlate::SELECT_COLOR        = {0.2666f, 0.2784f, 0.2784f, 1.0f}; //{ 0.4196f, 0.4235f, 0.4235f, 1.0f };
-ColorRGBA PartPlate::UNSELECT_COLOR      = {0.82f, 0.82f, 0.82f, 1.0f};
-ColorRGBA PartPlate::UNSELECT_DARK_COLOR = {0.384f, 0.384f, 0.412f, 1.0f};
-ColorRGBA PartPlate::DEFAULT_COLOR		= { 0.5f, 0.5f, 0.5f, 1.0f };
+ColorRGBA PartPlate::SELECT_COLOR        = {48 / 255.0f, 74 / 255.0f, 91 / 255.0f, 1.0f}; //{ 0.4196f, 0.4235f, 0.4235f, 1.0f };
+ColorRGBA PartPlate::UNSELECT_COLOR      = {202 / 255.0f, 211 / 255.0f, 216 / 255.0f, 1.0f};
+ColorRGBA PartPlate::UNSELECT_DARK_COLOR = {79 / 255.0f, 107 / 255.0f, 124 / 255.0f, 1.0f};
+ColorRGBA PartPlate::DEFAULT_COLOR		= { 104 / 255.0f, 134 / 255.0f, 152 / 255.0f, 1.0f };
 
-static ColorRGBA MODEL_SELECT_COLOR            = {0.607f, 0.607f, 0.6313f, 1.0f};
-static ColorRGBA MODEL_UNSELECT_COLOR          = {0.8823f, 0.8823f, 0.9019f, 1.0f};
-static ColorRGBA MODEL_SELECT_DARK_COLOR       = {0.2901f, 0.2901f, 0.3098, 1.0f};
-static ColorRGBA MODEL_UNSELECT_DARK_COLOR     = {0.2235f, 0.2235f, 0.2314f, 1.0f};
+static ColorRGBA MODEL_SELECT_COLOR            = {142 / 255.0f, 162 / 255.0f, 174 / 255.0f, 1.0f};
+static ColorRGBA MODEL_UNSELECT_COLOR          = {223 / 255.0f, 228 / 255.0f, 232 / 255.0f, 1.0f};
+static ColorRGBA MODEL_SELECT_DARK_COLOR       = {54 / 255.0f, 82 / 255.0f, 99 / 255.0f, 1.0f};
+static ColorRGBA MODEL_UNSELECT_DARK_COLOR     = {38 / 255.0f, 63 / 255.0f, 78 / 255.0f, 1.0f};
 
-ColorRGBA PartPlate::LINE_BOTTOM_COLOR	= { 0.8f, 0.8f, 0.8f, 0.4f };
+ColorRGBA PartPlate::LINE_BOTTOM_COLOR	= { 196 / 255.0f, 206 / 255.0f, 212 / 255.0f, 0.4f };
 ColorRGBA PartPlate::HEIGHT_LIMIT_TOP_COLOR		= { 0.6f, 0.6f, 1.0f, 1.0f };
 ColorRGBA PartPlate::HEIGHT_LIMIT_BOTTOM_COLOR	= { 0.4f, 0.4f, 1.0f, 1.0f };
 

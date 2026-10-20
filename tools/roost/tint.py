@@ -23,7 +23,7 @@ ROOT = recolor.ROOT
 HUE = recolor.BLUE_HUE
 DIRS = ['src/slic3r/GUI', 'src/slic3r/Config', 'resources/web', 'resources/images']
 SKIP_NAME = re.compile(recolor.SKIP_NAME.pattern + r'|GCodeViewer|GCodeProcessor|LibVGCode|Thermal|Heat|SlicerBridge|MCPTool', re.I)
-NIGHT = (0x07, 0x0C, 0x12)  # the site's darkest panel
+NIGHT = (0x0E, 0x1A, 0x27)  # the site's night page colour (navy, not black)
 
 
 def sat_for(l):
@@ -51,6 +51,45 @@ def tint(rgb):
     return tuple(max(0, min(255, round(c * 255))) for c in (nr, ng, nb))
 
 
+# Colours written as numbers from 0 to 1 (0.25f, 64 / 255.0, 0x40 / 255.0), the way the 3D view,
+# the build plate and the in-view panels write them. Only in UI colour calls (ImVec4, ImColor,
+# glClearColor) and, in the files that paint the background and plate, ColorRGB(A) values.
+# Model colours (the grey of an object, gizmo handles) are left alone.
+_NUM = r'(?:0x[0-9a-fA-F]{1,2}\s*/\s*255(?:\.0*)?f?|\d+(?:\.\d*)?f?\s*/\s*255(?:\.0*)?f?|\d*\.\d+f?|[01]\.?f?)'
+_UI_CALL = r'(?:ImVec4\s*[({]|ImColor\s*\(|glClearColor\s*\()'
+_SCENE_CALL = r'(?:ColorRGBA\s*[({]|ColorRGB\s*[({]|=\s*\{|ImVec4\s*[({]|ImColor\s*\(|glClearColor\s*\()'
+SCENE_FILES = {'GLCanvas3D.cpp', 'PartPlate.cpp', '3DBed.cpp', 'GLCanvas3DSimple.cpp', 'ImGuiWrapper.cpp', 'IMSlider.cpp'}
+
+
+def _num(t):
+    t = t.strip()
+    if '/' in t:
+        a = t.split('/')[0].strip()
+        return (int(a, 16) if a.lower().startswith('0x') else float(a.rstrip('f'))) / 255.0
+    return float(t.rstrip('f'))
+
+
+def tint_floats(text, filename):
+    call = _SCENE_CALL if filename in SCENE_FILES else _UI_CALL
+    rx = re.compile('(' + call + r'\s*)(' + _NUM + r')(\s*,\s*)(' + _NUM + r')(\s*,\s*)(' + _NUM + r')')
+    n = [0]
+    def sub(m):
+        try:
+            v = [_num(m.group(i)) for i in (2, 4, 6)]
+        except ValueError:
+            return m.group(0)
+        if not all(0.0 <= x <= 1.0 for x in v):
+            return m.group(0)
+        rgb = tuple(round(x * 255) for x in v)
+        new = tint(rgb)
+        if new == rgb:
+            return m.group(0)
+        n[0] += 1
+        a, b, c = (f'{x} / 255.0f' for x in new)
+        return f'{m.group(1)}{a}{m.group(3)}{b}{m.group(5)}{c}'
+    return rx.sub(sub, text), n[0]
+
+
 def main():
     recolor.RECOLOURS.append(tint)
     recolor.shift = tint
@@ -69,6 +108,9 @@ def main():
                 except (UnicodeDecodeError, OSError):
                     continue
                 new, n = recolor.fix(text, ext)
+                if ext in ('.cpp', '.hpp', '.h'):
+                    new, n2 = tint_floats(new, fn)
+                    n += n2
                 if n:
                     open(p, 'wb').write(new.encode('utf-8'))
                     total += n

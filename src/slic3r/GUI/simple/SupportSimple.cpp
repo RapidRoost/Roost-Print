@@ -88,16 +88,16 @@ void render_simple_input_window()
     const float  img_edge    = std::max(min_img, std::min(max_img, fit_img));
     const float  table_w     = img_edge * 5.0f + tile_gap * 4.0f;
     const ImVec2 img_sz(img_edge, img_edge);
-    const ImU32  bg_col      = dark ? IM_COL32(28, 28, 30, 255) : IM_COL32(242, 242, 246, 255);
-    const ImU32  br_grey     = dark ? IM_COL32(90, 90, 92, 255) : IM_COL32(180, 180, 185, 255);
-    const ImU32  br_green    = IM_COL32(21, 192, 89, 255);
-    const ImU32  br_hover    = IM_COL32(68, 205, 122, 255) ;
+    const ImU32  bg_col      = dark ? IM_COL32(18, 32, 40, 255) : IM_COL32(242, 242, 246, 255);
+    const ImU32  br_grey     = dark ? IM_COL32(68, 96, 114, 255) : IM_COL32(171, 185, 194, 255);
+    const ImU32  br_green    = IM_COL32(25, 125, 188, 255);
+    const ImU32  br_hover    = IM_COL32(71, 151, 202, 255) ;
     const float  radio_r     = 7.0f * scale;
     const float  radio_th    = 1.7f * scale;
     const float  text_gap_y  = 6.0f * scale;
-    const ImU32  radio_grey  = dark ? IM_COL32(140, 140, 145, 255) : IM_COL32(120, 120, 125, 255);
+    const ImU32  radio_grey  = dark ? IM_COL32(123, 147, 162, 255) : IM_COL32(98, 128, 147, 255);
     const ImU32  radio_green = br_green;
-    const ImU32  radio_fill  = IM_COL32(41, 190, 85, 180);
+    const ImU32  radio_fill  = IM_COL32(45, 131, 186, 180);
     // Text color follows dark/light mode (match general UI palette used elsewhere)
     const ImVec4 text_col    = dark ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
                                     : ImVec4(0.106f, 0.188f, 0.239f, 1.0f);

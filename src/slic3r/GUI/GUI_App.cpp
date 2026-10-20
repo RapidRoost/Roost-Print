@@ -1261,7 +1261,8 @@ public:
 
 #if !defined(CUSTOMIZED) || defined(CUSTOM_SPLASH_LOADING_TEXT_VISIBLE)
         // Official brief introduction
-        wxString official_brief_introduction = m_loading_info + "\n\n" + _L("Official brief introduction");
+        // Roost Print: just the loading line (Creality's "brief introduction" text isn't ours).
+        wxString official_brief_introduction = m_loading_info;
 
         wxRect rect(FromDIP(32), height * 0.50, FromDIP(210), FromDIP(100));
         const double splash_scale = std::max(1.0, double(width) / 860.0);
@@ -1307,10 +1308,13 @@ public:
         int width = FromDIP(860, nullptr);
         int height = FromDIP(480, nullptr);
 
+        // Roost Print: a solid (opaque) base. The splash art covers all of it, and a see-through
+        // base let the desktop show through the whole splash on Windows.
         wxImage image(width, height, true);
+        image.SetRGB(wxRect(0, 0, width, height), 255, 255, 255);
         image.InitAlpha();
         unsigned char* alpha = image.GetAlpha();
-        memset(alpha, 0, width * height);
+        memset(alpha, 255, width * height);
 
         wxBitmap new_bmp(image);
 
@@ -12397,6 +12401,8 @@ bool GUI_App::load_language(wxString language, bool initial)
     // to load possibly different dictionary, for example, load Czech dictionary for Slovak language.
     wxTranslations::Get()->SetLanguage(language_dict);
     m_wxLocale->AddCatalog(SLIC3R_PROCESS_NAME);
+    // Roost Print: the translation files are still built as CrealityPrint.mo.
+    m_wxLocale->AddCatalog("CrealityPrint");
     BOOST_LOG_TRIVIAL(warning) << "load_language: wxLocale initialized. canonical=" << m_wxLocale->GetCanonicalName().ToUTF8().data()
                                << ", locale=" << m_wxLocale->GetLocale().ToUTF8().data()
                                << ", dict_lang=" << static_cast<int>(language_dict)

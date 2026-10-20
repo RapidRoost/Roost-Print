@@ -769,7 +769,7 @@ void GizmoObjectManipulation::do_render_move_window(ImGuiWrapper *imgui_wrapper,
 
     ImGui::Dummy(ImVec2(0.0f, 0.0f));
 
-    ImVec4 bt_bgc = ImVec4(110 / 255.0, 110 / 255.0, 115 / 255.0, 1.0);
+    ImVec4 bt_bgc = ImVec4(89 / 255.0f, 118 / 255.0f, 136 / 255.0f, 1.0);
     ImVec4 bt_bgc_light = ImVec4(255 / 255.0, 255 / 255.0, 255 / 255.0, 1.0);
     bool is_dark = wxGetApp().dark_mode();
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiWrapper::COL_CREALITY);

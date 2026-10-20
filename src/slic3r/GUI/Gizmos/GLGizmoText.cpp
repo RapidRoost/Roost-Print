@@ -691,10 +691,10 @@ void GLGizmoText::push_button_style(bool pressed) {
             ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.f, 174 / 255.f, 66 / 255.f, 1.f));
         }
         else {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(45.f / 255.f, 45.f / 255.f, 49.f / 255.f, 1.f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(84 / 255.f, 84 / 255.f, 90 / 255.f, 1.f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(84 / 255.f, 84 / 255.f, 90 / 255.f, 1.f));
-            ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(45.f / 255.f, 45.f / 255.f, 49.f / 255.f, 1.f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(29 / 255.0f, 51 / 255.0f, 65 / 255.0f, 1.f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(64 / 255.0f, 92 / 255.0f, 110 / 255.0f, 1.f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(64 / 255.0f, 92 / 255.0f, 110 / 255.0f, 1.f));
+            ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(29 / 255.0f, 51 / 255.0f, 65 / 255.0f, 1.f));
         }
     }
     else {
@@ -706,8 +706,8 @@ void GLGizmoText::push_button_style(bool pressed) {
         }
         else {
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(238 / 255.f, 238 / 255.f, 238 / 255.f, 1.f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(238 / 255.f, 238 / 255.f, 238 / 255.f, 1.f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.f));
             ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1.f, 1.f, 1.f, 1.f));
         }
     

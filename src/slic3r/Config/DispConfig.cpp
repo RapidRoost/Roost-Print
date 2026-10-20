@@ -195,7 +195,7 @@ bool DispConfig::checkBox(const std::string& name, bool check,ButtonConfig cfg) 
     ImGui::PushStyleColor(ImGuiCol_FrameBgHovered,fg);
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, fg);
     ImGui::PushStyleColor(ImGuiCol_BorderActive, fg);
-    ImGui::PushStyleColor(ImGuiCol_Border, s_isDark ? ImVec4(122 / 255.f, 122 / 255.f, 127 /255.f, 1) :  ImVec4(214 / 255.f, 214 / 255.f, 220 / 255.f, 1));
+    ImGui::PushStyleColor(ImGuiCol_Border, s_isDark ? ImVec4(100 / 255.0f, 130 / 255.0f, 149 / 255.0f, 1) :  ImVec4(211 / 255.0f, 218 / 255.0f, 223 / 255.0f, 1));
     ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1, 1, 1, 1));
 
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, cfg.border);
@@ -252,7 +252,7 @@ int DispConfig::combo(const std::vector<std::string>& list,int current, ComboCon
 
     ImVec4 hgc = getColor(cfg.hgc);
     ImGui::PushStyleColor(ImGuiCol_BorderActive, hgc);
-    ImGui::PushStyleColor(ImGuiCol_Border, s_isDark ? ImVec4(108 / 255.f, 108 / 255.f, 112 / 255.f, 1) : ImVec4(214 / 255.f, 214 / 255.f, 220 /255.f,1));
+    ImGui::PushStyleColor(ImGuiCol_Border, s_isDark ? ImVec4(87 / 255.0f, 115 / 255.0f, 133 / 255.0f, 1) : ImVec4(211 / 255.0f, 218 / 255.0f, 223 / 255.0f,1));
     ImGui::PushStyleColor(ImGuiCol_Header, hgc);
     ImGui::PushStyleColor(ImGuiCol_HeaderHovered, hgc);
     ImGui::PushStyleColor(ImGuiCol_HeaderActive, hgc);
@@ -402,14 +402,14 @@ void DispConfig::processWindows(const wxString& name,CreateFn fn, WindowConfig s
         {
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{ 1.f, 1.f, 1.f, 0.6f });
             ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{ 1.f, 1.f, 1.f, 0.6f });
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 51 / 255.f,51 / 255.f,51 / 255.f,1.f });
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 32 / 255.0f,55 / 255.0f,70 / 255.0f,1.f });
             ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(225.0f / 255.0f, 228.0f / 255.0f, 233.0f / 255.0f, 1.0f));
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
             varnum   += 1;
             colornum += 4;
         } else {
-            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{ 34 / 255.f, 34 / 255.f, 34 / 255.f, 0.6f });
-            ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{ 34 / 255.f, 34 / 255.f, 34 / 255.f, 0.6f });
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{ 21 / 255.0f, 37 / 255.0f, 47 / 255.0f, 0.6f });
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{ 21 / 255.0f, 37 / 255.0f, 47 / 255.0f, 0.6f });
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 1.f, 1.f, 1.f, 1.f });
             ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.f, 0.f, 0.f, 0.f));
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -494,37 +494,37 @@ ImU32 DispConfig::getColorImU32(ColorType ct) {
         ret = IM_COL32(255, 0, 0, 255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_hyperText:
-        ret = IM_COL32(23, 204, 95, 255);
+        ret = IM_COL32(30, 144, 216, 255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_line:
-        ret = IM_COL32(67, 67, 70, 255);
+        ret = IM_COL32(47, 73, 90, 255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_lineSel:
-        ret = IM_COL32(126, 126, 132, 255);
+        ret = IM_COL32(105, 134, 153, 255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_btnBg:
-        ret = s_isDark ? IM_COL32(89, 89, 93,255) : IM_COL32(255, 255, 255,255);
+        ret = s_isDark ? IM_COL32(68, 96, 114,255) : IM_COL32(255, 255, 255,255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_inter:
-        ret = s_isDark ? IM_COL32(62, 62, 64, 255) : IM_COL32(234,234,238, 255);
+        ret = s_isDark ? IM_COL32(42, 68, 84, 255) : IM_COL32(233,237,239, 255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_interSel:
-        ret = IM_COL32(99, 99, 103, 255);
+        ret = IM_COL32(78, 106, 124, 255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_btnBgSelWhite:
-        ret = s_isDark ? IM_COL32(110, 110, 115, 255) : IM_COL32(242, 242, 245,255);
+        ret = s_isDark ? IM_COL32(89, 118, 136, 255) : IM_COL32(242, 244, 245,255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_btnBgSel:
-        ret = IM_COL32(23, 204, 95, 255);
+        ret = IM_COL32(30, 144, 216, 255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_text:
-        ret = s_isDark ? IM_COL32(255, 255, 255, 255) : IM_COL32(51, 51, 51,255);
+        ret = s_isDark ? IM_COL32(255, 255, 255, 255) : IM_COL32(32, 55, 70,255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_slider:
-        ret = s_isDark ? IM_COL32(74, 74, 77,255) : IM_COL32(206, 206, 207,255);
+        ret = s_isDark ? IM_COL32(53, 81, 98,255) : IM_COL32(199, 208, 214,255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_sliderSel:
-        ret = IM_COL32(23, 204, 95,255);
+        ret = IM_COL32(30, 144, 216,255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_slider_hand:
         ret = IM_COL32(0, 255, 101,255);
@@ -533,7 +533,7 @@ ImU32 DispConfig::getColorImU32(ColorType ct) {
         ret = s_isDark ? IM_COL32(66, 75, 81,255) : IM_COL32(78, 89, 105, 255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_normalTip:
-        ret = IM_COL32(23, 204, 95, 255);
+        ret = IM_COL32(30, 144, 216, 255);
         break;
     case Slic3r::GUI::DispConfig::e_ct_selectBox:
         ret = IM_COL32(255, 255, 255, 255);

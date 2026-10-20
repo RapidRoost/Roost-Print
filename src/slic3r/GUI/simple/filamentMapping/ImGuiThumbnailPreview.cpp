@@ -424,8 +424,8 @@ void ImGuiThumbnailPreview::draw(const ThumbnailData* thumbnail, const ImVec2& s
     ImDrawList* dl = ImGui::GetWindowDrawList();
 
     const float rounding = 6.0f * scale;
-    const ImU32 bg_col   = IM_COL32(52, 52, 52, 255);
-    const ImU32 br_col   = IM_COL32(120, 120, 120, 255);
+    const ImU32 bg_col   = IM_COL32(33, 56, 71, 255);
+    const ImU32 br_col   = IM_COL32(96, 125, 144, 255);
     dl->AddRectFilled(rmin, rmax, bg_col, rounding);
     dl->AddRect(rmin, rmax, br_col, rounding, 0, 1.0f);
 
@@ -433,7 +433,7 @@ void ImGuiThumbnailPreview::draw(const ThumbnailData* thumbnail, const ImVec2& s
         const char*  txt = "No preview";
         const ImVec2 ts  = ImGui::CalcTextSize(txt);
         const ImVec2 pos((rmin.x + rmax.x - ts.x) * 0.5f, (rmin.y + rmax.y - ts.y) * 0.5f);
-        dl->AddText(pos, IM_COL32(200, 200, 200, 255), txt);
+        dl->AddText(pos, IM_COL32(191, 202, 209, 255), txt);
         ImGui::PopID();
         return;
     }
@@ -489,8 +489,8 @@ void ImGuiThumbnailPreview::draw_recolored(const ThumbnailData* lit_thumbnail,
 
     const float rounding = 6.0f * scale;
     const bool dark_mode = wxGetApp().dark_mode();
-    const ImU32 bg_col   = dark_mode ? IM_COL32(52, 52, 52, 255) : IM_COL32(240, 240, 240, 255);
-    const ImU32 br_col   = IM_COL32(120, 120, 120, 255);
+    const ImU32 bg_col   = dark_mode ? IM_COL32(33, 56, 71, 255) : IM_COL32(238, 241, 242, 255);
+    const ImU32 br_col   = IM_COL32(96, 125, 144, 255);
     dl->AddRectFilled(rmin, rmax, bg_col, rounding);
     dl->AddRect(rmin, rmax, br_col, rounding, 0, 1.0f);
 
@@ -498,7 +498,7 @@ void ImGuiThumbnailPreview::draw_recolored(const ThumbnailData* lit_thumbnail,
         const char*  txt = "No preview";
         const ImVec2 ts  = ImGui::CalcTextSize(txt);
         const ImVec2 pos((rmin.x + rmax.x - ts.x) * 0.5f, (rmin.y + rmax.y - ts.y) * 0.5f);
-        dl->AddText(pos, IM_COL32(200, 200, 200, 255), txt);
+        dl->AddText(pos, IM_COL32(191, 202, 209, 255), txt);
         ImGui::PopID();
         return;
     }

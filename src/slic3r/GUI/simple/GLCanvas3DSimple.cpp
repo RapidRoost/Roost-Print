@@ -1012,8 +1012,8 @@ void GLCanvas3D::_render_cur_device_card_simple(const ImVec4& rect, const char* 
                 : ImVec4(1.00f, 1.00f, 1.00f, 0.92f));
 
             ImU32 base_border_col = dark
-                ? IM_COL32(110,110,114,200)
-                : IM_COL32(192,192,200,200);
+                ? IM_COL32(89,117,135,200)
+                : IM_COL32(187,198,205,200);
 
             ImU32 shadow_col = ImGui::GetColorU32(ImVec4(0,0,0, 40.0f/255.0f));
 
@@ -1026,7 +1026,7 @@ void GLCanvas3D::_render_cur_device_card_simple(const ImVec4& rect, const char* 
 
         if (hovered) {
             ImDrawList* fdl = ImGui::GetForegroundDrawList();
-            const ImU32 hover_col = IM_COL32(41,190,85,255);
+            const ImU32 hover_col = IM_COL32(45,131,186,255);
             const float inset = 0.75f;
             ImVec2 min2 = ImVec2(win_pos.x + inset, win_pos.y + inset);
             ImVec2 max2 = ImVec2(win_max.x - inset, win_max.y - inset);
@@ -1037,7 +1037,7 @@ void GLCanvas3D::_render_cur_device_card_simple(const ImVec4& rect, const char* 
         if (m_preset_icon_tex != nullptr) {
             dl->AddImage(m_preset_icon_tex, icon_pos, icon_pos + ImVec2(icon_w, icon_h));
         } else {
-            const ImU32 ph_col = IM_COL32(200, 200, 200, 255);
+            const ImU32 ph_col = IM_COL32(191, 202, 209, 255);
             dl->AddRectFilled(icon_pos, icon_pos + ImVec2(icon_w, icon_h), ph_col, 4.0f * scale);
         }
 
@@ -1050,7 +1050,7 @@ void GLCanvas3D::_render_cur_device_card_simple(const ImVec4& rect, const char* 
         const ImVec2 subtitle_pos = title_pos + ImVec2(0.0f, title_sz.y + line_gap);
 
         const bool dark_mode = wxGetApp().dark_mode();
-        const ImU32 title_col = IM_COL32(41,190,85,255);
+        const ImU32 title_col = IM_COL32(45,131,186,255);
         dl->AddText(title_pos, title_col, title.c_str());
 
         std::string model_label_local, status_txt_local;
@@ -1062,7 +1062,7 @@ void GLCanvas3D::_render_cur_device_card_simple(const ImVec4& rect, const char* 
                 if (d.online) {
                     if (d.deviceState == 0) {
                         status_txt_local = _u8L("Idle");
-                        status_col_u32 = IM_COL32(41,190,85,255);
+                        status_col_u32 = IM_COL32(45,131,186,255);
                     } else {
                         status_txt_local = _u8L("Printing");
                         status_col_u32 = IM_COL32(44,130,230,255);
@@ -1073,9 +1073,9 @@ void GLCanvas3D::_render_cur_device_card_simple(const ImVec4& rect, const char* 
                 }
             }
         }
-        const ImU32 sub_col = dark_mode ? IM_COL32(235,235,235,255) : IM_COL32(96, 96, 96, 255);
+        const ImU32 sub_col = dark_mode ? IM_COL32(232,236,238,255) : IM_COL32(73, 101, 119, 255);
         if (model_label_local.empty() && status_txt_local.empty()) {
-            const ImU32 empty_sub_col = dark_mode ? IM_COL32(235,235,235,255) : IM_COL32(35,35,35,255);
+            const ImU32 empty_sub_col = dark_mode ? IM_COL32(232,236,238,255) : IM_COL32(22,38,48,255);
             dl->AddText(subtitle_pos, empty_sub_col, subtitle.c_str());
         } else {
             const float base_px_sub = ImGui::GetFontSize();
@@ -1095,7 +1095,7 @@ void GLCanvas3D::_render_cur_device_card_simple(const ImVec4& rect, const char* 
         const float caret_w = 7.0f * scale;
         const float caret_h = 4.0f * scale;
         const float caret_pad = 8.0f * scale;
-        const ImU32 caret_col = IM_COL32(41,190,85,255);
+        const ImU32 caret_col = IM_COL32(45,131,186,255);
         const float thick = 2.0f;
         if (m_preset_panel_open) {
             ImVec2 left  = ImVec2(win_max.x - caret_pad - 2*caret_w, win_pos.y + 0.5f * block_h + caret_h);
@@ -1414,20 +1414,20 @@ void GLCanvas3D::render_card_popup_if_open(
         const ImVec2 q    = p + sz;
 
         const bool  dark  = wxGetApp().dark_mode();
-        // const ImU32 bg    = dark ? IM_COL32(50, 50, 50, 255) : IM_COL32(255, 255, 255, 255);
-        // const ImU32 br    = dark ? IM_COL32(110,110,114,200) : IM_COL32(192,192,200,200);
+        // const ImU32 bg    = dark ? IM_COL32(32, 54, 68, 255) : IM_COL32(255, 255, 255, 255);
+        // const ImU32 br    = dark ? IM_COL32(89,117,135,200) : IM_COL32(187,198,205,200);
         // const float r     = 10.0f * scale;
         const ImU32 bg = is_supports_popup
-            // ? (dark ? IM_COL32(34, 34, 34, 100) : IM_COL32(255, 255, 255, 100))
-            // ? (dark ? IM_COL32(34, 34, 34, 80) : IM_COL32(255, 255, 255, 80))
-            // ? (dark ? IM_COL32(34, 34, 34, 64) : IM_COL32(255, 255, 255, 64))
-            // ? (dark ? IM_COL32(34, 34, 34, 112) : IM_COL32(255, 255, 255, 112))
-            // ? (dark ? IM_COL32(34, 34, 34, 160) : IM_COL32(255, 255, 255, 160))
-            ? (dark ? IM_COL32(34, 34, 34, 200) : IM_COL32(255, 255, 255, 200))
-            : (dark ? IM_COL32(50, 50, 50, 255) : IM_COL32(255, 255, 255, 255));
+            // ? (dark ? IM_COL32(21, 37, 47, 100) : IM_COL32(255, 255, 255, 100))
+            // ? (dark ? IM_COL32(21, 37, 47, 80) : IM_COL32(255, 255, 255, 80))
+            // ? (dark ? IM_COL32(21, 37, 47, 64) : IM_COL32(255, 255, 255, 64))
+            // ? (dark ? IM_COL32(21, 37, 47, 112) : IM_COL32(255, 255, 255, 112))
+            // ? (dark ? IM_COL32(21, 37, 47, 160) : IM_COL32(255, 255, 255, 160))
+            ? (dark ? IM_COL32(21, 37, 47, 200) : IM_COL32(255, 255, 255, 200))
+            : (dark ? IM_COL32(32, 54, 68, 255) : IM_COL32(255, 255, 255, 255));
         const ImU32 br = is_supports_popup
             ? (dark ? IM_COL32(255, 255, 255, 34) : IM_COL32(225, 228, 233, 255))
-            : (dark ? IM_COL32(110,110,114,200) : IM_COL32(192,192,200,200));
+            : (dark ? IM_COL32(89,117,135,200) : IM_COL32(187,198,205,200));
         const float r = is_supports_popup ? 12.0f * scale : 10.0f * scale;
 
         dl->AddRectFilled(p, q, bg, r, ImDrawFlags_RoundCornersAll);
@@ -1811,7 +1811,7 @@ void GLCanvas3D::_render_resident_filament_panel_simple(const ImVec4& rect)
         const float bottom = panel_rect.y + panel_rect.w;
         const float highlight_inset = 14.0f * view_scale;
         const float highlight_thickness = resize_state.dragging ? (2.0f * view_scale) : (1.35f * view_scale);
-        const ImU32 highlight_col = resize_state.dragging ? IM_COL32(0, 220, 120, 210) : IM_COL32(126, 214, 166, 136);
+        const ImU32 highlight_col = resize_state.dragging ? IM_COL32(6, 134, 214, 210) : IM_COL32(128, 179, 212, 136);
         if (has_edge(draw_edge, ResidentFilamentResizeEdge::Left))
             draw_list->AddLine(ImVec2(left, top + highlight_inset), ImVec2(left, bottom - highlight_inset), highlight_col, highlight_thickness);
         if (has_edge(draw_edge, ResidentFilamentResizeEdge::Right))
@@ -1868,7 +1868,7 @@ void GLCanvas3D::_render_object_drawer_panel_simple(const ImVec4& rect)
     ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImGuiWrapper::COL_CREALITY);
     ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImGuiWrapper::COL_CREALITY);
     ImGui::PushStyleColor(ImGuiCol_Border, transparent);
-    ImVec4 tmp_color = ImVec4(158.0f / 255.0, 158.0f / 255.0, 158.0f / 255.0, 1.0f);
+    ImVec4 tmp_color = ImVec4(142 / 255.0f, 162 / 255.0f, 174 / 255.0f, 1.0f);
     ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK_TRANS));
     ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, tmp_color);
     ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, tmp_color);

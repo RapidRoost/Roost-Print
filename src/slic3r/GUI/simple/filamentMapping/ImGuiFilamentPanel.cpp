@@ -648,8 +648,8 @@ static void draw_add_popup_info_pill(const char* label, float scale)
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     draw_list->AddRectFilled(pos, ImVec2(pos.x + size.x, pos.y + size.y), popup_col(popup_rgba(0.14f, 0.22f, 0.18f, 0.98f)), 999.f);
     draw_list->AddRect(pos, ImVec2(pos.x + size.x, pos.y + size.y), popup_col(popup_rgba(0.30f, 0.74f, 0.47f, 0.34f)), 999.f);
-    draw_list->AddCircleFilled(ImVec2(pos.x + 10.f * scale, pos.y + size.y * 0.5f), 3.6f * scale, IM_COL32(78, 210, 124, 255));
-    draw_list->AddText(ImVec2(pos.x + 18.f * scale, pos.y + (size.y - text_size.y) * 0.5f), IM_COL32(216, 241, 224, 255), label);
+    draw_list->AddCircleFilled(ImVec2(pos.x + 10.f * scale, pos.y + size.y * 0.5f), 3.6f * scale, IM_COL32(81, 158, 207, 255));
+    draw_list->AddText(ImVec2(pos.x + 18.f * scale, pos.y + (size.y - text_size.y) * 0.5f), IM_COL32(217, 231, 240, 255), label);
 }
 
 void ImGuiFilamentPanel::refresh_items_from_config()

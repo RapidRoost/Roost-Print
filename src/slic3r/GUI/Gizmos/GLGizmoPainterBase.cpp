@@ -407,7 +407,7 @@ void GLGizmoPainterBase::render_height_range_by_imgui(const Transform3d& trafo) 
     ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, m_is_dark_mode ? ImVec4(0.0, 0.0, 0.0, 0.4) :
                                                               ImVec4(255 / 255.0, 255 / 255.0, 255 / 255.0, 0.7));
-    ImGui::PushStyleColor(ImGuiCol_Text, m_is_dark_mode ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(38 / 255.0, 46 / 255.0, 48 / 255.0, 0.7));
+    ImGui::PushStyleColor(ImGuiCol_Text, m_is_dark_mode ? ImVec4(1.0, 1.0, 1.0, 1.0) : ImVec4(27 / 255.0f, 47 / 255.0f, 59 / 255.0f, 0.7));
 
     ImGui::SetNextWindowFocus();
     imgui.set_next_window_pos(m_height_start_pos[0], m_height_start_pos[1], ImGuiCond_Always, 0.0f, 0.0f);
@@ -422,7 +422,7 @@ void GLGizmoPainterBase::render_height_range_by_imgui(const Transform3d& trafo) 
 
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0);
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0);
-    ImGui::PushStyleColor(ImGuiCol_FrameBg, m_is_dark_mode ? ImVec4(27 / 255.0, 27 / 255.0, 28 / 255.0, 0.5) :
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, m_is_dark_mode ? ImVec4(17 / 255.0f, 30 / 255.0f, 38 / 255.0f, 0.5) :
                                                              ImVec4(255 / 255.0, 255 / 255.0, 255 / 255.0, 0.7));
     bool changed = ImGui::BBLInputDouble("mm##m_height_start_z_in_imgui", &m_height_start_z_in_imgui, 0.0f, 0.0f, "%.2f");
     ImGui::PopStyleVar(2);
@@ -430,7 +430,7 @@ void GLGizmoPainterBase::render_height_range_by_imgui(const Transform3d& trafo) 
 
     ImGui::SameLine();
 
-    ImGui::PushStyleColor(ImGuiCol_Button, m_is_dark_mode ? ImVec4(27 / 255.0, 27 / 255.0, 28 / 255.0, 0.5) :
+    ImGui::PushStyleColor(ImGuiCol_Button, m_is_dark_mode ? ImVec4(17 / 255.0f, 30 / 255.0f, 38 / 255.0f, 0.5) :
                                                             ImVec4(255 / 255.0, 255 / 255.0, 255 / 255.0, 0.7));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiWrapper::COL_CREALITY);
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiWrapper::COL_CREALITY);

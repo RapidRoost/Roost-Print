@@ -1341,7 +1341,7 @@ void render_device_list_popup(GLCanvas3D& canvas, float /*x*/, float /*y*/, floa
         bool link_clicked = ImGui::IsItemClicked();
 
         ImDrawList* dl = ImGui::GetWindowDrawList();
-        const ImU32 link_col = IM_COL32(21,192,89,255);
+        const ImU32 link_col = IM_COL32(25,125,188,255);
         dl->AddText(link_pos_screen, link_col, btn_label.c_str());
 
         if (ImGui::IsItemHovered()) {
@@ -1405,7 +1405,7 @@ void render_device_list_popup(GLCanvas3D& canvas, float /*x*/, float /*y*/, floa
         ImGui::InvisibleButton("##add_printer_link_simple", szL);
         bool link_clicked = ImGui::IsItemClicked();
         ImDrawList* dl = ImGui::GetWindowDrawList();
-        const ImU32 link_col = IM_COL32(21,192,89,255);
+        const ImU32 link_col = IM_COL32(25,125,188,255);
         dl->AddText(link_pos_screen, link_col, link.c_str());
         if (ImGui::IsItemHovered()) {
             // Optional underline on hover
@@ -1437,10 +1437,10 @@ void render_device_list_popup(GLCanvas3D& canvas, float /*x*/, float /*y*/, floa
     const float img_h  = img_w;
     const float card_h = img_h + 56.0f * scale;
 
-    const ImU32 br_grey  = dark ? IM_COL32(110,110,114,200) : IM_COL32(192,192,200,200);
-    const ImU32 br_green = IM_COL32(41,190,85,255);
+    const ImU32 br_grey  = dark ? IM_COL32(89,117,135,200) : IM_COL32(187,198,205,200);
+    const ImU32 br_green = IM_COL32(45,131,186,255);
     const ImU32 text_col = ImGui::GetColorU32(dark ? ImVec4(1,1,1,1) : ImVec4(0.106f,0.188f,0.239f,1));
-    const ImU32 status_free = IM_COL32(21,192,89,255);
+    const ImU32 status_free = IM_COL32(25,125,188,255);
     const ImU32 status_busy = IM_COL32(56,125,255,255);
     const ImU32 status_off  = IM_COL32(255,125,0,255);
 
@@ -1532,7 +1532,7 @@ void render_device_list_popup(GLCanvas3D& canvas, float /*x*/, float /*y*/, floa
             ImVec2 raw_sz  = ImGui::CalcTextSize(model_label.c_str());
             ImVec2 label_sz = ImVec2(raw_sz.x * scale_px, raw_sz.y * scale_px);
             ImVec2 label_pos = ImVec2(tl.x + 0.5f * (card_w - label_sz.x), img_tl.y + img_h + 6.0f * scale);
-            dl->AddText(ImGui::GetFont(), text_px, label_pos, IM_COL32(150,150,155,255), model_label.c_str());
+            dl->AddText(ImGui::GetFont(), text_px, label_pos, IM_COL32(135,156,170,255), model_label.c_str());
 
             // Device name
             ImGui::SetCursorScreenPos(ImVec2(tl.x, br.y + 6.0f * scale));

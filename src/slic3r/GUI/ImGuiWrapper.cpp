@@ -163,11 +163,11 @@ static const std::map<const wchar_t, std::string> font_icons_extra_large = {
     //{ImGui::ClippyMarker            , "notification_clippy"             },
 };
 
-const ImVec4 ImGuiWrapper::COL_GREY_DARK         = { 0.333f, 0.333f, 0.333f, 1.0f };
-const ImVec4 ImGuiWrapper::COL_GREY_LIGHT        = { 0.4f, 0.4f, 0.4f, 1.0f };
+const ImVec4 ImGuiWrapper::COL_GREY_DARK         = { 62 / 255.0f, 90 / 255.0f, 108 / 255.0f, 1.0f };
+const ImVec4 ImGuiWrapper::COL_GREY_LIGHT        = { 80 / 255.0f, 107 / 255.0f, 124 / 255.0f, 1.0f };
 const ImVec4 ImGuiWrapper::COL_ORANGE_DARK       = { 0.757f, 0.404f, 0.216f, 1.0f };
 const ImVec4 ImGuiWrapper::COL_ORANGE_LIGHT      = to_ImVec4(ColorRGBA::ORANGE());
-const ImVec4 ImGuiWrapper::COL_WINDOW_BACKGROUND = { 0.1f, 0.1f, 0.1f, 0.8f };
+const ImVec4 ImGuiWrapper::COL_WINDOW_BACKGROUND = { 16 / 255.0f, 28 / 255.0f, 36 / 255.0f, 0.8f };
 const ImVec4 ImGuiWrapper::COL_BUTTON_BACKGROUND = COL_ORANGE_DARK;
 const ImVec4 ImGuiWrapper::COL_BUTTON_HOVERED    = COL_ORANGE_LIGHT;
 const ImVec4 ImGuiWrapper::COL_BUTTON_ACTIVE     = COL_BUTTON_HOVERED;
@@ -176,15 +176,15 @@ const ImVec4 ImGuiWrapper::COL_BUTTON_ACTIVE     = COL_BUTTON_HOVERED;
 
 const ImVec4 ImGuiWrapper::COL_BLUE_LIGHT        = ImVec4(0.122f, 0.557f, 0.918f, 1.0f);
 const ImVec4 ImGuiWrapper::COL_GREEN_LIGHT       = ImVec4(0.863f, 0.937f, 0.984f, 1.0f);
-const ImVec4 ImGuiWrapper::COL_HOVER             = { 0.933f, 0.933f, 0.933f, 1.0f };
-const ImVec4 ImGuiWrapper::COL_ACTIVE            = { 0.675f, 0.675f, 0.675f, 1.0f };
-const ImVec4 ImGuiWrapper::COL_SEPARATOR         = { 0.93f, 0.93f, 0.93f, 1.0f };
-const ImVec4 ImGuiWrapper::COL_SEPARATOR_DARK    = { 0.24f, 0.24f, 0.27f, 1.0f };
-const ImVec4 ImGuiWrapper::COL_TITLE_BG          = {0.839f, 0.839f, 0.862f, 1.0f};
-const ImVec4 ImGuiWrapper::COL_TITLE_BG_DARK     = {110 / 255.f,110 / 255.f, 115 / 255.f, 1.0f};
+const ImVec4 ImGuiWrapper::COL_HOVER             = { 235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.0f };
+const ImVec4 ImGuiWrapper::COL_ACTIVE            = { 159 / 255.0f, 175 / 255.0f, 185 / 255.0f, 1.0f };
+const ImVec4 ImGuiWrapper::COL_SEPARATOR         = { 234 / 255.0f, 238 / 255.0f, 240 / 255.0f, 1.0f };
+const ImVec4 ImGuiWrapper::COL_SEPARATOR_DARK    = { 44 / 255.0f, 70 / 255.0f, 86 / 255.0f, 1.0f };
+const ImVec4 ImGuiWrapper::COL_TITLE_BG          = {211 / 255.0f, 218 / 255.0f, 223 / 255.0f, 1.0f};
+const ImVec4 ImGuiWrapper::COL_TITLE_BG_DARK     = {89 / 255.0f,118 / 255.0f, 136 / 255.0f, 1.0f};
 const ImVec4 ImGuiWrapper::COL_WINDOW_BG         = { 1.000f, 1.000f, 1.000f, 1.0f };
-const ImVec4 ImGuiWrapper::COL_WINDOW_BG_DARK    = { 75 / 255.f, 75 / 255.f, 77 / 255.f, 1.f };
-//const ImVec4 ImGuiWrapper::COL_WINDOW_BG_DARK    = {0.294f, 0.294f, 0.302f, 1.f};
+const ImVec4 ImGuiWrapper::COL_WINDOW_BG_DARK    = { 54 / 255.0f, 81 / 255.0f, 98 / 255.0f, 1.f };
+//const ImVec4 ImGuiWrapper::COL_WINDOW_BG_DARK    = {54 / 255.0f, 81 / 255.0f, 98 / 255.0f, 1.f};
 const ImVec4 ImGuiWrapper::COL_ORCA              = to_ImVec4(ColorRGBA::ORCA());
 const ImVec4 ImGuiWrapper::COL_CREALITY          = ImVec4{0.118f, 0.565f, 0.847f, 1.0f};
 
@@ -782,8 +782,8 @@ bool ImGuiWrapper::bbl_input_double(const wxString& label, const double& value, 
 bool ImGuiWrapper::bbl_slider_float_style(const std::string &label, float *v, float v_min, float v_max, const char *format, float power, bool clamp, const wxString &tooltip)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.784f, 0.820f, 0.839f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, COL_CREALITY);
 
@@ -844,7 +844,7 @@ bool ImGuiWrapper::bbl_slider_int_style(
     const std::string& label, int* v, int v_min, int v_max, const char* format, bool clamp, const wxString& tooltip)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 0.00f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.784f, 0.820f, 0.839f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, COL_CREALITY);
@@ -1737,7 +1737,7 @@ bool begin_menu(const char *label, bool enabled)
                    ImMax((tb.y - extra) - ta.y, -100.0f); // triangle is maximum 200 high to limit the slope and the bias toward large sub-menus // FIXME: Multiply by fb_scale?
             tc.y                           = ta.y + ImMin((tc.y + extra) - ta.y, +100.0f);
             moving_toward_other_child_menu = ImTriangleContainsPoint(ta, tb, tc, g.IO.MousePos);
-            // GetForegroundDrawList()->AddTriangleFilled(ta, tb, tc, moving_within_opened_triangle ? IM_COL32(0,128,0,128) : IM_COL32(128,0,0,128)); // [DEBUG]
+            // GetForegroundDrawList()->AddTriangleFilled(ta, tb, tc, moving_within_opened_triangle ? IM_COL32(3,78,125,128) : IM_COL32(128,0,0,128)); // [DEBUG]
         }
         if (menu_is_open && !hovered && g.HoveredWindow == window && g.HoveredIdPreviousFrame != 0 && g.HoveredIdPreviousFrame != id && !moving_toward_other_child_menu)
             want_close = true;
@@ -2636,12 +2636,12 @@ void ImGuiWrapper::push_toolbar_style(const float scale)
         ImGui::PushStyleColor(ImGuiCol_TitleBg, ImGuiWrapper::COL_TITLE_BG_DARK);                                     // 3
         ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImGuiWrapper::COL_TITLE_BG_DARK);                               // 4
         ImGui::PushStyleColor(ImGuiCol_Separator, ImGuiWrapper::COL_SEPARATOR_DARK);                                  // 5
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(62 / 255.0f, 62 / 255.0f, 69 / 255.0f, 1.00f));                 // 6
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(73 / 255.0f, 73 / 255.0f, 78 / 255.0f, 1.00f));          // 7
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(73 / 255.0f, 73 / 255.0f, 78 / 255.0f, 1.00f));           // 8
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(84 / 255.0f, 84 / 255.0f, 90 / 255.0f, 1.00f));         // 9
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(62 / 255.0f, 62 / 255.0f, 69 / 255.0f, 1.00f));          // 10
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));             // 11
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(44 / 255.0f, 70 / 255.0f, 87 / 255.0f, 1.00f));                 // 6
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(53 / 255.0f, 81 / 255.0f, 98 / 255.0f, 1.00f));          // 7
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(53 / 255.0f, 81 / 255.0f, 98 / 255.0f, 1.00f));           // 8
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(64 / 255.0f, 92 / 255.0f, 110 / 255.0f, 1.00f));         // 9
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(44 / 255.0f, 70 / 255.0f, 87 / 255.0f, 1.00f));          // 10
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));             // 11
         ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, ImVec4(43 / 255.0f, 64 / 255.0f, 54 / 255.0f, 1.00f));         // 12
         ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                                // 13
         ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.329f, 0.439f, 0.510f, 1.00f));                            // 14
@@ -2657,10 +2657,10 @@ void ImGuiWrapper::push_toolbar_style(const float scale)
         ImGui::PushStyleColor(ImGuiCol_Separator, ImGuiWrapper::COL_SEPARATOR);         // 5
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));     // 6
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiWrapper::COL_HOVER);         // 7
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 1.00f)); // 8
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(172 / 255.0f, 172 / 255.0f, 172 / 255.0f, 1.00f));                        // 9
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 1.00f));  // 10
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));        // 11
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.00f)); // 8
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(159 / 255.0f, 175 / 255.0f, 185 / 255.0f, 1.00f));                        // 9
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.00f));  // 10
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));        // 11
         ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, COL_GREEN_LIGHT);                                     // 12
         ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));//13
         ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, ImVec4(0.329f, 0.439f, 0.510f, 1.00f));
@@ -2715,15 +2715,15 @@ void ImGuiWrapper::push_common_window_style(const float scale) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 0.88f));                                   // 1
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImGuiWrapper::COL_WINDOW_BG_DARK);                              // 2
-        ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(54 / 255.0f, 54 / 255.0f, 60 / 255.0f, 1.00f));           // 3
-        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(54 / 255.0f, 54 / 255.0f, 60 / 255.0f, 1.00f));     // 4
+        ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(37 / 255.0f, 61 / 255.0f, 77 / 255.0f, 1.00f));           // 3
+        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(37 / 255.0f, 61 / 255.0f, 77 / 255.0f, 1.00f));     // 4
         ImGui::PushStyleColor(ImGuiCol_Separator, ImGuiWrapper::COL_SEPARATOR_DARK);                             // 5
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                              // 6
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COL_CREALITY);                       // 7
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, COL_CREALITY);                        // 8
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(84 / 255.0f, 84 / 255.0f, 90 / 255.0f, 1.00f));    // 9
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(62 / 255.0f, 62 / 255.0f, 69 / 255.0f, 1.00f));     // 10
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));        // 11
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(64 / 255.0f, 92 / 255.0f, 110 / 255.0f, 1.00f));    // 9
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(44 / 255.0f, 70 / 255.0f, 87 / 255.0f, 1.00f));     // 10
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));        // 11
         ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                           // 12
         ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, ImVec4(43 / 255.0f, 64 / 255.0f, 54 / 255.0f, 1.00f));    // 13
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, COL_CREALITY);                       // 14
@@ -2734,7 +2734,7 @@ void ImGuiWrapper::push_common_window_style(const float scale) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.05f, 0.50f) * scale);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 3.0f * scale);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(38 / 255.0f, 46 / 255.0f, 48 / 255.0f, 1.00f));              // 1
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(27 / 255.0f, 47 / 255.0f, 59 / 255.0f, 1.00f));              // 1
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                            // 2
         ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(245 / 255.0f, 245 / 255.0f, 245 / 255.0f, 1.00f));        // 3
         ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(245 / 255.0f, 245 / 255.0f, 245 / 255.0f, 1.00f));  // 4
@@ -2742,9 +2742,9 @@ void ImGuiWrapper::push_common_window_style(const float scale) {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                              // 6
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COL_CREALITY);                       // 7
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, COL_CREALITY);                        // 8
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 1.00f)); // 9
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 1.00f));  // 10
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));        // 11
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.00f)); // 9
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.00f));  // 10
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));        // 11
         ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));                           // 12
         ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, ImGuiWrapper::COL_GREEN_LIGHT);                           // 13
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, COL_CREALITY);                       // 14
@@ -2783,18 +2783,18 @@ void ImGuiWrapper::push_cancel_button_style() {
     if (m_is_dark_mode) {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1.f, 1.f, 1.f, 0.64f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(73 / 255.f, 73 / 255.f, 78 / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(129 / 255.f, 129 / 255.f, 131 / 255.f, 1.f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(53 / 255.0f, 81 / 255.0f, 98 / 255.0f, 1.f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(106 / 255.0f, 135 / 255.0f, 154 / 255.0f, 1.f));
         ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.f, 1.f, 1.f, 0.64f));
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 0.64f));
     }
     else {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(38 / 255.f, 46 / 255.f, 48 / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(238.f / 255.f, 238.f / 255.f, 238.f / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(206.f / 255.f, 206.f / 255.f, 206.f / 255.f, 1.f));
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(27 / 255.0f, 47 / 255.0f, 59 / 255.0f, 1.f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 1.f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(198 / 255.0f, 208 / 255.0f, 214 / 255.0f, 1.f));
         ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.f, 0.f, 0.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(38.f / 255.0f, 46.f / 255.0f, 48.f / 255.0f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(27 / 255.0f, 47 / 255.0f, 59 / 255.0f, 1.00f));
     }
 }
 
@@ -2804,13 +2804,13 @@ void ImGuiWrapper::pop_cancel_button_style() {
 
 void ImGuiWrapper::push_button_disable_style() {
     if (m_is_dark_mode) {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(54 / 255.f, 54 / 255.f, 60 / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(54 / 255.f, 54 / 255.f, 60 / 255.f, 1.f));
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(37 / 255.0f, 61 / 255.0f, 77 / 255.0f, 1.f));
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(37 / 255.0f, 61 / 255.0f, 77 / 255.0f, 1.f));
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 0.4f));
     }
     else {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(206.f / 255.f, 206.f / 255.f, 206.f / 255.f, 1.f));
-        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(206.f / 255.f, 206.f / 255.f, 206.f / 255.f, 1.f));
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(198 / 255.0f, 208 / 255.0f, 214 / 255.0f, 1.f));
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(198 / 255.0f, 208 / 255.0f, 214 / 255.0f, 1.f));
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
     }
 }

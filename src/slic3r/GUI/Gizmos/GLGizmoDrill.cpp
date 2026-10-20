@@ -515,7 +515,7 @@ void GLGizmoDrill::on_render_input_window(float x, float y, float bottom_limit, 
     ImGui::AlignTextToFramePadding();
     ImGui::PushItemWidth(m_label_width);
     if (m_one_layer_only) {
-        ImGui::PushStyleColor(ImGuiCol_Text, is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 0.3f) : ImVec4{ 214 / 255.0f, 214 / 255.0f, 220 / 255.0f, 0.5f });
+        ImGui::PushStyleColor(ImGuiCol_Text, is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 0.3f) : ImVec4{ 211 / 255.0f, 218 / 255.0f, 223 / 255.0f, 0.5f });
     }
     m_imgui->text(m_labels_map["Depth"]);
     if (m_one_layer_only) {
@@ -532,7 +532,7 @@ void GLGizmoDrill::on_render_input_window(float x, float y, float bottom_limit, 
     ImGui::Dummy(ImVec2(0, 0));
     ImGui::SameLine(m_label_width);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
-    ImGui::PushStyleColor(ImGuiCol_Border, is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 0.3f) : ImVec4{ 214 / 255.0f, 214 / 255.0f, 220 / 255.0f, 1.0f });
+    ImGui::PushStyleColor(ImGuiCol_Border, is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 0.3f) : ImVec4{ 211 / 255.0f, 218 / 255.0f, 223 / 255.0f, 1.0f });
     m_imgui->bbl_checkbox(_L("One layer only"), m_one_layer_only);
     ImGui::PopStyleColor();
     ImGui::PopStyleVar();
@@ -644,7 +644,7 @@ void GLGizmoDrill::draw_cp_input_double(const std::string& label, double* v, dou
     ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, bd);
 
     if (disable) {
-        ImGui::PushStyleColor(ImGuiCol_Text, is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 0.3f) : ImVec4{ 214 / 255.0f, 214 / 255.0f, 220 / 255.0f, 0.5f });
+        ImGui::PushStyleColor(ImGuiCol_Text, is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 0.3f) : ImVec4{ 211 / 255.0f, 218 / 255.0f, 223 / 255.0f, 0.5f });
     }
 
     {

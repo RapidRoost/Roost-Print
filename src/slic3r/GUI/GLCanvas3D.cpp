@@ -103,7 +103,7 @@
 static constexpr const float TRACKBALLSIZE = 0.8f;
 
 static Slic3r::ColorRGBA DEFAULT_BG_LIGHT_COLOR      = {0xe1 / 255.0, 0xe4 / 255.0, 0xe9 / 255.0, 1.0f};
-static Slic3r::ColorRGBA DEFAULT_BG_LIGHT_COLOR_DARK = {0x36 / 255.0, 0x36 / 255.0, 0x38 / 255.0, 1.0f};
+static Slic3r::ColorRGBA DEFAULT_BG_LIGHT_COLOR_DARK = {36 / 255.0f, 59 / 255.0f, 74 / 255.0f, 1.0f};
 static Slic3r::ColorRGBA ERROR_BG_LIGHT_COLOR        = {0.753f, 0.192f, 0.039f, 1.0f};
 static Slic3r::ColorRGBA ERROR_BG_LIGHT_COLOR_DARK   = {0.753f, 0.192f, 0.039f, 1.0f};
 
@@ -404,7 +404,7 @@ void GLCanvas3D::LayersEditing::render_variable_layer_height_dialog(const GLCanv
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGuiWrapper::COL_CREALITY);
         ImGui::PushStyleColor(ImGuiCol_Button, dark ? normal_color : ImGui::GetStyleColorVec4(ImGuiCol_WindowBg));
         ImGui::PushStyleColor(ImGuiCol_Border,
-                              dark ? ImGui::GetStyleColorVec4(ImGuiCol_Border) : ImVec4(214.0 / 255, 214.0 / 255, 220.0 / 255, 1.0f));
+                              dark ? ImGui::GetStyleColorVec4(ImGuiCol_Border) : ImVec4(211 / 255.0f, 218 / 255.0f, 223 / 255.0f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_Text, hover ? ImVec4(1, 1, 1, 1) : ImGui::GetStyleColorVec4(ImGuiCol_Text));
 
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(20, 5));
@@ -427,7 +427,7 @@ void GLCanvas3D::LayersEditing::render_variable_layer_height_dialog(const GLCanv
     });
 
     /* line */
-    ImGui::PushStyleColor(ImGuiCol_Separator, dark ? normal_color : ImVec4(214.0 / 255, 214.0 / 255, 220.0 / 255, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Separator, dark ? normal_color : ImVec4(211 / 255.0f, 218 / 255.0f, 223 / 255.0f, 1.0f));
     // ImGui::SetCursorPosX(50.0f);
     ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - 100) * 0.5f); // 居中计算
     ImGui::SetNextItemWidth(200.0f);
@@ -445,8 +445,8 @@ void GLCanvas3D::LayersEditing::render_variable_layer_height_dialog(const GLCanv
     int radius = (int) m_smooth_params.radius;
     int v_min = 1, v_max = 10;
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.784f, 0.820f, 0.839f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImGuiWrapper::COL_CREALITY);
     if (ImGui::BBLSliderScalar("##radius_slider", ImGuiDataType_S32, &radius, &v_min, &v_max)) {
@@ -524,8 +524,8 @@ void GLCanvas3D::LayersEditing::render_variable_layer_height_dialog(const GLCanv
     int radius = (int) m_smooth_params.radius;
     int v_min = 1, v_max = 10;
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.784f, 0.820f, 0.839f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImGuiWrapper::COL_CREALITY);
     if (ImGui::BBLSliderScalar("##radius_slider", ImGuiDataType_S32, &radius, &v_min, &v_max)) {
@@ -1254,7 +1254,7 @@ void GLCanvas3D::SequentialPrintClearance::set_polygons(const Polygons&         
 void GLCanvas3D::SequentialPrintClearance::render()
 {
     const ColorRGBA FILL_COLOR    = {0.7f, 0.7f, 1.0f, 0.5f};
-    const ColorRGBA NO_FILL_COLOR = {0.75f, 0.75f, 0.75f, 0.75f};
+    const ColorRGBA NO_FILL_COLOR = {181 / 255.0f, 193 / 255.0f, 201 / 255.0f, 0.75f};
 
     GLShaderProgram* shader = wxGetApp().get_shader("flat");
     if (shader == nullptr)
@@ -6803,7 +6803,7 @@ bool GLCanvas3D::draw_input_double(const std::string& label, double* v, double s
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
         ImVec2      pos       = ImGui::GetCursorScreenPos();
         ImVec2      pos_max   = ImVec2(pos.x + size.x() + 4.0f, pos.y + height);
-        draw_list->AddRect(pos, pos_max, m_is_dark ? IM_COL32(110, 110, 114, 255) : IM_COL32(214, 214, 220, 255), 5.0f,
+        draw_list->AddRect(pos, pos_max, m_is_dark ? IM_COL32(89, 117, 135, 255) : IM_COL32(211, 218, 223, 255), 5.0f,
                            ImDrawFlags_RoundCornersAll);
     }
 
@@ -6869,7 +6869,7 @@ bool GLCanvas3D::draw_input_int(const std::string& label, int* v, int stride, co
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
         ImVec2      pos       = ImGui::GetCursorScreenPos();
         ImVec2      pos_max   = ImVec2(pos.x + size.x() + 4.0f, pos.y + height);
-        draw_list->AddRect(pos, pos_max, m_is_dark ? IM_COL32(110, 110, 114, 255) : IM_COL32(214, 214, 220, 255), 5.0f,
+        draw_list->AddRect(pos, pos_max, m_is_dark ? IM_COL32(89, 117, 135, 255) : IM_COL32(211, 218, 223, 255), 5.0f,
                            ImDrawFlags_RoundCornersAll);
     }
 
@@ -6940,7 +6940,7 @@ bool GLCanvas3D::draw_input_int_v2(const std::string& label, int* v, int stride,
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
         ImVec2      pos       = ImGui::GetCursorScreenPos();
         ImVec2      pos_max   = ImVec2(pos.x + size.x() + 4.0f, pos.y + height);
-        draw_list->AddRect(pos, pos_max, m_is_dark ? IM_COL32(110, 110, 114, 255) : IM_COL32(214, 214, 220, 255), 5.0f,
+        draw_list->AddRect(pos, pos_max, m_is_dark ? IM_COL32(89, 117, 135, 255) : IM_COL32(211, 218, 223, 255), 5.0f,
                            ImDrawFlags_RoundCornersAll);
     }
 
@@ -7292,8 +7292,8 @@ bool GLCanvas3D::_render_object_clone_options(float left, float right, float bot
     int v_min = 1, v_max = 99;
 
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(238 / 255.0f, 238 / 255.0f, 238 / 255.0f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(235 / 255.0f, 239 / 255.0f, 241 / 255.0f, 0.00f));
     ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.784f, 0.820f, 0.839f, 1.0f));
     const ImVec4 COL_CREALITY = ImVec4{0.118f, 0.565f, 0.847f, 1.0f};
     ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, COL_CREALITY);
@@ -10932,7 +10932,7 @@ void GLCanvas3D::_render_slice_control() const
 
             // Popup menu width equals main+dropdown width; white menu background; no padding
             {
-                ImVec4 dark_bg  = ImVec4(0x59 / 255.f, 0x59 / 255.f, 0x5D / 255.f, 1.0f); // #446072
+                ImVec4 dark_bg  = ImVec4(68 / 255.0f, 96 / 255.0f, 114 / 255.0f, 1.0f); // #446072
                 ImVec4 light_bg = config.getColor(DispConfig::e_ct_white);
                 ImGui::PushStyleColor(ImGuiCol_PopupBg, wxGetApp().dark_mode() ? dark_bg : light_bg);
             }
@@ -10956,7 +10956,7 @@ void GLCanvas3D::_render_slice_control() const
             // no shadow / no extra drawing behind popup
             int ret = -1;
             if (ImGui::BeginPopup("^##id0")) {
-                ImVec4 list_bg = wxGetApp().dark_mode() ? ImVec4(0x59 / 255.f, 0x59 / 255.f, 0x5D / 255.f, 1.0f) :
+                ImVec4 list_bg = wxGetApp().dark_mode() ? ImVec4(68 / 255.0f, 96 / 255.0f, 114 / 255.0f, 1.0f) :
                                                           config.getColor(DispConfig::e_ct_white);
                 ImVec4 list_ac = config.getColor(bigcfg.fg);
                 ImVec4 list_hv = ImVec4(68.f / 255.f, 205.f / 255.f, 122.f / 255.f, 1.0f);
@@ -11153,7 +11153,7 @@ void GLCanvas3D::_render_slice_control() const
                 if (ImGui::IsItemClicked())
                     ImGui::OpenPopup("^##id1");
                 {
-                    ImVec4 dark_bg2  = ImVec4(0x59 / 255.f, 0x59 / 255.f, 0x5D / 255.f, 1.0f); // #446072
+                    ImVec4 dark_bg2  = ImVec4(68 / 255.0f, 96 / 255.0f, 114 / 255.0f, 1.0f); // #446072
                     ImVec4 light_bg2 = config.getColor(DispConfig::e_ct_white);
                     ImGui::PushStyleColor(ImGuiCol_PopupBg, wxGetApp().dark_mode() ? dark_bg2 : light_bg2);
                 }
@@ -11177,7 +11177,7 @@ void GLCanvas3D::_render_slice_control() const
                 // no shadow / no extra drawing behind popup
                 int ret = -1;
                 if (ImGui::BeginPopup("^##id1")) {
-                    ImVec4 list_bg = wxGetApp().dark_mode() ? ImVec4(0x59 / 255.f, 0x59 / 255.f, 0x5D / 255.f, 1.0f) :
+                    ImVec4 list_bg = wxGetApp().dark_mode() ? ImVec4(68 / 255.0f, 96 / 255.0f, 114 / 255.0f, 1.0f) :
                                                               config.getColor(DispConfig::e_ct_white);
                     ImVec4 list_ac = config.getColor(bigcfg.fg);
                     ImVec4 list_hv = ImVec4(68.f / 255.f, 205.f / 255.f, 122.f / 255.f, 1.0f);
@@ -11777,7 +11777,7 @@ void GLCanvas3D::_render_main_toolbar()
         ImU32 left_arrow_button_color = m_is_dark ? IM_COL32(0, 0, 0, 0.5 * 255) : IM_COL32(0, 0, 0, 0.1 * 255);
 
         ImU32         right_arrow_button_color = left_arrow_button_color;
-        ImU32         arrow_color              = m_is_dark ? IM_COL32(251, 251, 251, 255) : IM_COL32(65, 65, 65, 255);
+        ImU32         arrow_color              = m_is_dark ? IM_COL32(251, 251, 251, 255) : IM_COL32(44, 70, 86, 255);
         ImGuiContext& context                  = *GImGui;
         ImGuiWrapper& imgui                    = *wxGetApp().imgui();
 
@@ -12057,7 +12057,7 @@ void GLCanvas3D::_render_imgui_select_plate_toolbar()
 
             ImDrawList* dl      = ImGui::GetWindowDrawList();
             float       r       = bar_width * 0.5f;
-            ImVec4      col_vec = wxGetApp().dark_mode() ? ImVec4(80.0f / 255.0f, 80.0f / 255.0f, 82.0f / 255.0f, 1.0f) :
+            ImVec4      col_vec = wxGetApp().dark_mode() ? ImVec4(58 / 255.0f, 86 / 255.0f, 104 / 255.0f, 1.0f) :
                                                            ImVec4(166.0f / 255.0f, 172.0f / 255.0f, 180.0f / 255.0f, 1.0f);
             ImU32       col     = ImGui::ColorConvertFloat4ToU32(col_vec);
             dl->AddRectFilled(bar_min, bar_max, col, r);
@@ -14222,14 +14222,14 @@ static void render_filament_nozzle_mapping_preview_summary(float scale)
         const ImVec2 canvas_max = canvas_min + ImVec2(collapse_canvas_size, collapse_canvas_size);
         const float uv_top = s_filament_grouping_preview_folded ? 1.0f : 0.0f;
         const float uv_bottom = s_filament_grouping_preview_folded ? 0.0f : 1.0f;
-        const ImU32 arrow_tint = dark_mode ? IM_COL32_WHITE : IM_COL32(65, 65, 65, 255);
+        const ImU32 arrow_tint = dark_mode ? IM_COL32_WHITE : IM_COL32(44, 70, 86, 255);
         draw_list->AddImage(s_filament_grouping_collapse_texture, canvas_min, canvas_max,
                             ImVec2(0.0f, uv_top), ImVec2(1.0f, uv_bottom), arrow_tint);
     }
     if (collapse_hovered) {
         draw_list->AddRect(collapse_pos,
                            collapse_pos + ImVec2(collapse_size, collapse_size),
-                           IM_COL32(21, 191, 89, 255), 6.0f * scale,
+                           IM_COL32(24, 119, 180, 255), 6.0f * scale,
                            ImDrawFlags_RoundCornersAll, 1.0f * scale);
     }
 
@@ -14372,7 +14372,7 @@ void GLCanvas3D::_render_printer_preset_and_obj_list()
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, rd);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, is_dark ? 0.0f : 1.0f);
 
-        ImVec4 bgc       = {34.0f / 255.0f, 34.0f / 255.0f, 34.0f / 255.0f, 0.6f};
+        ImVec4 bgc       = {21 / 255.0f, 37 / 255.0f, 47 / 255.0f, 0.6f};
         ImVec4 bgc_light = {1.0f, 1.f, 1.f, 0.6f};
         ImGui::PushStyleColor(ImGuiCol_WindowBg, is_dark ? bgc : bgc_light);
         ImGui::PushStyleColor(ImGuiCol_FrameBg, is_dark ? bgc : bgc_light);
@@ -14381,7 +14381,7 @@ void GLCanvas3D::_render_printer_preset_and_obj_list()
         ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImGuiWrapper::COL_CREALITY);
         ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImGuiWrapper::COL_CREALITY);
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(225.0f / 255.0f, 228.0f / 255.0f, 233.0f / 255.0f, 1.0f));
-        ImVec4 tmp_color = ImVec4(158.0f / 255.0, 158.0f / 255.0, 158.0f / 255.0, 1.0f);
+        ImVec4 tmp_color = ImVec4(142 / 255.0f, 162 / 255.0f, 174 / 255.0f, 1.0f);
         ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImGui::ColorConvertU32ToFloat4(IM_COL32_BLACK_TRANS));
         ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, tmp_color);
         ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, tmp_color);
@@ -14507,8 +14507,8 @@ bool GLCanvas3D::_render_global_objects_switch_button()
     float view_scale    = wxGetApp().plater()->get_current_canvas3D()->get_scale();
     bool  enable_object = wxGetApp().params_panel()->get_switch_of_object();
 
-    ImVec4 border_color = m_is_dark ? ImVec4(110.0f / 255.0f, 110.0f / 255.0f, 114.0f / 255.0f, 1.0f) :
-                                      ImVec4(170.0f / 255.0f, 170.0f / 255.0f, 176.0f / 255.0f, 1.0f);
+    ImVec4 border_color = m_is_dark ? ImVec4(89 / 255.0f, 117 / 255.0f, 135 / 255.0f, 1.0f) :
+                                      ImVec4(160 / 255.0f, 176 / 255.0f, 186 / 255.0f, 1.0f);
     ImGui::PushStyleColor(ImGuiCol_Border, border_color);
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
 
@@ -14555,7 +14555,7 @@ bool GLCanvas3D::_render_global_objects_switch_button()
     // switch button has diffrent text color
     ImVec4 text_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     if (enable_object == true) {
-        text_color = m_is_dark ? ImVec4(201.0f / 255.0f, 201.0f / 255.0f, 201.0f / 255.0f, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
+        text_color = m_is_dark ? ImVec4(193 / 255.0f, 203 / 255.0f, 209 / 255.0f, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
     }
     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 
@@ -14574,7 +14574,7 @@ bool GLCanvas3D::_render_global_objects_switch_button()
 
     text_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     if (enable_object == false) {
-        text_color = m_is_dark ? ImVec4(201.0f / 255.0f, 201.0f / 255.0f, 201.0f / 255.0f, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
+        text_color = m_is_dark ? ImVec4(193 / 255.0f, 203 / 255.0f, 209 / 255.0f, 1.0f) : ImVec4(0.125f, 0.216f, 0.275f, 1.0);
     }
     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
 

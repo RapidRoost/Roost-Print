@@ -40,12 +40,12 @@ bool PrintSettingsPanel::render(bool embedded)
 
     const bool is_dark = Slic3r::GUI::wxGetApp().dark_mode();
     // 集中颜色
-    const ImU32 slider_bg_color      = is_dark ? IM_COL32(60, 60, 60, 255)  : IM_COL32(230, 230, 230, 255);
-    const ImU32 highlight_color      = is_dark ? IM_COL32(200, 200, 200, 255): IM_COL32(255, 255, 255, 255);
-    const ImU32 highlight_text_color = IM_COL32(21, 192, 89, 255);
-    const ImU32 slider_text_color    = IM_COL32(160, 160, 160, 255);
-    const ImU32 label_text_color     = is_dark ? IM_COL32(255, 255, 255, 255): IM_COL32(30, 30, 30, 255);
-    const ImU32 panel_bg_color       = is_dark ? IM_COL32(30, 30, 30, 255)   : IM_COL32(255, 255, 255, 255);
+    const ImU32 slider_bg_color      = is_dark ? IM_COL32(40, 65, 80, 255)  : IM_COL32(226, 231, 234, 255);
+    const ImU32 highlight_color      = is_dark ? IM_COL32(191, 202, 209, 255): IM_COL32(255, 255, 255, 255);
+    const ImU32 highlight_text_color = IM_COL32(25, 125, 188, 255);
+    const ImU32 slider_text_color    = IM_COL32(145, 163, 175, 255);
+    const ImU32 label_text_color     = is_dark ? IM_COL32(255, 255, 255, 255): IM_COL32(18, 33, 42, 255);
+    const ImU32 panel_bg_color       = is_dark ? IM_COL32(18, 33, 42, 255)   : IM_COL32(255, 255, 255, 255);
 
     // 嵌入模式：外层卡片窗口已经绘制了白色圆角背景，这里只设置文字颜色；独立模式才设置 WindowBg
     if (!embedded) {
@@ -258,9 +258,9 @@ bool PrintSettingsPanel::render(bool embedded)
 
     // 其他控件（BeginTable 在嵌入/独立两种模式下都可以用）
 
-    const ImU32 bg_color    = is_dark ? IM_COL32(60, 60, 60, 255)  : IM_COL32(230, 230, 230, 255);
-    const ImU32 hover_color = is_dark ? IM_COL32(80, 80, 80, 255)  : IM_COL32(200, 200, 200, 255);
-    const ImU32 active_color= is_dark ? IM_COL32(100,100,100,255)  : IM_COL32(180,180,180,255);
+    const ImU32 bg_color    = is_dark ? IM_COL32(40, 65, 80, 255)  : IM_COL32(226, 231, 234, 255);
+    const ImU32 hover_color = is_dark ? IM_COL32(57, 85, 103, 255)  : IM_COL32(191, 202, 209, 255);
+    const ImU32 active_color= is_dark ? IM_COL32(77,105,123,255)  : IM_COL32(168,183,192,255);
 
     if (ImGui::BeginTable("PrintSettingsTable", 4, ImGuiTableFlags_SizingFixedFit)) { // ImGuiTableFlags_SizingStretchProp
 

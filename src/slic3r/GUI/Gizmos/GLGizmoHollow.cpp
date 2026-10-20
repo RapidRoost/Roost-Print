@@ -641,7 +641,7 @@ void GLGizmoHollow::on_render_input_window(float x, float y, float bottom_limit,
     
 
     ImGui::Dummy(ImVec2(0,0));
-    ImVec4 bt_bgc = ImVec4(110 / 255.0, 110 / 255.0, 115 / 255.0, 1.0);
+    ImVec4 bt_bgc = ImVec4(89 / 255.0f, 118 / 255.0f, 136 / 255.0f, 1.0);
     ImVec4 bt_bgc_light = ImVec4(255 / 255.0, 2555 / 255.0, 255 / 255.0, 1.0);
     bool is_dark = wxGetApp().dark_mode();
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGuiWrapper::COL_CREALITY);
@@ -768,7 +768,7 @@ void GLGizmoHollow::draw_cp_input_double(const std::string& label, double* v, do
     ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, bd);
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
     if (disable) {
-        ImGui::PushStyleColor(ImGuiCol_Text, is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 0.3f) : ImVec4{ 214 / 255.0f, 214 / 255.0f, 220 / 255.0f, 0.3f });
+        ImGui::PushStyleColor(ImGuiCol_Text, is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 0.3f) : ImVec4{ 211 / 255.0f, 218 / 255.0f, 223 / 255.0f, 0.3f });
     }
 
     {

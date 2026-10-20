@@ -409,11 +409,11 @@ void MeshBooleanUI::draw_action_buttons()
     if (!enable_button) {
         ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
         if (m_is_dark_mode) {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(39.0f / 255.0f, 39.0f / 255.0f, 39.0f / 255.0f, 1.0f));
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(108.0f / 255.0f, 108.0f / 255.0f, 108.0f / 255.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(24 / 255.0f, 42 / 255.0f, 54 / 255.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(85 / 255.0f, 113 / 255.0f, 131 / 255.0f, 1.0f));
         } else {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(230.0f / 255.0f, 230.0f / 255.0f, 230.0f / 255.0f, 1.0f));
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(163.0f / 255.0f, 163.0f / 255.0f, 163.0f / 255.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(226 / 255.0f, 231 / 255.0f, 234 / 255.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(148 / 255.0f, 166 / 255.0f, 178 / 255.0f, 1.0f));
         }
     }
 
@@ -443,11 +443,11 @@ void MeshBooleanUI::draw_action_buttons()
     if (!cancel_enabled) {
         ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
         if (m_is_dark_mode) {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(39.0f / 255.0f, 39.0f / 255.0f, 39.0f / 255.0f, 1.0f));
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(108.0f / 255.0f, 108.0f / 255.0f, 108.0f / 255.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(24 / 255.0f, 42 / 255.0f, 54 / 255.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(85 / 255.0f, 113 / 255.0f, 131 / 255.0f, 1.0f));
         } else {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(230.0f / 255.0f, 230.0f / 255.0f, 230.0f / 255.0f, 1.0f));
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(163.0f / 255.0f, 163.0f / 255.0f, 163.0f / 255.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(226 / 255.0f, 231 / 255.0f, 234 / 255.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(148 / 255.0f, 166 / 255.0f, 178 / 255.0f, 1.0f));
         }
     }
     // Note: Cancel and Reset buttons now use default button colors (no red highlighting)
@@ -731,7 +731,7 @@ bool MeshBooleanUI::draw_tab_button(const char* icon_name, const char* text, boo
 
     ImVec2 text_pos = ImVec2(start_x + icon_size + spacing, center_y - text_size.y * 0.5f);
     ImU32 text_color = selected ? IM_COL32(255,255,255,255)
-                                : (m_is_dark_mode ? IM_COL32(200,200,200,255) : IM_COL32(50,50,50,255));
+                                : (m_is_dark_mode ? IM_COL32(191,202,209,255) : IM_COL32(32,54,68,255));
     draw_list->AddText(text_pos, text_color, text);
 
     return clicked && enabled;
@@ -903,9 +903,9 @@ void MeshBooleanUI::draw_object_list(const std::string& table_name, ImVec2 size,
 
     // Set scrollbar color
     ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, IM_COL32(0, 0, 0, 0));
-    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, IM_COL32(220, 220, 220, 255));
-    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, IM_COL32(200, 200, 200, 200));
-    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(180, 180, 180, 220));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, IM_COL32(215, 221, 225, 255));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, IM_COL32(191, 202, 209, 200));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, IM_COL32(168, 183, 192, 220));
 
     // Create child window for list content - don't reduce height for bottom margin to avoid clipping
     float available_height = size.y - title_h - title_to_list_spacing;
@@ -1052,7 +1052,7 @@ bool MeshBooleanUI::draw_selectable(const ListItemInfo& item_info, bool selected
     ImU32 text_color;
     if (should_gray_out) {
         // Gray color for non-entity items when Entity Only is enabled
-        text_color = m_is_dark_mode ? IM_COL32(108, 108, 108, 255) : IM_COL32(163, 163, 163, 255);
+        text_color = m_is_dark_mode ? IM_COL32(85, 113, 131, 255) : IM_COL32(148, 166, 178, 255);
     } else {
         // Normal text color
         text_color = m_is_dark_mode ? MeshBooleanConfig::COLOR_TEXT_DARK : MeshBooleanConfig::COLOR_TEXT;

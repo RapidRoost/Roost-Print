@@ -387,7 +387,7 @@ WXLRESULT Button::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam)
     : wxButton(parent, id, label, pos, size, style, validator, name)
 {
     Bind(wxEVT_PAINT, &RoundedButton::OnPaint, this);
-    wxColour default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#070C12") : wxColour(211, 218, 223);
+    wxColour default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#0E1A27") : wxColour(211, 218, 223);
     wxButton::SetBackgroundColour(default_btn_bg);
     // SetBackgroundColour(GetParent()->GetBackgroundColour());
 }
@@ -421,7 +421,7 @@ void RoundedButton::Render(wxDC& dc)
         wxRect rect = GetClientRect();
 
         // 清除默认背景
-        wxColour default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#070C12") : wxColour(211, 218, 223);
+        wxColour default_btn_bg = Slic3r::GUI::wxGetApp().dark_mode() ? wxColour("#0E1A27") : wxColour(211, 218, 223);
         wxButton::SetBackgroundColour(default_btn_bg);
 
         // 绘制圆角背景

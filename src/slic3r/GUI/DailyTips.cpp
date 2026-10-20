@@ -149,7 +149,7 @@ void DailyTipsDataRenderer::render_text(const ImVec2& start_pos, const ImVec2& s
 {
     ImGuiWrapper& imgui = *wxGetApp().imgui();
 
-    ImGui::PushStyleColor(ImGuiCol_Text, m_is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 0.88f * m_fade_opacity) : ImVec4(38 / 255.0f, 46 / 255.0f, 48 / 255.0f, m_fade_opacity));
+    ImGui::PushStyleColor(ImGuiCol_Text, m_is_dark ? ImVec4(1.0f, 1.0f, 1.0f, 0.88f * m_fade_opacity) : ImVec4(27 / 255.0f, 47 / 255.0f, 59 / 255.0f, m_fade_opacity));
     // main text
     // first line is headline (for hint notification it must be divided by \n)
     std::string title_line;
@@ -578,7 +578,7 @@ void DailyTipsWindow::render()
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.f * scale);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 3) * scale);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10, 7) * scale);
-    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, m_is_dark ? ImVec4(54 / 255.0f, 54 / 255.0f, 60 / 255.0f, 1.00f) : ImVec4(245 / 255.0f, 245 / 255.0f, 245 / 255.0f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, m_is_dark ? ImVec4(37 / 255.0f, 61 / 255.0f, 77 / 255.0f, 1.00f) : ImVec4(245 / 255.0f, 245 / 255.0f, 245 / 255.0f, 1.00f));
     ImGui::GetCurrentContext()->DimBgRatio = 1.0f;
     int windows_flag =
         ImGuiWindowFlags_NoCollapse
