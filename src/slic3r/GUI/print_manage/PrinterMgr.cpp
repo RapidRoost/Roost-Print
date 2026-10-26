@@ -18,6 +18,9 @@
 #include <set>
 namespace pt = boost::property_tree;
 using json = nlohmann::json;
+#include <boost/log/trivial.hpp>
+#include <boost/nowide/fstream.hpp>
+#include <sstream>
 
 namespace DM {
 
@@ -276,9 +279,57 @@ namespace DM {
 
     }
 
+    // Roost Print: count the printers saved in a deviceInfo.json (0 if it can't be read).
+    static size_t roost_printer_count(const boost::filesystem::path& file)
+    {
+        try {
+            if (!boost::filesystem::exists(file))
+                return 0;
+            boost::nowide::ifstream t(file.string());
+            std::stringstream buffer;
+            buffer << t.rdbuf();
+            json j = json::parse(buffer.str());
+            size_t n = 0;
+            if (j.contains("groups") && j["groups"].is_array())
+                for (auto& g : j["groups"])
+                    if (g.contains("list") && g["list"].is_array())
+                        n += g["list"].size();
+            return n;
+        } catch (...) {
+            return 0;
+        }
+    }
+
+    // Roost Print: the shop's printers are already saved in the regular Creality Print on this
+    // computer. When Roost Print has none yet, copy that list over (newest Creality Print first),
+    // so every printer shows up in Device without adding them again. Never overwrites a list
+    // Roost Print already has.
+    static void roost_import_creality_printers(const boost::filesystem::path& device_file)
+    {
+        try {
+            if (roost_printer_count(device_file) > 0)
+                return;
+            const boost::filesystem::path creality = boost::filesystem::path(Slic3r::data_dir()).parent_path().parent_path() / "Creality Print";
+            for (const char* ver : {"7.3", "7.2", "7.1", "7.0", "6.0"}) {
+                const boost::filesystem::path from = creality / ver / "deviceInfo.json";
+                const size_t n = roost_printer_count(from);
+                if (n == 0)
+                    continue;
+                if (boost::filesystem::exists(device_file))
+                    boost::filesystem::copy_file(device_file, device_file.string() + ".before-import", boost::filesystem::copy_options::overwrite_existing);
+                boost::filesystem::copy_file(from, device_file, boost::filesystem::copy_options::overwrite_existing);
+                BOOST_LOG_TRIVIAL(info) << "Roost Print: imported " << n << " printers from " << from.string();
+                return;
+            }
+        } catch (const std::exception& e) {
+            BOOST_LOG_TRIVIAL(warning) << "Roost Print: printer import from Creality Print failed: " << e.what();
+        }
+    }
+
     void DeviceMgr::Load()
     {
         boost::filesystem::path device_file = boost::filesystem::path(Slic3r::data_dir()) / "deviceInfo.json";
+        roost_import_creality_printers(device_file);
         if (!boost::filesystem::exists(device_file))
         {
             boost::filesystem::path device_old_file = boost::filesystem::path(Slic3r::data_dir()).parent_path().parent_path() / "Creative3D/deviceInfo.json";
