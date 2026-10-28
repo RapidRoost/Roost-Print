@@ -327,8 +327,10 @@ void render_card(GLCanvas3D& canvas)
     Plater* plater = wxGetApp().plater();
     if (plater == nullptr || wxGetApp().preset_bundle == nullptr)
         return;
-    if (!g_applied_once)
+    if (!g_applied_once) {
+        g_applied_once = true; // once, not every frame until it runs
         wxGetApp().CallAfter([]() { apply(); });
+    }
 
     PartPlateList& plates      = plater->get_partplate_list();
     const int      plate_index = plates.get_curr_plate_index();
