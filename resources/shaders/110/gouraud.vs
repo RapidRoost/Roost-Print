@@ -51,6 +51,25 @@ varying vec4 world_pos;
 varying float world_normal_z;
 varying vec3 eye_normal;
 
+// Roost Print: the shop light (gouraud.fs) needs the normal and the view direction in the plate's
+// own frame, not the camera's, so the light stays put while the camera moves (like rapidroost.net).
+varying vec3 roost_world_normal;
+varying vec3 roost_world_view;
+
+// Roost Print: GLSL 1.10 has no transpose() or inverse().
+mat3 roost_transpose(mat3 m)
+{
+    return mat3(m[0][0], m[1][0], m[2][0], m[0][1], m[1][1], m[2][1], m[0][2], m[1][2], m[2][2]);
+}
+
+mat3 roost_inverse(mat3 m)
+{
+    vec3 a = m[0], b = m[1], c = m[2];
+    vec3 r0 = cross(b, c), r1 = cross(c, a), r2 = cross(a, b);
+    float det = dot(a, r0);
+    return roost_transpose(mat3(r0, r1, r2)) / det;
+}
+
 void main()
 {
 	// First transform the normal into camera space and normalize the result.
@@ -75,6 +94,14 @@ void main()
     world_normal_z = slope.actived ? (normalize(slope.volume_world_normal_matrix * v_normal)).z : 0.0;
 
     gl_Position = projection_matrix * position;
+
+    // Roost Print: normal and view direction in the plate's frame, for the shop light.
+    mat3 roost_vm = mat3(view_model_matrix[0].xyz, view_model_matrix[1].xyz, view_model_matrix[2].xyz);
+    mat3 roost_m  = mat3(volume_world_matrix[0].xyz, volume_world_matrix[1].xyz, volume_world_matrix[2].xyz);
+    // The camera's turn (view without the object's own move/turn/scale), backwards: camera -> plate.
+    mat3 roost_to_plate = roost_transpose(roost_vm * roost_inverse(roost_m));
+    roost_world_normal = roost_to_plate * eye_normal;
+    roost_world_view   = roost_to_plate * (-position.xyz);
     // Fill in the scalars for fragment shader clipping. Fragments with any of these components lower than zero are discarded.
     clipping_planes_dots = vec3(dot(world_pos, clipping_plane), world_pos.z - z_range.x, z_range.y - world_pos.z);
     color_clip_plane_dot = dot(world_pos, color_clip_plane);

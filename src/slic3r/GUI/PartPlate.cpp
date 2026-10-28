@@ -39,6 +39,7 @@
 #include "3DBed.hpp"
 #include "Plater.hpp"
 #include "PartPlate.hpp"
+#include "RoostStages.hpp"
 #include "ConfigManipulation.hpp"
 #include "Camera.hpp"
 #include "GUI_Colors.hpp"
@@ -992,6 +993,27 @@ void PartPlate::render_exclude_area() {
 	glsafe(::glDepthMask(GL_TRUE));
 }
 
+
+// Roost Print: blue border while there's something to print; yolk, green or red (border and a light
+// wash over the bed) once it's printing, printed or failed. Empty plates get nothing.
+void PartPlate::render_roost_stage()
+{
+	if (obj_to_instance_set.empty() || !m_roost_stage_border.is_initialized())
+		return;
+	const RoostStages::Stage stage = RoostStages::stage(m_plate_index);
+	ColorRGBA color = RoostStages::color(stage);
+	glsafe(::glDepthMask(GL_FALSE));
+	if (stage != RoostStages::Stage::ToPrint && m_roost_stage_fill.is_initialized()) {
+		ColorRGBA wash = color;
+		wash.a(m_selected ? 0.24f : 0.18f);
+		m_roost_stage_fill.set_color(wash);
+		m_roost_stage_fill.render();
+	}
+	color.a(stage == RoostStages::Stage::ToPrint ? 0.75f : 0.95f);
+	m_roost_stage_border.set_color(color);
+	m_roost_stage_border.render();
+	glsafe(::glDepthMask(GL_TRUE));
+}
 
 /*void PartPlate::render_background_for_picking(const ColorRGBA render_color) const
 {
@@ -2985,6 +3007,14 @@ bool PartPlate::set_shape(const Pointfs& shape, const Pointfs& exclude_areas, Ve
 		generate_exclude_polygon(exclude_poly);
 		calc_exclude_triangles(exclude_poly);
 
+		// Roost Print: the stage tint, just above the bed (the logo is at +0.02).
+		m_roost_stage_fill.reset();
+		m_roost_stage_border.reset();
+		init_model_from_poly(m_roost_stage_fill, poly, GROUND_Z + 0.03f);
+		const ExPolygons roost_border = diff_ex(ExPolygons{poly}, offset_ex(poly, -float(scale_(2.5))));
+		if (!roost_border.empty())
+			init_model_from_poly(m_roost_stage_border, roost_border.front(), GROUND_Z + 0.04f);
+
 		const BoundingBox& pp_bbox = poly.contour.bounding_box();
 		calc_gridlines(poly, pp_bbox);
 
@@ -3072,6 +3102,7 @@ void PartPlate::render(const Transform3d& view_matrix, const Transform3d& projec
         if (!bottom) {
             //render_background(only_body);
             render_exclude_area();
+            render_roost_stage(); // Roost Print
         }
 		if (show_grid)
 			render_grid(bottom);

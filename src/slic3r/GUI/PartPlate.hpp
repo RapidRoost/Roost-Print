@@ -140,6 +140,9 @@ private:
     std::vector<Vec3f> positions;
     
     GLModel m_exclude_triangles;
+    // Roost Print: the plate's stage tint (RoostStages.hpp): the whole print area, and a border band.
+    GLModel m_roost_stage_fill;
+    GLModel m_roost_stage_border;
     GLModel m_logo_triangles;
     GLModel m_gridlines;
     GLModel m_gridlines_bolder;
@@ -200,6 +203,8 @@ private:
     void render_logo_texture(GLTexture &logo_texture, GLModel &logo_buffer, bool bottom);
     void update_center_mark();
     void render_exclude_area();
+    // Roost Print: tint the bed by where this plate is up to (to print, printing, printed, failed).
+    void render_roost_stage();
     //void render_background_for_picking(const ColorRGBA render_color) const;
     void render_grid(bool bottom);
     void render_height_limit(PartPlate::HeightLimitMode mode = HEIGHT_LIMIT_BOTH);

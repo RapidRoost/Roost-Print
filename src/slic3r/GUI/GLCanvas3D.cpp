@@ -1,6 +1,7 @@
 // [FORMATTED BY CLANG-FORMAT 2026-05-11 19:10:09]
 #include "libslic3r/libslic3r.h"
 #include "GLCanvas3D.hpp"
+#include "RoostSlim.hpp"
 
 #include <igl/unproject.h>
 
@@ -4874,7 +4875,11 @@ void GLCanvas3D::on_mouse(wxMouseEvent& evt)
 #endif /* SLIC3R_DEBUG_MOUSE_EVENTS */
     }
 
-    if(wxGetApp().easy_mode()) {
+    // Roost Print: the simple view hides the toolbars, so they mustn't catch clicks either.
+    const bool roost_simple = RoostSlim::active(*this);
+    if (roost_simple) {
+        // nothing: no toolbars
+    } else if(wxGetApp().easy_mode()) {
         if (m_easymode_main_toolbar.on_mouse(evt, *this)) {
             if (m_easymode_main_toolbar.is_any_item_pressed())
                 m_gizmos.reset_all_states();
@@ -4914,14 +4919,14 @@ void GLCanvas3D::on_mouse(wxMouseEvent& evt)
 
 
     // BBS: GUI refactor: GLToolbar
-    if (m_assemble_view_toolbar.on_mouse(evt, *this) || m_assemble_view_internal_toolbar.on_mouse(evt, *this)) {
+    if (!roost_simple && (m_assemble_view_toolbar.on_mouse(evt, *this) || m_assemble_view_internal_toolbar.on_mouse(evt, *this))) {
         if (evt.LeftUp() || evt.MiddleUp() || evt.RightUp())
             mouse_up_cleanup();
         m_mouse.set_start_position_3D_as_invalid();
         return;
     }
 
-    if (wxGetApp().plater()->get_collapse_toolbar().on_mouse(evt, *this)) {
+    if (!roost_simple && wxGetApp().plater()->get_collapse_toolbar().on_mouse(evt, *this)) {
         if (evt.LeftUp() || evt.MiddleUp() || evt.RightUp())
             mouse_up_cleanup();
         m_mouse.set_start_position_3D_as_invalid();
@@ -4950,7 +4955,8 @@ void GLCanvas3D::on_mouse(wxMouseEvent& evt)
         m_dirty = true;
     };
 
-    if (m_gizmos.on_mouse(evt)) {
+    // Roost Print: no gizmo bar in the simple view; only a tool already open (from a shortcut) gets clicks.
+    if ((!roost_simple || m_gizmos.get_current_type() != GLGizmosManager::Undefined) && m_gizmos.on_mouse(evt)) {
         if (m_gizmos.is_running()) {
             _deactivate_arrange_menu();
             _deactivate_orient_menu();
@@ -10391,6 +10397,8 @@ void GLCanvas3D::_render_objects(GLVolumeCollection::ERenderType type, bool with
     if ((GUI::ERenderPipelineStage::Silhouette == render_pipeline_stage) || shader != nullptr) {
         if (GUI::ERenderPipelineStage::Silhouette != render_pipeline_stage) {
             shader->start_using();
+            // Roost Print: Prepare's models are lit by the shop, like rapidroost.net (gouraud.fs).
+            shader->set_uniform("roost_studio", canvas_type == ECanvasType::CanvasView3D && RoostSlim::shop_light());
         }
 
         switch (type) {
@@ -10477,6 +10485,7 @@ void GLCanvas3D::_render_objects(GLVolumeCollection::ERenderType type, bool with
         }*/
 
         if (GUI::ERenderPipelineStage::Silhouette != render_pipeline_stage) {
+            shader->set_uniform("roost_studio", false); // others using this shader keep the old light
             shader->stop_using();
         }
     }
@@ -11475,6 +11484,12 @@ void GLCanvas3D::_render_overlays()
 {
     glsafe(::glDisable(GL_DEPTH_TEST));
 
+    // Roost Print: the simple view shows the model and the job card, nothing else (RoostSlim.hpp).
+    if (RoostSlim::active(*this)) {
+        _render_overlays_roost();
+        return;
+    }
+
     _render_printer_preset_and_obj_list();
 
     _check_and_update_toolbar_icon_scale();
@@ -11535,6 +11550,17 @@ void GLCanvas3D::_render_overlays()
 
     _render_3d_navigator();
     // Roost Print: the AI assistant bot is removed.
+}
+
+// Roost Print: the simple view's overlays: the view cube, the plate picker in Preview, and the job
+// card. No settings, toolbars or tools (RoostSlim.hpp).
+void GLCanvas3D::_render_overlays_roost()
+{
+    _check_and_update_toolbar_icon_scale();
+    if (m_canvas_type == ECanvasType::CanvasPreview)
+        _render_imgui_select_plate_toolbar();
+    _render_3d_navigator();
+    RoostSlim::render_card(*this);
 }
 
 void GLCanvas3D::_render_style_editor()

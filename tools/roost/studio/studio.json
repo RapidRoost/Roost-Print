@@ -1,0 +1,68 @@
+{
+  "version": "06800f426f",
+  "backdropHi": "shop_360_hi.jpg",
+  "backdropLo": "shop_360_lo.jpg",
+  "light": "shop_360_light.bin",
+  "depth": "shop_360_depth.bin",
+  "depthSize": [
+    1024,
+    512
+  ],
+  "heightMm": 250.0,
+  "center": [
+    0.99652,
+    0.0834
+  ],
+  "key": [
+    -0.5987,
+    -0.1491,
+    0.78697
+  ],
+  "counterMask": "shop_360_counter.png",
+  "counter": {
+    "mesh": "counter_mesh.bin",
+    "vertices": 32,
+    "colorHi": "counter_hi.jpg",
+    "colorLo": "counter_lo.jpg",
+    "rough": "counter_rough.jpg",
+    "specular": 0.12
+  },
+  "source": {
+    "resolution": [
+      6144,
+      3072
+    ],
+    "device": "OPTIX",
+    "samples": 512,
+    "blender": "5.1.2",
+    "counter_hit": [
+      "PC Countertop.002"
+    ],
+    "cleared": [
+      "Face sheet.003 (collection IPad Pro 2024 13 inch Space Black)",
+      "Extruded.023 (collection IPad Pro 2024 13 inch Space Black)",
+      "Extruded.034 (collection IPad Pro 2024 13 inch Space Black)",
+      "Extruded.035 (collection IPad Pro 2024 13 inch Space Black)",
+      "Extruded.036 (collection IPad Pro 2024 13 inch Space Black)",
+      "Extruded.037 (collection IPad Pro 2024 13 inch Space Black)",
+      "Extruded.038 (collection IPad Pro 2024 13 inch Space Black)",
+      "Extruded.041 (collection IPad Pro 2024 13 inch Space Black)",
+      "Extruded.042 (collection IPad Pro 2024 13 inch Space Black)",
+      "Extruded.044 (collection IPad Pro 2024 13 inch Space Black)",
+      "Extruded.045 (collection IPad Pro 2024 13 inch Space Black)",
+      "Extruded.046 (collection IPad Pro 2024 13 inch Space Black)",
+      "Apple_logo.001 (collection IPad Pro 2024 13 inch Space Black)",
+      "Body1.073",
+      "Body1.074",
+      "Body11",
+      "Body12",
+      "PLACEHOLDER_PART_delete_me",
+      "Resin_Printer_Base",
+      "Resin_Printer_Cover",
+      "Resin_Printer_Screen",
+      "Speaker_Driver (BlenderKit)",
+      "Small_Plant (BlenderKit)",
+      "Small_Plant_Soil"
+    ]
+  }
+}

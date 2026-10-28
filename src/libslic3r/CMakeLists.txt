@@ -364,6 +364,8 @@ set(lisbslic3r_sources
     ObjColorUtils.hpp
     Orient.hpp
     Orient.cpp
+    RoostOrientCore.hpp
+    RoostOrientCore.cpp
     MultiPoint.cpp
     MultiPoint.hpp
     MutablePriorityQueue.hpp

@@ -4,6 +4,7 @@
 #include "slic3r/GUI/print_manage/Upload3mfToCloud.hpp"
 #include "slic3r/GUI/print_manage/App/SendToPrinter.hpp"
 #include "slic3r/GUI/RoostPrintCam.hpp"
+#include "slic3r/GUI/RoostStages.hpp"
 #include "libslic3r/Config.hpp"
 #include "libslic3r/Color.hpp"
 #include "libslic3r_version.h"
@@ -6357,6 +6358,7 @@ struct Plater::priv
     std::chrono::steady_clock::time_point m_slice_preflight_start_time{};
     bool                                  m_waiting_for_first_slice_progress{false};
     bool m_is_publishing{false};
+    bool m_roost_slice_in_place{false}; // Roost Print: Plater::roost_slice_in_place()
     int  m_is_RightClickInLeftUI{-1};
     int  m_cur_slice_plate;
     // BBS: m_slice_all in .gcode.3mf file case, set true when slice all
@@ -14315,8 +14317,19 @@ BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << ":received slice plate event\n";
             	// CR30鏈哄瀷,灞忚斀瑁欒竟鐢熸垚
         
         q->reslice();
-        q->select_view_3D("Preview");
+        // Roost Print: the simple view slices in place and stays on the model (RoostSlim.hpp).
+        if (!m_roost_slice_in_place)
+            q->select_view_3D("Preview");
     }
+}
+
+// Roost Print: slice the current plate exactly as "Slice plate" does, but stay on the model.
+void Plater::roost_slice_in_place()
+{
+    p->m_roost_slice_in_place = true;
+    SimpleEvent evt(EVT_GLTOOLBAR_SLICE_PLATE);
+    p->on_action_slice_plate(evt);
+    p->m_roost_slice_in_place = false;
 }
 
 // BBS: GUI refactor: slice all
@@ -14438,6 +14451,9 @@ void Plater::priv::on_action_send_to_multi_machine(SimpleEvent&)
     // Roost Print: which order is this for? (So PrintCam can show the customer their print.)
     std::vector<std::string> roost_orders;
     const int roost_plate = partplate_list.get_curr_plate_index();
+    // Roost Print: already printed (or printing)? Ask before sending it again.
+    if (!RoostStages::confirm_send(this->q, roost_plate))
+        return;
     if (!RoostPrintCam::orders_for_plate(this->q, roost_plate, roost_orders))
         return;
     // Roost Print: an ordinary window, so the slicer stays usable while it works.
@@ -14658,6 +14674,9 @@ bool Plater::priv::on_action_send_to_local_net_printer(bool isall, bool skip_saf
     // Roost Print: which order is this for? (So PrintCam can show the customer their print.)
     std::vector<std::string> roost_orders;
     const int roost_plate = partplate_list.get_curr_plate_index();
+    // Roost Print: already printed (or printing)? Ask before sending it again.
+    if (!RoostStages::confirm_send(this->q, roost_plate))
+        return false;
     if (!RoostPrintCam::orders_for_plate(this->q, roost_plate, roost_orders))
         return false;
     auto* dlg = new CxSentToPrinterDialog(this->q, CxSentToPrinterDialog::SendType::Single,
