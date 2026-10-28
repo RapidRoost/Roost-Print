@@ -64,17 +64,17 @@ varying vec3 roost_world_normal;
 varying vec3 roost_world_view;
 
 // ROOST_STUDIO_BEGIN (written by tools/roost/studio_light.py from the website's shop studio; don't edit)
-const vec3 ROOST_SH0 = vec3(1.388085, 1.265934, 1.231996);
-const vec3 ROOST_SH1 = vec3(-0.263031, -0.215589, -0.236507);
-const vec3 ROOST_SH2 = vec3(-0.138406, 0.072749, 0.127531);
-const vec3 ROOST_SH3 = vec3(0.019720, -0.004610, -0.079738);
-const vec3 ROOST_SH4 = vec3(-0.066565, -0.067461, -0.055462);
-const vec3 ROOST_SH5 = vec3(-0.007682, -0.014948, -0.020971);
-const vec3 ROOST_SH6 = vec3(0.130565, 0.119939, 0.080925);
-const vec3 ROOST_SH7 = vec3(-0.002723, -0.002298, -0.006929);
-const vec3 ROOST_SH8 = vec3(-0.024413, -0.023158, -0.002836);
+const vec3 ROOST_SH0 = vec3(1.735106, 1.582418, 1.539995);
+const vec3 ROOST_SH1 = vec3(-0.328789, -0.269487, -0.295634);
+const vec3 ROOST_SH2 = vec3(-0.173007, 0.090936, 0.159413);
+const vec3 ROOST_SH3 = vec3(0.024650, -0.005763, -0.099672);
+const vec3 ROOST_SH4 = vec3(-0.083206, -0.084326, -0.069328);
+const vec3 ROOST_SH5 = vec3(-0.009602, -0.018685, -0.026214);
+const vec3 ROOST_SH6 = vec3(0.163206, 0.149924, 0.101156);
+const vec3 ROOST_SH7 = vec3(-0.003404, -0.002872, -0.008662);
+const vec3 ROOST_SH8 = vec3(-0.030516, -0.028948, -0.003545);
 const vec3 ROOST_KEY_DIR = vec3(0.149101, -0.598702, 0.786972);
-const vec3 ROOST_KEY_COLOR = vec3(3.300000, 2.637039, 2.059069);
+const vec3 ROOST_KEY_COLOR = vec3(3.600000, 2.876770, 2.246257);
 // ROOST_STUDIO_END
 
 const float ROOST_PI = 3.14159265;

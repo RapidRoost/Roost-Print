@@ -39,11 +39,11 @@ KEY_INTENSITY = 1.5
 # Tuned for the slicer. On the website the part sits on the shop's warm wooden counter, in the room;
 # here it's on a navy plate, where the full-strength, full-colour shop light washes filament colours
 # out (yellow goes tan, black goes brown). So: the same light from the same directions, but mostly
-# colour-balanced (BALANCE 1 = neutral, 0 = the website's exact warmth), a bit softer all round and
+# colour-balanced (BALANCE 1 = neutral, 0 = the website's exact warmth), and
 # a stronger key light so the shape reads. The shader adds AgX's "punchy" look (Blender's AgX Punchy).
 BALANCE = 0.85
-SHOP_STRENGTH = 0.8
-KEY_BOOST = 2.2
+SHOP_STRENGTH = 1.0
+KEY_BOOST = 2.4
 
 
 def read_hdr(path):
