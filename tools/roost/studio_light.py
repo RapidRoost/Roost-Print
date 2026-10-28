@@ -36,6 +36,15 @@ SHADERS = [os.path.join(ROOT, "resources", "shaders", v, "gouraud.fs") for v in 
 KEY_COLOUR_SRGB = (0xFF, 0xE7, 0xCF)
 KEY_INTENSITY = 1.5
 
+# Tuned for the slicer. On the website the part sits on the shop's warm wooden counter, in the room;
+# here it's on a navy plate, where the full-strength, full-colour shop light washes filament colours
+# out (yellow goes tan, black goes brown). So: the same light from the same directions, but mostly
+# colour-balanced (BALANCE 1 = neutral, 0 = the website's exact warmth), a bit softer all round and
+# a stronger key light so the shape reads. The shader adds AgX's "punchy" look (Blender's AgX Punchy).
+BALANCE = 0.85
+SHOP_STRENGTH = 0.8
+KEY_BOOST = 2.2
+
 
 def read_hdr(path):
     """Radiance .hdr (RGBE, new-style run-length rows) -> float32 array (H, W, 3), top row first."""
@@ -188,8 +197,15 @@ def main():
         # Irradiance / pi: what a white matte surface sends back (the website's diffuse from the 360).
         coeffs.append(L * a_hat[b] / math.pi)
 
+    # Colour balance and strength (see BALANCE above): scale each channel towards the light's
+    # average brightness, keeping where the light comes from.
+    avg = coeffs[0]
+    luma = float(np.dot(avg, [0.2126, 0.7152, 0.0722]))
+    gain = (luma / avg) ** BALANCE * SHOP_STRENGTH
+    coeffs = [c * gain for c in coeffs]
+
     key = to_slicer(key_dir)
-    key_col = np.array([srgb_to_linear(c) for c in KEY_COLOUR_SRGB]) * KEY_INTENSITY
+    key_col = np.array([srgb_to_linear(c) for c in KEY_COLOUR_SRGB]) * KEY_INTENSITY * KEY_BOOST
 
     def evaluate(n):
         x, y, z = n

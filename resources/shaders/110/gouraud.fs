@@ -57,23 +57,24 @@ varying vec3 eye_normal;
 // Roost Print: the shop light, as on rapidroost.net's 3D preview. The website lights models with
 // the shop's 360 light (turned so the counter runs square to the plate), a warm key light, a satin
 // PLA surface (roughness 0.48, a little clearcoat) and AgX tone mapping. The light's numbers are
-// baked in below by tools/roost/studio_light.py; the maths matches three.js's physical material.
+// baked in below by tools/roost/studio_light.py (colour-balanced for the slicer, see there); the
+// maths matches three.js's physical material.
 uniform bool roost_studio;
 varying vec3 roost_world_normal;
 varying vec3 roost_world_view;
 
 // ROOST_STUDIO_BEGIN (written by tools/roost/studio_light.py from the website's shop studio; don't edit)
-const vec3 ROOST_SH0 = vec3(2.562086, 1.386417, 1.156683);
-const vec3 ROOST_SH1 = vec3(-0.485495, -0.236108, -0.222050);
-const vec3 ROOST_SH2 = vec3(-0.255465, 0.079673, 0.119735);
-const vec3 ROOST_SH3 = vec3(0.036399, -0.005049, -0.074863);
-const vec3 ROOST_SH4 = vec3(-0.122863, -0.073881, -0.052072);
-const vec3 ROOST_SH5 = vec3(-0.014179, -0.016371, -0.019689);
-const vec3 ROOST_SH6 = vec3(0.240992, 0.131354, 0.075978);
-const vec3 ROOST_SH7 = vec3(-0.005027, -0.002517, -0.006506);
-const vec3 ROOST_SH8 = vec3(-0.045061, -0.025362, -0.002662);
+const vec3 ROOST_SH0 = vec3(1.388085, 1.265934, 1.231996);
+const vec3 ROOST_SH1 = vec3(-0.263031, -0.215589, -0.236507);
+const vec3 ROOST_SH2 = vec3(-0.138406, 0.072749, 0.127531);
+const vec3 ROOST_SH3 = vec3(0.019720, -0.004610, -0.079738);
+const vec3 ROOST_SH4 = vec3(-0.066565, -0.067461, -0.055462);
+const vec3 ROOST_SH5 = vec3(-0.007682, -0.014948, -0.020971);
+const vec3 ROOST_SH6 = vec3(0.130565, 0.119939, 0.080925);
+const vec3 ROOST_SH7 = vec3(-0.002723, -0.002298, -0.006929);
+const vec3 ROOST_SH8 = vec3(-0.024413, -0.023158, -0.002836);
 const vec3 ROOST_KEY_DIR = vec3(0.149101, -0.598702, 0.786972);
-const vec3 ROOST_KEY_COLOR = vec3(1.500000, 1.198654, 0.935941);
+const vec3 ROOST_KEY_COLOR = vec3(3.300000, 2.637039, 2.059069);
 // ROOST_STUDIO_END
 
 const float ROOST_PI = 3.14159265;
@@ -100,7 +101,7 @@ vec3 roost_to_srgb(vec3 c)
     return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(vec3(0.0031308), c));
 }
 
-// three.js AgXToneMapping (exposure 1), linear sRGB in and out.
+// three.js AgXToneMapping (exposure 1) with AgX's punchy look, linear sRGB in and out.
 vec3 roost_agx(vec3 color)
 {
     mat3 srgb_to_2020 = mat3(vec3(0.6274, 0.0691, 0.0164), vec3(0.3293, 0.9195, 0.0880), vec3(0.0433, 0.0113, 0.8956));
@@ -118,6 +119,10 @@ vec3 roost_agx(vec3 color)
     vec3 x2 = color * color;
     vec3 x4 = x2 * x2;
     color = 15.5 * x4 * x2 - 40.14 * x4 * color + 31.96 * x4 - 6.868 * x2 * color + 0.4298 * x2 + 0.1191 * color - 0.00232;
+    // The "punchy" look (Filament's agxLook / Blender's AgX Punchy): keeps filament colours rich.
+    float luma = dot(color, vec3(0.2126, 0.7152, 0.0722));
+    color = pow(max(color, vec3(0.0)), vec3(1.35));
+    color = luma + 1.4 * (color - luma);
     color = outset * color;
     color = pow(max(vec3(0.0), color), vec3(2.2));
     return clamp(rec2020_to_srgb * color, 0.0, 1.0);
