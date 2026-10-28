@@ -355,6 +355,12 @@ set(SLIC3R_GUI_SOURCES
     GUI/PrinterWebView.hpp
     GUI/RoostPrintCam.cpp
     GUI/RoostPrintCam.hpp
+    GUI/RoostOrient.cpp
+    GUI/RoostOrient.hpp
+    GUI/RoostSlim.cpp
+    GUI/RoostSlim.hpp
+    GUI/RoostStages.cpp
+    GUI/RoostStages.hpp
     GUI/print_manage/PrinterMgr.cpp
     GUI/print_manage/PrinterMgr.hpp
     GUI/print_manage/App/PrinterMgrView.cpp

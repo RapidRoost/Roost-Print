@@ -1,5 +1,6 @@
 #include "SendToPrinter.hpp"
 #include "slic3r/GUI/RoostPrintCam.hpp"
+#include "slic3r/GUI/RoostStages.hpp"
 
 #include "slic3r/GUI/I18N.hpp"
 #include "slic3r/GUI/wxExtensions.hpp"
@@ -1771,6 +1772,27 @@ void CxSentToPrinterDialog::fire_print_send_event(const nlohmann::json& frontend
     BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": error_code - " << error_code << "  m_print_send_fired " << m_print_send_fired;
     boost::log::core::get()->flush();
     
+    // Roost Print: the plate went up and started, so it's printing now (plate stages, RoostStages.hpp).
+    if (error_code == "0") {
+        try {
+            int plate = -1;
+            if (frontend_data.contains("printPlateIndex") && frontend_data["printPlateIndex"].is_number())
+                plate = frontend_data["printPlateIndex"].get<int>();
+            else if (frontend_data.contains("plateIndex") && frontend_data["plateIndex"].is_number())
+                plate = frontend_data["plateIndex"].get<int>();
+            std::string file;
+            for (const char* k : {"upload3mfName", "uploadName"})
+                if (file.empty() && frontend_data.contains(k) && frontend_data[k].is_string())
+                    file = frontend_data[k].get<std::string>();
+            const std::string ip = frontend_data.contains("ipAddress") && frontend_data["ipAddress"].is_string() ?
+                                       frontend_data["ipAddress"].get<std::string>() : std::string();
+            if (plate >= 0 && !file.empty())
+                RoostStages::on_sent(plate, file, ip);
+        } catch (const std::exception& e) {
+            BOOST_LOG_TRIVIAL(warning) << "Roost Print: couldn't note the sent plate: " << e.what();
+        }
+    }
+
     if (m_print_send_fired) {
         return;
     }

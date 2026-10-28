@@ -1406,6 +1406,7 @@ private:
 #endif // ENABLE_RENDER_SELECTION_CENTER
     void _check_and_update_toolbar_icon_scale();
     void _render_overlays();
+    void _render_overlays_roost(); // Roost Print: the simple view (RoostSlim.hpp)
     void _render_overlays_easymode();
     void _render_ai_chat_toggle();
     void _render_style_editor();

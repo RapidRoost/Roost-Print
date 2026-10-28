@@ -1,4 +1,5 @@
 #include "MainFrame.hpp"
+#include "RoostSlim.hpp"
 #include "ParameterSwitchTrace.hpp"
 
 #include <wx/colour.h>
@@ -1590,6 +1591,8 @@ void MainFrame::init_tabpanel() {
     // And start PrintCam in the background now (if it's on this computer), so the cameras run while you slice.
     // (The watcher starts it, keeps it running, and flags anything that stops customers watching.)
     CallAfter([] { RoostPrintCam::start_watching(); });
+    // Roost Print: the simple view, once the window is up (RoostSlim.hpp).
+    CallAfter([] { RoostSlim::apply(); });
     if(m_plater) {
         m_plater->create_send_to_printer_dlg();  // BBS : pre create the send dialog on program startup
     }
@@ -3530,6 +3533,16 @@ void MainFrame::init_menubar_as_editor()
             viewMenu->Check(wxID_CAMERA_PERSPECTIVE + camera_id_base, true);
         else
             viewMenu->Check(wxID_CAMERA_ORTHOGONAL + camera_id_base, true);
+
+        viewMenu->AppendSeparator();
+        // Roost Print: the simple view (just the model, the job card and Send) or the full slicer,
+        // and the shop light on models (RoostSlim.hpp).
+        append_menu_check_item(viewMenu, wxID_ANY, _L("Simple Roost view"), _L("Just the model, the job card and Send. Untick for the full slicer."),
+            [](wxCommandEvent&) { RoostSlim::set_enabled(!RoostSlim::enabled()); }, this,
+            []() { return true; }, []() { return RoostSlim::enabled(); }, this);
+        append_menu_check_item(viewMenu, wxID_ANY, _L("Shop lighting"), _L("Light models with the shop, like rapidroost.net"),
+            [](wxCommandEvent&) { RoostSlim::set_shop_light(!RoostSlim::shop_light()); }, this,
+            []() { return true; }, []() { return RoostSlim::shop_light(); }, this);
 
         viewMenu->AppendSeparator();
         append_menu_check_item(viewMenu, wxID_ANY, _L("Show &Wireframe"), _L("Show wireframes in 3D scene"),

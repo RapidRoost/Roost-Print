@@ -10,6 +10,10 @@ Rapid Roost's slicer for the shop's printers. It's [Creality Print](https://gith
 6. **No Creality updates.** No update checks, no "Update Ready" window, no downloads or installs, no plugin or profile updates from Creality. Roost Print updates come from this repo.
 7. **Removed.** AI Creation, Online Models, the AI/Pro mode switch (it's always the full slicer), the customer support button and the AI assistant bot.
 8. **No cloud profile packages.** Printer and filament profiles come with the app, so Creality's online packages can't replace them.
+9. **The simple view.** Opens straight to the model and one job card: the plate's stage, printer, material, print time and filament, **Send to printer**, and buttons to mark a plate by hand. The settings panel, toolbars and editing tools are hidden, and each plate slices by itself a moment after anything changes (staying on the model; **Layers** shows the sliced layers). **View → Simple Roost view** (or **Full slicer** on the card) goes back to the whole slicer for odd jobs.
+10. **Plate stages.** Each plate's bed is tinted by where it's up to: blue border = to print, yolk = printing, green = printed, red = failed. Sending a plate makes it printing; PrintCam reports when that file finishes (green) or stops (red). Stages are saved per file and plate, so they're there when the file is opened again, and Roost Print asks before sending a plate that's already printed.
+11. **The fastest way up.** Every part opened in the simple view gets checked thousands of ways up (height, support, first layer, tipping over), the best few are test-sliced with the shop's settings, and the fastest wins. The card says how much time it saved, with **Undo the turn**. Plates already sent are never reshuffled.
+12. **Shop lighting.** Models in Prepare are lit by the shop's 360 light and warm key light, the same as rapidroost.net's 3D preview (AgX tone mapping, satin PLA). **View → Shop lighting** turns it off. The layer preview stays plain.
 
 Roost Print keeps its settings in its own folder, so it can sit next to a normal Creality Print.
 
@@ -39,6 +43,10 @@ The changes live in a few small places, so Creality's updates can be merged in:
 | Creality updates off | marked `Roost Print:` in `GUI_App.cpp` (checks, "Update Ready"), `AppUpdater.cpp` (download, install), `Utils/PresetUpdater.cpp` (background sync), `MainFrame.cpp` (Help menu) |
 | Send window | `print_manage/App/SendToPrinter.cpp` (`set_modeless`) and `Plater.cpp` |
 | Removed features | marked `Roost Print:` in `BBLTopbar.cpp`, `MainFrame.cpp`, `GUI_App.cpp`, `GLCanvas3D.cpp`, `simple/MCPChatPanel.cpp` |
+| Simple view (job card, auto-slice, hidden tools) | `src/slic3r/GUI/RoostSlim.cpp`; hooked in `GLCanvas3D.cpp` (`_render_overlays_roost`, toolbar clicks), `MainFrame.cpp` (View menu), `Plater.cpp` (`roost_slice_in_place`) |
+| Plate stages | `src/slic3r/GUI/RoostStages.cpp`; tint in `PartPlate.cpp` (`render_roost_stage`), sent from `SendToPrinter.cpp` (`fire_print_send_event`), finished/failed from PrintCam in `RoostPrintCam.cpp` |
+| Fastest way up | `src/libslic3r/RoostOrientCore.cpp` (the quick round), `src/slic3r/GUI/RoostOrient.cpp` (test slices, turning, undo) |
+| Shop lighting | `resources/shaders/{110,140}/gouraud.{vs,fs}`; the light is baked in by `tools/roost/studio_light.py` from `tools/roost/studio/` (copied from the website's `public/studio/`) |
 | Windows build | `.github/workflows/roost_build.yml` |
 
 To pick up a new Creality Print: merge it in, then run `python tools/roost/recolor.py`, `python tools/roost/tint.py`, `python tools/roost/rebrand.py`, `python tools/roost/make_art.py`, `python tools/roost/plates.py` and `python tools/roost/polymaker.py`.

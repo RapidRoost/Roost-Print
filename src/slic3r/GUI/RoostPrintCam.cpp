@@ -1,5 +1,6 @@
 // Roost Print: PrintCam, built in. See RoostPrintCam.hpp.
 #include "RoostPrintCam.hpp"
+#include "RoostStages.hpp"
 
 #include "GUI_App.hpp"
 #include "I18N.hpp"
@@ -320,6 +321,7 @@ struct Snapshot
     std::vector<std::string> asks;        // orders waiting for a yes/no on their email
     std::vector<std::string> no_order;    // printers printing a file with no order number
     std::vector<std::string> unknown;     // order numbers the website doesn't know
+    std::vector<RoostStages::PrinterJob> jobs; // what each printer is printing (plate stages)
 };
 
 static std::string join(const std::vector<std::string>& v, const std::string& sep = ", ")
@@ -356,6 +358,17 @@ static Snapshot parse_state(const std::string& body)
             if (!p.is_object() || !p.contains("status") || !p["status"].is_object())
                 continue;
             const std::string state = p["status"].value("state", std::string());
+            // Roost Print: which file each printer is on, and how far, for the plate stages.
+            {
+                RoostStages::PrinterJob job;
+                job.printer  = p.value("name", std::string());
+                job.ip       = p.value("ip", std::string());
+                job.file     = p.contains("file") && p["file"].is_string() ? p["file"].get<std::string>() : std::string();
+                job.state    = state;
+                job.progress = p["status"].contains("progress") && p["status"]["progress"].is_number() ?
+                                   p["status"]["progress"].get<int>() : 0;
+                snap.jobs.push_back(std::move(job));
+            }
             const bool busy = state == "printing" || state == "paused" || state == "preparing";
             const bool has_order = p.contains("orders") && p["orders"].is_array() && !p["orders"].empty();
             if (busy && !has_order)
@@ -436,6 +449,9 @@ private:
         MainFrame* frame = wxGetApp().mainframe;
         if (frame == nullptr)
             return;
+        // Roost Print: plates that were sent turn printed or failed as their printers finish.
+        if (snap.running)
+            RoostStages::on_printers(snap.jobs);
         // "PrintCam (2)" while customers wait for a yes/no.
         if (frame->topbar())
             frame->topbar()->SetTabText(MainFrame::tpPrintCam,

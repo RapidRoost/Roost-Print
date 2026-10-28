@@ -820,6 +820,8 @@ public:
     void set_bed_position(Vec2d& pos);
     //BBS: is the background process slicing currently
     bool is_background_process_slicing() const;
+    // Roost Print: slice the current plate like "Slice plate", but stay on the model (the simple view).
+    void roost_slice_in_place();
     bool export_gcode_to_path(const fs::path& output_path, bool output_path_on_removable_media);
     bool cancel_background_slicing();
     //BBS: update slicing context

@@ -50,7 +50,12 @@ A warning in the 3D view (only after two checks in a row, so a blip doesn't nag)
 
 Only `GET /api/state` (local, no secret needed), and only these fields:
 `sync.last`, `sync.ok`, `sync.error`, `sync.unknown[]`, `emails[].order` and `emails[].state`
-(`"ask"`), `printers[].name`, `printers[].status.state`, `printers[].orders[]`.
+(`"ask"`), `printers[].name`, `printers[].ip`, `printers[].file`, `printers[].status.state`,
+`printers[].status.progress`, `printers[].orders[]`.
+
+The plate stages (`RoostStages.cpp`) use `file`, `ip`, `status.state` and `status.progress`: a plate
+that was sent turns printed when its file shows `finished` on the printer it went to, and failed on
+`stopped` or `error`.
 **If PrintCam's /api/state changes shape, change `parse_state` in RoostPrintCam.cpp.**
 
 Roost Print never holds PrintCam's secret or settings, and sends nothing to the website itself.
