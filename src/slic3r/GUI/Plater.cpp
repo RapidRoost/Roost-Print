@@ -5,6 +5,7 @@
 #include "slic3r/GUI/print_manage/App/SendToPrinter.hpp"
 #include "slic3r/GUI/RoostPrintCam.hpp"
 #include "slic3r/GUI/RoostStages.hpp"
+#include "slic3r/GUI/RoostPicker.hpp"
 #include "libslic3r/Config.hpp"
 #include "libslic3r/Color.hpp"
 #include "libslic3r_version.h"
@@ -14685,6 +14686,12 @@ bool Plater::priv::on_action_send_to_local_net_printer(bool isall, bool skip_saf
         if (wxGetApp().preset_bundle && wxGetApp().preset_bundle->machine_is_belt())
             restore_belt_transformation();
     });
+    // Roost Print: opened from the job card for one printer (RoostPicker.hpp): start there by itself.
+    {
+        std::string roost_ip, roost_mac, roost_name;
+        if (RoostPicker::take_pending(roost_plate, roost_ip, roost_mac, roost_name))
+            dlg->roost_start_on(roost_ip, roost_mac, roost_name);
+    }
     dlg->Show();
     dlg->Raise();
     return true;

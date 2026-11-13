@@ -357,6 +357,8 @@ set(SLIC3R_GUI_SOURCES
     GUI/RoostPrintCam.hpp
     GUI/RoostOrient.cpp
     GUI/RoostOrient.hpp
+    GUI/RoostPicker.cpp
+    GUI/RoostPicker.hpp
     GUI/RoostSlim.cpp
     GUI/RoostSlim.hpp
     GUI/RoostStages.cpp

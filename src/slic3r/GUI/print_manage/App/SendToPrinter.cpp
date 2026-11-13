@@ -1,6 +1,7 @@
 #include "SendToPrinter.hpp"
 #include "slic3r/GUI/RoostPrintCam.hpp"
 #include "slic3r/GUI/RoostStages.hpp"
+#include "slic3r/GUI/MsgDialog.hpp"
 
 #include "slic3r/GUI/I18N.hpp"
 #include "slic3r/GUI/wxExtensions.hpp"
@@ -1005,6 +1006,10 @@ void CxSentToPrinterDialog::handle_send_3mf(const nlohmann::json& json_data)
 {
     if (m_close_pending)
         return;
+    // Roost Print: started by itself for one printer, but the window picked another. Send nothing.
+    if (roost_wrong_printer(json_data.contains("ipAddress") && json_data["ipAddress"].is_string() ?
+                                json_data["ipAddress"].get<std::string>() : std::string()))
+        return;
 
     // Fire click_send_single analytics event when user clicks "Send Only" button (3MF path)
     AnalyticsEventPayload payload;
@@ -1223,6 +1228,10 @@ void CxSentToPrinterDialog::handle_register_complete(const nlohmann::json& json_
 void CxSentToPrinterDialog::handle_send_gcode(const nlohmann::json& json_data) 
 {
     if (m_close_pending)
+        return;
+    // Roost Print: started by itself for one printer, but the window picked another. Send nothing.
+    if (roost_wrong_printer(json_data.contains("ipAddress") && json_data["ipAddress"].is_string() ?
+                                json_data["ipAddress"].get<std::string>() : std::string()))
         return;
 
     // Fire click_send_single analytics event when user clicks "Send Only" button
@@ -2202,7 +2211,74 @@ void CxSentToPrinterDialog::OnLoaded(wxWebViewEvent &evt)
         return;
     SendAPIKey();
 
+    // Roost Print: opened for one printer, so press Start Print once the window is ready.
+    if (!m_roost_ip.empty())
+        roost_inject_auto_start();
+
     Test::EVENT_SPREAD("sendToPrint_loaded");
+}
+
+void CxSentToPrinterDialog::roost_start_on(const std::string& ip, const std::string& mac, const std::string& name)
+{
+    m_roost_ip           = ip;
+    m_roost_mac          = mac;
+    m_roost_name         = name;
+    m_roost_auto_clicked = false;
+    // The page tells us just before it presses Start Print by itself (roost_inject_auto_start).
+    RegisterHandler("roost_auto_start_clicked", [this](const nlohmann::json&) { m_roost_auto_clicked = true; });
+    RegisterHandler("roost_auto_start_gave_up", [this](const nlohmann::json&) {
+        BOOST_LOG_TRIVIAL(info) << "Roost Print: the send window wasn't ready to start on " << m_roost_name << "; left for you";
+    });
+    BOOST_LOG_TRIVIAL(info) << "Roost Print: send window opened for " << name << " (" << ip << ")";
+}
+
+// Roost Print: wait until the page's Start Print button has been ready for a moment (the printer
+// picked and the colours matched), then press it. Gives up after 30 seconds and leaves the window
+// as it is. Anything that needs an answer (a warning from the page) stops it there, for you.
+void CxSentToPrinterDialog::roost_inject_auto_start()
+{
+    const std::string js = R"JS(
+(function () {
+  if (window.__roostAutoStart) return;
+  window.__roostAutoStart = true;
+  var tries = 0, ready = 0;
+  var post = function (cmd) { try { window.wx.postMessage(JSON.stringify({ command: cmd })); } catch (e) {} };
+  var timer = setInterval(function () {
+    tries++;
+    if (tries > 60) { clearInterval(timer); post("roost_auto_start_gave_up"); return; }
+    if (document.querySelector(".el-overlay:not([style*='display: none']) .el-message-box")) { clearInterval(timer); post("roost_auto_start_gave_up"); return; }
+    var button = null;
+    var all = document.querySelectorAll("button.start-print");
+    for (var i = 0; i < all.length; i++) { if (all[i].offsetParent !== null) { button = all[i]; break; } }
+    if (!button || button.disabled || button.classList.contains("is-disabled")) { ready = 0; return; }
+    if (++ready < 3) return;
+    clearInterval(timer);
+    post("roost_auto_start_clicked");
+    button.click();
+  }, 500);
+})();
+)JS";
+    run_script(js);
+}
+
+bool CxSentToPrinterDialog::roost_wrong_printer(const std::string& ip)
+{
+    if (!m_roost_auto_clicked || m_roost_ip.empty())
+        return false;
+    m_roost_auto_clicked = false; // only checks the press we made ourselves
+    if (ip == m_roost_ip)
+        return false;
+    BOOST_LOG_TRIVIAL(warning) << "Roost Print: the send window picked " << ip << ", not " << m_roost_name << " (" << m_roost_ip
+                               << "); nothing sent";
+    const wxString msg = wxString::Format(_L("The send window picked a different printer, not %s.\nNothing was sent. "
+                                             "Press Send on the job card again, or pick the printer yourself."),
+                                          wxString::FromUTF8(m_roost_name));
+    wxGetApp().CallAfter([msg]() {
+        MessageDialog dlg(wxGetApp().mainframe, msg, _L("Not sent"), wxOK | wxICON_WARNING);
+        dlg.ShowModal();
+    });
+    wxPostEvent(this, wxCloseEvent(wxEVT_CLOSE_WINDOW));
+    return true;
 }
 
 void CxSentToPrinterDialog::on_dpi_changed(const wxRect& suggested_rect)

@@ -158,8 +158,19 @@ public:
     }
     bool is_modeless() const { return m_modeless; }
 
+    // Roost Print: opened for one printer (the job card's best printer, RoostPicker.hpp). The
+    // window presses Start Print by itself once it's ready, and sends nothing if it ended up on
+    // a different printer.
+    void roost_start_on(const std::string& ip, const std::string& mac, const std::string& name);
+
 private:
     void finish_close(wxCloseEvent& event);
+    void roost_inject_auto_start();
+    bool roost_wrong_printer(const std::string& ip);
+    std::string m_roost_ip;
+    std::string m_roost_mac;
+    std::string m_roost_name;
+    bool        m_roost_auto_clicked = false;
     bool m_modeless = false;
     std::map<int, std::vector<std::string>> m_roost_orders;
     std::function<void()> m_on_closed;

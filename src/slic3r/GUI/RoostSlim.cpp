@@ -30,6 +30,7 @@
 #include "Plater.hpp"
 #include "RoostImGuiBrand.hpp"
 #include "RoostOrient.hpp"
+#include "RoostPicker.hpp"
 #include "RoostStages.hpp"
 #include "SiderBar.h"
 
@@ -249,6 +250,262 @@ bool stage_chip(const char* label, RoostStages::Stage stage, bool selected, cons
     const ImVec4 tc  = selected ? (stage == RoostStages::Stage::Printing ? RoostImGui::yolk_text() : ImVec4(1, 1, 1, 1)) : RoostImGui::text();
     dl->AddText(ImVec2(pos.x + (size.x - ts.x) * 0.5f, pos.y + (size.y - ts.y) * 0.5f), ImGui::GetColorU32(tc), label, end);
     return clicked;
+}
+
+// A small on/off switch with its label: yolk when on.
+bool roost_switch(const char* id, const std::string& label, bool on, float scale)
+{
+    const float  h     = 18.0f * scale;
+    const float  w     = 32.0f * scale;
+    const ImVec2 ts    = ImGui::CalcTextSize(label.c_str());
+    const ImVec2 pos   = ImGui::GetCursorScreenPos();
+    const float  rowh  = std::max(h, ts.y);
+    const bool   click = ImGui::InvisibleButton(id, ImVec2(w + 8.0f * scale + ts.x, rowh));
+    const bool   hover = ImGui::IsItemHovered();
+    ImDrawList*  dl    = ImGui::GetWindowDrawList();
+    const float  top   = pos.y + (rowh - h) * 0.5f;
+    const ImVec4 track = on ? RoostImGui::yolk() : (hover ? RoostImGui::wash() : RoostImGui::field());
+    dl->AddRectFilled(ImVec2(pos.x, top), ImVec2(pos.x + w, top + h), ImGui::GetColorU32(track), h * 0.5f);
+    dl->AddRect(ImVec2(pos.x, top), ImVec2(pos.x + w, top + h), ImGui::GetColorU32(RoostImGui::ink()), h * 0.5f, 0, 1.5f * scale);
+    const float  r   = h * 0.5f - 3.0f * scale;
+    const ImVec2 c(on ? pos.x + w - h * 0.5f : pos.x + h * 0.5f, top + h * 0.5f);
+    dl->AddCircleFilled(c, r, ImGui::GetColorU32(on ? RoostImGui::to_vec4(RoostBrand::kInk) : RoostImGui::surface()));
+    dl->AddCircle(c, r, ImGui::GetColorU32(RoostImGui::ink()), 0, 1.5f * scale);
+    dl->AddText(ImVec2(pos.x + w + 8.0f * scale, pos.y + (rowh - ts.y) * 0.5f), ImGui::GetColorU32(RoostImGui::text()), label.c_str());
+    return click;
+}
+
+// A coloured dot, then wrapped text (the best printer's reason, or why nothing suits).
+void dot_text(const ImVec4& dot, const ImVec4& colour, const std::string& s, float width, float scale)
+{
+    const ImVec2 pos = ImGui::GetCursorScreenPos();
+    const float  r   = 4.0f * scale;
+    const float  lh  = ImGui::GetTextLineHeight();
+    ImGui::GetWindowDrawList()->AddCircleFilled(ImVec2(pos.x + r, pos.y + lh * 0.5f), r, ImGui::GetColorU32(dot));
+    ImGui::SetCursorScreenPos(ImVec2(pos.x + 2.0f * r + 6.0f * scale, pos.y));
+    ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + width - 2.0f * r - 6.0f * scale);
+    ImGui::TextColored(colour, "%s", s.c_str());
+    ImGui::PopTextWrapPos();
+}
+
+ImVec4 ok_green() { return ImVec4(0x2F / 255.0f, 0xA3 / 255.0f, 0x5A / 255.0f, 1.0f); } // #2fa35a, good to go
+ImVec4 problem_red() { return to_imvec(RoostStages::color(RoostStages::Stage::Failed)); }
+
+// Where the card was drawn last frame, so the spools window can sit beside it.
+ImVec2 g_card_pos{0.0f, 0.0f};
+ImVec2 g_card_size{0.0f, 0.0f};
+bool   g_spools_open = false;
+
+// The "Spools by hand" window: what's loaded in each printer that can't read its own spool (K1C).
+void render_spools_window(GLCanvas3D& canvas)
+{
+    if (!g_spools_open)
+        return;
+    ImGuiWrapper& imgui = *wxGetApp().imgui();
+    const float   scale = canvas.get_scale();
+    const float   width = 330.0f * scale;
+    const float   pad   = 14.0f * scale;
+    const float   inner = width - 2.0f * pad;
+
+    // A second's worth of caching: the list is read from the Device page's data.
+    static std::vector<RoostPicker::Printer> printers;
+    static std::chrono::steady_clock::time_point read_at{};
+    if (std::chrono::steady_clock::now() - read_at > std::chrono::seconds(1)) {
+        printers = RoostPicker::hand_set_printers();
+        read_at  = std::chrono::steady_clock::now();
+    }
+
+    imgui.set_next_window_pos(g_card_pos.x + g_card_size.x + 16.0f * scale, g_card_pos.y, ImGuiCond_Always, 0.0f, 0.0f);
+    ImGui::SetNextWindowSizeConstraints(ImVec2(width, -1.0f), ImVec2(width, -1.0f));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, RoostImGui::kRadiusCard * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, RoostImGui::kOutline * scale);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(pad, pad));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.0f * scale, 8.0f * scale));
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, RoostImGui::surface());
+    ImGui::PushStyleColor(ImGuiCol_Border, RoostImGui::ink());
+    ImGui::PushStyleColor(ImGuiCol_Text, RoostImGui::text());
+    ImGui::PushStyleColor(ImGuiCol_Separator, RoostImGui::line());
+    const int flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
+                      ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings |
+                      ImGuiWindowFlags_NoFocusOnAppearing;
+    if (imgui.begin(std::string("##roost_spools"), flags)) {
+        {
+            const ImVec2 wp = ImGui::GetWindowPos(), ws = ImGui::GetWindowSize();
+            const float  off = RoostImGui::kShadow * scale;
+            ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(wp.x + off, wp.y + off), ImVec2(wp.x + ws.x + off, wp.y + ws.y + off),
+                                                          ImGui::GetColorU32(RoostImGui::ink()), RoostImGui::kRadiusCard * scale);
+        }
+        imgui.push_bold_font();
+        ImGui::TextUnformatted(_u8L("Spools by hand").c_str());
+        imgui.pop_bold_font();
+        ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + inner);
+        dim_text(_u8L("For printers that can't read their spool. Set what's loaded."));
+        ImGui::PopTextWrapPos();
+
+        if (printers.empty()) {
+            ImGui::Separator();
+            ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + inner);
+            ImGui::TextUnformatted(_u8L("No printers to set. Every printer reads its own spools, or none are added yet.").c_str());
+            ImGui::PopTextWrapPos();
+        }
+
+        const auto&              types   = RoostPicker::hand_types();
+        const auto&              colours = RoostPicker::hand_colours();
+        std::vector<std::string> type_rows{_u8L("Not set")};
+        for (const std::string& t : types)
+            type_rows.push_back(t);
+        std::vector<std::string> colour_rows;
+        for (const auto& c : colours)
+            colour_rows.push_back(_u8L(c.first.c_str()));
+        const std::vector<double>      nozzles{0.0, 0.2, 0.4, 0.6, 0.8};
+        const std::vector<std::string> nozzle_rows{_u8L("Nozzle"), "0.2", "0.4", "0.6", "0.8"};
+        const float                    gap = 6.0f * scale;
+        const float                    w3  = (inner - 2.0f * gap) / 3.0f;
+
+        for (int i = 0; i < int(printers.size()); ++i) {
+            const RoostPicker::Printer& p = printers[i];
+            ImGui::PushID(i);
+            ImGui::Separator();
+            imgui.push_bold_font();
+            ImGui::TextUnformatted(p.name.c_str());
+            imgui.pop_bold_font();
+            ImGui::SameLine();
+            dim_text(p.model_name + (p.online ? std::string() : " - " + _u8L("offline")));
+
+            const RoostPicker::HandSpool cur = RoostPicker::hand_spool(p.mac);
+            int tsel = 0;
+            for (int k = 0; k < int(types.size()); ++k)
+                if (types[k] == cur.type)
+                    tsel = k + 1;
+            int csel = -1;
+            for (int k = 0; k < int(colours.size()); ++k)
+                if (colours[k].second == cur.colour)
+                    csel = k;
+            int nsel = 0;
+            for (int k = 1; k < int(nozzles.size()); ++k)
+                if (std::abs(nozzles[k] - cur.nozzle) < 0.01)
+                    nsel = k;
+
+            const int tpick = roost_combo("##roost_hand_type", type_rows[tsel], type_rows, tsel, w3);
+            ImGui::SameLine(0.0f, gap);
+            const ImVec4 swatch = hex_colour(cur.colour.empty() ? std::string("#C8C8C8") : cur.colour);
+            const int cpick = roost_combo("##roost_hand_colour", csel >= 0 ? colour_rows[csel] : _u8L("Colour"), colour_rows, csel, w3, &swatch);
+            ImGui::SameLine(0.0f, gap);
+            const int npick = roost_combo("##roost_hand_nozzle", nozzle_rows[nsel], nozzle_rows, nsel, w3);
+
+            if ((tpick >= 0 && tpick != tsel) || (cpick >= 0 && cpick != csel) || (npick >= 0 && npick != nsel)) {
+                RoostPicker::HandSpool next = cur;
+                if (tpick >= 0)
+                    next.type = tpick == 0 ? std::string() : types[tpick - 1];
+                if (cpick >= 0)
+                    next.colour = colours[cpick].second;
+                if (npick >= 0)
+                    next.nozzle = nozzles[npick];
+                if (!next.type.empty() && next.colour.empty())
+                    next.colour = colours.front().second; // black until told otherwise
+                const std::string mac = p.mac;
+                wxGetApp().CallAfter([mac, next]() { RoostPicker::set_hand_spool(mac, next); });
+            }
+            ImGui::PopID();
+        }
+
+        ImGui::Separator();
+        if (RoostImGui::sticker_button((_u8L("Done") + "##roost_spools_done").c_str(), ImVec2(inner, 28.0f * scale),
+                                       RoostImGui::StickerKind::Primary, true, scale))
+            g_spools_open = false;
+    }
+    imgui.end();
+    ImGui::PopStyleColor(4);
+    ImGui::PopStyleVar(4);
+}
+
+// The best printer for this plate, another one from the list, Send, and auto-send.
+void render_picker(float inner, float pad, float scale, bool can_send)
+{
+    ImGuiWrapper&                imgui = *wxGetApp().imgui();
+    const RoostPicker::Ranking&  rank  = RoostPicker::ranking();
+    const std::string            chosen = RoostPicker::chosen_mac();
+    const RoostPicker::Pick*     target = nullptr;
+    int                          target_row = -1;
+    for (int i = 0; i < int(rank.picks.size()); ++i)
+        if (!chosen.empty() && rank.picks[i].printer.mac == chosen) {
+            target     = &rank.picks[i];
+            target_row = i;
+        }
+    if (target == nullptr && !rank.picks.empty() && rank.picks.front().suits) {
+        target     = &rank.picks.front();
+        target_row = 0;
+    }
+
+    const float label_w = 96.0f * scale;
+    if (rank.valid) {
+        if (target != nullptr) {
+            dim_text(chosen.empty() ? _u8L("Best printer") : _u8L("Send to"));
+            ImGui::SameLine(pad + label_w);
+            imgui.push_bold_font();
+            ImGui::TextUnformatted(target->printer.name.c_str());
+            imgui.pop_bold_font();
+            const ImVec4 dot = target->suits ? ok_green() : (target->can_send ? RoostImGui::yolk() : problem_red());
+            dot_text(dot, target->suits ? RoostImGui::text() : (target->can_send ? RoostImGui::text() : RoostImGui::error()),
+                     target->reason, inner, scale);
+        } else {
+            // Nothing suits: say why, plainly.
+            dot_text(problem_red(), RoostImGui::error(), rank.why_none, inner, scale);
+        }
+
+        // The last print may still be on the bed: one press says it's been taken off.
+        std::string bed_mac, bed_name;
+        if (target != nullptr && target->printer.online && target->printer.idle && !target->printer.error && !target->printer.bed_clear) {
+            bed_mac  = target->printer.mac;
+            bed_name = target->printer.name;
+        } else if (target == nullptr) {
+            bed_mac  = rank.bed_check_mac;
+            bed_name = rank.bed_check_name;
+        }
+        if (!bed_mac.empty()) {
+            const std::string label = format(_u8L("%1%: bed is clear"), bed_name) + "##roost_bed_clear";
+            if (RoostImGui::sticker_button(label.c_str(), ImVec2(inner, 26.0f * scale), RoostImGui::StickerKind::Selected, true, scale))
+                wxGetApp().CallAfter([bed_mac]() { RoostPicker::mark_bed_clear(bed_mac); });
+        }
+
+        // Pick another printer from the ranked list.
+        if (!rank.picks.empty()) {
+            std::vector<std::string> rows;
+            for (const RoostPicker::Pick& p : rank.picks)
+                rows.push_back(p.printer.name + "  -  " + p.reason);
+            if (!chosen.empty())
+                rows.push_back(_u8L("Back to the best printer"));
+            const int pick = roost_combo("##roost_pick_printer", _u8L("Pick another printer"), rows, chosen.empty() ? -1 : target_row, inner);
+            if (pick >= 0) {
+                const std::string mac = pick < int(rank.picks.size()) ? rank.picks[pick].printer.mac : std::string();
+                wxGetApp().CallAfter([mac]() { RoostPicker::choose(mac); });
+            }
+        }
+    }
+
+    // ---- Send ----
+    if (target != nullptr && target->can_send) {
+        const std::string label = format(_u8L("Send to %1%"), target->printer.name) + "##roost_send";
+        if (RoostImGui::sticker_button(label.c_str(), ImVec2(inner, 36.0f * scale), RoostImGui::StickerKind::Primary, can_send, scale)) {
+            const std::string mac = target->printer.mac;
+            wxGetApp().CallAfter([mac]() { RoostPicker::send_to(mac); });
+        }
+    } else if (RoostImGui::sticker_button((_u8L("Send to printer") + "##roost_send").c_str(), ImVec2(inner, 36.0f * scale),
+                                          RoostImGui::StickerKind::Primary, can_send, scale)) {
+        // Nobody picked: the send window, to choose there.
+        wxGetApp().CallAfter([]() {
+            if (Plater* p = wxGetApp().plater())
+                wxPostEvent(p, SimpleEvent(EVT_GLTOOLBAR_SEND_TO_LOCAL_NET_PRINTER));
+        });
+    }
+
+    // ---- Auto-send, and the spools set by hand ----
+    const bool on = RoostPicker::auto_send();
+    if (roost_switch("##roost_auto_send", _u8L("Auto-send to best printer"), on, scale))
+        wxGetApp().CallAfter([on]() { RoostPicker::set_auto_send(!on); });
+    if (RoostImGui::sticker_button((_u8L("Spools by hand") + "##roost_spools").c_str(), ImVec2(0.0f, 24.0f * scale),
+                                   g_spools_open ? RoostImGui::StickerKind::Selected : RoostImGui::StickerKind::Secondary, true, scale))
+        g_spools_open = !g_spools_open;
 }
 
 void maybe_auto_slice(GLCanvas3D& canvas, Plater* plater, PartPlate* plate, int plate_index, bool has_objects, bool valid, bool slicing)
@@ -540,14 +797,11 @@ void render_card(GLCanvas3D& canvas)
                 dim_text(_u8L("Getting ready to slice..."));
             }
 
-            // ---- Send ----
+            // ---- Best printer, and Send (RoostPicker.hpp) ----
             const bool can_send = valid && !slicing && !RoostOrient::busy();
-            if (RoostImGui::sticker_button((_u8L("Send to printer") + "##roost_send").c_str(), ImVec2(inner, 36.0f * scale),
-                                           RoostImGui::StickerKind::Primary, can_send, scale))
-                wxGetApp().CallAfter([]() {
-                    if (Plater* p = wxGetApp().plater())
-                        wxPostEvent(p, SimpleEvent(EVT_GLTOOLBAR_SEND_TO_LOCAL_NET_PRINTER));
-                });
+            ImGui::Separator();
+            RoostPicker::on_frame(); // auto-send, when it's on
+            render_picker(inner, pad, scale, can_send);
 
             // ---- Mark it by hand ----
             ImGui::Dummy(ImVec2(0.0f, 2.0f * scale));
@@ -583,10 +837,14 @@ void render_card(GLCanvas3D& canvas)
         if (RoostImGui::sticker_button((_u8L("Full slicer") + "##roost_full").c_str(), ImVec2(half, 28.0f * scale),
                                        RoostImGui::StickerKind::Secondary, true, scale))
             wxGetApp().CallAfter([]() { set_enabled(false); });
+        g_card_pos  = ImGui::GetWindowPos();
+        g_card_size = ImGui::GetWindowSize();
     }
     imgui.end();
     ImGui::PopStyleColor(4);
     ImGui::PopStyleVar(4);
+
+    render_spools_window(canvas);
 }
 
 } // namespace RoostSlim
