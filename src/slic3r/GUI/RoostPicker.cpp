@@ -336,6 +336,7 @@ Pending g_pending;
 
 std::map<std::string, Clock::time_point> g_claimed; // mac -> when a plate was sent there
 std::set<std::string>                    g_auto_tried;
+std::set<std::string>                    g_auto_jumped; // plates auto-send has moved the view to (once each)
 
 const auto kClaim   = std::chrono::minutes(3);
 const auto kPending = std::chrono::seconds(60);
@@ -785,6 +786,7 @@ void set_auto_send(bool on)
     if (on) {
         // Only plates sliced from now on: don't fire at whatever is on screen already.
         g_auto_tried.clear();
+        g_auto_jumped.clear();
         if (Plater* plater = wxGetApp().plater())
             g_auto_tried.insert(plate_sig(plater, plater->get_partplate_list().get_curr_plate_index()));
     }
@@ -797,20 +799,37 @@ void on_frame()
     Plater* plater = wxGetApp().plater();
     if (plater == nullptr)
         return;
-    const int  plate_index = plater->get_partplate_list().get_curr_plate_index();
-    PartPlate* plate       = plater->get_partplate_list().get_plate(plate_index);
-    if (plate == nullptr || plate->get_objects_on_this_plate().empty())
-        return;
-    if (!plate->is_slice_result_valid() || plater->is_background_process_slicing() || RoostOrient::busy())
-        return;
-    // Never a plate that's printing, printed or failed: only To print.
-    if (RoostStages::stage(plate_index) != RoostStages::Stage::ToPrint)
+    if (plater->is_background_process_slicing() || RoostOrient::busy())
         return;
     if (g_pending.plate >= 0 && Clock::now() - g_pending.at < kPending)
         return; // a send window is opening
+    PartPlateList& plates = plater->get_partplate_list();
+    // A plate auto-send still has to do: has parts, is To print (never printing, printed or
+    // failed), and hasn't been tried yet (sent, or the send was cancelled).
+    auto waiting = [&](int i) {
+        PartPlate* p = plates.get_plate(i);
+        return p != nullptr && !p->get_objects_on_this_plate().empty() &&
+               RoostStages::stage(i) == RoostStages::Stage::ToPrint && g_auto_tried.count(plate_sig(plater, i)) == 0;
+    };
+    const int plate_index = plates.get_curr_plate_index();
+    if (!waiting(plate_index)) {
+        // Every plate in the file, not just the one on screen: go to the next one waiting.
+        // Selecting it slices it; the next frames send it.
+        for (int i = 0; i < plates.get_plate_count(); ++i)
+            if (i != plate_index && waiting(i) && g_auto_jumped.insert(plate_sig(plater, i)).second) {
+                BOOST_LOG_TRIVIAL(info) << "Roost Print: auto-send moving on to plate " << i + 1;
+                wxGetApp().CallAfter([i]() {
+                    if (Plater* p = wxGetApp().plater())
+                        p->select_plate(i, true);
+                });
+                return;
+            }
+        return;
+    }
+    PartPlate* plate = plates.get_plate(plate_index);
+    if (!plate->is_slice_result_valid())
+        return;
     const std::string sig = plate_sig(plater, plate_index);
-    if (g_auto_tried.count(sig) > 0)
-        return; // tried this plate already (sent, or the send was cancelled)
     const Pick* b = best();
     if (b == nullptr)
         return;

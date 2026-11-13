@@ -390,7 +390,7 @@ ColorRGBA color(Stage s)
     auto rgb = [](const wxColour& c) { return ColorRGBA(c.Red() / 255.0f, c.Green() / 255.0f, c.Blue() / 255.0f, 1.0f); };
     switch (s) {
     case Stage::Printing: return rgb(RoostBrand::kYolk);
-    case Stage::Printed: return ColorRGBA(0x2F / 255.0f, 0xB3 / 255.0f, 0x5C / 255.0f, 1.0f); // fresh green
+    case Stage::Printed: return ColorRGBA(0x2F / 255.0f, 0xA3 / 255.0f, 0x5A / 255.0f, 1.0f); // the website's "done" green
     case Stage::Failed: return ColorRGBA(0xE5 / 255.0f, 0x48 / 255.0f, 0x3B / 255.0f, 1.0f);  // warning red
     default: return rgb(RoostBrand::kBlue);
     }
