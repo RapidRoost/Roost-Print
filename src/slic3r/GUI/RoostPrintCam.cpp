@@ -32,6 +32,7 @@
 
 #include <wx/button.h>
 #include <wx/filedlg.h>
+#include <wx/msgdlg.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -143,6 +144,53 @@ bool ensure_started()
     return pid > 0;
 }
 
+
+/* ----- The farm ----- */
+
+std::string farm_inbox()
+{
+    const std::string exe = find_exe();
+    if (exe.empty())
+        return {};
+    return (fs::path(exe).parent_path() / "farm" / "inbox").string();
+}
+
+void send_to_farm(wxWindow* parent)
+{
+    Plater* plater = wxGetApp().plater();
+    if (plater == nullptr)
+        return;
+    const std::string inbox = farm_inbox();
+    if (inbox.empty()) {
+        wxMessageBox(_L("PrintCam isn't on this computer, so there is no farm queue to send to. Open the PrintCam tab and press Find PrintCam.exe."),
+                     _L("Send to the farm"), wxOK | wxICON_INFORMATION, parent);
+        return;
+    }
+    const int plate_index = plater->get_partplate_list().get_curr_plate_index();
+    std::vector<std::string> orders;
+    if (!orders_for_plate(parent, plate_index, orders))
+        return; // cancelled
+    std::string name = std::string(plater->get_project_name().ToUTF8().data());
+    if (name.empty())
+        name = "print";
+    if (plater->get_partplate_list().get_plate_count() > 1)
+        name += "_plate_" + std::to_string(plate_index + 1);
+    name = order_file_name(name, orders);
+    if (name.size() < 6 || name.compare(name.size() - 6, 6, ".gcode") != 0)
+        name += ".gcode";
+    boost::system::error_code ec;
+    fs::create_directories(fs::path(inbox), ec);
+    fs::path out = fs::path(inbox) / name;
+    // Don't overwrite one that's still waiting to be picked up.
+    for (int n = 2; fs::exists(out, ec) && n < 100; ++n)
+        out = fs::path(inbox) / (name.substr(0, name.size() - 6) + "_" + std::to_string(n) + ".gcode");
+    ensure_started();
+    if (!plater->export_gcode_to_path(out, false))
+        wxMessageBox(_L("That plate couldn't be saved for the farm. Slice it first, and check the plate has no errors."),
+                     _L("Send to the farm"), wxOK | wxICON_WARNING, parent);
+    else
+        BOOST_LOG_TRIVIAL(info) << "Roost Print: sent to the farm queue: " << out.string();
+}
 
 /* ----- Order numbers ----- */
 

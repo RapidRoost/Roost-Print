@@ -14,6 +14,7 @@ Rapid Roost's slicer for the shop's printers. It's [Creality Print](https://gith
 10. **Plate stages.** Each plate's bed is tinted by where it's up to: blue border = to print, yolk = printing, green = printed, red = failed. Sending a plate makes it printing; PrintCam reports when that file finishes (green) or stops (red). Stages are saved per file and plate, so they're there when the file is opened again, and Roost Print asks before sending a plate that's already printed.
 11. **The fastest way up.** Every part opened in the simple view gets checked thousands of ways up (height, support, first layer, tipping over), the best few are test-sliced with the shop's settings, and the fastest wins. The card says how much time it saved, with **Undo the turn**. Plates already sent are never reshuffled.
 12. **Shop lighting.** Models in Prepare are lit by the shop's 360 light and warm key light, the same as rapidroost.net's 3D preview (AgX tone mapping, satin PLA). **View → Shop lighting** turns it off. The layer preview stays plain.
+13. **Send to the farm.** Under **Send to printer** on the job card. It saves the sliced plate, named for its order, into PrintCam's farm queue. The farm then sends it to a free printer with a clear bed and the right filament (see PrintCam's README, "The farm").
 
 Roost Print keeps its settings in its own folder, so it can sit next to a normal Creality Print.
 
@@ -46,6 +47,7 @@ The changes live in a few small places, so Creality's updates can be merged in:
 | Simple view (job card, auto-slice, hidden tools) | `src/slic3r/GUI/RoostSlim.cpp`; hooked in `GLCanvas3D.cpp` (`_render_overlays_roost`, toolbar clicks), `MainFrame.cpp` (View menu), `Plater.cpp` (`roost_slice_in_place`) |
 | Plate stages | `src/slic3r/GUI/RoostStages.cpp`; tint in `PartPlate.cpp` (`render_roost_stage`), sent from `SendToPrinter.cpp` (`fire_print_send_event`), finished/failed from PrintCam in `RoostPrintCam.cpp` |
 | Fastest way up | `src/libslic3r/RoostOrientCore.cpp` (the quick round), `src/slic3r/GUI/RoostOrient.cpp` (test slices, turning, undo) |
+| Send to the farm | `RoostPrintCam::send_to_farm` in `src/slic3r/GUI/RoostPrintCam.cpp`; the button is in `RoostSlim.cpp` |
 | Shop lighting | `resources/shaders/{110,140}/gouraud.{vs,fs}`; the light is baked in by `tools/roost/studio_light.py` from `tools/roost/studio/` (copied from the website's `public/studio/`) |
 | Windows build | `.github/workflows/roost_build.yml` |
 

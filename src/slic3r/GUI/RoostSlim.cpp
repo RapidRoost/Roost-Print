@@ -30,6 +30,7 @@
 #include "Plater.hpp"
 #include "RoostImGuiBrand.hpp"
 #include "RoostOrient.hpp"
+#include "RoostPrintCam.hpp"
 #include "RoostStages.hpp"
 #include "SiderBar.h"
 
@@ -547,6 +548,14 @@ void render_card(GLCanvas3D& canvas)
                 wxGetApp().CallAfter([]() {
                     if (Plater* p = wxGetApp().plater())
                         wxPostEvent(p, SimpleEvent(EVT_GLTOOLBAR_SEND_TO_LOCAL_NET_PRINTER));
+                });
+
+            // ---- Or let the farm pick the printer ----
+            if (RoostImGui::sticker_button((_u8L("Send to the farm") + "##roost_farm").c_str(), ImVec2(inner, 30.0f * scale),
+                                           RoostImGui::StickerKind::Secondary, can_send, scale))
+                wxGetApp().CallAfter([]() {
+                    if (Plater* p = wxGetApp().plater())
+                        RoostPrintCam::send_to_farm(p);
                 });
 
             // ---- Mark it by hand ----
