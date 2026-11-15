@@ -58,6 +58,17 @@ std::string order_file_name(const std::string& name, const std::vector<std::stri
 // An empty list means a shop print (no customer). False means the send was cancelled.
 bool orders_for_plate(wxWindow* parent, int plate_index, std::vector<std::string>& orders);
 
+/* ----- The farm -----
+ * PrintCam also runs the farm: a queue that sends each sliced plate to a free printer with a clear
+ * bed and the right filament. Anything saved into its inbox folder joins the queue. */
+
+// PrintCam's farm inbox (<PrintCam folder>/farm/inbox). Empty if PrintCam isn't installed here.
+std::string farm_inbox();
+
+// Save the current plate's sliced gcode into the farm's queue, named for its order.
+// The plate must be sliced. Says what happened in a message box if it can't.
+void send_to_farm(wxWindow* parent);
+
 /* ----- Watching PrintCam -----
  * While Roost Print runs it checks on PrintCam every few seconds (its page on this computer,
  * /api/state), and:
